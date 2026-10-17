@@ -1,0 +1,139 @@
+{
+ "_comment": "Календарь сжат: месяц = 14 игровых дней (2 недели), год = 168 дней. Температуры — средние по месяцам, °C.",
+ "start_month": 8,
+ "days_per_month": 14,
+ "month_temp": [
+  -15,
+  -13,
+  -6,
+  4,
+  12,
+  18,
+  21,
+  19,
+  12,
+  5,
+  -3,
+  -11
+ ],
+ "temp_noise": 4.0,
+ "diurnal": 3.5,
+ "snow_chance": [
+  0.5,
+  0.45,
+  0.3,
+  0.08,
+  0,
+  0,
+  0,
+  0,
+  0.02,
+  0.15,
+  0.4,
+  0.5
+ ],
+ "sunrise": [
+  540,
+  480,
+  420,
+  360,
+  300,
+  270,
+  290,
+  340,
+  400,
+  450,
+  500,
+  550
+ ],
+ "sunset": [
+  990,
+  1050,
+  1110,
+  1170,
+  1230,
+  1290,
+  1270,
+  1210,
+  1140,
+  1060,
+  1000,
+  970
+ ],
+ "heating_below": 10,
+ "heat_cost_radiator_day": 240,
+ "radiator_cells": 22,
+ "comfort_temp": 21,
+ "walls_insulation": 5,
+ "sanding_cost_day": 500,
+ "cold_below": 15,
+ "freezing_below": 6,
+ "hot_above": 29,
+ "slip_chance": 0.0012,
+ "snow_per_hour": 22,
+ "melt_per_hour_per_deg": 3,
+ "trample": 7,
+ "sweep_score": 46,
+ "holidays": [
+  {
+   "id": "new_year",
+   "month": 11,
+   "dom": 12,
+   "name": "Новогодний корпоратив"
+  },
+  {
+   "id": "ny_off",
+   "month": 0,
+   "dom": 1,
+   "days": 3,
+   "off": true,
+   "name": "Новогодние каникулы"
+  },
+  {
+   "id": "feb23",
+   "month": 1,
+   "dom": 11,
+   "name": "23 февраля"
+  },
+  {
+   "id": "mar8",
+   "month": 2,
+   "dom": 4,
+   "name": "8 марта"
+  },
+  {
+   "id": "may_off",
+   "month": 4,
+   "dom": 1,
+   "days": 1,
+   "off": true,
+   "name": "Праздник весны и труда"
+  },
+  {
+   "id": "subbotnik",
+   "month": 3,
+   "dom": 12,
+   "name": "Субботник"
+  },
+  {
+   "id": "machine_day",
+   "month": 8,
+   "dom": 12,
+   "name": "День машиностроителя"
+  }
+ ],
+ "rain_chance": [
+  0,
+  0,
+  0.05,
+  0.25,
+  0.3,
+  0.3,
+  0.3,
+  0.3,
+  0.3,
+  0.35,
+  0.15,
+  0
+ ]
+}

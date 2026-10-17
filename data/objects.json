@@ -1,0 +1,3016 @@
+{
+	"lathe": {
+		"name": "Токарный 1К62",
+		"cat": "Станки",
+		"cost": 160000,
+		"build_time": 120,
+		"size": [
+			3,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 4,
+			"power_kw": 7.5,
+			"process": "turning",
+			"part_size": "m"
+		},
+		"desc": "Старый советский токарно-винторезный станок: мелкие и средние детали. Медленный, но неубиваемый. Нужен токарь.",
+		"crates": 3
+	},
+	"lathe_tv4": {
+		"name": "Токарный ТВ-4",
+		"cat": "Станки",
+		"cost": 65000,
+		"build_time": 50,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 4,
+			"power_kw": 1.1,
+			"process": "turning",
+			"part_size": "s",
+			"speed_k": 1.15,
+			"defect_k": 1.1
+		},
+		"desc": "Настольный токарный станок из ПТУ. Только мелочь: пальцы, втулки, штуцеры. Дёшев и почти не ест ток.",
+		"crates": 1
+	},
+	"lathe_1a616": {
+		"name": "Токарный 1А616",
+		"cat": "Станки",
+		"cost": 115000,
+		"build_time": 80,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 4,
+			"power_kw": 4.0,
+			"process": "turning",
+			"part_size": "s",
+			"speed_k": 0.85,
+			"defect_k": 0.95
+		},
+		"desc": "Компактный токарно-винторезный станок для мелких деталей: на них он шустрее 1К62.",
+		"crates": 2
+	},
+	"lathe_16k20": {
+		"name": "Токарный 16К20",
+		"cat": "Станки",
+		"cost": 240000,
+		"build_time": 130,
+		"size": [
+			3,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 4,
+			"power_kw": 11.0,
+			"process": "turning",
+			"part_size": "m",
+			"speed_k": 0.85,
+			"defect_k": 0.9
+		},
+		"desc": "Самый массовый токарный станок страны: мелкие и средние детали, быстрее и точнее 1К62.",
+		"stage": 2,
+		"crates": 3
+	},
+	"lathe_1m63": {
+		"name": "Токарный 1М63",
+		"cat": "Станки",
+		"cost": 460000,
+		"build_time": 180,
+		"size": [
+			4,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 3,
+			"power_kw": 15.0,
+			"process": "turning",
+			"part_size": "l",
+			"speed_k": 1.0,
+			"min_skill": 2
+		},
+		"desc": "Тяжёлый токарный станок с длинной станиной: вагонные оси и крупные валы. Нужен токарь от 2-го разряда.",
+		"stage": 3,
+		"crates": 4
+	},
+	"mill_6t80": {
+		"name": "Фрезерный 6Т80",
+		"cat": "Станки",
+		"cost": 150000,
+		"build_time": 90,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 4.0,
+			"process": "milling",
+			"part_size": "s",
+			"speed_k": 1.05
+		},
+		"desc": "Горизонтально-фрезерный станок для мелких деталей: пазы, лыски, диски.",
+		"stage": 2,
+		"crates": 2
+	},
+	"mill_6r10": {
+		"name": "Фрезерный 6Р10",
+		"cat": "Станки",
+		"cost": 190000,
+		"build_time": 100,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 3.0,
+			"process": "milling",
+			"part_size": "s",
+			"speed_k": 0.9,
+			"defect_k": 0.95
+		},
+		"desc": "Вертикально-фрезерный станок для мелких деталей: на мелочи быстрее 6Р12.",
+		"stage": 2,
+		"crates": 2
+	},
+	"mill": {
+		"name": "Фрезерный 6Р12",
+		"cat": "Станки",
+		"cost": 280000,
+		"build_time": 140,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 7.5,
+			"process": "milling",
+			"part_size": "m"
+		},
+		"desc": "Вертикально-фрезерный станок: плоскости, пазы, шлицы на мелких и средних деталях. Нужен фрезеровщик.",
+		"stage": 2,
+		"crates": 3
+	},
+	"mill_6r82": {
+		"name": "Фрезерный 6Р82",
+		"cat": "Станки",
+		"cost": 300000,
+		"build_time": 140,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 7.5,
+			"process": "milling",
+			"part_size": "m",
+			"speed_k": 0.9
+		},
+		"desc": "Горизонтально-фрезерный станок с поворотным столом: шлицы и зубья на средних деталях.",
+		"stage": 2,
+		"crates": 3
+	},
+	"mill_6r13": {
+		"name": "Фрезерный 6Р13",
+		"cat": "Станки",
+		"cost": 420000,
+		"build_time": 170,
+		"size": [
+			3,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 11.0,
+			"process": "milling",
+			"part_size": "l",
+			"speed_k": 0.95,
+			"min_skill": 2
+		},
+		"desc": "Тяжёлый вертикально-фрезерный станок с большим столом для крупных деталей.",
+		"stage": 3,
+		"crates": 4
+	},
+	"drill_ns12": {
+		"name": "Сверлильный НС-12",
+		"cat": "Станки",
+		"cost": 22000,
+		"build_time": 30,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 0.6,
+			"process": "drilling",
+			"part_size": "s",
+			"speed_k": 1.15
+		},
+		"desc": "Настольная сверлилка до 12 мм: мелкие отверстия в мелких деталях.",
+		"stage": 2,
+		"crates": 1
+	},
+	"drill_2n118": {
+		"name": "Сверлильный 2Н118",
+		"cat": "Станки",
+		"cost": 55000,
+		"build_time": 45,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 1.5,
+			"process": "drilling",
+			"part_size": "s",
+			"speed_k": 0.9
+		},
+		"desc": "Вертикально-сверлильный станок до 18 мм — для мелких деталей.",
+		"stage": 2,
+		"crates": 1
+	},
+	"drill": {
+		"name": "Сверлильный 2Н135",
+		"cat": "Станки",
+		"cost": 85000,
+		"build_time": 60,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 2.2,
+			"process": "drilling",
+			"part_size": "m"
+		},
+		"desc": "Вертикально-сверлильный станок для отверстий и резьбы. Работает фрезеровщик или любой станочник.",
+		"stage": 2,
+		"crates": 1
+	},
+	"drill_2n150": {
+		"name": "Сверлильный 2Н150",
+		"cat": "Станки",
+		"cost": 125000,
+		"build_time": 70,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 4.0,
+			"process": "drilling",
+			"part_size": "m",
+			"speed_k": 0.85
+		},
+		"desc": "Мощный вертикально-сверлильный станок до 50 мм: быстрее 2Н135 на средних деталях.",
+		"stage": 2,
+		"crates": 2
+	},
+	"drill_2m55": {
+		"name": "Радиальный 2М55",
+		"cat": "Станки",
+		"cost": 260000,
+		"build_time": 110,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 4,
+			"power_kw": 5.5,
+			"process": "drilling",
+			"part_size": "l",
+			"speed_k": 0.9
+		},
+		"desc": "Радиально-сверлильный станок: шпиндель на поворотной траверсе достаёт до любой точки крупной детали.",
+		"stage": 3,
+		"crates": 3
+	},
+	"workbench": {
+		"name": "Слесарный верстак",
+		"cat": "Станки",
+		"cost": 18000,
+		"build_time": 30,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": true,
+		"desc": "Слесарный верстак с тисками — рабочее место слесаря: дорабатывает здесь брак (часть деталей спасает и несёт на ОТК), режет заготовки ножовкой, пока нет ленточной пилы. Делает помещение цехом.",
+		"crates": 2,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		]
+	},
+	"band_saw": {
+		"name": "Ленточнопильный станок",
+		"cat": "Станки",
+		"cost": 85000,
+		"build_time": 40,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "saw",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"power_kw": 2.2,
+		"desc": "Заготовительный участок: режет пруток на мерные заготовки впрок. Первая операция из готовой заготовки на 20% быстрее — станочнику не нужно отрезать самому. Режет разнорабочий или станочник.",
+		"crates": 2,
+		"stage": 2,
+		"zones": [
+			"workshop",
+			"storage"
+		]
+	},
+	"rack": {
+		"name": "Стеллаж для металла",
+		"cat": "Склад",
+		"cost": 9000,
+		"build_time": 20,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "storage",
+		"needs_floor": false,
+		"storage": {
+			"slots": 2,
+			"cap": 12,
+			"accept": [
+				"mat"
+			]
+		},
+		"desc": "Две полки по 12 прутков. Сюда разгружают металл.",
+		"crates": 2
+	},
+	"pallet": {
+		"name": "Поддон для готовой продукции",
+		"cat": "Склад",
+		"cost": 1500,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "storage",
+		"needs_floor": false,
+		"storage": {
+			"slots": 1,
+			"cap": 16,
+			"accept": [
+				"ok"
+			]
+		},
+		"desc": "Деревянный поддон на 16 деталей, прошедших ОТК. Отсюда грузят заказы."
+	},
+	"scrap_bin": {
+		"name": "Тара для брака",
+		"cat": "Склад",
+		"cost": 2500,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "storage",
+		"needs_floor": false,
+		"storage": {
+			"slots": 1,
+			"cap": 30,
+			"accept": [
+				"scrap"
+			]
+		},
+		"desc": "Сюда ОТК складывает забракованные детали. Брак потом сдают в металлолом."
+	},
+	"qc_table": {
+		"name": "Стол ОТК",
+		"cat": "ОТК",
+		"cost": 26000,
+		"build_time": 30,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "qc",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				-1,
+				"down"
+			],
+			[
+				1,
+				-1,
+				"down"
+			],
+			[
+				0,
+				1,
+				"up"
+			],
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"storage": {
+			"slots": 1,
+			"cap": 6,
+			"accept": [
+				"machined"
+			]
+		},
+		"desc": "Поверочная плита, штангенциркуль и микрометр. Контролёр проверяет каждую деталь.",
+		"crates": 2,
+		"zones": [
+			"workshop"
+		]
+	},
+	"toilet": {
+		"name": "Туалетная кабинка",
+		"cat": "Быт",
+		"cost": 15000,
+		"build_time": 30,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "toilet",
+		"needs_floor": false,
+		"spots": [
+			[
+				0,
+				0,
+				"down"
+			]
+		],
+		"desc": "Без туалета люди мучаются, а работа стоит. Нужна вода: протяните трубу водопровода к кабинке.",
+		"water": true,
+		"zones": [
+			"wc"
+		]
+	},
+	"dining_table": {
+		"name": "Обеденный стол",
+		"cat": "Быт",
+		"cost": 7000,
+		"build_time": 12,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "table",
+		"needs_floor": false,
+		"desc": "Поставь рядом стулья — будет где пообедать.",
+		"crates": 1,
+		"zones": [
+			"canteen"
+		]
+	},
+	"chair": {
+		"name": "Стул",
+		"cat": "Быт",
+		"cost": 1800,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "chair",
+		"needs_floor": false,
+		"spots": [
+			[
+				0,
+				0,
+				"auto"
+			]
+		],
+		"desc": "Ставь вплотную к столу.",
+		"hand": true
+	},
+	"bench": {
+		"name": "Скамейка",
+		"cat": "Быт",
+		"cost": 4500,
+		"build_time": 8,
+		"size": [
+			2,
+			1
+		],
+		"blocks": false,
+		"kind": "rest",
+		"needs_floor": false,
+		"spots": [
+			[
+				0,
+				0,
+				"down"
+			],
+			[
+				1,
+				0,
+				"down"
+			]
+		],
+		"desc": "Посидеть в перерыв и перевести дух.",
+		"crates": 1
+	},
+	"kettle": {
+		"name": "Тумба с чайником",
+		"cat": "Быт",
+		"cost": 3500,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "appliance",
+		"needs_floor": false,
+		"desc": "Электрочайник на тумбе. Чай в перерыв — святое.",
+		"power_kw": 0.5,
+		"hand": true
+	},
+	"urn": {
+		"name": "Урна-курилка",
+		"cat": "Быт",
+		"cost": 1200,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Место, где решаются все важные вопросы завода.",
+		"hand": true
+	},
+	"plant": {
+		"name": "Фикус в кадке",
+		"cat": "Декор",
+		"cost": 1600,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Живой уголок.",
+		"hand": true,
+		"prestige": 1
+	},
+	"extinguisher": {
+		"name": "Огнетушитель",
+		"cat": "Безопасность",
+		"cost": 2400,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Огнетушитель ОП-4. С ним пожар тушат в несколько раз быстрее. Пожарный надзор требует хотя бы один в каждом помещении (кроме туалета и душевой), а в горячих цехах — два.",
+		"hand": true
+	},
+	"substation": {
+		"name": "Трансформаторная подстанция",
+		"cat": "Электрика",
+		"cost": 120000,
+		"build_time": 120,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "power",
+		"needs_floor": true,
+		"power_source": "tp",
+		"capacity_kw": 40,
+		"boostable": true,
+		"zones": [
+			"tech_room"
+		],
+		"crates": 3,
+		"no_rotate": true,
+		"desc": "Единственный источник тока: поставили в техпомещении — от неё питается весь завод. Сама даёт 40 кВт; вплотную к ней ставят аккумуляторные шкафы — каждый добавляет 20 кВт (до 9 шкафов, всего до 220 кВт). Мало и этого — вторая подстанция в техпомещении, соединённая кабелем."
+	},
+	"cabinet": {
+		"name": "Трансформатор ТМ-25",
+		"cat": "Электрика",
+		"cost": 45000,
+		"build_time": 24,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "power",
+		"needs_floor": false,
+		"desc": "Малый трансформатор: поставили — и от него пошёл ток. Тяните кабель к станкам и приборам. Не хватает мощности — поставьте ещё один или трансформатор побольше.",
+		"power_source": "tr",
+		"capacity_kw": 15,
+		"no_rotate": true,
+		"legacy": true
+	},
+	"tr_63": {
+		"name": "Трансформатор ТМ-63",
+		"cat": "Электрика",
+		"cost": 150000,
+		"build_time": 60,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "power",
+		"needs_floor": false,
+		"power_source": "tr",
+		"capacity_kw": 50,
+		"crates": 1,
+		"no_rotate": true,
+		"desc": "Трансформатор побольше, с расширительным бачком и радиаторами: даёт ток сам, без всяких договоров. Хватит на небольшой цех.",
+		"legacy": true
+	},
+	"locker": {
+		"name": "Шкафчик для одежды",
+		"cat": "Быт",
+		"cost": 6000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "locker",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"desc": "Двухстворчатый металлический шкафчик. Здесь переодеваются в спецовку до и после смены.",
+		"zones": [
+			"locker",
+			"dorm"
+		]
+	},
+	"locker2": {
+		"name": "Шкафчик на двоих",
+		"cat": "Быт",
+		"cost": 9500,
+		"build_time": 10,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "locker",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"zones": [
+			"locker",
+			"dorm"
+		],
+		"seats": 2,
+		"desc": "Две узкие секции со своими дверцами: переодеваются двое. Считается за два шкафчика — ставить приходится вдвое меньше."
+	},
+	"sink": {
+		"name": "Раковина",
+		"cat": "Быт",
+		"cost": 5000,
+		"build_time": 10,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "sink",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"desc": "Помыть руки после туалета и перед обедом. Без раковины туалет не считается туалетом. Нужна вода из водопровода.",
+		"water": true,
+		"zones": [
+			"wc",
+			"medbay",
+			"canteen",
+			"locker",
+			"shower"
+		]
+	},
+	"fridge": {
+		"name": "Холодильник",
+		"cat": "Быт",
+		"cost": 22000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "appliance",
+		"needs_floor": true,
+		"power_kw": 0.3,
+		"desc": "Хранить обеды из дома. Нужен для нормальной столовой. Потребляет электричество."
+	},
+	"microwave": {
+		"name": "Микроволновка на тумбе",
+		"cat": "Быт",
+		"cost": 9000,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "appliance",
+		"needs_floor": true,
+		"power_kw": 0.8,
+		"desc": "Разогреть обед. Подходит для столовой.",
+		"hand": true
+	},
+	"cooler": {
+		"name": "Кулер с водой",
+		"cat": "Быт",
+		"cost": 7000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "appliance",
+		"needs_floor": false,
+		"power_kw": 0.1,
+		"desc": "Холодная и горячая вода. Делает комнату отдыха комнатой отдыха.",
+		"prestige": 1
+	},
+	"sofa": {
+		"name": "Диван",
+		"cat": "Быт",
+		"cost": 18000,
+		"build_time": 8,
+		"size": [
+			2,
+			1
+		],
+		"blocks": false,
+		"kind": "rest",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				0,
+				"down"
+			],
+			[
+				1,
+				0,
+				"down"
+			]
+		],
+		"comfort": 2,
+		"desc": "Продавленный, но мягкий. Отдых на диване восстанавливает силы быстрее.",
+		"crates": 2,
+		"prestige": 1
+	},
+	"honor_board": {
+		"name": "Доска почёта",
+		"cat": "Декор",
+		"cost": 8000,
+		"build_time": 10,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Каждый понедельник сюда вешают фото лучшего работника недели. Ему приятно, остальным есть к чему стремиться.",
+		"crates": 1,
+		"prestige": 2
+	},
+	"ktp": {
+		"name": "Трансформаторная подстанция (КТП)",
+		"cat": "Электрика",
+		"cost": 650000,
+		"build_time": 240,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "power",
+		"needs_floor": true,
+		"power_source": "ktp",
+		"capacity_kw": 160,
+		"desc": "Своя подстанция на 160 кВт — хватит на целый завод. Ставится в техпомещении (электрощитовой); вплотную к ней — до 9 аккумуляторных шкафов на случай перегруза.",
+		"stage": 2,
+		"crates": 4,
+		"zones": [
+			"tech_room"
+		],
+		"legacy": true
+	},
+	"weld_post": {
+		"name": "Сварочный пост",
+		"cat": "Сварка и сборка",
+		"cost": 120000,
+		"build_time": 60,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 8,
+			"out_cap": 2,
+			"power_kw": 12.0,
+			"process": "welding",
+			"part_size": "l"
+		},
+		"desc": "Сварочный стол и полуавтомат. Мощный потребитель тока — подумайте о сети. Нужен сварщик и сварочная проволока.",
+		"stage": 2,
+		"crates": 2
+	},
+	"assembly_table": {
+		"name": "Сборочный верстак",
+		"cat": "Сварка и сборка",
+		"cost": 45000,
+		"build_time": 40,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 8,
+			"out_cap": 2,
+			"power_kw": 0.5,
+			"process": "assembly",
+			"air": "boost",
+			"part_size": "m"
+		},
+		"desc": "Стол слесаря-сборщика с гайковёртом и прессом. Собирает узлы из ваших деталей. Со сжатым воздухом (пневмогайковёрт) собирают на 20% быстрее.",
+		"stage": 2,
+		"crates": 2
+	},
+	"weld_vd306": {
+		"name": "Ручная сварка ВД-306",
+		"cat": "Сварка и сборка",
+		"cost": 60000,
+		"build_time": 40,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 8,
+			"out_cap": 2,
+			"power_kw": 9.0,
+			"process": "welding",
+			"part_size": "m",
+			"speed_k": 1.2,
+			"defect_k": 1.1
+		},
+		"desc": "Выпрямитель ВД-306 и стол для ручной дуговой сварки: дёшево, но медленнее полуавтомата. Средние сварные изделия.",
+		"stage": 2,
+		"crates": 2
+	},
+	"weld_pdg251": {
+		"name": "Полуавтомат ПДГ-251",
+		"cat": "Сварка и сборка",
+		"cost": 110000,
+		"build_time": 50,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 8,
+			"out_cap": 2,
+			"power_kw": 10.0,
+			"process": "welding",
+			"part_size": "m",
+			"speed_k": 0.85
+		},
+		"desc": "Сварочный полуавтомат с подачей проволоки: средние рамы и секции варит быстрее поста.",
+		"stage": 2,
+		"crates": 2
+	},
+	"weld_spot": {
+		"name": "Точечная МТ-1928",
+		"cat": "Сварка и сборка",
+		"cost": 140000,
+		"build_time": 50,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 6,
+			"out_cap": 2,
+			"power_kw": 20.0,
+			"process": "welding",
+			"part_size": "m",
+			"speed_k": 0.7,
+			"defect_k": 1.15
+		},
+		"desc": "Контактная точечная сварка: очень быстро, но шов слабее — брака чуть больше. Ест много тока.",
+		"stage": 3,
+		"crates": 2
+	},
+	"weld_stand": {
+		"name": "Сварочный стенд с кантователем",
+		"cat": "Сварка и сборка",
+		"cost": 380000,
+		"build_time": 120,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 10,
+			"out_cap": 2,
+			"power_kw": 18.0,
+			"process": "welding",
+			"part_size": "l",
+			"speed_k": 0.8
+		},
+		"desc": "Стенд с поворотным кантователем: балки и фермы варят без перекладки краном.",
+		"stage": 3,
+		"crates": 4
+	},
+	"asm_bench": {
+		"name": "Верстак сборщика",
+		"cat": "Сварка и сборка",
+		"cost": 18000,
+		"build_time": 25,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 6,
+			"out_cap": 2,
+			"power_kw": 0.2,
+			"process": "assembly",
+			"part_size": "m",
+			"speed_k": 1.2,
+			"air": "boost"
+		},
+		"desc": "Простой верстак с тисками и ключами: собирают медленнее, зато дёшево и места мало.",
+		"stage": 2,
+		"crates": 1
+	},
+	"asm_press": {
+		"name": "Сборочный пресс П-6326",
+		"cat": "Сварка и сборка",
+		"cost": 95000,
+		"build_time": 60,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 8,
+			"out_cap": 2,
+			"power_kw": 3.0,
+			"process": "assembly",
+			"part_size": "m",
+			"speed_k": 0.8,
+			"air": "boost"
+		},
+		"desc": "Гидравлический пресс для запрессовки подшипников и втулок: средние узлы собирают быстрее.",
+		"stage": 2,
+		"crates": 2
+	},
+	"asm_stand": {
+		"name": "Сборочный стенд",
+		"cat": "Сварка и сборка",
+		"cost": 180000,
+		"build_time": 90,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 10,
+			"out_cap": 2,
+			"power_kw": 2.0,
+			"process": "assembly",
+			"part_size": "l",
+			"speed_k": 0.95,
+			"air": "boost"
+		},
+		"desc": "Стенд с поворотной плитой для крупных изделий: насосы, станки.",
+		"stage": 3,
+		"crates": 3
+	},
+	"asm_line": {
+		"name": "Сборочный конвейер",
+		"cat": "Сварка и сборка",
+		"cost": 650000,
+		"build_time": 160,
+		"size": [
+			4,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 12,
+			"out_cap": 3,
+			"power_kw": 6.0,
+			"process": "assembly",
+			"part_size": "l",
+			"speed_k": 0.6,
+			"air": "boost"
+		},
+		"desc": "Тележечный конвейер: изделие едет от поста к посту, сборка идёт почти вдвое быстрее.",
+		"stage": 4,
+		"crates": 5
+	},
+	"furnace": {
+		"name": "Камерная печь",
+		"cat": "Термо и покраска",
+		"cost": 420000,
+		"build_time": 180,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 6,
+			"out_cap": 6,
+			"power_kw": 25.0,
+			"process": "heat",
+			"batch": true,
+			"part_size": "m"
+		},
+		"desc": "Печь для закалки и отпуска. Греет партию до 6 деталей, работает без присмотра. Ест 25 кВт — нужна своя подстанция или большая мощность.",
+		"stage": 3,
+		"crates": 4
+	},
+	"paint_booth": {
+		"name": "Покрасочная камера",
+		"cat": "Термо и покраска",
+		"cost": 260000,
+		"build_time": 120,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 4,
+			"out_cap": 4,
+			"power_kw": 4.0,
+			"process": "paint",
+			"air": "need",
+			"part_size": "l"
+		},
+		"desc": "Камера с фильтрами: грунт и эмаль краскопультом. Нужен маляр, краска и сжатый воздух от компрессора (без него красят кистью — в полтора раза дольше). Пары краски выводят вытяжкой.",
+		"stage": 3,
+		"crates": 4
+	},
+	"heat_snol": {
+		"name": "Муфельная печь СНОЛ",
+		"cat": "Термо и покраска",
+		"cost": 60000,
+		"build_time": 40,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 3,
+			"power_kw": 4.0,
+			"process": "heat",
+			"part_size": "s",
+			"batch": true,
+			"speed_k": 0.8,
+			"room_heat": 0.6
+		},
+		"desc": "Лабораторная печь на три мелкие детали: быстро греется, ест немного.",
+		"stage": 3,
+		"crates": 1
+	},
+	"heat_tvch": {
+		"name": "Установка ТВЧ",
+		"cat": "Термо и покраска",
+		"cost": 520000,
+		"build_time": 120,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 2,
+			"power_kw": 30.0,
+			"process": "heat",
+			"part_size": "m",
+			"batch": true,
+			"speed_k": 0.3,
+			"room_heat": 0.25,
+			"smoke": false
+		},
+		"desc": "Закалка токами высокой частоты: по две детали за раз, но в три раза быстрее печи. Без дыма, зато очень много тока.",
+		"stage": 3,
+		"crates": 3
+	},
+	"heat_shaft": {
+		"name": "Шахтная печь",
+		"cat": "Термо и покраска",
+		"cost": 780000,
+		"build_time": 200,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 8,
+			"out_cap": 8,
+			"power_kw": 45.0,
+			"process": "heat",
+			"part_size": "l",
+			"batch": true,
+			"speed_k": 1.0
+		},
+		"desc": "Глубокая печь в полу: длинные валы и оси калят стоя, партия до 8 штук.",
+		"stage": 3,
+		"crates": 5
+	},
+	"heat_bogie": {
+		"name": "Выкатная печь",
+		"cat": "Термо и покраска",
+		"cost": 1200000,
+		"build_time": 260,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 12,
+			"out_cap": 12,
+			"power_kw": 60.0,
+			"process": "heat",
+			"part_size": "l",
+			"batch": true,
+			"speed_k": 1.0
+		},
+		"desc": "Печь с выкатным подом: под выезжает на рельсах, крупные детали грузят краном, партия до 12 штук.",
+		"stage": 4,
+		"crates": 6
+	},
+	"paint_table": {
+		"name": "Стол окраски",
+		"cat": "Термо и покраска",
+		"cost": 40000,
+		"build_time": 40,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 4,
+			"out_cap": 4,
+			"power_kw": 1.0,
+			"process": "paint",
+			"part_size": "s",
+			"speed_k": 1.1,
+			"air": "need"
+		},
+		"desc": "Решётчатый стол с вытяжным зонтом: мелкие детали красят краскопультом.",
+		"stage": 3,
+		"crates": 2
+	},
+	"paint_small": {
+		"name": "Малая камера окраски",
+		"cat": "Термо и покраска",
+		"cost": 140000,
+		"build_time": 80,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 4,
+			"out_cap": 4,
+			"power_kw": 2.5,
+			"process": "paint",
+			"part_size": "m",
+			"speed_k": 0.95,
+			"air": "need"
+		},
+		"desc": "Тупиковая камера с водяной завесой для средних деталей.",
+		"stage": 3,
+		"crates": 3
+	},
+	"paint_powder": {
+		"name": "Порошковая камера",
+		"cat": "Термо и покраска",
+		"cost": 380000,
+		"build_time": 140,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 4,
+			"out_cap": 4,
+			"power_kw": 9.0,
+			"process": "paint",
+			"part_size": "m",
+			"speed_k": 0.85,
+			"defect_k": 0.85,
+			"cons_k": 0.6,
+			"air": "need"
+		},
+		"desc": "Камера порошковой окраски: порошок напыляют и запекают — краски уходит на 40% меньше, покрытие крепче.",
+		"stage": 3,
+		"crates": 4
+	},
+	"paint_line": {
+		"name": "Окрасочная линия",
+		"cat": "Термо и покраска",
+		"cost": 900000,
+		"build_time": 220,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 6,
+			"out_cap": 6,
+			"power_kw": 15.0,
+			"process": "paint",
+			"part_size": "l",
+			"speed_k": 0.6,
+			"air": "need"
+		},
+		"desc": "Подвесной конвейер через камеру и сушку: крупные изделия красят потоком.",
+		"stage": 4,
+		"crates": 5
+	},
+	"wip_rack": {
+		"name": "Стеллаж НЗП",
+		"cat": "Склад",
+		"cost": 9000,
+		"build_time": 20,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "storage",
+		"needs_floor": false,
+		"storage": {
+			"slots": 2,
+			"cap": 12,
+			"accept": [
+				"wip"
+			]
+		},
+		"desc": "Незавершённое производство: детали между операциями ждут своего станка здесь.",
+		"crates": 2
+	},
+	"tool_cabinet": {
+		"name": "Шкаф с инструментом",
+		"cat": "Логистика",
+		"cost": 25000,
+		"build_time": 12,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "tool_cabinet",
+		"needs_floor": true,
+		"desc": "Инструментальная кладовая: в оборудованной кладовой инструмент расходуется на четверть меньше.",
+		"zones": [
+			"toolroom",
+			"workshop"
+		]
+	},
+	"cart": {
+		"name": "Грузовая тележка",
+		"cat": "Логистика",
+		"cost": 15000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "cart",
+		"needs_floor": false,
+		"desc": "Разнорабочий берёт её, если везти много: 12 единиц за ходку вместо 6.",
+		"hand": true
+	},
+	"forklift": {
+		"name": "Электропогрузчик",
+		"cat": "Логистика",
+		"cost": 950000,
+		"build_time": 10,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "forklift",
+		"needs_floor": false,
+		"desc": "Возит до 24 единиц и на треть быстрее. Водит только опытный грузчик (погрузка от 6).",
+		"stage": 2,
+		"crates": 1
+	},
+	"crane": {
+		"name": "Кран-балка 3,2 т",
+		"cat": "Логистика",
+		"cost": 380000,
+		"build_time": 160,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "crane",
+		"needs_floor": false,
+		"desc": "Мостовой кран-балка 3,2 т. Щёлкните внутри цеха: подкрановые пути встанут вдоль стен, балка — от стены до стены. Мост ездит вдоль помещения, тележка с талью — вдоль балки к станку, где обрабатывают тяжёлую деталь. С краном тяжёлые детали (валы, корпуса, рамы, узлы) делают без потерь, без крана — на 30% медленнее. Пролёт — до 26 клеток.",
+		"stage": 3,
+		"crates": 3,
+		"ceiling": true,
+		"span": true,
+		"no_rotate": true
+	},
+	"office_desk": {
+		"name": "Стол ИТР",
+		"cat": "Офис",
+		"cost": 18000,
+		"build_time": 12,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "desk",
+		"needs_floor": false,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"desc": "Письменный стол с компьютером, телефоном и лампой. Рабочее место специалиста: мастера, бухгалтера, снабженца, диспетчера, кадровика, технолога.",
+		"stage": 2,
+		"crates": 2
+	},
+	"doc_cabinet": {
+		"name": "Шкаф для документов",
+		"cat": "Офис",
+		"cost": 8000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Папки с договорами, накладными и личными делами. Нужен снабжению, кадрам и начальнику цеха.",
+		"stage": 2
+	},
+	"safe": {
+		"name": "Сейф",
+		"cat": "Офис",
+		"cost": 22000,
+		"build_time": 10,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Несгораемый сейф для кассы и печати. Без него бухгалтерия не бухгалтерия.",
+		"stage": 2
+	},
+	"plan_board": {
+		"name": "Доска планирования",
+		"cat": "Офис",
+		"cost": 9000,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Магнитная доска с графиком загрузки станков. Сердце ПДО.",
+		"stage": 2,
+		"hand": true,
+		"prestige": 1
+	},
+	"drawing_board": {
+		"name": "Кульман",
+		"cat": "Офис",
+		"cost": 16000,
+		"build_time": 10,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Чертёжный прибор. Технологи и конструкторы разрабатывают на нём новые изделия и техпроцессы.",
+		"stage": 2,
+		"prestige": 1
+	},
+	"cnc_lathe": {
+		"name": "Токарный с ЧПУ 16А20Ф3",
+		"cat": "ЧПУ",
+		"cost": 1600000,
+		"build_time": 160,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_lathe",
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 6,
+			"power_kw": 11.0,
+			"process": "turning",
+			"speed_k": 0.55,
+			"defect_k": 0.45,
+			"min_skill": 4,
+			"part_size": "m",
+			"cnc": true
+		},
+		"desc": "Советский токарный станок с ЧПУ: шестипозиционная револьверная головка, прозрачный щиток, отдельный шкаф с пультом. Почти вдвое быстрее и точнее 1К62, мелкие и средние детали. Нужен опытный токарь — оператор ЧПУ (токарное дело от 4).",
+		"stage": 3,
+		"crates": 4
+	},
+	"cnc_65a60": {
+		"name": "Обрабатывающий центр 65А60",
+		"cat": "ЧПУ",
+		"cost": 1900000,
+		"build_time": 170,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_mill",
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 6,
+			"power_kw": 15.0,
+			"process": "milling",
+			"part_size": "m",
+			"speed_k": 0.6,
+			"defect_k": 0.5,
+			"min_skill": 4,
+			"cnc": true
+		},
+		"desc": "Советский вертикальный обрабатывающий центр: колонна, крестовый стол, цепной магазин инструментов и шкафы электроавтоматики. Фрезерует средние детали почти вдвое быстрее. Нужен фрезеровщик-наладчик (фрезерное дело от 4).",
+		"stage": 3,
+		"crates": 4
+	},
+	"cnc_sidway": {
+		"name": "Сайдвей ВМ-2215",
+		"cat": "ЧПУ",
+		"cost": 1300000,
+		"build_time": 140,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_import",
+		"machine": {
+			"in_cap": 4,
+			"out_cap": 8,
+			"power_kw": 7.5,
+			"process": "milling",
+			"part_size": "s",
+			"speed_k": 0.45,
+			"defect_k": 0.45,
+			"min_skill": 4,
+			"cnc": true
+		},
+		"desc": "Фрезерный станок с ЧПУ на станине (вымышленная марка по мотивам импортных): колонна, голова с мотором, стол с гармошками. Мелкие фрезерные детали — быстро и недорого.",
+		"stage": 3,
+		"crates": 3
+	},
+	"cnc_panther": {
+		"name": "Пантера-2600",
+		"cat": "ЧПУ",
+		"cost": 2600000,
+		"build_time": 170,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_import",
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 6,
+			"power_kw": 15.0,
+			"process": "turning",
+			"part_size": "m",
+			"speed_k": 0.45,
+			"defect_k": 0.35,
+			"min_skill": 4,
+			"cnc": true
+		},
+		"desc": "Длинный токарный центр в кожухе (вымышленная марка): раздвижные двери, транспортёр стружки, пульт на кронштейне. Быстрее и точнее 16А20Ф3 на средних деталях.",
+		"stage": 4,
+		"crates": 4
+	},
+	"cnc_hangan": {
+		"name": "Ханган HL-1600",
+		"cat": "ЧПУ",
+		"cost": 4200000,
+		"build_time": 220,
+		"size": [
+			4,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_import",
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 4,
+			"power_kw": 22.0,
+			"process": "turning",
+			"part_size": "l",
+			"speed_k": 0.55,
+			"defect_k": 0.4,
+			"min_skill": 4,
+			"cnc": true
+		},
+		"desc": "Тяжёлый токарный станок с ЧПУ (вымышленная марка): огромный патрон, люнет, щиток на рельсе. Оси и крупные валы вдвое быстрее 1М63.",
+		"stage": 4,
+		"crates": 5
+	},
+	"cnc_hartwood": {
+		"name": "Хартвуд VMC-3260",
+		"cat": "ЧПУ",
+		"cost": 3800000,
+		"build_time": 200,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_import",
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 6,
+			"power_kw": 18.0,
+			"process": "milling",
+			"part_size": "l",
+			"speed_k": 0.5,
+			"defect_k": 0.35,
+			"min_skill": 4,
+			"cnc": true
+		},
+		"desc": "Портальный обрабатывающий центр (вымышленная марка): две стойки, траверса, длинный стол и лесенка к площадке. Крупные корпуса и плиты за один установ.",
+		"stage": 4,
+		"crates": 5
+	},
+	"cnc_minger": {
+		"name": "Мингер VM-540",
+		"cat": "ЧПУ",
+		"cost": 2200000,
+		"build_time": 150,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_import",
+		"machine": {
+			"in_cap": 3,
+			"out_cap": 6,
+			"power_kw": 11.0,
+			"process": "milling",
+			"part_size": "m",
+			"speed_k": 0.5,
+			"defect_k": 0.4,
+			"min_skill": 4,
+			"cnc": true
+		},
+		"desc": "Обрабатывающий центр в кожухе (вымышленная марка): две двери с окнами, магазин инструментов сбоку, пульт справа. Быстрый и точный, занимает мало места.",
+		"stage": 4,
+		"crates": 4
+	},
+	"cnc_maiday": {
+		"name": "Майдэй МБЛ-400",
+		"cat": "ЧПУ",
+		"cost": 1500000,
+		"build_time": 140,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"research": "cnc_import",
+		"machine": {
+			"in_cap": 4,
+			"out_cap": 8,
+			"power_kw": 7.5,
+			"process": "turning",
+			"part_size": "s",
+			"speed_k": 0.45,
+			"defect_k": 0.4,
+			"min_skill": 4,
+			"cnc": true
+		},
+		"desc": "Компактный токарный станок с ЧПУ в кожухе (вымышленная марка): наклонная станина, большая дверь с окном, пульт на кожухе. Мелкие токарные детали — быстрее всех.",
+		"stage": 3,
+		"crates": 3
+	},
+	"radiator": {
+		"name": "Батарея отопления",
+		"cat": "Быт",
+		"cost": 6500,
+		"build_time": 12,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "radiator",
+		"needs_floor": true,
+		"desc": "Чугунная батарея отопления. Одна прогревает около 22 клеток помещения. Греет, только если рядом с насосной станцией стоит электрокотёл под током (или есть своя газовая котельная). Зимой без отопления мёрзнут, работают медленнее и злятся."
+	},
+	"first_aid": {
+		"name": "Аптечка",
+		"cat": "Безопасность",
+		"cost": 3000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "first_aid",
+		"needs_floor": false,
+		"desc": "Бинты, йод, нашатырь. Если рядом есть аптечка, травмы легче и больничный короче. Трудовая инспекция проверяет её наличие.",
+		"hand": true
+	},
+	"checkpoint": {
+		"name": "Проходная с вахтой",
+		"cat": "Безопасность",
+		"cost": 45000,
+		"build_time": 60,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "checkpoint",
+		"needs_floor": false,
+		"desc": "Будка вахтёра и турникет. Ставится у въезда. С ней можно включить досмотр на проходной — «несуны» почти перестают таскать металл. Инспекторы отмечаются здесь.",
+		"stage": 2,
+		"crates": 3
+	},
+	"test_stand": {
+		"name": "Испытательный стенд",
+		"cat": "ОТК",
+		"cost": 180000,
+		"build_time": 90,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"machine": {
+			"in_cap": 2,
+			"out_cap": 2,
+			"power_kw": 5.0,
+			"process": "test",
+			"part_size": "l"
+		},
+		"desc": "Гидравлический стенд с манометрами и ультразвуковым дефектоскопом. Насосы, задвижки, оси и изделия по госзаказу проходят испытания. Работает контролёр ОТК.",
+		"stage": 2,
+		"crates": 2,
+		"water": true
+	},
+	"lamp_bulb": {
+		"name": "Лампа накаливания",
+		"cat": "Освещение",
+		"cost": 900,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "light",
+		"needs_floor": false,
+		"ceiling": true,
+		"no_rotate": true,
+		"hand": true,
+		"light_r": 3.2,
+		"power_kw": 0.1,
+		"desc": "Простой патрон с плафоном под потолком. Светит на 3 клетки вокруг. Подключается к кабелю, проложенному не дальше 3 клеток — провод тянут сами."
+	},
+	"lamp_tube": {
+		"name": "Светильник ЛПО (лампы дневного света)",
+		"cat": "Освещение",
+		"cost": 2600,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "light",
+		"needs_floor": false,
+		"ceiling": true,
+		"no_rotate": true,
+		"hand": true,
+		"light_r": 4.6,
+		"power_kw": 0.08,
+		"desc": "Две люминесцентные трубки: светит на 4–5 клеток, экономный. Подключается к кабелю не дальше 3 клеток."
+	},
+	"lamp_drl": {
+		"name": "Промышленный светильник ДРЛ",
+		"cat": "Освещение",
+		"cost": 7500,
+		"build_time": 10,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "light",
+		"needs_floor": false,
+		"ceiling": true,
+		"no_rotate": true,
+		"stage": 2,
+		"light_r": 7.2,
+		"power_kw": 0.4,
+		"desc": "Колокол под высоким потолком цеха: светит на 7 клеток вокруг, но потребляет больше. Подключается к кабелю не дальше 3 клеток."
+	},
+	"lamp_street": {
+		"name": "Уличный фонарь",
+		"cat": "Освещение",
+		"cost": 12000,
+		"build_time": 14,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "light",
+		"needs_floor": false,
+		"outdoor": true,
+		"no_rotate": true,
+		"light_r": 5.5,
+		"power_kw": 0.25,
+		"desc": "Фонарь на столбе для двора, проходной и зоны разгрузки: ночью не скользко и не страшно. Подключается к кабелю не дальше 3 клеток."
+	},
+	"pump_house": {
+		"name": "Насосная станция",
+		"cat": "Водопровод",
+		"cost": 90000,
+		"build_time": 80,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "pump",
+		"needs_floor": true,
+		"zones": [
+			"tech_room"
+		],
+		"crates": 2,
+		"power_kw": 3.0,
+		"water": true,
+		"net": "water",
+		"no_rotate": true,
+		"desc": "Источник воды: два насоса и гидробак. Одна на завод — даёт воду всем приборам, сколько бы их ни было. Ставится в техпомещении, нужен ток — кабель от подстанции. От неё тяните трубы в клетки туалетов, раковин, душевых, котла и стенда. Рядом поставьте электрокотёл — тогда заработают батареи."
+	},
+	"water_heater": {
+		"name": "Электрокотёл отопления «Теплон-12»",
+		"cat": "Водопровод",
+		"cost": 48000,
+		"build_time": 40,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "heater",
+		"needs_floor": true,
+		"power_kw": 6.0,
+		"no_rotate": true,
+		"crates": 1,
+		"near_pump": 1,
+		"desc": "Греет воду для всех батарей отопления на заводе. Ставится вплотную к насосной станции (не дальше одной клетки), нужен ток — кабель от подстанции. Без него батареи холодные."
+	},
+	"water_inlet": {
+		"name": "Скважинный насос",
+		"cat": "Водопровод",
+		"cost": 30000,
+		"build_time": 24,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "water_source",
+		"needs_floor": false,
+		"no_rotate": true,
+		"desc": "Поставили насос — пошла вода. От него тяните трубы к туалетам, раковинам, душевым, котлу и стенду. Тянет 10 приборов; больше — ставьте ещё насос или насосную станцию.",
+		"pump_fixtures": 10,
+		"legacy": true
+	},
+	"school_desk": {
+		"name": "Парта",
+		"cat": "Офис",
+		"cost": 5500,
+		"build_time": 6,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "school_desk",
+		"needs_floor": false,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			],
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"desc": "Двухместная парта со стульями. Ставьте в учебный класс: одно место — один человек на курсах.",
+		"crates": 1,
+		"zones": [
+			"classroom"
+		]
+	},
+	"chalkboard": {
+		"name": "Школьная доска",
+		"cat": "Офис",
+		"cost": 4500,
+		"build_time": 5,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Зелёная доска с мелом и указкой. Без неё учебный класс — просто комната с партами.",
+		"crates": 1,
+		"prestige": 1
+	},
+	"chip_bin": {
+		"name": "Контейнер для стружки",
+		"cat": "Склад",
+		"cost": 4000,
+		"build_time": 5,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "chip_bin",
+		"needs_floor": false,
+		"no_rotate": true,
+		"desc": "Металлический ящик на колёсах на 300 кг. Сюда сметают стружку; по пятницам приезжает ломовоз и платит за металлолом — и за стружку, и за брак из тары.",
+		"crates": 1
+	},
+	"safety_stand": {
+		"name": "Стенд «Охрана труда»",
+		"cat": "Офис",
+		"cost": 5500,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"stage": 2,
+		"desc": "Для кабинета охраны труда: плакаты, знаки, журнал инструктажей."
+	},
+	"palm": {
+		"name": "Пальма в кадке",
+		"cat": "Декор",
+		"cost": 5500,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Большая раскидистая пальма. Кабинет сразу выглядит солиднее.",
+		"hand": true
+	},
+	"aquarium": {
+		"name": "Аквариум",
+		"cat": "Декор",
+		"cost": 16000,
+		"build_time": 8,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "appliance",
+		"needs_floor": true,
+		"prestige": 3,
+		"power_kw": 0.1,
+		"desc": "Гуппи, сомики и пузырьки. В комнате отдыха на рыбок смотрят часами.",
+		"crates": 1
+	},
+	"rug": {
+		"name": "Ковёр",
+		"cat": "Декор",
+		"cost": 4500,
+		"build_time": 3,
+		"size": [
+			2,
+			1
+		],
+		"blocks": false,
+		"kind": "rug",
+		"needs_floor": true,
+		"prestige": 1,
+		"desc": "Красный ковёр с узором. Уютнее в кабинете и комнате отдыха.",
+		"hand": true
+	},
+	"bookcase": {
+		"name": "Книжный шкаф",
+		"cat": "Декор",
+		"cost": 9000,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Справочники, ГОСТы и подшивка «Техники — молодёжи».",
+		"crates": 1
+	},
+	"tv": {
+		"name": "Телевизор на тумбе",
+		"cat": "Декор",
+		"cost": 14000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "appliance",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"power_kw": 0.15,
+		"desc": "В перерыв — новости и футбол. Хорош в комнате отдыха и столовой.",
+		"hand": true
+	},
+	"pennant": {
+		"name": "Переходящее знамя",
+		"cat": "Декор",
+		"cost": 6000,
+		"build_time": 3,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Бархатное знамя «Лучшему коллективу» с бахромой. Гордость цеха.",
+		"hand": true
+	},
+	"vent_fan": {
+		"name": "Вытяжной вентилятор",
+		"cat": "Инженерия",
+		"cost": 32000,
+		"build_time": 20,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "vent_fan",
+		"needs_floor": false,
+		"no_rotate": true,
+		"power_kw": 1.1,
+		"vent_cap": 80,
+		"net": "vent",
+		"crates": 1,
+		"desc": "Осевой вентилятор в кожухе: вытягивает воздух из своего помещения, а через воздуховоды — и из других (всего до 80 клеток площади). Без вентиляции в сварочном и покрасочном участке не продохнуть. Нужен кабель."
+	},
+	"vent_hood": {
+		"name": "Вытяжной зонт",
+		"cat": "Инженерия",
+		"cost": 11000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "vent_hood",
+		"needs_floor": false,
+		"ceiling": true,
+		"no_rotate": true,
+		"hand": true,
+		"net": "vent",
+		"desc": "Местный отсос над сварочным постом, покрасочной камерой или печью: подвесьте над станком или рядом с ним и подведите воздуховод к сети с работающим вентилятором — дым и пары уходят на 75% меньше в помещение."
+	},
+	"compressor": {
+		"name": "Винтовой компрессор",
+		"cat": "Инженерия",
+		"cost": 96000,
+		"build_time": 40,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "compressor",
+		"needs_floor": true,
+		"power_kw": 7.5,
+		"air_cap": 4,
+		"net": "air",
+		"stage": 2,
+		"crates": 2,
+		"desc": "Сжатый воздух 8 атм для четырёх потребителей разом: покрасочной камеры (без воздуха красят кистью — в полтора раза дольше) и сборочных столов (пневмогайковёрт — на 20% быстрее). Шумит под 90 дБ — лучше поставить в отдельную компрессорную. Тяните пневмомагистраль."
+	},
+	"boiler": {
+		"name": "Газовый котёл",
+		"cat": "Инженерия",
+		"cost": 260000,
+		"build_time": 120,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "boiler",
+		"needs_floor": true,
+		"power_kw": 0.6,
+		"water": true,
+		"boiler_cap": 16,
+		"net": "water",
+		"stage": 2,
+		"crates": 3,
+		"inlet": [
+			1,
+			0
+		],
+		"desc": "Своя котельная: греет до 16 батарей, подключённых трубой к его сети водопровода. Газ вдвое дешевле городского тепла, а авария на теплотрассе не страшна. Ставят только в отдельной котельной; нужны вода и кабель.",
+		"zones": [
+			"boiler_room"
+		]
+	},
+	"ppe_cabinet": {
+		"name": "Шкаф СИЗ",
+		"cat": "Безопасность",
+		"cost": 9000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "ppe_cabinet",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"desc": "Склад средств индивидуальной защиты: каски, очки, наушники, перчатки, респираторы. Рабочие сами берут новый комплект, когда старый износился (примерно за 20 смен). Комплекты закупаются как расходники (Снабжение)."
+	},
+	"camera": {
+		"name": "Видеокамера",
+		"cat": "Безопасность",
+		"cost": 14000,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "camera",
+		"needs_floor": false,
+		"ceiling": true,
+		"no_rotate": true,
+		"hand": true,
+		"light_r": 3.0,
+		"power_kw": 0.03,
+		"desc": "Купольная камера под потолком: смотрит за всем помещением. Несуны реже решаются красть там, где камера, а запись помогает поймать тех, кто всё же вынес. Нужен ток (кабель не дальше 3 клеток)."
+	},
+	"union_board": {
+		"name": "Доска профкома",
+		"cat": "Офис",
+		"cost": 4000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"hand": true,
+		"desc": "Объявления профсоюзного комитета: путёвки, взносы, график дежурств. Вместе со столом делает помещение профкомом."
+	},
+	"days_board": {
+		"name": "Табло «Дней без травм»",
+		"cat": "Безопасность",
+		"cost": 6000,
+		"build_time": 5,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"hand": true,
+		"prestige": 1,
+		"desc": "Счётчик дней без несчастных случаев. Каждое утро цифра растёт — и никто не хочет её обнулить: в помещении с табло травм на 5% меньше."
+	},
+	"bunk_bed": {
+		"name": "Двухъярусная кровать",
+		"cat": "Быт",
+		"cost": 14000,
+		"build_time": 10,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "bed",
+		"needs_floor": true,
+		"no_rotate": true,
+		"stage": 2,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"crates": 2,
+		"desc": "Две койки для иногородних рабочих. Поставьте в отдельную комнату со шкафчиком и назначьте её «Общежитием»: приедут люди из других городов, а жильцы не опаздывают.",
+		"dev": "city2",
+		"zones": [
+			"dorm"
+		]
+	},
+	"stove": {
+		"name": "Электроплита промышленная",
+		"cat": "Быт",
+		"cost": 65000,
+		"build_time": 14,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "stove",
+		"needs_floor": true,
+		"no_rotate": true,
+		"stage": 2,
+		"power_kw": 6.0,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			],
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"crates": 2,
+		"desc": "Шесть конфорок и духовка. В столовой с плитой, линией раздачи и поваром — горячие обеды: суп, второе, компот.",
+		"dev": "city2",
+		"zones": [
+			"canteen"
+		]
+	},
+	"serving_line": {
+		"name": "Линия раздачи",
+		"cat": "Быт",
+		"cost": 28000,
+		"build_time": 10,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "serving",
+		"needs_floor": true,
+		"no_rotate": true,
+		"stage": 2,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			],
+			[
+				1,
+				1,
+				"up"
+			]
+		],
+		"crates": 1,
+		"desc": "Мармит с подогревом. Нужен вместе с плитой — без раздачи горячее не подать.",
+		"dev": "city2",
+		"zones": [
+			"canteen"
+		]
+	},
+	"med_couch": {
+		"name": "Медицинская кушетка",
+		"cat": "Безопасность",
+		"cost": 12000,
+		"build_time": 8,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "med_couch",
+		"needs_floor": true,
+		"no_rotate": true,
+		"stage": 2,
+		"crates": 1,
+		"desc": "Для медпункта: кушетка, шкаф с лекарствами и раковина. С фельдшером больничные после травм короче, гриппом болеют реже.",
+		"dev": "city2",
+		"zones": [
+			"medbay"
+		]
+	},
+	"med_cabinet": {
+		"name": "Шкаф с лекарствами",
+		"cat": "Безопасность",
+		"cost": 15000,
+		"build_time": 6,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "med_cabinet",
+		"needs_floor": true,
+		"no_rotate": true,
+		"stage": 2,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"hand": true,
+		"desc": "Бинты, йод, жаропонижающее и тонометр. Рабочее место фельдшера.",
+		"dev": "city2",
+		"zones": [
+			"medbay"
+		]
+	},
+	"radio_station": {
+		"name": "Радиоузел",
+		"cat": "Офис",
+		"cost": 38000,
+		"build_time": 10,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "radio",
+		"needs_floor": true,
+		"no_rotate": true,
+		"stage": 3,
+		"power_kw": 0.3,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"hand": true,
+		"desc": "Заводское радио: новости, производственная гимнастика и музыка в обед. Слышно там, где висят громкоговорители.",
+		"dev": "city3"
+	},
+	"loudspeaker": {
+		"name": "Громкоговоритель",
+		"cat": "Офис",
+		"cost": 6000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "speaker",
+		"needs_floor": false,
+		"ceiling": true,
+		"no_rotate": true,
+		"hand": true,
+		"stage": 3,
+		"light_r": 3.0,
+		"power_kw": 0.05,
+		"desc": "Рупор под потолком: в этом помещении слышно заводское радио. Нужен ток (кабель не дальше 3 клеток) и радиоузел.",
+		"dev": "city3"
+	},
+	"cat_bowl": {
+		"name": "Миска для кота",
+		"cat": "Декор",
+		"cost": 400,
+		"build_time": 1,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "cat_bowl",
+		"needs_floor": false,
+		"no_rotate": true,
+		"hand": true,
+		"desc": "Корм и вода для заводского кота. Без миски кот уйдёт."
+	},
+	"phone_stand": {
+		"name": "Телефон на тумбе",
+		"cat": "Офис",
+		"cost": 6500,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"stage": 2,
+		"desc": "Для отдела сбыта: менеджер обзванивает заказчиков."
+	},
+	"law_shelf": {
+		"name": "Шкаф с кодексами",
+		"cat": "Офис",
+		"cost": 12000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"stage": 2,
+		"desc": "Для юротдела: кодексы, договоры, судебная практика."
+	},
+	"director_desk": {
+		"name": "Стол директора",
+		"cat": "Офис",
+		"cost": 35000,
+		"build_time": 14,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"desc": "Большой стол с зелёной лампой и телефоном. Нужен для кабинета директора — без него не исследуются ступени «Развития».",
+		"crates": 2
+	},
+	"battery": {
+		"name": "Аккумуляторный шкаф",
+		"cat": "Электрика",
+		"cost": 40000,
+		"build_time": 40,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "battery",
+		"needs_floor": true,
+		"no_rotate": true,
+		"zones": [
+			"tech_room"
+		],
+		"crates": 1,
+		"batt_kwh": 30,
+		"batt_kw": 20,
+		"desc": "Аккумуляторный шкаф ставят вплотную к подстанции (в том числе по углам): каждый добавляет ей 20 кВт мощности. У одной подстанции — до 9 шкафов. Работает в техпомещении.",
+		"boost_kw": 20
+	},
+	"pump_station": {
+		"name": "Насосная станция",
+		"cat": "Водопровод",
+		"cost": 180000,
+		"build_time": 60,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "pump",
+		"needs_floor": true,
+		"zones": [
+			"tech_room"
+		],
+		"stage": 2,
+		"crates": 2,
+		"power_kw": 4.0,
+		"water": true,
+		"pump_fixtures": 24,
+		"net": "water",
+		"desc": "Большой насос на 24 прибора (туалеты, раковины, души, стенды, котёл). Ставится в техпомещении, нужен ток — кабель от трансформатора. Трубы от неё тяните, как от простого насоса.",
+		"no_rotate": true,
+		"legacy": true
+	},
+	"shower": {
+		"name": "Душевая кабина",
+		"cat": "Быт",
+		"cost": 45000,
+		"build_time": 40,
+		"size": [
+			1,
+			1
+		],
+		"blocks": false,
+		"kind": "shower",
+		"needs_floor": true,
+		"no_rotate": true,
+		"spots": [
+			[
+				0,
+				0,
+				"down"
+			]
+		],
+		"water": true,
+		"zones": [
+			"shower"
+		],
+		"stage": 2,
+		"crates": 1,
+		"desc": "Помыться после смены: станочник в масле и стружке, сварщик в копоти. Кто помылся — уходит домой довольным, без душа к концу недели ворчат. Нужна вода; ставится в душевой."
+	},
+	"company_board": {
+		"name": "Вывеска завода",
+		"cat": "Декор",
+		"cost": 15000,
+		"build_time": 20,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"hand": true,
+		"desc": "Табличка с эмблемой и названием завода — на проходную, в цех или у кабинета директора. Название и эмблему меняют в паспорте завода (щелчок по эмблеме в шапке)."
+	}
+}

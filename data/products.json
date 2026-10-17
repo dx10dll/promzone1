@@ -1,0 +1,797 @@
+{
+  "pin": {
+    "name": "Палец",
+    "size": "s",
+    "material": "bar45",
+    "route": [
+      {
+        "op": "turning",
+        "time": 20,
+        "skill": 1
+      }
+    ],
+    "qc_time": 5,
+    "price": [
+      1600,
+      2050
+    ],
+    "qty": [
+      15,
+      40
+    ],
+    "desc": "Простая цилиндрическая деталь."
+  },
+  "bushing": {
+    "name": "Втулка",
+    "size": "s",
+    "material": "bar45",
+    "route": [
+      {
+        "op": "turning",
+        "time": 30,
+        "skill": 2
+      }
+    ],
+    "qc_time": 6,
+    "price": [
+      2250,
+      2950
+    ],
+    "qty": [
+      8,
+      24
+    ],
+    "desc": "Втулка с внутренним отверстием."
+  },
+  "fitting": {
+    "name": "Штуцер",
+    "size": "s",
+    "material": "hex27",
+    "route": [
+      {
+        "op": "turning",
+        "time": 45,
+        "skill": 3
+      }
+    ],
+    "qc_time": 8,
+    "price": [
+      3450,
+      4350
+    ],
+    "qty": [
+      6,
+      16
+    ],
+    "desc": "Штуцер с резьбой из шестигранника."
+  },
+  "bolt": {
+    "name": "Болт М16",
+    "size": "s",
+    "material": "hex27",
+    "route": [
+      {
+        "op": "turning",
+        "time": 22,
+        "skill": 2
+      }
+    ],
+    "qc_time": 4,
+    "price": [
+      2050,
+      2450
+    ],
+    "qty": [
+      20,
+      60
+    ],
+    "desc": "Болт с шестигранной головкой: точение стержня и нарезка резьбы. Мелочь, но нужна всем."
+  },
+  "nut": {
+    "name": "Гайка М16",
+    "size": "s",
+    "material": "hex27",
+    "route": [
+      {
+        "op": "turning",
+        "time": 12,
+        "skill": 1
+      },
+      {
+        "op": "drilling",
+        "time": 8,
+        "skill": 1
+      }
+    ],
+    "qc_time": 3,
+    "price": [
+      1850,
+      2200
+    ],
+    "qty": [
+      30,
+      80
+    ],
+    "desc": "Гайка из шестигранника: отрезать, подрезать торцы, сверлить и нарезать резьбу метчиком."
+  },
+  "stud": {
+    "name": "Шпилька М12",
+    "size": "s",
+    "material": "bar45",
+    "route": [
+      {
+        "op": "turning",
+        "time": 15,
+        "skill": 1
+      }
+    ],
+    "qc_time": 3,
+    "price": [
+      1400,
+      1650
+    ],
+    "qty": [
+      20,
+      60
+    ],
+    "desc": "Шпилька с резьбой на обоих концах — для фланцев и крышек."
+  },
+  "shaft": {
+    "name": "Вал",
+    "size": "m",
+    "material": "bar40x",
+    "route": [
+      {
+        "op": "turning",
+        "time": 60,
+        "skill": 4
+      }
+    ],
+    "qc_time": 10,
+    "price": [
+      4900,
+      6200
+    ],
+    "qty": [
+      3,
+      10
+    ],
+    "heavy": true,
+    "desc": "Ступенчатый вал из легированной стали."
+  },
+  "bracket": {
+    "name": "Кронштейн",
+    "size": "s",
+    "material": "plate8",
+    "route": [
+      {
+        "op": "milling",
+        "time": 25,
+        "skill": 2
+      },
+      {
+        "op": "drilling",
+        "time": 12,
+        "skill": 1
+      },
+      {
+        "op": "paint",
+        "time": 10,
+        "skill": 1
+      }
+    ],
+    "qc_time": 6,
+    "price": [
+      4700,
+      5700
+    ],
+    "qty": [
+      10,
+      30
+    ],
+    "desc": "Кронштейн из листа: фрезеровка, сверловка, покраска.",
+    "paint_col": "#5e7a54"
+  },
+  "housing": {
+    "name": "Корпус подшипника",
+    "size": "m",
+    "material": "forging",
+    "route": [
+      {
+        "op": "turning",
+        "time": 40,
+        "skill": 3
+      },
+      {
+        "op": "milling",
+        "time": 30,
+        "skill": 3
+      },
+      {
+        "op": "drilling",
+        "time": 15,
+        "skill": 2
+      }
+    ],
+    "qc_time": 10,
+    "price": [
+      8950,
+      10950
+    ],
+    "qty": [
+      4,
+      12
+    ],
+    "heavy": true,
+    "desc": "Корпус из поковки: точение, фрезеровка привалочной плоскости, сверловка крепежа."
+  },
+  "spline_shaft": {
+    "name": "Вал шлицевой",
+    "size": "m",
+    "material": "bar40x",
+    "route": [
+      {
+        "op": "turning",
+        "time": 55,
+        "skill": 4
+      },
+      {
+        "op": "milling",
+        "time": 45,
+        "skill": 4
+      },
+      {
+        "op": "heat",
+        "time": 120,
+        "skill": 2
+      }
+    ],
+    "qc_time": 12,
+    "price": [
+      12500,
+      14900
+    ],
+    "qty": [
+      3,
+      10
+    ],
+    "heavy": true,
+    "desc": "Шлицевой вал: точение, нарезка шлицев фрезой, закалка в печи."
+  },
+  "frame": {
+    "name": "Рама сварная",
+    "size": "m",
+    "material": "profile40",
+    "mat_qty": 4,
+    "route": [
+      {
+        "op": "welding",
+        "time": 80,
+        "skill": 3
+      },
+      {
+        "op": "paint",
+        "time": 25,
+        "skill": 1,
+        "cons": 2
+      }
+    ],
+    "qc_time": 10,
+    "price": [
+      10650,
+      12900
+    ],
+    "qty": [
+      3,
+      10
+    ],
+    "heavy": true,
+    "desc": "Рама из профиля 40×40: сварка и покраска.",
+    "paint_col": "#3d5a48"
+  },
+  "drive_unit": {
+    "name": "Узел приводной",
+    "size": "m",
+    "components": {
+      "shaft": 1,
+      "bushing": 2,
+      "housing": 1
+    },
+    "route": [
+      {
+        "op": "assembly",
+        "time": 50,
+        "skill": 3
+      }
+    ],
+    "qc_time": 15,
+    "price": [
+      27300,
+      33150
+    ],
+    "qty": [
+      2,
+      6
+    ],
+    "heavy": true,
+    "desc": "Узел в сборе: вал, две втулки и корпус подшипника. Детали делаете сами."
+  },
+  "flange": {
+    "name": "Фланец",
+    "size": "m",
+    "material": "forging",
+    "route": [
+      {
+        "op": "turning",
+        "time": 25,
+        "skill": 2
+      },
+      {
+        "op": "drilling",
+        "time": 15,
+        "skill": 1
+      }
+    ],
+    "qc_time": 8,
+    "price": [
+      4200,
+      5100
+    ],
+    "qty": [
+      6,
+      18
+    ],
+    "research": "product_flange",
+    "desc": "Фланец под приварку из поковки: точение и сверловка отверстий под шпильки."
+  },
+  "gear": {
+    "name": "Шестерня цилиндрическая",
+    "size": "m",
+    "material": "forging",
+    "route": [
+      {
+        "op": "turning",
+        "time": 30,
+        "skill": 3
+      },
+      {
+        "op": "milling",
+        "time": 45,
+        "skill": 4
+      },
+      {
+        "op": "heat",
+        "time": 120,
+        "skill": 2
+      }
+    ],
+    "qc_time": 14,
+    "price": [
+      10300,
+      12050
+    ],
+    "qty": [
+      4,
+      12
+    ],
+    "research": "product_gear",
+    "desc": "Зубчатое колесо: точение заготовки, зубофрезерование и закалка."
+  },
+  "gearbox": {
+    "name": "Редуктор цилиндрический",
+    "size": "m",
+    "components": {
+      "spline_shaft": 1,
+      "gear": 2,
+      "housing": 1,
+      "bushing": 2
+    },
+    "route": [
+      {
+        "op": "assembly",
+        "time": 80,
+        "skill": 4
+      },
+      {
+        "op": "paint",
+        "time": 20,
+        "skill": 1,
+        "cons": 1.5
+      }
+    ],
+    "qc_time": 25,
+    "price": [
+      59500,
+      68000
+    ],
+    "qty": [
+      1,
+      3
+    ],
+    "heavy": true,
+    "paint_col": "#4a6a8a",
+    "research": "product_gearbox",
+    "desc": "Редуктор в сборе с покраской. Все детали делаете сами — нужен почти весь завод."
+  },
+  "disc": {
+    "name": "Диск бороны",
+    "size": "s",
+    "material": "plate8",
+    "route": [
+      {
+        "op": "milling",
+        "time": 20,
+        "skill": 2
+      },
+      {
+        "op": "heat",
+        "time": 60,
+        "skill": 2
+      }
+    ],
+    "qc_time": 5,
+    "price": [
+      2900,
+      3600
+    ],
+    "qty": [
+      10,
+      30
+    ],
+    "desc": "Сферический диск дисковой бороны: вырезка и закалка."
+  },
+  "harrow": {
+    "name": "Секция бороны",
+    "size": "m",
+    "material": "profile40",
+    "mat_qty": 3,
+    "route": [
+      {
+        "op": "welding",
+        "time": 60,
+        "skill": 2
+      },
+      {
+        "op": "paint",
+        "time": 15,
+        "skill": 1,
+        "cons": 1.5
+      }
+    ],
+    "qc_time": 8,
+    "price": [
+      10800,
+      13000
+    ],
+    "qty": [
+      4,
+      12
+    ],
+    "heavy": true,
+    "paint_col": "#c9372c",
+    "desc": "Сварная секция зубовой бороны, красная, как положено."
+  },
+  "beam": {
+    "name": "Балка сварная",
+    "size": "l",
+    "material": "profile40",
+    "mat_qty": 6,
+    "route": [
+      {
+        "op": "welding",
+        "time": 90,
+        "skill": 3
+      },
+      {
+        "op": "paint",
+        "time": 25,
+        "skill": 1,
+        "cons": 2
+      }
+    ],
+    "qc_time": 10,
+    "price": [
+      15400,
+      18700
+    ],
+    "qty": [
+      2,
+      8
+    ],
+    "heavy": true,
+    "paint_col": "#6a7480",
+    "desc": "Двутавровая балка для каркасов: сварка и грунтовка."
+  },
+  "truss": {
+    "name": "Ферма стропильная",
+    "size": "l",
+    "material": "profile40",
+    "mat_qty": 10,
+    "route": [
+      {
+        "op": "welding",
+        "time": 150,
+        "skill": 4
+      },
+      {
+        "op": "welding",
+        "time": 60,
+        "skill": 3
+      },
+      {
+        "op": "paint",
+        "time": 40,
+        "skill": 1,
+        "cons": 3
+      }
+    ],
+    "qc_time": 15,
+    "price": [
+      39500,
+      48500
+    ],
+    "qty": [
+      1,
+      4
+    ],
+    "heavy": true,
+    "paint_col": "#5a6a58",
+    "desc": "Стропильная ферма для ангара: сборка на прихватках, обварка, покраска. Громоздкая — нужна кран-балка."
+  },
+  "valve": {
+    "name": "Задвижка клиновая",
+    "size": "m",
+    "components": {
+      "housing": 1,
+      "flange": 2,
+      "spline_shaft": 1
+    },
+    "route": [
+      {
+        "op": "assembly",
+        "time": 60,
+        "skill": 3
+      },
+      {
+        "op": "test",
+        "time": 30,
+        "skill": 3
+      }
+    ],
+    "qc_time": 12,
+    "price": [
+      46000,
+      55000
+    ],
+    "qty": [
+      1,
+      4
+    ],
+    "heavy": true,
+    "desc": "Задвижка в сборе. Каждая проходит гидроиспытания на стенде."
+  },
+  "pump": {
+    "name": "Насос центробежный",
+    "size": "l",
+    "components": {
+      "housing": 1,
+      "shaft": 1,
+      "gear": 1,
+      "flange": 2
+    },
+    "route": [
+      {
+        "op": "assembly",
+        "time": 90,
+        "skill": 4
+      },
+      {
+        "op": "test",
+        "time": 40,
+        "skill": 3
+      },
+      {
+        "op": "paint",
+        "time": 20,
+        "skill": 1,
+        "cons": 1.5
+      }
+    ],
+    "qc_time": 15,
+    "price": [
+      86000,
+      101000
+    ],
+    "qty": [
+      1,
+      3
+    ],
+    "heavy": true,
+    "paint_col": "#3d6a9a",
+    "desc": "Насос в сборе: сборка, испытание давлением, покраска."
+  },
+  "axle": {
+    "name": "Ось вагонная",
+    "size": "l",
+    "material": "bar40x",
+    "mat_qty": 3,
+    "route": [
+      {
+        "op": "turning",
+        "time": 90,
+        "skill": 5
+      },
+      {
+        "op": "heat",
+        "time": 120,
+        "skill": 3
+      },
+      {
+        "op": "test",
+        "time": 25,
+        "skill": 4
+      }
+    ],
+    "qc_time": 15,
+    "price": [
+      28500,
+      34000
+    ],
+    "qty": [
+      2,
+      8
+    ],
+    "heavy": true,
+    "desc": "Ось колёсной пары: точение, термообработка и ультразвуковая дефектоскопия. Приёмка жёсткая."
+  },
+  "brake_cyl": {
+    "name": "Тормозной цилиндр",
+    "size": "m",
+    "components": {
+      "housing": 1,
+      "bushing": 2,
+      "flange": 1
+    },
+    "route": [
+      {
+        "op": "assembly",
+        "time": 60,
+        "skill": 3
+      },
+      {
+        "op": "test",
+        "time": 30,
+        "skill": 4
+      }
+    ],
+    "qc_time": 12,
+    "price": [
+      42000,
+      49500
+    ],
+    "qty": [
+      2,
+      6
+    ],
+    "heavy": true,
+    "desc": "Тормозной цилиндр вагона: сборка и испытание на герметичность."
+  },
+  "bench_lathe": {
+    "name": "Станок настольный токарный",
+    "size": "l",
+    "components": {
+      "gearbox": 1,
+      "spline_shaft": 1,
+      "frame": 1,
+      "housing": 2
+    },
+    "route": [
+      {
+        "op": "assembly",
+        "time": 180,
+        "skill": 5
+      },
+      {
+        "op": "test",
+        "time": 60,
+        "skill": 4
+      },
+      {
+        "op": "paint",
+        "time": 30,
+        "skill": 2,
+        "cons": 2
+      }
+    ],
+    "qc_time": 30,
+    "price": [
+      418000,
+      484000
+    ],
+    "qty": [
+      1,
+      2
+    ],
+    "heavy": true,
+    "paint_col": "#4a7a5a",
+    "research": "product_gearbox",
+    "desc": "Настольный токарный станок — импортозамещение в чистом виде. Долгий цикл: редуктор, валы, станина, испытания."
+  },
+  "node12k": {
+    "name": "Узел 12-К",
+    "size": "m",
+    "material": "forging",
+    "route": [
+      {
+        "op": "turning",
+        "time": 50,
+        "skill": 4
+      },
+      {
+        "op": "milling",
+        "time": 40,
+        "skill": 4
+      },
+      {
+        "op": "heat",
+        "time": 100,
+        "skill": 3
+      },
+      {
+        "op": "test",
+        "time": 20,
+        "skill": 4
+      }
+    ],
+    "qc_time": 15,
+    "price": [
+      26500,
+      31000
+    ],
+    "qty": [
+      2,
+      6
+    ],
+    "heavy": true,
+    "desc": "Узел по чертежам заказчика. Что это — знать не положено."
+  },
+  "item7t": {
+    "name": "Изделие 7Т",
+    "size": "m",
+    "components": {
+      "spline_shaft": 1,
+      "gear": 1,
+      "housing": 1
+    },
+    "route": [
+      {
+        "op": "assembly",
+        "time": 90,
+        "skill": 4
+      },
+      {
+        "op": "test",
+        "time": 40,
+        "skill": 4
+      },
+      {
+        "op": "paint",
+        "time": 15,
+        "skill": 1,
+        "cons": 1
+      }
+    ],
+    "qc_time": 25,
+    "price": [
+      104500,
+      121000
+    ],
+    "qty": [
+      1,
+      3
+    ],
+    "heavy": true,
+    "paint_col": "#4a5a3a",
+    "desc": "Изделие по госзаказу. Сдаётся военной приёмке."
+  }
+}

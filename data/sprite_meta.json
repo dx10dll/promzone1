@@ -1,0 +1,4820 @@
+{
+ "lathe": {
+  "file": "res://assets/objects/lathe.svg",
+  "w": 208,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "chuck": [
+    56,
+    48,
+    13,
+    26
+   ],
+   "tool": [
+    104,
+    60
+   ],
+   "lamp": [
+    33,
+    36
+   ],
+   "bar": [
+    100,
+    104
+   ],
+   "out": [
+    150,
+    84
+   ],
+   "light": [
+    84,
+    40
+   ]
+  }
+ },
+ "workbench": {
+  "file": "res://assets/objects/workbench.svg",
+  "w": 144,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "rack": {
+  "file": "res://assets/objects/rack.svg",
+  "w": 144,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "slots": [
+   [
+    11,
+    38,
+    106,
+    26
+   ],
+   [
+    11,
+    70,
+    106,
+    31
+   ]
+  ]
+ },
+ "pallet": {
+  "file": "res://assets/objects/pallet.svg",
+  "w": 80,
+  "h": 90,
+  "ox": 0,
+  "oy": 74,
+  "slots": [
+   [
+    6,
+    14,
+    52,
+    42
+   ]
+  ]
+ },
+ "scrap_bin": {
+  "file": "res://assets/objects/scrap_bin.svg",
+  "w": 80,
+  "h": 104,
+  "ox": 0,
+  "oy": 88,
+  "slots": [
+   [
+    10,
+    22,
+    44,
+    16
+   ]
+  ]
+ },
+ "qc_table": {
+  "file": "res://assets/objects/qc_table.svg",
+  "w": 144,
+  "h": 110,
+  "ox": 0,
+  "oy": 94,
+  "slots": [
+   [
+    8,
+    34,
+    48,
+    22
+   ]
+  ]
+ },
+ "toilet": {
+  "file": "res://assets/objects/toilet.svg",
+  "w": 80,
+  "h": 114,
+  "ox": 0,
+  "oy": 98,
+  "anchors": {
+   "busy": [
+    52,
+    16
+   ]
+  }
+ },
+ "dining_table": {
+  "file": "res://assets/objects/dining_table.svg",
+  "w": 144,
+  "h": 106,
+  "ox": 0,
+  "oy": 90
+ },
+ "chair_down": {
+  "file": "res://assets/objects/chair_down.svg",
+  "w": 80,
+  "h": 100,
+  "ox": 0,
+  "oy": 84
+ },
+ "chair_up": {
+  "file": "res://assets/objects/chair_up.svg",
+  "w": 80,
+  "h": 100,
+  "ox": 0,
+  "oy": 84
+ },
+ "chair_side": {
+  "file": "res://assets/objects/chair_side.svg",
+  "w": 80,
+  "h": 100,
+  "ox": 0,
+  "oy": 84
+ },
+ "chair": {
+  "file": "res://assets/objects/chair_down.svg",
+  "w": 80,
+  "h": 100,
+  "ox": 0,
+  "oy": 84
+ },
+ "bench": {
+  "file": "res://assets/objects/bench.svg",
+  "w": 144,
+  "h": 102,
+  "ox": 0,
+  "oy": 86
+ },
+ "kettle": {
+  "file": "res://assets/objects/kettle.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "urn": {
+  "file": "res://assets/objects/urn.svg",
+  "w": 80,
+  "h": 102,
+  "ox": 0,
+  "oy": 86,
+  "anchors": {
+   "smoke": [
+    32,
+    30
+   ]
+  }
+ },
+ "plant": {
+  "file": "res://assets/objects/plant.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "extinguisher": {
+  "file": "res://assets/objects/extinguisher.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "cabinet": {
+  "file": "res://assets/objects/cabinet.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "locker": {
+  "file": "res://assets/objects/locker.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "sink": {
+  "file": "res://assets/objects/sink.svg",
+  "w": 80,
+  "h": 124,
+  "ox": 0,
+  "oy": 108
+ },
+ "fridge": {
+  "file": "res://assets/objects/fridge.svg",
+  "w": 80,
+  "h": 138,
+  "ox": 0,
+  "oy": 122
+ },
+ "microwave": {
+  "file": "res://assets/objects/microwave.svg",
+  "w": 80,
+  "h": 112,
+  "ox": 0,
+  "oy": 96
+ },
+ "cooler": {
+  "file": "res://assets/objects/cooler.svg",
+  "w": 80,
+  "h": 130,
+  "ox": 0,
+  "oy": 114
+ },
+ "sofa": {
+  "file": "res://assets/objects/sofa.svg",
+  "w": 144,
+  "h": 106,
+  "ox": 0,
+  "oy": 90
+ },
+ "honor_board": {
+  "file": "res://assets/objects/honor_board.svg",
+  "w": 144,
+  "h": 142,
+  "ox": 0,
+  "oy": 126
+ },
+ "ktp": {
+  "file": "res://assets/objects/ktp.svg",
+  "w": 144,
+  "h": 184,
+  "ox": 0,
+  "oy": 168
+ },
+ "mill": {
+  "file": "res://assets/objects/mill.svg",
+  "w": 144,
+  "h": 154,
+  "ox": 0,
+  "oy": 138,
+  "anchors": {
+   "lamp": [
+    88,
+    31
+   ],
+   "work": [
+    64,
+    64
+   ],
+   "in": [
+    18,
+    68
+   ],
+   "out": [
+    104,
+    68
+   ]
+  }
+ },
+ "drill": {
+  "file": "res://assets/objects/drill.svg",
+  "w": 80,
+  "h": 162,
+  "ox": 0,
+  "oy": 146,
+  "anchors": {
+   "lamp": [
+    24.5,
+    15.5
+   ],
+   "work": [
+    28,
+    72
+   ],
+   "in": [
+    16,
+    84
+   ],
+   "out": [
+    40,
+    84
+   ]
+  }
+ },
+ "weld_post": {
+  "file": "res://assets/objects/weld_post.svg",
+  "w": 144,
+  "h": 126,
+  "ox": 0,
+  "oy": 110,
+  "anchors": {
+   "lamp": [
+    118,
+    58
+   ],
+   "work": [
+    40,
+    56
+   ],
+   "in": [
+    14,
+    50
+   ],
+   "out": [
+    72,
+    50
+   ],
+   "flash": [
+    40,
+    56
+   ]
+  }
+ },
+ "assembly_table": {
+  "file": "res://assets/objects/assembly_table.svg",
+  "w": 144,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    107,
+    -5
+   ],
+   "work": [
+    64,
+    50
+   ],
+   "in": [
+    16,
+    52
+   ],
+   "out": [
+    110,
+    58
+   ]
+  }
+ },
+ "furnace": {
+  "file": "res://assets/objects/furnace.svg",
+  "w": 144,
+  "h": 198,
+  "ox": 0,
+  "oy": 182,
+  "anchors": {
+   "lamp": [
+    114,
+    76
+   ],
+   "glow": [
+    40,
+    80,
+    30,
+    18
+   ],
+   "in": [
+    24,
+    146
+   ],
+   "out": [
+    80,
+    146
+   ]
+  }
+ },
+ "paint_booth": {
+  "file": "res://assets/objects/paint_booth.svg",
+  "w": 144,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    123,
+    70
+   ],
+   "work": [
+    70,
+    84
+   ],
+   "in": [
+    20,
+    128
+   ],
+   "out": [
+    110,
+    128
+   ],
+   "mist": [
+    70,
+    74
+   ]
+  }
+ },
+ "wip_rack": {
+  "file": "res://assets/objects/wip_rack.svg",
+  "w": 144,
+  "h": 134,
+  "ox": 0,
+  "oy": 118,
+  "slots": [
+   [
+    14,
+    16,
+    100,
+    22
+   ],
+   [
+    14,
+    56,
+    100,
+    22
+   ]
+  ]
+ },
+ "tool_cabinet": {
+  "file": "res://assets/objects/tool_cabinet.svg",
+  "w": 80,
+  "h": 140,
+  "ox": 0,
+  "oy": 124
+ },
+ "cart": {
+  "file": "res://assets/objects/cart.svg",
+  "w": 80,
+  "h": 106,
+  "ox": 0,
+  "oy": 90
+ },
+ "forklift": {
+  "file": "res://assets/objects/forklift.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "crane": {
+  "file": "res://assets/objects/crane.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "office_desk": {
+  "file": "res://assets/objects/office_desk.svg",
+  "w": 200,
+  "h": 182,
+  "ox": 0,
+  "oy": 110,
+  "anchors": {
+   "screen": [
+    40,
+    36
+   ]
+  }
+ },
+ "doc_cabinet": {
+  "file": "res://assets/objects/doc_cabinet.svg",
+  "w": 80,
+  "h": 144,
+  "ox": 0,
+  "oy": 128
+ },
+ "safe": {
+  "file": "res://assets/objects/safe.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "plan_board": {
+  "file": "res://assets/objects/plan_board.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "drawing_board": {
+  "file": "res://assets/objects/drawing_board.svg",
+  "w": 80,
+  "h": 152,
+  "ox": 0,
+  "oy": 136
+ },
+ "cnc_lathe": {
+  "file": "res://assets/objects/cnc_lathe.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    159,
+    24
+   ],
+   "chuck": [
+    66,
+    107,
+    8,
+    30
+   ],
+   "tool": [
+    126,
+    130
+   ],
+   "bar": [
+    70,
+    172
+   ],
+   "out": [
+    142,
+    188
+   ],
+   "in": [
+    18,
+    188
+   ],
+   "work": [
+    100,
+    122
+   ],
+   "screen": [
+    157,
+    104
+   ]
+  }
+ },
+ "water_heater": {
+  "file": "res://assets/objects/water_heater.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    27,
+    74
+   ]
+  }
+ },
+ "van": {
+  "w": 216,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "radiator": {
+  "file": "res://assets/objects/radiator.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94,
+  "anchors": {
+   "heat": [
+    32,
+    20
+   ]
+  }
+ },
+ "first_aid": {
+  "file": "res://assets/objects/first_aid.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "checkpoint": {
+  "file": "res://assets/objects/checkpoint.svg",
+  "w": 144,
+  "h": 154,
+  "ox": 0,
+  "oy": 138
+ },
+ "test_stand": {
+  "file": "res://assets/objects/test_stand.svg",
+  "w": 144,
+  "h": 134,
+  "ox": 0,
+  "oy": 118,
+  "anchors": {
+   "lamp": [
+    108,
+    32
+   ],
+   "work": [
+    56,
+    58
+   ],
+   "in": [
+    112,
+    84
+   ],
+   "out": [
+    16,
+    84
+   ],
+   "gauge": [
+    60,
+    24
+   ],
+   "gauge2": [
+    82,
+    24
+   ],
+   "screen": [
+    109,
+    21
+   ]
+  }
+ },
+ "lathe_v": {
+  "file": "res://assets/objects/lathe_v.svg",
+  "w": 80,
+  "h": 254,
+  "ox": 0,
+  "oy": 238,
+  "anchors": {
+   "lamp": [
+    18,
+    29
+   ],
+   "work": [
+    32,
+    116
+   ],
+   "bar": [
+    -6,
+    216
+   ],
+   "out": [
+    6,
+    222
+   ]
+  }
+ },
+ "cnc_lathe_v": {
+  "file": "res://assets/objects/cnc_lathe_v.svg",
+  "w": 144,
+  "h": 298,
+  "ox": 0,
+  "oy": 282,
+  "anchors": {
+   "lamp": [
+    30.72,
+    36
+   ],
+   "work": [
+    57.6,
+    130
+   ],
+   "in": [
+    8,
+    258
+   ],
+   "out": [
+    8,
+    176.0
+   ]
+  }
+ },
+ "mill_v": {
+  "file": "res://assets/objects/mill_v.svg",
+  "w": 80,
+  "h": 218,
+  "ox": 0,
+  "oy": 202,
+  "anchors": {
+   "lamp": [
+    52,
+    128
+   ],
+   "work": [
+    26,
+    136
+   ],
+   "in": [
+    20,
+    94
+   ],
+   "out": [
+    20,
+    170
+   ]
+  }
+ },
+ "weld_post_v": {
+  "file": "res://assets/objects/weld_post_v.svg",
+  "w": 80,
+  "h": 190,
+  "ox": 0,
+  "oy": 174,
+  "anchors": {
+   "lamp": [
+    31,
+    158
+   ],
+   "work": [
+    26,
+    80
+   ],
+   "flash": [
+    26,
+    80
+   ],
+   "in": [
+    12,
+    56
+   ],
+   "out": [
+    46,
+    66
+   ]
+  }
+ },
+ "assembly_table_v": {
+  "file": "res://assets/objects/assembly_table_v.svg",
+  "w": 80,
+  "h": 184,
+  "ox": 0,
+  "oy": 168,
+  "anchors": {
+   "lamp": [
+    46,
+    20
+   ],
+   "work": [
+    22,
+    80
+   ],
+   "in": [
+    14,
+    54
+   ],
+   "out": [
+    44,
+    126
+   ]
+  }
+ },
+ "test_stand_v": {
+  "file": "res://assets/objects/test_stand_v.svg",
+  "w": 80,
+  "h": 198,
+  "ox": 0,
+  "oy": 182,
+  "anchors": {
+   "lamp": [
+    46,
+    28
+   ],
+   "work": [
+    24,
+    84
+   ],
+   "in": [
+    8,
+    154
+   ],
+   "out": [
+    52,
+    154
+   ]
+  }
+ },
+ "workbench_v": {
+  "file": "res://assets/objects/workbench_v.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158
+ },
+ "rack_v": {
+  "file": "res://assets/objects/rack_v.svg",
+  "w": 80,
+  "h": 188,
+  "ox": 0,
+  "oy": 172,
+  "slots": [
+   [
+    14,
+    42,
+    36,
+    50
+   ],
+   [
+    14,
+    102,
+    36,
+    42
+   ]
+  ]
+ },
+ "wip_rack_v": {
+  "file": "res://assets/objects/wip_rack_v.svg",
+  "w": 80,
+  "h": 198,
+  "ox": 0,
+  "oy": 182,
+  "slots": [
+   [
+    14,
+    24,
+    36,
+    64
+   ],
+   [
+    14,
+    96,
+    36,
+    64
+   ]
+  ]
+ },
+ "qc_table_v": {
+  "file": "res://assets/objects/qc_table_v.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158,
+  "slots": [
+   [
+    12,
+    36,
+    36,
+    48
+   ]
+  ]
+ },
+ "dining_table_v": {
+  "file": "res://assets/objects/dining_table_v.svg",
+  "w": 80,
+  "h": 170,
+  "ox": 0,
+  "oy": 154
+ },
+ "bench_v": {
+  "file": "res://assets/objects/bench_v.svg",
+  "w": 80,
+  "h": 166,
+  "ox": 0,
+  "oy": 150
+ },
+ "sofa_v": {
+  "file": "res://assets/objects/sofa_v.svg",
+  "w": 80,
+  "h": 170,
+  "ox": 0,
+  "oy": 154
+ },
+ "office_desk_v": {
+  "file": "res://assets/objects/office_desk_v.svg",
+  "w": 80,
+  "h": 190,
+  "ox": 0,
+  "oy": 174,
+  "anchors": {
+   "screen": [
+    47,
+    56
+   ]
+  }
+ },
+ "lamp_bulb": {
+  "file": "res://assets/objects/lamp_bulb.svg",
+  "w": 64,
+  "h": 94,
+  "ox": 0,
+  "oy": 94
+ },
+ "lamp_tube": {
+  "file": "res://assets/objects/lamp_tube.svg",
+  "w": 64,
+  "h": 86,
+  "ox": 0,
+  "oy": 86
+ },
+ "lamp_drl": {
+  "file": "res://assets/objects/lamp_drl.svg",
+  "w": 64,
+  "h": 98,
+  "ox": 0,
+  "oy": 98
+ },
+ "lamp_street": {
+  "file": "res://assets/objects/lamp_street.svg",
+  "w": 80,
+  "h": 176,
+  "ox": 0,
+  "oy": 160
+ },
+ "water_inlet": {
+  "file": "res://assets/objects/water_inlet.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "school_desk": {
+  "file": "res://assets/objects/school_desk.svg",
+  "w": 200,
+  "h": 176,
+  "ox": 0,
+  "oy": 104
+ },
+ "chalkboard": {
+  "file": "res://assets/objects/chalkboard.svg",
+  "w": 144,
+  "h": 156,
+  "ox": 0,
+  "oy": 140
+ },
+ "locker_v": {
+  "file": "res://assets/objects/locker_v.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "locker_b": {
+  "file": "res://assets/objects/locker_b.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "sink_v": {
+  "file": "res://assets/objects/sink_v.svg",
+  "w": 80,
+  "h": 124,
+  "ox": 0,
+  "oy": 108
+ },
+ "sink_b": {
+  "file": "res://assets/objects/sink_b.svg",
+  "w": 80,
+  "h": 124,
+  "ox": 0,
+  "oy": 108
+ },
+ "fridge_v": {
+  "file": "res://assets/objects/fridge_v.svg",
+  "w": 80,
+  "h": 138,
+  "ox": 0,
+  "oy": 122
+ },
+ "fridge_b": {
+  "file": "res://assets/objects/fridge_b.svg",
+  "w": 80,
+  "h": 138,
+  "ox": 0,
+  "oy": 122
+ },
+ "microwave_v": {
+  "file": "res://assets/objects/microwave_v.svg",
+  "w": 80,
+  "h": 112,
+  "ox": 0,
+  "oy": 96
+ },
+ "microwave_b": {
+  "file": "res://assets/objects/microwave_b.svg",
+  "w": 80,
+  "h": 112,
+  "ox": 0,
+  "oy": 96
+ },
+ "cooler_v": {
+  "file": "res://assets/objects/cooler_v.svg",
+  "w": 80,
+  "h": 130,
+  "ox": 0,
+  "oy": 114
+ },
+ "cooler_b": {
+  "file": "res://assets/objects/cooler_b.svg",
+  "w": 80,
+  "h": 130,
+  "ox": 0,
+  "oy": 114
+ },
+ "toilet_v": {
+  "file": "res://assets/objects/toilet_v.svg",
+  "w": 80,
+  "h": 114,
+  "ox": 0,
+  "oy": 98,
+  "anchors": {
+   "busy": [
+    52,
+    16
+   ]
+  }
+ },
+ "toilet_b": {
+  "file": "res://assets/objects/toilet_b.svg",
+  "w": 80,
+  "h": 114,
+  "ox": 0,
+  "oy": 98,
+  "anchors": {
+   "busy": [
+    52,
+    86
+   ]
+  }
+ },
+ "kettle_v": {
+  "file": "res://assets/objects/kettle_v.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "kettle_b": {
+  "file": "res://assets/objects/kettle_b.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "tool_cabinet_v": {
+  "file": "res://assets/objects/tool_cabinet_v.svg",
+  "w": 80,
+  "h": 140,
+  "ox": 0,
+  "oy": 124
+ },
+ "tool_cabinet_b": {
+  "file": "res://assets/objects/tool_cabinet_b.svg",
+  "w": 80,
+  "h": 140,
+  "ox": 0,
+  "oy": 124
+ },
+ "doc_cabinet_v": {
+  "file": "res://assets/objects/doc_cabinet_v.svg",
+  "w": 80,
+  "h": 144,
+  "ox": 0,
+  "oy": 128
+ },
+ "doc_cabinet_b": {
+  "file": "res://assets/objects/doc_cabinet_b.svg",
+  "w": 80,
+  "h": 144,
+  "ox": 0,
+  "oy": 128
+ },
+ "safe_v": {
+  "file": "res://assets/objects/safe_v.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "safe_b": {
+  "file": "res://assets/objects/safe_b.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "first_aid_v": {
+  "file": "res://assets/objects/first_aid_v.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "first_aid_b": {
+  "file": "res://assets/objects/first_aid_b.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "radiator_v": {
+  "file": "res://assets/objects/radiator_v.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94,
+  "anchors": {
+   "heat": [
+    32,
+    20
+   ]
+  }
+ },
+ "radiator_b": {
+  "file": "res://assets/objects/radiator_b.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94,
+  "anchors": {
+   "heat": [
+    32,
+    20
+   ]
+  }
+ },
+ "plan_board_v": {
+  "file": "res://assets/objects/plan_board_v.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "plan_board_b": {
+  "file": "res://assets/objects/plan_board_b.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "drawing_board_v": {
+  "file": "res://assets/objects/drawing_board_v.svg",
+  "w": 80,
+  "h": 152,
+  "ox": 0,
+  "oy": 136
+ },
+ "drawing_board_b": {
+  "file": "res://assets/objects/drawing_board_b.svg",
+  "w": 80,
+  "h": 152,
+  "ox": 0,
+  "oy": 136
+ },
+ "drill_v": {
+  "file": "res://assets/objects/drill_v.svg",
+  "w": 80,
+  "h": 162,
+  "ox": 0,
+  "oy": 146,
+  "anchors": {
+   "lamp": [
+    16.5,
+    15.5
+   ],
+   "work": [
+    20,
+    72
+   ],
+   "in": [
+    10,
+    84
+   ],
+   "out": [
+    34,
+    84
+   ]
+  }
+ },
+ "drill_b": {
+  "file": "res://assets/objects/drill_b.svg",
+  "w": 80,
+  "h": 162,
+  "ox": 0,
+  "oy": 146,
+  "anchors": {
+   "lamp": [
+    48.5,
+    13.5
+   ],
+   "work": [
+    34,
+    70
+   ],
+   "in": [
+    22,
+    80
+   ],
+   "out": [
+    44,
+    80
+   ]
+  }
+ },
+ "honor_board_v": {
+  "file": "res://assets/objects/honor_board_v.svg",
+  "w": 80,
+  "h": 272,
+  "ox": 0,
+  "oy": 256
+ },
+ "chalkboard_v": {
+  "file": "res://assets/objects/chalkboard_v.svg",
+  "w": 80,
+  "h": 288,
+  "ox": 0,
+  "oy": 272
+ },
+ "honor_board_b": {
+  "file": "res://assets/objects/honor_board_b.svg",
+  "w": 144,
+  "h": 142,
+  "ox": 0,
+  "oy": 126
+ },
+ "chalkboard_b": {
+  "file": "res://assets/objects/chalkboard_b.svg",
+  "w": 144,
+  "h": 156,
+  "ox": 0,
+  "oy": 140
+ },
+ "school_desk_v": {
+  "file": "res://assets/objects/school_desk_v.svg",
+  "w": 80,
+  "h": 184,
+  "ox": 0,
+  "oy": 168
+ },
+ "school_desk_b": {
+  "file": "res://assets/objects/school_desk_b.svg",
+  "w": 144,
+  "h": 172,
+  "ox": 0,
+  "oy": 156
+ },
+ "office_desk_b": {
+  "file": "res://assets/objects/office_desk_b.svg",
+  "w": 144,
+  "h": 172,
+  "ox": 0,
+  "oy": 156,
+  "anchors": {
+   "screen": [
+    96,
+    96
+   ]
+  }
+ },
+ "sofa_b": {
+  "file": "res://assets/objects/sofa_b.svg",
+  "w": 144,
+  "h": 106,
+  "ox": 0,
+  "oy": 90
+ },
+ "bench_b": {
+  "file": "res://assets/objects/bench_b.svg",
+  "w": 144,
+  "h": 102,
+  "ox": 0,
+  "oy": 86
+ },
+ "workbench_b": {
+  "file": "res://assets/objects/workbench_b.svg",
+  "w": 144,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "lathe_b": {
+  "file": "res://assets/objects/lathe_b.svg",
+  "w": 208,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "lamp": [
+    180,
+    6
+   ],
+   "work": [
+    116,
+    46
+   ],
+   "bar": [
+    94,
+    104
+   ],
+   "out": [
+    40,
+    84
+   ]
+  }
+ },
+ "cnc_lathe_b": {
+  "file": "res://assets/objects/cnc_lathe_b.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    30,
+    36
+   ],
+   "work": [
+    82,
+    132
+   ],
+   "in": [
+    162,
+    188
+   ],
+   "out": [
+    40,
+    188
+   ]
+  }
+ },
+ "mill_b": {
+  "file": "res://assets/objects/mill_b.svg",
+  "w": 144,
+  "h": 154,
+  "ox": 0,
+  "oy": 138,
+  "anchors": {
+   "lamp": [
+    40,
+    31
+   ],
+   "work": [
+    64,
+    62
+   ],
+   "in": [
+    110,
+    68
+   ],
+   "out": [
+    18,
+    68
+   ]
+  }
+ },
+ "weld_post_b": {
+  "file": "res://assets/objects/weld_post_b.svg",
+  "w": 144,
+  "h": 126,
+  "ox": 0,
+  "oy": 110,
+  "anchors": {
+   "lamp": [
+    12,
+    58
+   ],
+   "work": [
+    88,
+    56
+   ],
+   "in": [
+    114,
+    50
+   ],
+   "out": [
+    56,
+    50
+   ],
+   "flash": [
+    88,
+    56
+   ]
+  }
+ },
+ "assembly_table_b": {
+  "file": "res://assets/objects/assembly_table_b.svg",
+  "w": 144,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    22,
+    -5
+   ],
+   "work": [
+    64,
+    50
+   ],
+   "in": [
+    112,
+    52
+   ],
+   "out": [
+    18,
+    58
+   ]
+  }
+ },
+ "test_stand_b": {
+  "file": "res://assets/objects/test_stand_b.svg",
+  "w": 144,
+  "h": 134,
+  "ox": 0,
+  "oy": 118,
+  "anchors": {
+   "lamp": [
+    20,
+    32
+   ],
+   "work": [
+    72,
+    58
+   ],
+   "in": [
+    16,
+    84
+   ],
+   "out": [
+    112,
+    84
+   ],
+   "gauge": [
+    98,
+    24
+   ],
+   "gauge2": [
+    98,
+    24
+   ],
+   "screen": [
+    19,
+    21
+   ]
+  }
+ },
+ "furnace_v": {
+  "file": "res://assets/objects/furnace_v.svg",
+  "w": 144,
+  "h": 198,
+  "ox": 0,
+  "oy": 182,
+  "anchors": {
+   "lamp": [
+    114,
+    76
+   ],
+   "glow": [
+    6,
+    80,
+    10,
+    22
+   ],
+   "in": [
+    10,
+    146
+   ],
+   "out": [
+    40,
+    146
+   ]
+  }
+ },
+ "furnace_b": {
+  "file": "res://assets/objects/furnace_b.svg",
+  "w": 144,
+  "h": 198,
+  "ox": 0,
+  "oy": 182,
+  "anchors": {
+   "lamp": [
+    14,
+    76
+   ],
+   "in": [
+    56,
+    146
+   ],
+   "out": [
+    112,
+    146
+   ]
+  }
+ },
+ "paint_booth_v": {
+  "file": "res://assets/objects/paint_booth_v.svg",
+  "w": 144,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    123,
+    70
+   ],
+   "work": [
+    40,
+    84
+   ],
+   "in": [
+    12,
+    128
+   ],
+   "out": [
+    40,
+    128
+   ],
+   "mist": [
+    12,
+    74
+   ]
+  }
+ },
+ "paint_booth_b": {
+  "file": "res://assets/objects/paint_booth_b.svg",
+  "w": 144,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    17,
+    70
+   ],
+   "in": [
+    110,
+    128
+   ],
+   "out": [
+    20,
+    128
+   ]
+  }
+ },
+ "chip_bin": {
+  "file": "res://assets/objects/chip_bin.svg",
+  "w": 80,
+  "h": 114,
+  "ox": 0,
+  "oy": 98,
+  "anchors": {
+   "fill": [
+    12,
+    30,
+    40,
+    12
+   ]
+  }
+ },
+ "band_saw": {
+  "file": "res://assets/objects/band_saw.svg",
+  "w": 144,
+  "h": 140,
+  "ox": 0,
+  "oy": 124,
+  "anchors": {
+   "blade": [
+    52,
+    26,
+    52,
+    64
+   ],
+   "lamp": [
+    10,
+    59
+   ],
+   "out": [
+    96,
+    62
+   ]
+  }
+ },
+ "band_saw_v": {
+  "file": "res://assets/objects/band_saw_v.svg",
+  "w": 80,
+  "h": 204,
+  "ox": 0,
+  "oy": 188,
+  "anchors": {
+   "blade": [
+    36,
+    40,
+    36,
+    90
+   ],
+   "lamp": [
+    44,
+    157
+   ],
+   "out": [
+    16,
+    160
+   ]
+  }
+ },
+ "band_saw_b": {
+  "file": "res://assets/objects/band_saw_b.svg",
+  "w": 144,
+  "h": 140,
+  "ox": 0,
+  "oy": 124,
+  "anchors": {
+   "lamp": [
+    112,
+    59
+   ],
+   "out": [
+    30,
+    62
+   ]
+  }
+ },
+ "safety_stand": {
+  "file": "res://assets/objects/safety_stand.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "palm": {
+  "file": "res://assets/objects/palm.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "aquarium": {
+  "file": "res://assets/objects/aquarium.svg",
+  "w": 144,
+  "h": 134,
+  "ox": 0,
+  "oy": 118,
+  "anchors": {
+   "bubbles": [
+    106,
+    46
+   ]
+  }
+ },
+ "rug": {
+  "file": "res://assets/objects/rug.svg",
+  "w": 128,
+  "h": 64,
+  "ox": 0,
+  "oy": 64
+ },
+ "rug_v": {
+  "file": "res://assets/objects/rug_v.svg",
+  "w": 64,
+  "h": 128,
+  "ox": 0,
+  "oy": 128
+ },
+ "bookcase": {
+  "file": "res://assets/objects/bookcase.svg",
+  "w": 80,
+  "h": 146,
+  "ox": 0,
+  "oy": 130
+ },
+ "tv": {
+  "file": "res://assets/objects/tv.svg",
+  "w": 80,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "screen": [
+    32,
+    25
+   ]
+  }
+ },
+ "pennant": {
+  "file": "res://assets/objects/pennant.svg",
+  "w": 80,
+  "h": 160,
+  "ox": 0,
+  "oy": 144
+ },
+ "vent_fan": {
+  "file": "res://assets/objects/vent_fan.svg",
+  "w": 80,
+  "h": 130,
+  "ox": 0,
+  "oy": 114,
+  "anchors": {
+   "rotor": [
+    32,
+    58,
+    20
+   ],
+   "lamp": [
+    51,
+    34
+   ]
+  }
+ },
+ "vent_hood": {
+  "file": "res://assets/objects/vent_hood.svg",
+  "w": 64,
+  "h": 94,
+  "ox": 0,
+  "oy": 94
+ },
+ "compressor": {
+  "file": "res://assets/objects/compressor.svg",
+  "w": 144,
+  "h": 136,
+  "ox": 0,
+  "oy": 120,
+  "anchors": {
+   "gauge": [
+    100,
+    82
+   ],
+   "lamp": [
+    65,
+    35
+   ]
+  }
+ },
+ "boiler": {
+  "file": "res://assets/objects/boiler.svg",
+  "w": 144,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "flame": [
+    54,
+    114,
+    32,
+    20
+   ],
+   "lamp": [
+    24,
+    141
+   ],
+   "smoke": [
+    64,
+    0
+   ]
+  }
+ },
+ "ppe_cabinet": {
+  "file": "res://assets/objects/ppe_cabinet.svg",
+  "w": 80,
+  "h": 138,
+  "ox": 0,
+  "oy": 122
+ },
+ "ppe_cabinet_v": {
+  "file": "res://assets/objects/ppe_cabinet_v.svg",
+  "w": 80,
+  "h": 138,
+  "ox": 0,
+  "oy": 122
+ },
+ "ppe_cabinet_b": {
+  "file": "res://assets/objects/ppe_cabinet_b.svg",
+  "w": 80,
+  "h": 138,
+  "ox": 0,
+  "oy": 122
+ },
+ "camera": {
+  "file": "res://assets/objects/camera.svg",
+  "w": 64,
+  "h": 94,
+  "ox": 0,
+  "oy": 94,
+  "anchors": {
+   "led": [
+    40,
+    10
+   ]
+  }
+ },
+ "union_board": {
+  "file": "res://assets/objects/union_board.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "days_board": {
+  "file": "res://assets/objects/days_board.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "digits": [
+    32,
+    39
+   ]
+  }
+ },
+ "bunk_bed": {
+  "file": "res://assets/objects/bunk_bed.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "stove": {
+  "file": "res://assets/objects/stove.svg",
+  "w": 144,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "serving_line": {
+  "file": "res://assets/objects/serving_line.svg",
+  "w": 144,
+  "h": 114,
+  "ox": 0,
+  "oy": 98
+ },
+ "med_couch": {
+  "file": "res://assets/objects/med_couch.svg",
+  "w": 144,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "med_cabinet": {
+  "file": "res://assets/objects/med_cabinet.svg",
+  "w": 80,
+  "h": 142,
+  "ox": 0,
+  "oy": 126
+ },
+ "radio_station": {
+  "file": "res://assets/objects/radio_station.svg",
+  "w": 80,
+  "h": 116,
+  "ox": 0,
+  "oy": 100
+ },
+ "loudspeaker": {
+  "file": "res://assets/objects/loudspeaker.svg",
+  "w": 64,
+  "h": 94,
+  "ox": 0,
+  "oy": 94
+ },
+ "cat_bowl": {
+  "file": "res://assets/objects/cat_bowl.svg",
+  "w": 64,
+  "h": 68,
+  "ox": 0,
+  "oy": 68
+ },
+ "phone_stand": {
+  "file": "res://assets/objects/phone_stand.svg",
+  "w": 80,
+  "h": 144,
+  "ox": 0,
+  "oy": 128
+ },
+ "law_shelf": {
+  "file": "res://assets/objects/law_shelf.svg",
+  "w": 80,
+  "h": 144,
+  "ox": 0,
+  "oy": 128
+ },
+ "director_desk": {
+  "file": "res://assets/objects/director_desk.svg",
+  "w": 152,
+  "h": 150,
+  "ox": 0,
+  "oy": 126
+ },
+ "battery": {
+  "file": "res://assets/objects/battery.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120,
+  "anchors": {
+   "lamp": [
+    32,
+    26
+   ]
+  }
+ },
+ "pump_station": {
+  "file": "res://assets/objects/pump_station.svg",
+  "w": 144,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    116,
+    46
+   ]
+  }
+ },
+ "shower": {
+  "file": "res://assets/objects/shower.svg",
+  "w": 80,
+  "h": 138,
+  "ox": 0,
+  "oy": 122
+ },
+ "tr_63": {
+  "file": "res://assets/objects/tr_63.svg",
+  "w": 144,
+  "h": 128,
+  "ox": 0,
+  "oy": 112
+ },
+ "locker2": {
+  "file": "res://assets/objects/locker2.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "locker2_v": {
+  "file": "res://assets/objects/locker2_v.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "locker2_b": {
+  "file": "res://assets/objects/locker2_b.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120
+ },
+ "company_board": {
+  "file": "res://assets/objects/company_board.svg",
+  "w": 144,
+  "h": 164,
+  "ox": 0,
+  "oy": 148,
+  "anchors": {
+   "plate": [
+    10,
+    12,
+    124,
+    50
+   ]
+  }
+ },
+ "substation": {
+  "file": "res://assets/objects/substation.svg",
+  "w": 144,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    123,
+    149
+   ],
+   "screen": [
+    123,
+    141
+   ]
+  }
+ },
+ "pump_house": {
+  "file": "res://assets/objects/pump_house.svg",
+  "w": 144,
+  "h": 198,
+  "ox": 0,
+  "oy": 182,
+  "anchors": {
+   "lamp": [
+    22,
+    138
+   ]
+  }
+ },
+ "lathe_tv4": {
+  "file": "res://assets/objects/lathe_tv4.svg",
+  "w": 144,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "chuck": [
+    45,
+    40.0,
+    10,
+    20
+   ],
+   "tool": [
+    72.3,
+    42
+   ],
+   "lamp": [
+    17.12,
+    29
+   ],
+   "bar": [
+    62.3,
+    104
+   ],
+   "out": [
+    84,
+    84
+   ],
+   "light": [
+    52.3,
+    28
+   ]
+  }
+ },
+ "lathe_tv4_v": {
+  "file": "res://assets/objects/lathe_tv4_v.svg",
+  "w": 80,
+  "h": 190,
+  "ox": 0,
+  "oy": 174,
+  "anchors": {
+   "lamp": [
+    18,
+    36
+   ],
+   "work": [
+    32,
+    116
+   ],
+   "bar": [
+    -6,
+    152
+   ],
+   "out": [
+    6,
+    158
+   ]
+  }
+ },
+ "lathe_tv4_b": {
+  "file": "res://assets/objects/lathe_tv4_b.svg",
+  "w": 144,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "lamp": [
+    111.7,
+    29
+   ],
+   "work": [
+    70.4,
+    42
+   ],
+   "bar": [
+    57.6,
+    104
+   ],
+   "out": [
+    40,
+    84
+   ]
+  }
+ },
+ "lathe_1a616": {
+  "file": "res://assets/objects/lathe_1a616.svg",
+  "w": 144,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "chuck": [
+    48,
+    54.0,
+    11,
+    22
+   ],
+   "tool": [
+    74.02,
+    54
+   ],
+   "lamp": [
+    18.08,
+    39
+   ],
+   "bar": [
+    64.02,
+    104
+   ],
+   "out": [
+    84,
+    84
+   ],
+   "light": [
+    54.019999999999996,
+    40
+   ]
+  }
+ },
+ "lathe_1a616_v": {
+  "file": "res://assets/objects/lathe_1a616_v.svg",
+  "w": 80,
+  "h": 190,
+  "ox": 0,
+  "oy": 174,
+  "anchors": {
+   "lamp": [
+    18,
+    34
+   ],
+   "work": [
+    32,
+    116
+   ],
+   "bar": [
+    -6,
+    152
+   ],
+   "out": [
+    6,
+    158
+   ]
+  }
+ },
+ "lathe_1a616_b": {
+  "file": "res://assets/objects/lathe_1a616_b.svg",
+  "w": 144,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "lamp": [
+    110.8,
+    39
+   ],
+   "work": [
+    70.4,
+    54
+   ],
+   "bar": [
+    57.6,
+    104
+   ],
+   "out": [
+    40,
+    84
+   ]
+  }
+ },
+ "lathe_16k20": {
+  "file": "res://assets/objects/lathe_16k20.svg",
+  "w": 208,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "chuck": [
+    56,
+    52.0,
+    13,
+    26
+   ],
+   "tool": [
+    102.26,
+    54
+   ],
+   "lamp": [
+    20.64,
+    34
+   ],
+   "bar": [
+    92.26,
+    104
+   ],
+   "out": [
+    148,
+    84
+   ],
+   "light": [
+    82.26,
+    40
+   ]
+  }
+ },
+ "lathe_16k20_v": {
+  "file": "res://assets/objects/lathe_16k20_v.svg",
+  "w": 80,
+  "h": 254,
+  "ox": 0,
+  "oy": 238,
+  "anchors": {
+   "lamp": [
+    18,
+    29
+   ],
+   "work": [
+    32,
+    116
+   ],
+   "bar": [
+    -6,
+    216
+   ],
+   "out": [
+    6,
+    222
+   ]
+  }
+ },
+ "lathe_16k20_b": {
+  "file": "res://assets/objects/lathe_16k20_b.svg",
+  "w": 208,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "lamp": [
+    172.4,
+    34
+   ],
+   "work": [
+    105.60000000000001,
+    54
+   ],
+   "bar": [
+    86.4,
+    104
+   ],
+   "out": [
+    40,
+    84
+   ]
+  }
+ },
+ "lathe_1m63": {
+  "file": "res://assets/objects/lathe_1m63.svg",
+  "w": 272,
+  "h": 131,
+  "ox": 0,
+  "oy": 115,
+  "anchors": {
+   "chuck": [
+    65,
+    57.0,
+    15,
+    30
+   ],
+   "tool": [
+    131.12,
+    61
+   ],
+   "lamp": [
+    23.52,
+    34
+   ],
+   "bar": [
+    121.12,
+    111
+   ],
+   "out": [
+    212,
+    91
+   ],
+   "light": [
+    111.12,
+    47
+   ]
+  }
+ },
+ "lathe_1m63_v": {
+  "file": "res://assets/objects/lathe_1m63_v.svg",
+  "w": 80,
+  "h": 325,
+  "ox": 0,
+  "oy": 309,
+  "anchors": {
+   "lamp": [
+    18,
+    29
+   ],
+   "work": [
+    32,
+    123
+   ],
+   "bar": [
+    -6,
+    287
+   ],
+   "out": [
+    6,
+    293
+   ]
+  }
+ },
+ "lathe_1m63_b": {
+  "file": "res://assets/objects/lathe_1m63_b.svg",
+  "w": 272,
+  "h": 131,
+  "ox": 0,
+  "oy": 115,
+  "anchors": {
+   "lamp": [
+    233.7,
+    34
+   ],
+   "work": [
+    140.8,
+    61
+   ],
+   "bar": [
+    115.2,
+    111
+   ],
+   "out": [
+    40,
+    91
+   ]
+  }
+ },
+ "mill_6t80": {
+  "file": "res://assets/objects/mill_6t80.svg",
+  "w": 144,
+  "h": 166,
+  "ox": 0,
+  "oy": 150,
+  "anchors": {
+   "lamp": [
+    68.75999999999999,
+    43
+   ],
+   "work": [
+    53.76,
+    56
+   ],
+   "in": [
+    18,
+    80
+   ],
+   "out": [
+    104,
+    80
+   ]
+  }
+ },
+ "mill_6t80_v": {
+  "file": "res://assets/objects/mill_6t80_v.svg",
+  "w": 80,
+  "h": 230,
+  "ox": 0,
+  "oy": 214,
+  "anchors": {
+   "lamp": [
+    52,
+    140
+   ],
+   "work": [
+    26,
+    146
+   ],
+   "in": [
+    20,
+    106
+   ],
+   "out": [
+    20,
+    184
+   ]
+  }
+ },
+ "mill_6t80_b": {
+  "file": "res://assets/objects/mill_6t80_b.svg",
+  "w": 144,
+  "h": 166,
+  "ox": 0,
+  "oy": 150,
+  "anchors": {
+   "lamp": [
+    36.76,
+    43
+   ],
+   "work": [
+    53.76,
+    74
+   ],
+   "in": [
+    110,
+    80
+   ],
+   "out": [
+    18,
+    80
+   ]
+  }
+ },
+ "mill_6r10": {
+  "file": "res://assets/objects/mill_6r10.svg",
+  "w": 144,
+  "h": 154,
+  "ox": 0,
+  "oy": 138,
+  "anchors": {
+   "lamp": [
+    68.75999999999999,
+    31
+   ],
+   "work": [
+    53.76,
+    64
+   ],
+   "in": [
+    18,
+    68
+   ],
+   "out": [
+    104,
+    68
+   ]
+  }
+ },
+ "mill_6r10_v": {
+  "file": "res://assets/objects/mill_6r10_v.svg",
+  "w": 80,
+  "h": 218,
+  "ox": 0,
+  "oy": 202,
+  "anchors": {
+   "lamp": [
+    52,
+    128
+   ],
+   "work": [
+    26,
+    134
+   ],
+   "in": [
+    20,
+    94
+   ],
+   "out": [
+    20,
+    172
+   ]
+  }
+ },
+ "mill_6r10_b": {
+  "file": "res://assets/objects/mill_6r10_b.svg",
+  "w": 144,
+  "h": 154,
+  "ox": 0,
+  "oy": 138,
+  "anchors": {
+   "lamp": [
+    36.76,
+    31
+   ],
+   "work": [
+    53.76,
+    62
+   ],
+   "in": [
+    110,
+    68
+   ],
+   "out": [
+    18,
+    68
+   ]
+  }
+ },
+ "mill_6r82": {
+  "file": "res://assets/objects/mill_6r82.svg",
+  "w": 144,
+  "h": 166,
+  "ox": 0,
+  "oy": 150,
+  "anchors": {
+   "lamp": [
+    68.75999999999999,
+    43
+   ],
+   "work": [
+    53.76,
+    56
+   ],
+   "in": [
+    18,
+    80
+   ],
+   "out": [
+    104,
+    80
+   ]
+  }
+ },
+ "mill_6r82_v": {
+  "file": "res://assets/objects/mill_6r82_v.svg",
+  "w": 80,
+  "h": 230,
+  "ox": 0,
+  "oy": 214,
+  "anchors": {
+   "lamp": [
+    52,
+    140
+   ],
+   "work": [
+    26,
+    146
+   ],
+   "in": [
+    20,
+    106
+   ],
+   "out": [
+    20,
+    184
+   ]
+  }
+ },
+ "mill_6r82_b": {
+  "file": "res://assets/objects/mill_6r82_b.svg",
+  "w": 144,
+  "h": 166,
+  "ox": 0,
+  "oy": 150,
+  "anchors": {
+   "lamp": [
+    36.76,
+    43
+   ],
+   "work": [
+    53.76,
+    74
+   ],
+   "in": [
+    110,
+    80
+   ],
+   "out": [
+    18,
+    80
+   ]
+  }
+ },
+ "mill_6r13": {
+  "file": "res://assets/objects/mill_6r13.svg",
+  "w": 208,
+  "h": 164,
+  "ox": 0,
+  "oy": 148,
+  "anchors": {
+   "lamp": [
+    101.64,
+    41
+   ],
+   "work": [
+    80.64,
+    74
+   ],
+   "in": [
+    18,
+    78
+   ],
+   "out": [
+    168,
+    78
+   ]
+  }
+ },
+ "mill_6r13_v": {
+  "file": "res://assets/objects/mill_6r13_v.svg",
+  "w": 80,
+  "h": 292,
+  "ox": 0,
+  "oy": 276,
+  "anchors": {
+   "lamp": [
+    52,
+    138
+   ],
+   "work": [
+    26,
+    144
+   ],
+   "in": [
+    20,
+    104
+   ],
+   "out": [
+    20,
+    246
+   ]
+  }
+ },
+ "mill_6r13_b": {
+  "file": "res://assets/objects/mill_6r13_b.svg",
+  "w": 208,
+  "h": 164,
+  "ox": 0,
+  "oy": 148,
+  "anchors": {
+   "lamp": [
+    57.64,
+    41
+   ],
+   "work": [
+    80.64,
+    72
+   ],
+   "in": [
+    174,
+    78
+   ],
+   "out": [
+    18,
+    78
+   ]
+  }
+ },
+ "drill_ns12": {
+  "file": "res://assets/objects/drill_ns12.svg",
+  "w": 80,
+  "h": 132,
+  "ox": 0,
+  "oy": 116,
+  "anchors": {
+   "lamp": [
+    20,
+    12
+   ],
+   "work": [
+    24,
+    54
+   ],
+   "in": [
+    12,
+    58
+   ],
+   "out": [
+    48,
+    58
+   ]
+  }
+ },
+ "drill_ns12_v": {
+  "file": "res://assets/objects/drill_ns12_v.svg",
+  "w": 80,
+  "h": 132,
+  "ox": 0,
+  "oy": 116,
+  "anchors": {
+   "lamp": [
+    20,
+    12
+   ],
+   "work": [
+    24,
+    54
+   ],
+   "in": [
+    12,
+    58
+   ],
+   "out": [
+    48,
+    58
+   ]
+  }
+ },
+ "drill_ns12_b": {
+  "file": "res://assets/objects/drill_ns12_b.svg",
+  "w": 80,
+  "h": 132,
+  "ox": 0,
+  "oy": 116,
+  "anchors": {
+   "lamp": [
+    20,
+    12
+   ],
+   "work": [
+    24,
+    54
+   ],
+   "in": [
+    48,
+    58
+   ],
+   "out": [
+    12,
+    58
+   ]
+  }
+ },
+ "drill_2n118": {
+  "file": "res://assets/objects/drill_2n118.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158,
+  "anchors": {
+   "lamp": [
+    24.5,
+    27.5
+   ],
+   "work": [
+    28,
+    84
+   ],
+   "in": [
+    16,
+    96
+   ],
+   "out": [
+    40,
+    96
+   ]
+  }
+ },
+ "drill_2n118_v": {
+  "file": "res://assets/objects/drill_2n118_v.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158,
+  "anchors": {
+   "lamp": [
+    24.5,
+    27.5
+   ],
+   "work": [
+    28,
+    84
+   ],
+   "in": [
+    16,
+    96
+   ],
+   "out": [
+    40,
+    96
+   ]
+  }
+ },
+ "drill_2n118_b": {
+  "file": "res://assets/objects/drill_2n118_b.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158,
+  "anchors": {
+   "lamp": [
+    24.5,
+    27.5
+   ],
+   "work": [
+    28,
+    84
+   ],
+   "in": [
+    40,
+    96
+   ],
+   "out": [
+    16,
+    96
+   ]
+  }
+ },
+ "drill_2n150": {
+  "file": "res://assets/objects/drill_2n150.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158,
+  "anchors": {
+   "lamp": [
+    24.5,
+    27.5
+   ],
+   "work": [
+    28,
+    84
+   ],
+   "in": [
+    16,
+    96
+   ],
+   "out": [
+    40,
+    96
+   ]
+  }
+ },
+ "drill_2n150_v": {
+  "file": "res://assets/objects/drill_2n150_v.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158,
+  "anchors": {
+   "lamp": [
+    24.5,
+    27.5
+   ],
+   "work": [
+    28,
+    84
+   ],
+   "in": [
+    16,
+    96
+   ],
+   "out": [
+    40,
+    96
+   ]
+  }
+ },
+ "drill_2n150_b": {
+  "file": "res://assets/objects/drill_2n150_b.svg",
+  "w": 80,
+  "h": 174,
+  "ox": 0,
+  "oy": 158,
+  "anchors": {
+   "lamp": [
+    24.5,
+    27.5
+   ],
+   "work": [
+    28,
+    84
+   ],
+   "in": [
+    40,
+    96
+   ],
+   "out": [
+    16,
+    96
+   ]
+  }
+ },
+ "drill_2m55": {
+  "file": "res://assets/objects/drill_2m55.svg",
+  "w": 144,
+  "h": 240,
+  "ox": 0,
+  "oy": 224,
+  "anchors": {
+   "lamp": [
+    96.4,
+    44
+   ],
+   "work": [
+    87.4,
+    110
+   ],
+   "in": [
+    44.4,
+    150
+   ],
+   "out": [
+    104,
+    184
+   ]
+  }
+ },
+ "drill_2m55_v": {
+  "file": "res://assets/objects/drill_2m55_v.svg",
+  "w": 144,
+  "h": 240,
+  "ox": 0,
+  "oy": 224,
+  "anchors": {
+   "lamp": [
+    96.4,
+    44
+   ],
+   "work": [
+    87.4,
+    110
+   ],
+   "in": [
+    44.4,
+    150
+   ],
+   "out": [
+    104,
+    184
+   ]
+  }
+ },
+ "drill_2m55_b": {
+  "file": "res://assets/objects/drill_2m55_b.svg",
+  "w": 144,
+  "h": 240,
+  "ox": 0,
+  "oy": 224,
+  "anchors": {
+   "lamp": [
+    33.6,
+    44
+   ],
+   "work": [
+    42.6,
+    110
+   ],
+   "in": [
+    76.8,
+    150
+   ],
+   "out": [
+    24,
+    184
+   ]
+  }
+ },
+ "weld_vd306": {
+  "file": "res://assets/objects/weld_vd306.svg",
+  "w": 144,
+  "h": 126,
+  "ox": 0,
+  "oy": 110,
+  "anchors": {
+   "lamp": [
+    116,
+    62
+   ],
+   "work": [
+    40,
+    56
+   ],
+   "flash": [
+    40,
+    56
+   ],
+   "in": [
+    14,
+    50
+   ],
+   "out": [
+    72,
+    50
+   ]
+  }
+ },
+ "weld_vd306_v": {
+  "file": "res://assets/objects/weld_vd306_v.svg",
+  "w": 80,
+  "h": 190,
+  "ox": 0,
+  "oy": 174,
+  "anchors": {
+   "lamp": [
+    31,
+    158
+   ],
+   "work": [
+    26,
+    80
+   ],
+   "flash": [
+    26,
+    80
+   ],
+   "in": [
+    12,
+    56
+   ],
+   "out": [
+    46,
+    66
+   ]
+  }
+ },
+ "weld_vd306_b": {
+  "file": "res://assets/objects/weld_vd306_b.svg",
+  "w": 144,
+  "h": 126,
+  "ox": 0,
+  "oy": 110,
+  "anchors": {
+   "lamp": [
+    12,
+    62
+   ],
+   "work": [
+    88,
+    56
+   ],
+   "flash": [
+    88,
+    56
+   ],
+   "in": [
+    114,
+    50
+   ],
+   "out": [
+    56,
+    50
+   ]
+  }
+ },
+ "weld_pdg251": {
+  "file": "res://assets/objects/weld_pdg251.svg",
+  "w": 144,
+  "h": 126,
+  "ox": 0,
+  "oy": 110,
+  "anchors": {
+   "lamp": [
+    118,
+    58
+   ],
+   "work": [
+    40,
+    56
+   ],
+   "flash": [
+    40,
+    56
+   ],
+   "in": [
+    14,
+    50
+   ],
+   "out": [
+    72,
+    50
+   ]
+  }
+ },
+ "weld_pdg251_v": {
+  "file": "res://assets/objects/weld_pdg251_v.svg",
+  "w": 80,
+  "h": 190,
+  "ox": 0,
+  "oy": 174,
+  "anchors": {
+   "lamp": [
+    31,
+    158
+   ],
+   "work": [
+    26,
+    80
+   ],
+   "flash": [
+    26,
+    80
+   ],
+   "in": [
+    12,
+    56
+   ],
+   "out": [
+    46,
+    66
+   ]
+  }
+ },
+ "weld_pdg251_b": {
+  "file": "res://assets/objects/weld_pdg251_b.svg",
+  "w": 144,
+  "h": 126,
+  "ox": 0,
+  "oy": 110,
+  "anchors": {
+   "lamp": [
+    12,
+    62
+   ],
+   "work": [
+    88,
+    56
+   ],
+   "flash": [
+    88,
+    56
+   ],
+   "in": [
+    114,
+    50
+   ],
+   "out": [
+    56,
+    50
+   ]
+  }
+ },
+ "weld_spot": {
+  "file": "res://assets/objects/weld_spot.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    43,
+    110
+   ],
+   "work": [
+    9,
+    66
+   ],
+   "flash": [
+    9,
+    66
+   ],
+   "in": [
+    30,
+    124
+   ],
+   "out": [
+    50,
+    124
+   ]
+  }
+ },
+ "weld_spot_v": {
+  "file": "res://assets/objects/weld_spot_v.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    43,
+    110
+   ],
+   "work": [
+    9,
+    66
+   ],
+   "flash": [
+    9,
+    66
+   ],
+   "in": [
+    30,
+    124
+   ],
+   "out": [
+    50,
+    124
+   ]
+  }
+ },
+ "weld_spot_b": {
+  "file": "res://assets/objects/weld_spot_b.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    43,
+    110
+   ],
+   "work": [
+    50,
+    66
+   ],
+   "flash": [
+    50,
+    66
+   ],
+   "in": [
+    50,
+    124
+   ],
+   "out": [
+    30,
+    124
+   ]
+  }
+ },
+ "weld_stand": {
+  "file": "res://assets/objects/weld_stand.svg",
+  "w": 208,
+  "h": 200,
+  "ox": 0,
+  "oy": 184,
+  "anchors": {
+   "lamp": [
+    174,
+    37
+   ],
+   "work": [
+    96.0,
+    100
+   ],
+   "flash": [
+    96.0,
+    100
+   ],
+   "in": [
+    24,
+    154
+   ],
+   "out": [
+    168,
+    154
+   ]
+  }
+ },
+ "weld_stand_v": {
+  "file": "res://assets/objects/weld_stand_v.svg",
+  "w": 144,
+  "h": 264,
+  "ox": 0,
+  "oy": 248,
+  "anchors": {
+   "lamp": [
+    110,
+    60
+   ],
+   "work": [
+    64.0,
+    142.4
+   ],
+   "flash": [
+    64.0,
+    142.4
+   ],
+   "in": [
+    16,
+    86
+   ],
+   "out": [
+    16,
+    218
+   ]
+  }
+ },
+ "weld_stand_b": {
+  "file": "res://assets/objects/weld_stand_b.svg",
+  "w": 208,
+  "h": 200,
+  "ox": 0,
+  "oy": 184,
+  "anchors": {
+   "lamp": [
+    18,
+    37
+   ],
+   "work": [
+    96.0,
+    100
+   ],
+   "flash": [
+    96.0,
+    100
+   ],
+   "in": [
+    168,
+    154
+   ],
+   "out": [
+    24,
+    154
+   ]
+  }
+ },
+ "asm_bench": {
+  "file": "res://assets/objects/asm_bench.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    48,
+    14
+   ],
+   "work": [
+    30,
+    52
+   ],
+   "in": [
+    12,
+    54
+   ],
+   "out": [
+    50,
+    58
+   ]
+  }
+ },
+ "asm_bench_v": {
+  "file": "res://assets/objects/asm_bench_v.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    48,
+    14
+   ],
+   "work": [
+    30,
+    52
+   ],
+   "in": [
+    12,
+    54
+   ],
+   "out": [
+    50,
+    58
+   ]
+  }
+ },
+ "asm_bench_b": {
+  "file": "res://assets/objects/asm_bench_b.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    48,
+    14
+   ],
+   "work": [
+    30,
+    52
+   ],
+   "in": [
+    12,
+    54
+   ],
+   "out": [
+    50,
+    58
+   ]
+  }
+ },
+ "asm_press": {
+  "file": "res://assets/objects/asm_press.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    87,
+    21
+   ],
+   "work": [
+    98,
+    72
+   ],
+   "in": [
+    16,
+    82
+   ],
+   "out": [
+    64.0,
+    88
+   ]
+  }
+ },
+ "asm_press_v": {
+  "file": "res://assets/objects/asm_press_v.svg",
+  "w": 80,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    46,
+    26
+   ],
+   "work": [
+    44,
+    70
+   ],
+   "in": [
+    14,
+    84
+   ],
+   "out": [
+    44,
+    156
+   ]
+  }
+ },
+ "asm_press_b": {
+  "file": "res://assets/objects/asm_press_b.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    20,
+    21
+   ],
+   "work": [
+    30,
+    72
+   ],
+   "in": [
+    112,
+    82
+   ],
+   "out": [
+    64.0,
+    88
+   ]
+  }
+ },
+ "asm_stand": {
+  "file": "res://assets/objects/asm_stand.svg",
+  "w": 208,
+  "h": 204,
+  "ox": 0,
+  "oy": 188,
+  "anchors": {
+   "lamp": [
+    173,
+    20
+   ],
+   "work": [
+    86.4,
+    90
+   ],
+   "in": [
+    22,
+    148
+   ],
+   "out": [
+    162,
+    174
+   ]
+  }
+ },
+ "asm_stand_v": {
+  "file": "res://assets/objects/asm_stand_v.svg",
+  "w": 144,
+  "h": 268,
+  "ox": 0,
+  "oy": 252,
+  "anchors": {
+   "lamp": [
+    112,
+    30
+   ],
+   "work": [
+    57.6,
+    136.8
+   ],
+   "in": [
+    14,
+    80
+   ],
+   "out": [
+    14,
+    222
+   ]
+  }
+ },
+ "asm_stand_b": {
+  "file": "res://assets/objects/asm_stand_b.svg",
+  "w": 208,
+  "h": 204,
+  "ox": 0,
+  "oy": 188,
+  "anchors": {
+   "lamp": [
+    19,
+    20
+   ],
+   "work": [
+    105.60000000000001,
+    90
+   ],
+   "in": [
+    170,
+    148
+   ],
+   "out": [
+    30,
+    174
+   ]
+  }
+ },
+ "asm_line": {
+  "file": "res://assets/objects/asm_line.svg",
+  "w": 272,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "lamp": [
+    237,
+    18
+   ],
+   "work": [
+    115.2,
+    58
+   ],
+   "in": [
+    14,
+    60
+   ],
+   "out": [
+    238,
+    64
+   ]
+  }
+ },
+ "asm_line_v": {
+  "file": "res://assets/objects/asm_line_v.svg",
+  "w": 80,
+  "h": 316,
+  "ox": 0,
+  "oy": 300,
+  "anchors": {
+   "lamp": [
+    46,
+    42
+   ],
+   "work": [
+    30,
+    159.2
+   ],
+   "in": [
+    14,
+    58
+   ],
+   "out": [
+    30,
+    280
+   ]
+  }
+ },
+ "asm_line_b": {
+  "file": "res://assets/objects/asm_line_b.svg",
+  "w": 272,
+  "h": 124,
+  "ox": 0,
+  "oy": 108,
+  "anchors": {
+   "lamp": [
+    19,
+    18
+   ],
+   "work": [
+    140.8,
+    58
+   ],
+   "in": [
+    242,
+    60
+   ],
+   "out": [
+    18,
+    64
+   ]
+  }
+ },
+ "heat_snol": {
+  "file": "res://assets/objects/heat_snol.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    48,
+    42
+   ],
+   "glow": [
+    20,
+    42,
+    14,
+    9
+   ],
+   "in": [
+    12,
+    70
+   ],
+   "out": [
+    52,
+    70
+   ]
+  }
+ },
+ "heat_snol_v": {
+  "file": "res://assets/objects/heat_snol_v.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    48,
+    42
+   ],
+   "glow": [
+    20,
+    42,
+    14,
+    9
+   ],
+   "in": [
+    12,
+    70
+   ],
+   "out": [
+    52,
+    70
+   ]
+  }
+ },
+ "heat_snol_b": {
+  "file": "res://assets/objects/heat_snol_b.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104,
+  "anchors": {
+   "lamp": [
+    16,
+    42
+   ],
+   "glow": [
+    24,
+    42,
+    14,
+    9
+   ],
+   "in": [
+    52,
+    70
+   ],
+   "out": [
+    12,
+    70
+   ]
+  }
+ },
+ "heat_tvch": {
+  "file": "res://assets/objects/heat_tvch.svg",
+  "w": 144,
+  "h": 140,
+  "ox": 0,
+  "oy": 124,
+  "anchors": {
+   "lamp": [
+    16,
+    74
+   ],
+   "glow": [
+    80,
+    56,
+    20,
+    14
+   ],
+   "in": [
+    70,
+    74
+   ],
+   "out": [
+    112,
+    74
+   ]
+  }
+ },
+ "heat_tvch_v": {
+  "file": "res://assets/objects/heat_tvch_v.svg",
+  "w": 80,
+  "h": 204,
+  "ox": 0,
+  "oy": 188,
+  "anchors": {
+   "lamp": [
+    18,
+    70
+   ],
+   "glow": [
+    22,
+    128,
+    20,
+    14
+   ],
+   "in": [
+    12,
+    126
+   ],
+   "out": [
+    52,
+    156
+   ]
+  }
+ },
+ "heat_tvch_b": {
+  "file": "res://assets/objects/heat_tvch_b.svg",
+  "w": 144,
+  "h": 140,
+  "ox": 0,
+  "oy": 124,
+  "anchors": {
+   "lamp": [
+    110,
+    40
+   ],
+   "glow": [
+    24,
+    56,
+    20,
+    14
+   ],
+   "in": [
+    56,
+    74
+   ],
+   "out": [
+    12,
+    74
+   ]
+  }
+ },
+ "heat_shaft": {
+  "file": "res://assets/objects/heat_shaft.svg",
+  "w": 144,
+  "h": 204,
+  "ox": 0,
+  "oy": 188,
+  "anchors": {
+   "lamp": [
+    101,
+    82
+   ],
+   "glow": [
+    38.4,
+    100.64,
+    30.72,
+    16
+   ],
+   "in": [
+    14,
+    178
+   ],
+   "out": [
+    76.8,
+    178
+   ]
+  }
+ },
+ "heat_shaft_v": {
+  "file": "res://assets/objects/heat_shaft_v.svg",
+  "w": 144,
+  "h": 204,
+  "ox": 0,
+  "oy": 188,
+  "anchors": {
+   "lamp": [
+    101,
+    82
+   ],
+   "glow": [
+    38.4,
+    100.64,
+    30.72,
+    16
+   ],
+   "in": [
+    14,
+    178
+   ],
+   "out": [
+    76.8,
+    178
+   ]
+  }
+ },
+ "heat_shaft_b": {
+  "file": "res://assets/objects/heat_shaft_b.svg",
+  "w": 144,
+  "h": 204,
+  "ox": 0,
+  "oy": 188,
+  "anchors": {
+   "lamp": [
+    101,
+    82
+   ],
+   "glow": [
+    38.4,
+    100.64,
+    30.72,
+    16
+   ],
+   "in": [
+    14,
+    178
+   ],
+   "out": [
+    76.8,
+    178
+   ]
+  }
+ },
+ "heat_bogie": {
+  "file": "res://assets/objects/heat_bogie.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    160,
+    86
+   ],
+   "glow": [
+    57.599999999999994,
+    88,
+    42.24,
+    18
+   ],
+   "in": [
+    20,
+    190
+   ],
+   "out": [
+    142,
+    190
+   ]
+  }
+ },
+ "heat_bogie_v": {
+  "file": "res://assets/objects/heat_bogie_v.svg",
+  "w": 144,
+  "h": 278,
+  "ox": 0,
+  "oy": 262,
+  "anchors": {
+   "lamp": [
+    108,
+    40
+   ],
+   "glow": [
+    38.4,
+    210,
+    38.4,
+    16
+   ],
+   "in": [
+    14,
+    252
+   ],
+   "out": [
+    114,
+    252
+   ]
+  }
+ },
+ "heat_bogie_b": {
+  "file": "res://assets/objects/heat_bogie_b.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    18,
+    86
+   ],
+   "glow": [
+    96.0,
+    88,
+    42.24,
+    18
+   ],
+   "in": [
+    172,
+    190
+   ],
+   "out": [
+    50,
+    190
+   ]
+  }
+ },
+ "paint_table": {
+  "file": "res://assets/objects/paint_table.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    116,
+    66
+   ],
+   "work": [
+    64.0,
+    70
+   ],
+   "mist": [
+    64.0,
+    70
+   ],
+   "in": [
+    16,
+    120
+   ],
+   "out": [
+    110,
+    120
+   ]
+  }
+ },
+ "paint_table_v": {
+  "file": "res://assets/objects/paint_table_v.svg",
+  "w": 80,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    46,
+    66
+   ],
+   "work": [
+    30,
+    120
+   ],
+   "mist": [
+    30,
+    110
+   ],
+   "in": [
+    12,
+    90
+   ],
+   "out": [
+    12,
+    170
+   ]
+  }
+ },
+ "paint_table_b": {
+  "file": "res://assets/objects/paint_table_b.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    14,
+    66
+   ],
+   "work": [
+    64.0,
+    70
+   ],
+   "mist": [
+    64.0,
+    70
+   ],
+   "in": [
+    112,
+    120
+   ],
+   "out": [
+    18,
+    120
+   ]
+  }
+ },
+ "paint_small": {
+  "file": "res://assets/objects/paint_small.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    116,
+    66
+   ],
+   "work": [
+    64.0,
+    80
+   ],
+   "mist": [
+    64.0,
+    80
+   ],
+   "in": [
+    16,
+    120
+   ],
+   "out": [
+    110,
+    120
+   ]
+  }
+ },
+ "paint_small_v": {
+  "file": "res://assets/objects/paint_small_v.svg",
+  "w": 80,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    46,
+    66
+   ],
+   "work": [
+    30,
+    120
+   ],
+   "mist": [
+    30,
+    110
+   ],
+   "in": [
+    12,
+    90
+   ],
+   "out": [
+    12,
+    170
+   ]
+  }
+ },
+ "paint_small_b": {
+  "file": "res://assets/objects/paint_small_b.svg",
+  "w": 144,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    14,
+    66
+   ],
+   "work": [
+    64.0,
+    80
+   ],
+   "mist": [
+    64.0,
+    80
+   ],
+   "in": [
+    112,
+    120
+   ],
+   "out": [
+    18,
+    120
+   ]
+  }
+ },
+ "paint_powder": {
+  "file": "res://assets/objects/paint_powder.svg",
+  "w": 144,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    110,
+    36
+   ],
+   "work": [
+    38.4,
+    90
+   ],
+   "mist": [
+    38.4,
+    80
+   ],
+   "in": [
+    20,
+    192
+   ],
+   "out": [
+    108,
+    192
+   ]
+  }
+ },
+ "paint_powder_v": {
+  "file": "res://assets/objects/paint_powder_v.svg",
+  "w": 144,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    110,
+    36
+   ],
+   "work": [
+    64.0,
+    102.0
+   ],
+   "mist": [
+    64.0,
+    95.6
+   ],
+   "in": [
+    12,
+    90
+   ],
+   "out": [
+    12,
+    188
+   ]
+  }
+ },
+ "paint_powder_b": {
+  "file": "res://assets/objects/paint_powder_b.svg",
+  "w": 144,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    18,
+    36
+   ],
+   "work": [
+    76.8,
+    90
+   ],
+   "mist": [
+    76.8,
+    80
+   ],
+   "in": [
+    108,
+    192
+   ],
+   "out": [
+    20,
+    192
+   ]
+  }
+ },
+ "paint_line": {
+  "file": "res://assets/objects/paint_line.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    174,
+    36
+   ],
+   "work": [
+    57.599999999999994,
+    90
+   ],
+   "mist": [
+    57.599999999999994,
+    80
+   ],
+   "in": [
+    20,
+    192
+   ],
+   "out": [
+    172,
+    192
+   ]
+  }
+ },
+ "paint_line_v": {
+  "file": "res://assets/objects/paint_line_v.svg",
+  "w": 144,
+  "h": 278,
+  "ox": 0,
+  "oy": 262,
+  "anchors": {
+   "lamp": [
+    110,
+    36
+   ],
+   "work": [
+    64.0,
+    118.0
+   ],
+   "mist": [
+    64.0,
+    108.4
+   ],
+   "in": [
+    12,
+    90
+   ],
+   "out": [
+    12,
+    252
+   ]
+  }
+ },
+ "paint_line_b": {
+  "file": "res://assets/objects/paint_line_b.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    18,
+    36
+   ],
+   "work": [
+    115.19999999999999,
+    90
+   ],
+   "mist": [
+    115.19999999999999,
+    80
+   ],
+   "in": [
+    172,
+    192
+   ],
+   "out": [
+    20,
+    192
+   ]
+  }
+ },
+ "cnc_65a60": {
+  "file": "res://assets/objects/cnc_65a60.svg",
+  "w": 208,
+  "h": 268,
+  "ox": 0,
+  "oy": 252,
+  "anchors": {
+   "lamp": [
+    112,
+    26
+   ],
+   "work": [
+    93,
+    168
+   ],
+   "in": [
+    162,
+    244
+   ],
+   "out": [
+    14,
+    244
+   ],
+   "screen": [
+    141,
+    170
+   ]
+  }
+ },
+ "cnc_65a60_v": {
+  "file": "res://assets/objects/cnc_65a60_v.svg",
+  "w": 144,
+  "h": 358,
+  "ox": 0,
+  "oy": 342,
+  "anchors": {
+   "lamp": [
+    102.4,
+    86
+   ],
+   "work": [
+    64.0,
+    180
+   ],
+   "in": [
+    8,
+    318
+   ],
+   "out": [
+    8,
+    236.0
+   ]
+  }
+ },
+ "cnc_65a60_b": {
+  "file": "res://assets/objects/cnc_65a60_b.svg",
+  "w": 208,
+  "h": 268,
+  "ox": 0,
+  "oy": 252,
+  "anchors": {
+   "lamp": [
+    80,
+    26
+   ],
+   "work": [
+    99,
+    168
+   ],
+   "in": [
+    30,
+    244
+   ],
+   "out": [
+    178,
+    244
+   ]
+  }
+ },
+ "cnc_panther": {
+  "file": "res://assets/objects/cnc_panther.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    28,
+    42
+   ],
+   "work": [
+    92,
+    144
+   ],
+   "in": [
+    140,
+    190
+   ],
+   "out": [
+    18,
+    190
+   ],
+   "screen": [
+    66,
+    80
+   ]
+  }
+ },
+ "cnc_panther_v": {
+  "file": "res://assets/objects/cnc_panther_v.svg",
+  "w": 144,
+  "h": 298,
+  "ox": 0,
+  "oy": 282,
+  "anchors": {
+   "lamp": [
+    88,
+    34
+   ],
+   "work": [
+    44.879999999999995,
+    110
+   ],
+   "in": [
+    8,
+    258
+   ],
+   "out": [
+    8,
+    176.0
+   ]
+  }
+ },
+ "cnc_panther_b": {
+  "file": "res://assets/objects/cnc_panther_b.svg",
+  "w": 208,
+  "h": 214,
+  "ox": 0,
+  "oy": 198,
+  "anchors": {
+   "lamp": [
+    164,
+    42
+   ],
+   "work": [
+    100,
+    144
+   ],
+   "in": [
+    52,
+    190
+   ],
+   "out": [
+    162,
+    190
+   ]
+  }
+ },
+ "cnc_sidway": {
+  "file": "res://assets/objects/cnc_sidway.svg",
+  "w": 144,
+  "h": 254,
+  "ox": 0,
+  "oy": 238,
+  "anchors": {
+   "lamp": [
+    36,
+    26
+   ],
+   "work": [
+    56,
+    136
+   ],
+   "in": [
+    104,
+    230
+   ],
+   "out": [
+    14,
+    230
+   ],
+   "screen": [
+    106,
+    102
+   ]
+  }
+ },
+ "cnc_sidway_v": {
+  "file": "res://assets/objects/cnc_sidway_v.svg",
+  "w": 144,
+  "h": 280,
+  "ox": 0,
+  "oy": 264,
+  "anchors": {
+   "lamp": [
+    102.4,
+    72
+   ],
+   "work": [
+    64.0,
+    166
+   ],
+   "in": [
+    8,
+    240
+   ],
+   "out": [
+    8,
+    190.0
+   ]
+  }
+ },
+ "cnc_sidway_b": {
+  "file": "res://assets/objects/cnc_sidway_b.svg",
+  "w": 144,
+  "h": 254,
+  "ox": 0,
+  "oy": 238,
+  "anchors": {
+   "lamp": [
+    92,
+    26
+   ],
+   "work": [
+    72,
+    136
+   ],
+   "in": [
+    24,
+    230
+   ],
+   "out": [
+    114,
+    230
+   ]
+  }
+ },
+ "cnc_hangan": {
+  "file": "res://assets/objects/cnc_hangan.svg",
+  "w": 272,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    20,
+    42
+   ],
+   "chuck": [
+    74,
+    78,
+    16,
+    60
+   ],
+   "tool": [
+    192,
+    106
+   ],
+   "bar": [
+    100,
+    172
+   ],
+   "out": [
+    216,
+    182
+   ],
+   "in": [
+    18,
+    182
+   ],
+   "work": [
+    192,
+    106
+   ]
+  }
+ },
+ "cnc_hangan_v": {
+  "file": "res://assets/objects/cnc_hangan_v.svg",
+  "w": 144,
+  "h": 362,
+  "ox": 0,
+  "oy": 346,
+  "anchors": {
+   "lamp": [
+    30.72,
+    36
+   ],
+   "work": [
+    57.6,
+    130
+   ],
+   "in": [
+    8,
+    322
+   ],
+   "out": [
+    8,
+    208.0
+   ]
+  }
+ },
+ "cnc_hangan_b": {
+  "file": "res://assets/objects/cnc_hangan_b.svg",
+  "w": 272,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    236,
+    42
+   ],
+   "work": [
+    64,
+    106
+   ],
+   "in": [
+    238,
+    182
+   ],
+   "out": [
+    40,
+    182
+   ]
+  }
+ },
+ "cnc_hartwood": {
+  "file": "res://assets/objects/cnc_hartwood.svg",
+  "w": 208,
+  "h": 284,
+  "ox": 0,
+  "oy": 268,
+  "anchors": {
+   "lamp": [
+    118,
+    18
+   ],
+   "work": [
+    98,
+    184
+   ],
+   "in": [
+    162,
+    264
+   ],
+   "out": [
+    26,
+    264
+   ],
+   "screen": [
+    174,
+    150
+   ]
+  }
+ },
+ "cnc_hartwood_v": {
+  "file": "res://assets/objects/cnc_hartwood_v.svg",
+  "w": 144,
+  "h": 312,
+  "ox": 0,
+  "oy": 296,
+  "anchors": {
+   "lamp": [
+    25.6,
+    30
+   ],
+   "work": [
+    64.0,
+    200.0
+   ],
+   "in": [
+    8,
+    272
+   ],
+   "out": [
+    8,
+    190.0
+   ]
+  }
+ },
+ "cnc_hartwood_b": {
+  "file": "res://assets/objects/cnc_hartwood_b.svg",
+  "w": 208,
+  "h": 284,
+  "ox": 0,
+  "oy": 268,
+  "anchors": {
+   "lamp": [
+    74,
+    18
+   ],
+   "work": [
+    94,
+    184
+   ],
+   "in": [
+    30,
+    264
+   ],
+   "out": [
+    166,
+    264
+   ]
+  }
+ },
+ "cnc_minger": {
+  "file": "res://assets/objects/cnc_minger.svg",
+  "w": 144,
+  "h": 254,
+  "ox": 0,
+  "oy": 238,
+  "anchors": {
+   "lamp": [
+    74,
+    54
+   ],
+   "work": [
+    44,
+    158
+   ],
+   "in": [
+    104,
+    230
+   ],
+   "out": [
+    22,
+    230
+   ],
+   "screen": [
+    112,
+    125
+   ]
+  }
+ },
+ "cnc_minger_v": {
+  "file": "res://assets/objects/cnc_minger_v.svg",
+  "w": 144,
+  "h": 294,
+  "ox": 0,
+  "oy": 278,
+  "anchors": {
+   "lamp": [
+    84,
+    44
+   ],
+   "work": [
+    50.0,
+    110
+   ],
+   "in": [
+    8,
+    254
+   ],
+   "out": [
+    8,
+    204.0
+   ]
+  }
+ },
+ "cnc_minger_b": {
+  "file": "res://assets/objects/cnc_minger_b.svg",
+  "w": 144,
+  "h": 254,
+  "ox": 0,
+  "oy": 238,
+  "anchors": {
+   "lamp": [
+    54,
+    54
+   ],
+   "work": [
+    84,
+    158
+   ],
+   "in": [
+    24,
+    230
+   ],
+   "out": [
+    106,
+    230
+   ]
+  }
+ },
+ "cnc_maiday": {
+  "file": "res://assets/objects/cnc_maiday.svg",
+  "w": 144,
+  "h": 218,
+  "ox": 0,
+  "oy": 202,
+  "anchors": {
+   "lamp": [
+    84,
+    64
+   ],
+   "work": [
+    40,
+    150
+   ],
+   "in": [
+    104,
+    194
+   ],
+   "out": [
+    14,
+    194
+   ],
+   "screen": [
+    83.89999999999999,
+    138
+   ]
+  }
+ },
+ "cnc_maiday_b": {
+  "file": "res://assets/objects/cnc_maiday_b.svg",
+  "w": 144,
+  "h": 218,
+  "ox": 0,
+  "oy": 202,
+  "anchors": {
+   "lamp": [
+    44,
+    64
+   ],
+   "work": [
+    88,
+    150
+   ],
+   "in": [
+    24,
+    194
+   ],
+   "out": [
+    112,
+    194
+   ]
+  }
+ },
+ "cnc_maiday_v": {
+  "file": "res://assets/objects/cnc_maiday_v.svg",
+  "w": 144,
+  "h": 234,
+  "ox": 0,
+  "oy": 218,
+  "anchors": {
+   "lamp": [
+    88,
+    34
+   ],
+   "work": [
+    44.879999999999995,
+    110
+   ],
+   "in": [
+    8,
+    194
+   ],
+   "out": [
+    8,
+    144.0
+   ]
+  }
+ }
+}

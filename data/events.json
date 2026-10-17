@@ -1,0 +1,297 @@
+{
+  "_comment": "Рассказчик. kind: bad/good/neutral; w — вес; sev — сколько «напряжения» тратит; cd — дней до повтора; min_day — не раньше. modes — множители веса по режимам.",
+  "modes": {
+    "calm": {
+      "name": "Спокойная пятилетка",
+      "desc": "Мягкий режим для строительства: событий меньше, они слабее, штрафы вдвое ниже.",
+      "day_chance": 0.33,
+      "good_share": 0.6,
+      "tension_rate": 6,
+      "grace_days": 6,
+      "injury_k": 0.5,
+      "fire_k": 0.5
+    },
+    "market": {
+      "name": "Рыночная экономика",
+      "desc": "Стандарт: кризисы чередуются со спокойными неделями.",
+      "day_chance": 0.5,
+      "good_share": 0.42,
+      "tension_rate": 9,
+      "grace_days": 3,
+      "injury_k": 1.0,
+      "fire_k": 1.0
+    },
+    "wild": {
+      "name": "Лихие девяностые",
+      "desc": "Хардкор: задержки оплат, бартер, рейдеры, скачущие цены, частые проверки и кражи.",
+      "day_chance": 0.65,
+      "good_share": 0.3,
+      "tension_rate": 14,
+      "grace_days": 2,
+      "injury_k": 1.4,
+      "fire_k": 1.4
+    }
+  },
+  "events": {
+    "fire": {
+      "kind": "bad",
+      "w": 6,
+      "sev": 30,
+      "cd": 12,
+      "min_day": 6
+    },
+    "injury": {
+      "kind": "bad",
+      "w": 6,
+      "sev": 15,
+      "cd": 5,
+      "min_day": 4
+    },
+    "bad_metal": {
+      "kind": "bad",
+      "w": 5,
+      "sev": 15,
+      "cd": 10,
+      "min_day": 5
+    },
+    "metal_up": {
+      "kind": "bad",
+      "w": 4,
+      "sev": 10,
+      "cd": 12,
+      "min_day": 6,
+      "modes": {
+        "calm": 0.6,
+        "wild": 2.0
+      }
+    },
+    "metal_down": {
+      "kind": "good",
+      "w": 3,
+      "sev": 0,
+      "cd": 14,
+      "min_day": 6
+    },
+    "outage": {
+      "kind": "bad",
+      "w": 5,
+      "sev": 12,
+      "cd": 8,
+      "min_day": 4
+    },
+    "pipe_burst": {
+      "kind": "bad",
+      "w": 6,
+      "sev": 15,
+      "cd": 10,
+      "min_day": 8,
+      "season": "winter"
+    },
+    "cold_snap": {
+      "kind": "bad",
+      "w": 6,
+      "sev": 15,
+      "cd": 14,
+      "min_day": 8,
+      "season": "winter"
+    },
+    "heatwave": {
+      "kind": "bad",
+      "w": 5,
+      "sev": 10,
+      "cd": 14,
+      "min_day": 8,
+      "season": "summer"
+    },
+    "flood": {
+      "kind": "bad",
+      "w": 5,
+      "sev": 10,
+      "cd": 30,
+      "min_day": 8,
+      "season": "spring"
+    },
+    "supply_delay": {
+      "kind": "bad",
+      "w": 4,
+      "sev": 8,
+      "cd": 7,
+      "min_day": 5
+    },
+    "hot_order": {
+      "kind": "good",
+      "w": 6,
+      "sev": 0,
+      "cd": 5,
+      "min_day": 3
+    },
+    "theft": {
+      "kind": "bad",
+      "w": 5,
+      "sev": 10,
+      "cd": 7,
+      "min_day": 6,
+      "modes": {
+        "calm": 0.5,
+        "wild": 2.2
+      }
+    },
+    "drinking": {
+      "kind": "bad",
+      "w": 4,
+      "sev": 12,
+      "cd": 10,
+      "min_day": 7
+    },
+    "rumor": {
+      "kind": "bad",
+      "w": 3,
+      "sev": 10,
+      "cd": 14,
+      "min_day": 12
+    },
+    "shift_conflict": {
+      "kind": "bad",
+      "w": 4,
+      "sev": 8,
+      "cd": 14,
+      "min_day": 10
+    },
+    "retire": {
+      "kind": "neutral",
+      "w": 4,
+      "sev": 0,
+      "cd": 20,
+      "min_day": 10
+    },
+    "poach": {
+      "kind": "bad",
+      "w": 4,
+      "sev": 12,
+      "cd": 12,
+      "min_day": 12
+    },
+    "wedding": {
+      "kind": "good",
+      "w": 4,
+      "sev": 0,
+      "cd": 12,
+      "min_day": 6
+    },
+    "baby": {
+      "kind": "good",
+      "w": 3,
+      "sev": 0,
+      "cd": 14,
+      "min_day": 10
+    },
+    "rational": {
+      "kind": "good",
+      "w": 6,
+      "sev": 0,
+      "cd": 8,
+      "min_day": 5
+    },
+    "governor": {
+      "kind": "neutral",
+      "w": 3,
+      "sev": 0,
+      "cd": 40,
+      "min_day": 18
+    },
+    "journalist": {
+      "kind": "neutral",
+      "w": 4,
+      "sev": 0,
+      "cd": 18,
+      "min_day": 10
+    },
+    "grant": {
+      "kind": "good",
+      "w": 4,
+      "sev": 0,
+      "cd": 25,
+      "min_day": 12,
+      "modes": {
+        "wild": 0.3
+      }
+    },
+    "competitor_sale": {
+      "kind": "good",
+      "w": 4,
+      "sev": 0,
+      "cd": 20,
+      "min_day": 10
+    },
+    "raid": {
+      "kind": "bad",
+      "w": 3,
+      "sev": 40,
+      "cd": 30,
+      "min_day": 20,
+      "modes": {
+        "calm": 0,
+        "market": 0,
+        "wild": 1.0
+      }
+    },
+    "barter": {
+      "kind": "neutral",
+      "w": 5,
+      "sev": 0,
+      "cd": 8,
+      "min_day": 6,
+      "modes": {
+        "calm": 0,
+        "market": 0,
+        "wild": 1.0
+      }
+    },
+    "strike": {
+      "kind": "bad",
+      "w": 0,
+      "sev": 0,
+      "cd": 20,
+      "min_day": 8
+    },
+    "heat_off": {
+      "kind": "bad",
+      "w": 5,
+      "sev": 12,
+      "cd": 16,
+      "min_day": 10,
+      "season": "winter"
+    },
+    "wire_break": {
+      "kind": "bad",
+      "w": 4,
+      "sev": 10,
+      "cd": 12,
+      "min_day": 7
+    },
+    "leak": {
+      "kind": "bad",
+      "w": 4,
+      "sev": 10,
+      "cd": 12,
+      "min_day": 7
+    }
+  },
+  "decision_hours": 6,
+  "injury_base": 1.2e-05,
+  "sick_days": [
+    2,
+    6
+  ],
+  "fire_base": 2e-05,
+  "fire_spread": 0.025,
+  "fire_grow": 0.015,
+  "fire_brigade_after": 45,
+  "fire_brigade_cells": 14,
+  "extinguish_rate": 0.18,
+  "extinguish_bare": 0.05,
+  "strike_mood": 33,
+  "strike_days": 3,
+  "guard_cost_day": 1500,
+  "wild_defer_chance": 0.35
+}

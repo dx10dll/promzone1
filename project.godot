@@ -1,0 +1,49 @@
+; Промзона — симулятор строительства и управления заводом.
+; Файл настроек проекта Godot 4.
+
+config_version=5
+
+[application]
+
+config/name="Промзона"
+config/description="Симулятор строительства и управления российским заводом"
+config/version="1.22"
+run/main_scene="res://scenes/main_menu.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.svg"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Promzona"
+boot_splash/bg_color=Color(0.113725, 0.12549, 0.141176, 1)
+boot_splash/show_image=false
+
+[autoload]
+
+Game="*res://scripts/autoload/game.gd"
+Snd="*res://scripts/autoload/snd.gd"
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/size/mode=2
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[gui]
+
+theme/custom_font="res://assets/fonts/IBMPlexSans-Regular.ttf"
+theme/default_font_multichannel_signed_distance_field=true
+
+[importer_defaults]
+
+texture={
+"mipmaps/generate": true,
+"svg/scale": 3.0
+}
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=3
+environment/defaults/default_clear_color=Color(0.16, 0.17, 0.18, 1)

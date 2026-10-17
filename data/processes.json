@@ -1,0 +1,58 @@
+{
+ "turning": {
+  "name": "Токарная",
+  "skill": "turning",
+  "prof": "turner",
+  "cons": "tools",
+  "cons_use": 1.0
+ },
+ "milling": {
+  "name": "Фрезерная",
+  "skill": "milling",
+  "prof": "miller",
+  "cons": "tools",
+  "cons_use": 1.5
+ },
+ "drilling": {
+  "name": "Сверлильная",
+  "skill": "milling",
+  "prof": "miller",
+  "cons": "tools",
+  "cons_use": 0.5
+ },
+ "welding": {
+  "name": "Сварка",
+  "skill": "welding",
+  "prof": "welder",
+  "cons": "electrodes",
+  "cons_use": 1.0
+ },
+ "heat": {
+  "name": "Термообработка",
+  "skill": "heat",
+  "prof": "heat_treater",
+  "cons": "",
+  "cons_use": 0.0
+ },
+ "paint": {
+  "name": "Покраска",
+  "skill": "paint",
+  "prof": "painter",
+  "cons": "paint",
+  "cons_use": 1.0
+ },
+ "assembly": {
+  "name": "Сборка",
+  "skill": "assembly",
+  "prof": "assembler",
+  "cons": "",
+  "cons_use": 0.0
+ },
+ "test": {
+  "name": "Испытания",
+  "skill": "qc",
+  "prof": "qc",
+  "cons": "",
+  "cons_use": 0.0
+ }
+}

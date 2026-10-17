@@ -1,0 +1,909 @@
+{
+  "ate_canteen": {
+    "text": "Пообедал в нормальной столовой",
+    "mood": 6,
+    "dur": 720,
+    "grp": "byt"
+  },
+  "ate_table": {
+    "text": "Обедал за столом прямо в цеху",
+    "mood": -1,
+    "dur": 600,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "ate_bench": {
+    "text": "Обедал на скамейке",
+    "mood": -3,
+    "dur": 600,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "ate_standing": {
+    "text": "Обедал стоя, на ходу",
+    "mood": -6,
+    "dur": 600,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "toilet_open": {
+    "text": "Туалет прямо в цеху, без стен",
+    "mood": -3,
+    "dur": 480,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "toilet_nosink": {
+    "text": "Негде помыть руки",
+    "mood": -2,
+    "dur": 480,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "toilet_good": {
+    "text": "Чистый туалет с кафелем",
+    "mood": 1,
+    "dur": 480,
+    "grp": "byt"
+  },
+  "held_it": {
+    "text": "Долго терпел — туалет был занят",
+    "mood": -5,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "changed_locker": {
+    "text": "Переоделся в бытовке",
+    "mood": 2,
+    "dur": 600,
+    "grp": "byt"
+  },
+  "changed_shop": {
+    "text": "Шкафчик стоит прямо в цеху",
+    "mood": -1,
+    "dur": 600,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "changed_corner": {
+    "text": "Переодевался где придётся",
+    "mood": -4,
+    "dur": 600,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "dark": {
+    "text": "Работал в темноте",
+    "mood": -5,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "rested_room": {
+    "text": "Отдохнул в комнате отдыха",
+    "mood": 3,
+    "dur": 300,
+    "grp": "byt"
+  },
+  "sofa": {
+    "text": "Посидел на диване",
+    "mood": 1,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "smoked": {
+    "text": "Перекурил",
+    "mood": 2,
+    "dur": 120,
+    "grp": "byt"
+  },
+  "no_smoke": {
+    "text": "Негде покурить",
+    "mood": -4,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "idle_bad": {
+    "text": "Нечем заняться — тоска",
+    "mood": -3,
+    "dur": 120,
+    "grp": "work"
+  },
+  "payday": {
+    "text": "Зарплату выдали вовремя",
+    "mood": 5,
+    "dur": 2880,
+    "grp": "money"
+  },
+  "bonus": {
+    "text": "Получил премию",
+    "mood": 10,
+    "dur": 4320,
+    "wage": true,
+    "grp": "money"
+  },
+  "raise": {
+    "text": "Подняли ставку",
+    "mood": 8,
+    "dur": 4320,
+    "wage": true,
+    "grp": "money"
+  },
+  "wage_cut": {
+    "text": "Урезали ставку",
+    "mood": -12,
+    "dur": 4320,
+    "wage": true,
+    "grp": "money"
+  },
+  "coworker_fired": {
+    "text": "Уволили коллегу",
+    "mood": -4,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "new_machine": {
+    "text": "На заводе новое оборудование",
+    "mood": 3,
+    "dur": 2880,
+    "grp": "work"
+  },
+  "honor_board": {
+    "text": "Моё фото на доске почёта",
+    "mood": 8,
+    "dur": 10080,
+    "grp": "work"
+  },
+  "breaker": {
+    "text": "Выбило свет посреди смены",
+    "mood": -3,
+    "dur": 240,
+    "grp": "work"
+  },
+  "overtime_drink": {
+    "text": "Голова болит после выходных",
+    "mood": -3,
+    "dur": 480,
+    "grp": "home"
+  },
+  "master_good": {
+    "text": "Толковый мастер на смене",
+    "mood": 3,
+    "dur": 600,
+    "grp": "work"
+  },
+  "no_master": {
+    "text": "Бардак: на смене нет мастера",
+    "mood": -3,
+    "dur": 600,
+    "grp": "work"
+  },
+  "rush": {
+    "text": "Аврал: гонят план",
+    "mood": -5,
+    "dur": 600,
+    "grp": "work"
+  },
+  "overtime": {
+    "text": "Сверхурочные: устал, но заплатят",
+    "mood": -2,
+    "dur": 900,
+    "grp": "money"
+  },
+  "five_s": {
+    "text": "Порядок на рабочем месте (5S)",
+    "mood": 2,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "office_own": {
+    "text": "Свой кабинет",
+    "mood": 4,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "office_shared": {
+    "text": "Тесно в общей конторе",
+    "mood": -1,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "no_desk": {
+    "text": "Нет рабочего места — работает «на коленке»",
+    "mood": -6,
+    "dur": 600,
+    "grp": "work"
+  },
+  "ate_menu": {
+    "text": "Комплексный обед в столовой",
+    "mood": 4,
+    "dur": 720,
+    "grp": "byt"
+  },
+  "cold": {
+    "text": "Холодно на рабочем месте",
+    "mood": -5,
+    "dur": 120,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "freezing": {
+    "text": "Зуб на зуб не попадает",
+    "mood": -12,
+    "dur": 120,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "hot": {
+    "text": "Жарко, как в печке",
+    "mood": -6,
+    "dur": 120,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "warm_winter": {
+    "text": "На улице мороз, а в цеху тепло",
+    "mood": 2,
+    "dur": 180,
+    "grp": "byt"
+  },
+  "injured": {
+    "text": "Получил травму на работе",
+    "mood": -14,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "coworker_injured": {
+    "text": "Коллега покалечился на работе",
+    "mood": -4,
+    "dur": 1440,
+    "grp": "team"
+  },
+  "fire_scare": {
+    "text": "Пожар! Страшно было",
+    "mood": -8,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "inspection_ok": {
+    "text": "Проверку прошли без замечаний",
+    "mood": 3,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "corporate": {
+    "text": "Отличный был корпоратив",
+    "mood": 10,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "no_party": {
+    "text": "Даже на Новый год не поздравили",
+    "mood": -6,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "ny_bonus": {
+    "text": "Новогодняя премия!",
+    "mood": 8,
+    "dur": 4320,
+    "wage": true,
+    "grp": "money"
+  },
+  "holiday_gift": {
+    "text": "Поздравили с праздником",
+    "mood": 5,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "holiday_forgot": {
+    "text": "Про праздник забыли",
+    "mood": -5,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "machine_day": {
+    "text": "Торжественное собрание и грамоты",
+    "mood": 5,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "subbotnik": {
+    "text": "Вышли на субботник всем коллективом",
+    "mood": 2,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "strike_won": {
+    "text": "Добились своего на забастовке",
+    "mood": 8,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "strike_half": {
+    "text": "Пошли на компромисс с начальством",
+    "mood": 2,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "strike_lost": {
+    "text": "Начальство не слышит людей",
+    "mood": -10,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "strike_crushed": {
+    "text": "Зачинщика уволили. Боятся слово сказать",
+    "mood": -12,
+    "dur": 5760,
+    "grp": "team"
+  },
+  "gift_given": {
+    "text": "Коллектив поздравил с важным событием",
+    "mood": 10,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "gift_none": {
+    "text": "Даже открытку не подписали",
+    "mood": -5,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "rational_paid": {
+    "text": "Рацпредложение приняли и заплатили",
+    "mood": 10,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "rational_ignored": {
+    "text": "Рацпредложение положили под сукно",
+    "mood": -6,
+    "dur": 2880,
+    "grp": "work"
+  },
+  "layoff_rumor": {
+    "text": "Ходят слухи о сокращении",
+    "mood": -6,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "rumor_cleared": {
+    "text": "На собрании развеяли слухи",
+    "mood": 2,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "reprimand": {
+    "text": "Объявили выговор",
+    "mood": -8,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "fight": {
+    "text": "Подрался с коллегой",
+    "mood": -6,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "chaos": {
+    "text": "На заводе бардак, а начальству всё равно",
+    "mood": -3,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "searched": {
+    "text": "Обыскивают на проходной, как в тюрьме",
+    "mood": -1,
+    "dur": 1440,
+    "grp": "byt"
+  },
+  "plan_done": {
+    "text": "Выполнили месячный план",
+    "mood": 5,
+    "dur": 2880,
+    "grp": "work"
+  },
+  "retire_party": {
+    "text": "Проводили ветерана на пенсию",
+    "mood": 3,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "raise_kept": {
+    "text": "Прибавили, чтобы не ушёл к конкурентам",
+    "mood": 6,
+    "dur": 4320,
+    "wage": true,
+    "grp": "money"
+  },
+  "vacation": {
+    "text": "Отгулял отпуск",
+    "mood": 10,
+    "dur": 4320,
+    "grp": "home"
+  },
+  "no_vacation": {
+    "text": "Летом не пустили в отпуск",
+    "mood": -7,
+    "dur": 4320,
+    "grp": "home"
+  },
+  "governor_visit": {
+    "text": "Сам губернатор приезжал на завод",
+    "mood": 3,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "shift_mess": {
+    "text": "Прошлая смена опять оставила бардак",
+    "mood": -3,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "suspended": {
+    "text": "Участок закрыли по предписанию",
+    "mood": -4,
+    "dur": 1440,
+    "grp": "work"
+  },
+  "nye_off": {
+    "text": "Новогодние каникулы",
+    "mood": 6,
+    "dur": 2880,
+    "grp": "home"
+  },
+  "roof_leak": {
+    "text": "Течёт крыша — работаем под каплями",
+    "mood": -4,
+    "dur": 720,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "arrears": {
+    "text": "Зарплату задерживают уже который месяц",
+    "mood": -14,
+    "dur": 1500,
+    "wage": true,
+    "grp": "money"
+  },
+  "arrears_paid": {
+    "text": "Наконец вернули долги по зарплате",
+    "mood": 10,
+    "dur": 5760,
+    "wage": true,
+    "grp": "money"
+  },
+  "dogs": {
+    "text": "Бродячие собаки на территории",
+    "mood": -2,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "dogs_tame": {
+    "text": "Заводские собаки — свои, родные",
+    "mood": 2,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "stage_up": {
+    "text": "Завод растёт — есть перспектива",
+    "mood": 4,
+    "dur": 2880,
+    "grp": "work"
+  },
+  "noisy": {
+    "text": "Шумно — голова гудит (наушники бы)",
+    "mood": -3,
+    "dur": 120,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "nickname": {
+    "text": "Ребята дали прозвище — теперь точно свой",
+    "mood": 4,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "on_course": {
+    "text": "Учусь на курсах — расту",
+    "mood": 3,
+    "dur": 600,
+    "grp": "work"
+  },
+  "course_done": {
+    "text": "Окончил курсы — есть чем гордиться",
+    "mood": 6,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "mentor_proud": {
+    "text": "Ученик вырос — гордость берёт",
+    "mood": 6,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "friend_left": {
+    "text": "Ушёл друг",
+    "mood": -6,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "practice_kept": {
+    "text": "Взяли в штат после практики!",
+    "mood": 10,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "room_l1": {
+    "text": "Убогое помещение: голые стены",
+    "mood": -3,
+    "dur": 240,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "room_l3": {
+    "text": "Помещение приятно обустроено",
+    "mood": 2,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "room_l4": {
+    "text": "Хорошо обустроено, как у людей",
+    "mood": 4,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "room_l5": {
+    "text": "Обустроено на загляденье",
+    "mood": 6,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "dirty": {
+    "text": "Грязно, кругом стружка",
+    "mood": -3,
+    "dur": 240,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "very_dirty": {
+    "text": "Грязища: по стружке не пройти",
+    "mood": -6,
+    "dur": 240,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "stuffy": {
+    "text": "Душно, пахнет гарью — вентиляции бы",
+    "mood": -3,
+    "dur": 120,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "fumes": {
+    "text": "Дым и пары, глаза слезятся — дышать нечем",
+    "mood": -8,
+    "dur": 180,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "no_ppe": {
+    "text": "Работаю без каски и очков — страшновато",
+    "mood": -3,
+    "dur": 240,
+    "grp": "work"
+  },
+  "new_ppe": {
+    "text": "Выдали новую спецовку и наушники",
+    "mood": 2,
+    "dur": 480,
+    "grp": "work"
+  },
+  "milk": {
+    "text": "Выдали молоко за вредность",
+    "mood": 2,
+    "dur": 600,
+    "grp": "byt"
+  },
+  "no_milk": {
+    "text": "Вредность есть, а молока не дают",
+    "mood": -4,
+    "dur": 600,
+    "wage": true,
+    "grp": "byt"
+  },
+  "sout_harm": {
+    "text": "По СОУТ моё место вредное — хоть доплачивают",
+    "mood": 1,
+    "dur": 720,
+    "wage": true,
+    "grp": "money"
+  },
+  "tea_break": {
+    "text": "Перерыв на чай по графику",
+    "mood": 3,
+    "dur": 300,
+    "grp": "byt"
+  },
+  "no_lunch_break": {
+    "text": "По графику нет обеда — едим на ходу",
+    "mood": -10,
+    "dur": 600,
+    "grp": "byt"
+  },
+  "planerka": {
+    "text": "Планёрка: знаю, что делать за смену",
+    "mood": 2,
+    "dur": 480,
+    "grp": "work"
+  },
+  "brigadier": {
+    "text": "Назначили бригадиром",
+    "mood": 6,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "brigade_friends": {
+    "text": "Дружная бригада",
+    "mood": 4,
+    "dur": 1440,
+    "grp": "team"
+  },
+  "brigade_feud": {
+    "text": "В бригаде не ладим",
+    "mood": -5,
+    "dur": 1440,
+    "grp": "team"
+  },
+  "pennant": {
+    "text": "Наша бригада — лучшая: вымпел у нас!",
+    "mood": 6,
+    "dur": 10080,
+    "grp": "team"
+  },
+  "fined": {
+    "text": "Лишили премии",
+    "mood": -8,
+    "dur": 4320,
+    "wage": true,
+    "grp": "money"
+  },
+  "thief_fired": {
+    "text": "Несуна уволили — и правильно",
+    "mood": 1,
+    "dur": 1440,
+    "grp": "team"
+  },
+  "friend_fired_article": {
+    "text": "Друга уволили по статье",
+    "mood": -5,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "forgiven": {
+    "text": "Простили — повезло",
+    "mood": 4,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "union_ok": {
+    "text": "Профсоюз признали",
+    "mood": 4,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "union_denied": {
+    "text": "Профсоюз не дали создать",
+    "mood": -7,
+    "dur": 7200,
+    "grp": "team"
+  },
+  "kd_kept": {
+    "text": "Колдоговор соблюдается",
+    "mood": 3,
+    "dur": 1500,
+    "grp": "team"
+  },
+  "kd_broken": {
+    "text": "Нарушили колдоговор",
+    "mood": -8,
+    "dur": 7200,
+    "grp": "team"
+  },
+  "kd_lunch": {
+    "text": "Обеды компенсируют по колдоговору",
+    "mood": 2,
+    "dur": 1500,
+    "wage": true,
+    "grp": "byt"
+  },
+  "n1_fair": {
+    "text": "Признали вину завода, выплатили компенсацию",
+    "mood": 6,
+    "dur": 7200,
+    "grp": "work"
+  },
+  "n1_blame": {
+    "text": "Пострадавшего сделали крайним",
+    "mood": -5,
+    "dur": 7200,
+    "grp": "work"
+  },
+  "n1_hidden": {
+    "text": "Травму замяли",
+    "mood": -3,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "union_help": {
+    "text": "Профком помог деньгами",
+    "mood": 3,
+    "dur": 4320,
+    "grp": "money"
+  },
+  "clean_handover": {
+    "text": "Сдали участок в порядке",
+    "mood": 1,
+    "dur": 600,
+    "grp": "work"
+  },
+  "pennant_banner": {
+    "text": "Переходящее знамя — у нашей бригады",
+    "mood": 3,
+    "dur": 10080,
+    "grp": "team"
+  },
+  "union_heard": {
+    "text": "Профком выслушал, начальство обещало разобраться",
+    "mood": 3,
+    "dur": 2880,
+    "grp": "team"
+  },
+  "ate_hot": {
+    "text": "Горячий обед: суп, второе и компот",
+    "mood": 9,
+    "dur": 720,
+    "grp": "byt"
+  },
+  "cat_pet": {
+    "text": "Погладил заводского кота",
+    "mood": 3,
+    "dur": 480,
+    "grp": "byt"
+  },
+  "nurse_helped": {
+    "text": "Фельдшер сразу помог",
+    "mood": 5,
+    "dur": 4320,
+    "grp": "home"
+  },
+  "radio_music": {
+    "text": "Музыка по заводскому радио",
+    "mood": 3,
+    "dur": 240,
+    "grp": "byt"
+  },
+  "radio_gym": {
+    "text": "Производственная гимнастика",
+    "mood": 2,
+    "dur": 300,
+    "grp": "work"
+  },
+  "radio_news": {
+    "text": "В курсе заводских новостей",
+    "mood": 1,
+    "dur": 720,
+    "grp": "team"
+  },
+  "dk_club": {
+    "text": "Хожу в кружок при ДК",
+    "mood": 4,
+    "dur": 10080,
+    "grp": "home"
+  },
+  "dk_concert": {
+    "text": "Концерт в ДК к празднику",
+    "mood": 6,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "rats": {
+    "text": "Крысы на складе — противно",
+    "mood": -3,
+    "dur": 2880,
+    "grp": "byt"
+  },
+  "kittens": {
+    "text": "Взял котёнка у заводской кошки",
+    "mood": 6,
+    "dur": 10080,
+    "grp": "home"
+  },
+  "showered": {
+    "text": "Помылся в душе после смены",
+    "mood": 4,
+    "dur": 900,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "no_shower": {
+    "text": "Ушёл домой в масле и копоти — душа нет",
+    "mood": -3,
+    "dur": 900,
+    "comfort": true,
+    "grp": "byt"
+  },
+  "chatted": {
+    "text": "Поболтал с товарищем",
+    "mood": 2,
+    "dur": 300,
+    "grp": "team"
+  },
+  "argued": {
+    "text": "Поругался с коллегой",
+    "mood": -4,
+    "dur": 600,
+    "grp": "team"
+  },
+  "saw_fight": {
+    "text": "На глазах подрались двое — неприятно",
+    "mood": -1,
+    "dur": 600,
+    "grp": "team"
+  },
+  "grade_up": {
+    "text": "Сдал на разряд — растёт квалификация",
+    "mood": 7,
+    "dur": 4320,
+    "grp": "work"
+  },
+  "exam_failed": {
+    "text": "Не сдал на разряд — обидно",
+    "mood": -4,
+    "dur": 2880,
+    "grp": "work"
+  },
+  "raise_refused": {
+    "text": "Сдал на разряд, а прибавки не дали",
+    "mood": -8,
+    "dur": 7200,
+    "grp": "money"
+  },
+  "indexed": {
+    "text": "Проиндексировали зарплату",
+    "mood": 4,
+    "dur": 4320,
+    "grp": "money"
+  },
+  "no_index": {
+    "text": "Цены растут, а зарплату не индексируют",
+    "mood": -5,
+    "dur": 7200,
+    "grp": "money"
+  },
+  "veteran_honor": {
+    "text": "Год на заводе — ветеран, уважают",
+    "mood": 6,
+    "dur": 4320,
+    "grp": "team"
+  },
+  "wage_late": {
+    "text": "Зарплату не выдали — сказали «потерпите»",
+    "mood": -12,
+    "dur": 4320,
+    "wage": true,
+    "grp": "money"
+  },
+  "no_tools": {
+    "text": "Нечем работать: инструмента нет, а начальство молчит",
+    "mood": -8,
+    "dur": 1500,
+    "grp": "work"
+  },
+  "mice": {
+    "text": "Видел мышь в цеху — фу, грязища",
+    "mood": -4,
+    "dur": 720,
+    "grp": "byt"
+  }
+}

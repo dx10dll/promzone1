@@ -1,0 +1,221 @@
+{
+	"floors": {
+		"concrete": {
+			"id": 1,
+			"name": "Бетонный пол",
+			"cost": 600,
+			"build_time": 4,
+			"desc": "Основа любого цеха. Дёшево и сердито.",
+			"tex": "concrete",
+			"mat": "bm_cement"
+		},
+		"tile": {
+			"id": 2,
+			"name": "Кафельная плитка",
+			"cost": 1400,
+			"build_time": 7,
+			"desc": "Для бытовок, туалетов и столовой.",
+			"tex": "tile",
+			"mat": "bm_tile"
+		},
+		"lino": {
+			"id": 3,
+			"name": "Линолеум",
+			"cost": 900,
+			"build_time": 5,
+			"desc": "Для кабинетов и комнат отдыха.",
+			"tex": "lino",
+			"mat": "bm_lino"
+		},
+		"epoxy": {
+			"id": 4,
+			"name": "Наливной пол",
+			"cost": 1100,
+			"build_time": 6,
+			"tex": "epoxy",
+			"desc": "Гладкий полимерный пол для цеха: стружка и грязь копятся на треть медленнее.",
+			"mat": "bm_epoxy"
+		},
+		"tile_blue": {
+			"id": 5,
+			"name": "Голубая плитка",
+			"cost": 1500,
+			"build_time": 7,
+			"tex": "tile_blue",
+			"desc": "Кафель для душевых, медпункта и столовой.",
+			"mat": "bm_tile"
+		},
+		"parquet": {
+			"id": 6,
+			"name": "Паркет",
+			"cost": 1800,
+			"build_time": 8,
+			"tex": "parquet",
+			"desc": "Для кабинета директора и контор: уютнее линолеума.",
+			"mat": "bm_parquet"
+		}
+	},
+	"walls": {
+		"brick": {
+			"id": 1,
+			"name": "Кирпичная стена",
+			"cost": 2200,
+			"build_time": 9,
+			"solid": true,
+			"buildable": true,
+			"desc": "Тёплая и надёжная стена.",
+			"kind": "wall",
+			"tex": "brick",
+			"mat": "bm_brick"
+		},
+		"window": {
+			"id": 2,
+			"name": "Окно",
+			"cost": 5200,
+			"build_time": 13,
+			"solid": true,
+			"buildable": true,
+			"desc": "Стена с окном: даёт дневной свет.",
+			"kind": "window",
+			"mat": "bm_window"
+		},
+		"door": {
+			"id": 3,
+			"name": "Дверь",
+			"cost": 7000,
+			"build_time": 11,
+			"solid": false,
+			"buildable": true,
+			"desc": "Проход для людей.",
+			"kind": "door",
+			"mat": "bm_door"
+		},
+		"gate": {
+			"id": 4,
+			"name": "Ворота",
+			"cost": 24000,
+			"build_time": 22,
+			"solid": false,
+			"buildable": true,
+			"desc": "Широкие рольворота для грузов.",
+			"kind": "gate",
+			"mat": "bm_gate"
+		},
+		"fence": {
+			"id": 5,
+			"name": "Забор",
+			"cost": 0,
+			"build_time": 0,
+			"solid": true,
+			"buildable": false,
+			"desc": "Граница участка.",
+			"kind": "fence"
+		},
+		"fence_gate": {
+			"id": 6,
+			"name": "Въезд",
+			"cost": 0,
+			"build_time": 0,
+			"solid": false,
+			"buildable": false,
+			"desc": "Въезд на территорию.",
+			"kind": "fence"
+		},
+		"concrete_wall": {
+			"id": 7,
+			"name": "Бетонная стена",
+			"cost": 1800,
+			"build_time": 8,
+			"solid": true,
+			"buildable": true,
+			"kind": "wall",
+			"tex": "concrete",
+			"desc": "Панели из бетона: дешевле кирпича и быстро строится.",
+			"mat": "bm_block"
+		},
+		"sandwich": {
+			"id": 8,
+			"name": "Сэндвич-панель",
+			"cost": 1500,
+			"build_time": 5,
+			"solid": true,
+			"buildable": true,
+			"kind": "wall",
+			"tex": "sandwich",
+			"desc": "Лёгкая металлическая панель с утеплителем — для цехов и складов, строится вдвое быстрее кирпича.",
+			"mat": "bm_panel"
+		},
+		"partition": {
+			"id": 9,
+			"name": "Перегородка",
+			"cost": 900,
+			"build_time": 4,
+			"solid": true,
+			"buildable": true,
+			"kind": "wall",
+			"tex": "partition",
+			"desc": "Гипсокартон на профиле: дёшево делить большой зал на кабинеты.",
+			"mat": "bm_gkl"
+		},
+		"metal_door": {
+			"id": 10,
+			"name": "Металлическая дверь",
+			"cost": 9500,
+			"build_time": 12,
+			"solid": false,
+			"buildable": true,
+			"kind": "door",
+			"tex": "metal",
+			"desc": "Крепкая стальная дверь — для склада, кассы и проходной.",
+			"mat": "bm_door"
+		},
+		"silicate": {
+			"id": 11,
+			"name": "Силикатный кирпич",
+			"cost": 2400,
+			"build_time": 9,
+			"solid": true,
+			"buildable": true,
+			"kind": "wall",
+			"tex": "silicate",
+			"mat": "bm_brick",
+			"desc": "Белый кирпич: тёплый, светлый и аккуратный — для контор и бытовок. Чуть дороже красного."
+		},
+		"gasblock": {
+			"id": 12,
+			"name": "Газобетон",
+			"cost": 1700,
+			"build_time": 6,
+			"solid": true,
+			"buildable": true,
+			"kind": "wall",
+			"tex": "gasblock",
+			"mat": "bm_block",
+			"desc": "Крупные лёгкие блоки: строятся быстро, держат тепло лучше бетона. Хороши для складов и цехов."
+		},
+		"glass_door": {
+			"id": 13,
+			"name": "Остеклённая дверь",
+			"cost": 12000,
+			"build_time": 12,
+			"solid": false,
+			"buildable": true,
+			"kind": "door",
+			"tex": "glass",
+			"mat": "bm_door",
+			"desc": "Алюминиевая дверь со стеклом — светло и солидно: для конторы, кабинетов и столовой."
+		},
+		"gate_warm": {
+			"id": 14,
+			"name": "Ворота синие",
+			"cost": 28000,
+			"build_time": 22,
+			"solid": false,
+			"buildable": true,
+			"kind": "gate",
+			"tex": "warm",
+			"mat": "bm_gate",
+			"desc": "Такие же рольворота для грузов, но с синими утеплёнными секциями — для нарядного фасада и склада."
+		}
+	}
+}
