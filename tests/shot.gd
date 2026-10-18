@@ -44,7 +44,7 @@ func _ready() -> void:
 		Game.pending_opts["flora"] = true
 	if args.size() > 7 and args[7] == "v113L":
 		Game.pending_opts["lots"] = true
-	if args.size() > 7 and args[7] == "v118L":
+	if args.size() > 7 and (args[7] == "v118L" or args[7] == "lot126"):
 		Game.pending_opts = {"lots": true, "flora": true}
 	if args.size() > 7 and args[7] == "v115b":
 		Game.pending_scn = "field"
@@ -94,6 +94,11 @@ func _ready() -> void:
 		S.big_shop(gm.sim)
 		S.complex_orders(gm.sim, 12)
 	var setup := args[7] if args.size() > 7 else ""
+	if setup == "lot126":
+		for k in gm.sim.world.lots.size():
+			gm.sim.buy_lot(k)
+			var b := OldBuild.plan(gm.sim, k)
+			print("lot ", k, " ", gm.sim.world.lot_rect(k), " building ", b)
 	if setup == "fx125":
 		# 1.25: искры, пар, стружка — держим станки «в работе» для снимка
 		var S5 := preload("res://tests/setups.gd")
@@ -720,6 +725,30 @@ func _ready() -> void:
 					ms0[1].enabled = false
 					gm.sim.cons["tools"] = 0.0
 				gm.hud.open_window("prod:stall")
+			"year126":
+				var sm := gm.sim
+				var S6 := preload("res://tests/setups.gd")
+				S6.big_shop(sm)
+				sm.progress.stage = 4
+				sm.reputation = 72.0
+				var sw := S6.hire(sm, "sales_manager", "office", 6)
+				sw.present = true
+				sm.office.all_depts = true
+				if not sm.dev.done.has("mkt3"):
+					sm.dev.done.append("mkt3")
+				var c1 := sm.sales._new_contract()
+				if not c1.is_empty():
+					sm.sales._make_year(c1)
+				var c2 := sm.sales._new_contract()
+				if not c2.is_empty():
+					sm.sales.contracts.append(c2)
+					sm.sales.sign(int(c2["id"]))
+					c2["status"] = "active"
+					c2["done_w"] = 2
+					c2["week_i"] = 3
+				if not c1.is_empty():
+					sm.sales.contracts.append(c1)
+				gm.hud.open_window("orders:contracts")
 			"staffq":
 				GameWindow.staff_q = "разнораб"
 				gm.hud.open_window("staff")

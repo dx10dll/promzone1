@@ -45,7 +45,8 @@ func _draw() -> void:
 	for w: Worker in sim.workers + sim.visitors:
 		if not w.present or w.hidden:
 			continue
-		var p := Vector2(w.pos.x * T, w.pos.y * T + 6.0 + 9.0)
+		var wp := w.vpos()
+		var p := Vector2(wp.x * T, wp.y * T + 6.0 + 9.0)
 		if not view.has_point(p):
 			continue
 		var nm := w.last if w.last != "" else w.first

@@ -677,7 +677,7 @@ func _shift_clean_task(w: Worker) -> Task:
 			if int(sim.upkeep.dirt[sim.world.idx(c)]) >= 8 and sim.world.passable(c) and not _cool(w, "clean"):
 				cells.append(c)
 		if not cells.is_empty():
-			cells.shuffle()
+			sim.shuffle(cells)
 			var ct := _make_task(w, {"k": "clean", "cells": cells.slice(0, 6), "s": 0.0})
 			if ct:
 				ct.label = "Уборка участка по графику"
@@ -901,16 +901,18 @@ func _ready_machines(machines: Array[Thing]) -> Array[Thing]:
 		return _rm
 	_rm_key = key
 	_rm = []
+	var no_zone: Array[Thing] = []
+	var no_water: Array[Thing] = []
 	for m in machines:
 		if m.demolish or m.product == "" or m.broken or m.condition < 15.0:
 			continue
 		if not m.enabled or not sim.power.powered(m) or sim.inspect.is_suspended(m):
 			continue
 		if not sim.rooms.zone_ok(m):
-			sim.notify_once("zonem%d" % m.id, "%s стоит вне цеха — на нём не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство)." % m.title(), Sim.LVL_WARN, m.cell, 720.0)
+			no_zone.append(m)
 			continue
 		if not sim.water.has_water(m):
-			sim.notify_once("drym%d" % m.id, "%s стоит: нет воды. Протяните трубу от насоса (меню «Сети»)." % m.title(), Sim.LVL_WARN, m.cell, 720.0)
+			no_water.append(m)
 			continue
 		if m.is_batch():
 			if m.working or not _batch_ready(m):
@@ -922,7 +924,20 @@ func _ready_machines(machines: Array[Thing]) -> Array[Thing]:
 			sim.notify_once("nocons_" + cn, "Станок «%s» стоит: закончился %s — ждём поставку." % [m.title(), str(Defs.consumables.get(cn, {}).get("short", cn))], Sim.LVL_WARN, m.cell, 480.0)
 			continue
 		_rm.append(m)
+	# 1.26: одно сообщение на всех, а не по штуке на каждый станок
+	if not no_zone.is_empty():
+		sim.notify_once("zonem_all", "%s вне цеха — на %s не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство). Список — «Производство → Что стоит»." % [_names(no_zone), "нём" if no_zone.size() == 1 else "них"], Sim.LVL_WARN, no_zone[0].cell, 720.0)
+	if not no_water.is_empty():
+		sim.notify_once("drym_all", "Нет воды: %s. Протяните трубу от насоса (меню «Сети»)." % _names(no_water), Sim.LVL_WARN, no_water[0].cell, 720.0)
 	return _rm
+
+
+## «Токарный 1К62» / «Токарный 1К62 и ещё 3 станка».
+func _names(ms: Array[Thing]) -> String:
+	if ms.size() == 1:
+		return "«%s»" % ms[0].title()
+	var more := ms.size() - 1
+	return "«%s» и ещё %d %s" % [ms[0].title(), more, Defs.plural(more, "станок", "станка", "станков")]
 
 
 ## 1.23: то же, но строка ключа собирается, только если у человека вообще есть «отказы» —
@@ -1107,17 +1122,7 @@ func _find_work(w: Worker) -> Task:
 
 	# 2. контроль ОТК
 	if w.skill("qc") >= 2:
-		for q in sim.usable_of("qc"):
-			if q.demolish or q.user >= 0:
-				continue
-			var has_part := false
-			for iid in sim.slot_ids(q, 0):
-				var it0: Item = sim.items.get(iid)
-				if it0 and it0.reserved_by < 0:
-					has_part = true
-					break
-			if not has_part:
-				continue
+		for q in _qc_with_parts():
 			var sp2 := _free_spot(q, w)
 			if sp2.is_empty() or _coolf(w, "qc%d", q.id) or not Workplace.may_use(sim, w, q):
 				continue
@@ -1127,13 +1132,7 @@ func _find_work(w: Worker) -> Task:
 	var haul_bonus := 40.0 if laborer else (15.0 if builder else 0.0)
 
 	# 3. подвезти к станку металл, детали НЗП или комплектующие для сборки
-	for m in machines:
-		if m.demolish or m.product == "" or m.broken:
-			continue
-		m.ensure_incoming()
-		var room := m.slot_cap(0) - sim.count_slot(m, 0) - int(m.incoming[0])
-		if room <= 0 or not sim.planner.should_feed(m):
-			continue
+	for m in _hungry_machines(machines):
 		var it := _nearest_feed(m, w)
 		if it == null:
 			continue
@@ -1283,7 +1282,7 @@ func _find_work(w: Worker) -> Task:
 			elif m2.condition < svc:
 				var urgent2 := 30.0 if m2.condition < 25.0 else 0.0
 				cands.append({"s": 78.0 + urgent2 + (15.0 if w.prof in ["turner", "miller"] else 0.0) + (60.0 if w.prof == "setter" else (45.0 if w.prof == "fitter" else 0.0)) - _dist(wc, m2.cell) * 0.3, "k": "repair", "t": m2})
-	for t: Thing in sim.things.values():
+	for t: Thing in _pending_things():
 		if (t.built and not t.demolish) or t.user >= 0 or _coolf(w, "th%d", t.id):
 			continue
 		if not t.built:
@@ -1710,6 +1709,66 @@ func _feed_lists(m: Thing) -> Array:
 			return out
 		return ["mat:" + str(Defs.products[p].get("material", ""))]
 	return ["part:%s:wip:%d" % [p, m.job_step]]
+
+
+## 1.26: общие для всех списки «доски работ» — считаются раз за игровой шаг, а не для каждого,
+## кто ищет работу (на 300 людях поиск работы — 9/10 хода).
+var _jb_min := -1.0
+var _jb_pending: Array[Thing] = []
+var _jb_hungry: Array[Thing] = []
+var _jb_qc: Array[Thing] = []
+
+
+func _job_board() -> void:
+	if sim.minute == _jb_min:
+		return
+	_jb_min = sim.minute
+	_jb_pending.clear()
+	for t: Thing in sim.things.values():
+		if not t.built or t.demolish:
+			_jb_pending.append(t)
+	_jb_hungry.clear()
+	for m in sim.things_of("machine"):
+		if m.demolish or m.product == "" or m.broken:
+			continue
+		m.ensure_incoming()
+		var room := m.slot_cap(0) - sim.count_slot(m, 0) - int(m.incoming[0])
+		if room > 0 and sim.planner.should_feed(m):
+			_jb_hungry.append(m)
+	_jb_qc.clear()
+	for q in sim.usable_of("qc"):
+		if q.demolish or q.user >= 0:
+			continue
+		for iid in sim.slot_ids(q, 0):
+			var it0: Item = sim.items.get(iid)
+			if it0 and it0.reserved_by < 0:
+				_jb_qc.append(q)
+				break
+
+
+## Недостроенное и то, что сносят.
+func _pending_things() -> Array[Thing]:
+	_job_board()
+	return _jb_pending
+
+
+## Станки, к которым надо подвезти металл или детали (в пределах шага место могли занять — проверяем ещё раз).
+func _hungry_machines(machines: Array[Thing]) -> Array[Thing]:
+	_job_board()
+	var out: Array[Thing] = []
+	for m in _jb_hungry:
+		if not machines.has(m) or m.demolish or m.broken:
+			continue
+		m.ensure_incoming()
+		if m.slot_cap(0) - sim.count_slot(m, 0) - int(m.incoming[0]) > 0:
+			out.append(m)
+	return out
+
+
+## Столы ОТК, на которых ждёт деталь.
+func _qc_with_parts() -> Array[Thing]:
+	_job_board()
+	return _jb_qc.filter(func(q: Thing) -> bool: return q.user < 0 and not q.demolish)
 
 
 func _nearest_feed(m: Thing, w: Worker) -> Item:
@@ -2260,6 +2319,8 @@ func _face_to_rect(from: Vector2i, r: Rect2i) -> String:
 # ================================================================ быт: туалет, обед, отдых, безделье
 
 func _toilet_task(w: Worker) -> Task:
+	if _coolf(w, "wc%d", 0):
+		return null   # 1.26: только что все кабинки были заняты — не перебираем их снова каждую попытку
 	var best: Thing = null
 	var bd := INF
 	var dry := 0
@@ -2282,6 +2343,7 @@ func _toilet_task(w: Worker) -> Task:
 			sim.notify_once("weaktoilet", "Не хватает воды: один насос тянет %d приборов. Поставьте ещё насос или насосную станцию (Сети → Водопровод)." % Water.CITY_FIXTURES, Sim.LVL_WARN, w.cell(), 600.0)
 		elif dry > 0:
 			sim.notify_once("drytoilet", "В туалете нет воды — кабинкой пользоваться нельзя. Поставьте насос и протяните от него трубу (меню «Сети», W).", Sim.LVL_WARN, w.cell(), 600.0)
+		_set_cool(w, "wc0", 2.0)
 		return null
 	var t := Task.new()
 	t.kind = "toilet"
@@ -2453,7 +2515,7 @@ func _run(w: Worker, dt: float) -> void:
 				if li:
 					li.reserved_by = -1
 					w.task.res_items.erase(li.id)
-					sim.put_on_ground(li, w.cell() if sim.world.passable(w.cell()) else sim.world.nearest_passable(w.cell()))
+					sim.put_on_ground(li, _off_wall_bp(w.cell() if sim.world.passable(w.cell()) else sim.world.nearest_passable(w.cell())))
 			w.carrying = -1
 			w.carry_extra.clear()
 			w.task.next()
@@ -2528,7 +2590,7 @@ func _put(w: Worker, tl: Dictionary) -> void:
 			sim.put_in_thing(it, t, s)
 			w.week_score += 1
 		else:
-			sim.put_on_ground(it, w.cell())
+			sim.put_on_ground(it, _off_wall_bp(w.cell()))
 		it.reserved_by = -1
 		w.task.res_items.erase(it.id)
 	w.task.next()
@@ -2547,7 +2609,7 @@ func _route_inspected(w: Worker) -> void:
 	if dest.is_empty():
 		var what := "тару для брака" if it.q == "scrap" else "ещё один поддон для готовой продукции"
 		sim.notify_once("store_" + it.cat(), "Некуда положить «%s». Поставьте %s." % [it.display_name(), what], Sim.LVL_WARN, w.cell())
-		sim.put_on_ground(it, w.cell())
+		sim.put_on_ground(it, _off_wall_bp(w.cell()))
 		it.reserved_by = -1
 		w.task.res_items.erase(it.id)
 		w.task.next()
@@ -2874,7 +2936,7 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 						return
 				sim.item_rev += 1
 				# не вышло (или некуда нести) — кладём у верстака, грузчики отнесут
-				sim.put_on_ground(rit, w.cell() if sim.world.passable(w.cell()) else sim.world.nearest_passable(w.cell()))
+				sim.put_on_ground(rit, _off_wall_bp(w.cell() if sim.world.passable(w.cell()) else sim.world.nearest_passable(w.cell())))
 				rit.reserved_by = -1
 				w.task.res_items.erase(rit.id)
 				w.carrying = -1
@@ -3392,6 +3454,7 @@ func abort(w: Worker) -> void:
 		var drop := w.cell()
 		if not sim.world.passable(drop):
 			drop = sim.world.nearest_passable(drop)
+		drop = _off_wall_bp(drop)
 		var carried: Array = w.carry_extra.duplicate()
 		if w.carrying >= 0:
 			carried.push_front(w.carrying)
@@ -3411,3 +3474,25 @@ func abort(w: Worker) -> void:
 	if w.anim != "walk":
 		w.anim = "idle"
 	w.activity = "На месте"
+
+
+## 1.26: груз не бросаем на чертёж стены — стену на клетке с грузом не начать, и стройка вставала навсегда
+## (строитель, уходя со смены, ронял последний кирпич ровно туда, где его и надо было класть).
+func _off_wall_bp(c: Vector2i) -> Vector2i:
+	if not _wall_bp_at(c):
+		return c
+	for r in range(1, 4):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var n := c + Vector2i(dx, dy)
+				if sim.world.inb(n) and sim.world.passable(n) and not _wall_bp_at(n):
+					return n
+	return c
+
+
+func _wall_bp_at(c: Vector2i) -> bool:
+	if not sim.world.inb(c):
+		return false
+	var i := sim.world.idx(c)
+	var wv := sim.world.bp_wall[i]
+	return sim.bp_cells.has(i) and wv != World.BP_NONE and Defs.wall_solid(wv)

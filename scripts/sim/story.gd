@@ -1773,7 +1773,7 @@ func _res_vacation(_d: Dictionary, choice: int) -> void:
 			Mood.add(sim, w, "no_vacation")
 		return
 	var st := sim.workers.duplicate()
-	st.shuffle()
+	sim.shuffle(st)
 	var n := maxi(1, int(st.size() / 4))
 	for i in n:
 		var w2: Worker = st[i]

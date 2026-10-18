@@ -915,9 +915,12 @@ func _contracts() -> void:
 			var th := UITheme.hbox(8)
 			th.add_child(_icon(Tex.item(str(c["product"])), 36))
 			th.add_child(_cl2("%s × %d в неделю" % [Defs.product_name(str(c["product"])), int(c["per_week"])], str(c["client"])))
-			th.add_child(UITheme.chip("контракт", UITheme.INFO))
+			var yr := bool(c.get("year", false))
+			th.add_child(UITheme.chip("договор на год" if yr else "контракт", UITheme.ACCENT if yr else UITheme.INFO))
 			v.add_child(th)
 			v.add_child(_cl("%s за шт. (+%d%% к рынку) · %d %s · всего %s" % [Defs.money_str(float(c["price"])), int(round(float(c["prem"]) * 100.0)), int(c["weeks"]), Defs.plural(int(c["weeks"]), "неделя", "недели", "недель"), Defs.money_str(float(c["price"]) * int(c["per_week"]) * int(c["weeks"]))], 13, UITheme.GOOD))
+			if yr:
+				v.add_child(UITheme.para("Аванс 10%% (%s) сразу при подписании. Терпит два срыва, третий — расторжение и неустойка 10%% от недопоставленного. В конце — премия 8%%." % Defs.money_str(Sales.total(c) * 0.1), 12, UITheme.ACCENT))
 			v.add_child(_cl("первая партия — в неделю со дня %d · ответить до дня %d" % [int(c["start"]), int(float(c["until"]) / 1440.0) + 1], 12, UITheme.MUTED))
 			var ok := sl.missing(str(c["product"])).is_empty() and sl.capacity_week(str(c["product"])) >= float(int(c["per_week"]))
 			v.add_child(UITheme.para(sl.assess(c), 12, UITheme.GOOD if ok else UITheme.WARN))
@@ -942,11 +945,11 @@ func _contracts() -> void:
 		if str(c2["status"]) == "wait":
 			st = "подписан, первая партия — в неделю со дня %d (через %d дн.)" % [int(c2["start"]), maxi(0, int(c2["start"]) - sim.day())]
 		else:
-			st = "партия %d из %d · сдано %d · сорвано %d" % [int(c2["week_i"]), int(c2["weeks"]), int(c2["done_w"]), int(c2["fails"])]
+			st = "партия %d из %d · сдано %d · сорвано %d из %d допустимых" % [int(c2["week_i"]), int(c2["weeks"]), int(c2["done_w"]), int(c2["fails"]), Sales.max_fails(c2) - 1]
 			var cur := sim.orders.get_order(int(c2["order"]))
 			if not cur.is_empty() and ["active", "ready", "shipping"].has(str(cur["status"])):
 				st += " · срок партии %s" % sim.orders.deadline_str(cur)
-		_trow([[_icon(Tex.item(str(c2["product"])), 28), 34], [_cl2("%s × %d в неделю по %s" % [Defs.product_name(str(c2["product"])), int(c2["per_week"]), Defs.money_str(float(c2["price"]))], str(c2["client"])), 360],
+		_trow([[_icon(Tex.item(str(c2["product"])), 28), 34], [_cl2("%s × %d в неделю по %s" % [Defs.product_name(str(c2["product"])), int(c2["per_week"]), Defs.money_str(float(c2["price"]))], str(c2["client"]) + (" · договор на год" if bool(c2.get("year", false)) else "")), 360],
 			[_cl(st, 13, UITheme.BAD if int(c2["fails"]) > 0 else UITheme.INFO), -1]], Callable(), 44.0)
 	var fin := sl.by_state(["done", "broken"])
 	if not fin.is_empty():

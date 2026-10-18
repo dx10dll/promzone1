@@ -6,6 +6,9 @@ extends Node2D
 const SPEEDS := [0.0, 1.0, 2.0, 4.0]     ## множители скорости: пауза, ×1, ×2, ×4
 const NIGHT_RATE := 75.0                  ## игровых минут в секунду, когда на заводе пусто
 const MAX_STEP := 0.5
+const MIN_STEP := 0.05
+const SIM_HZ := 10.0                     ## 1.26: шагов симуляции в секунду на обычной скорости
+var _acc := 0.0
 
 var sim: Sim
 var world_root := Node2D.new()
@@ -19,6 +22,10 @@ var overlay := OverlayLayer.new()
 var weather := WeatherLayer.new()
 var fx := FxLayer.new()
 var sound := SoundLayer.new()
+var fps_label: Label = null     ## 1.26: F3 — кадры в секунду и время симуляции
+var _fps_acc := 0.0
+var _fps_sim := 0.0
+var _fps_n := 0
 var sim_ms := 0.0               ## 1.23: сколько мс ушло на симуляцию в этом кадре (для замеров)
 var city: CityBackdrop          ## 1.23: город за краем карты (поезд и машины слышно)
 var cranes := CraneLayer.new()
@@ -198,20 +205,31 @@ func _process(delta: float) -> void:
 	if sim.crisis.is_over() and not _over_shown and hud.letter_box == null:
 		_over_shown = true
 		hud.show_game_over()
+	if fps_label:
+		_fps_tick(delta)
+	sim_ms = 0.0
 	if not is_running():
 		return
 	var rate: float = float(SPEEDS[speed]) / maxf(0.05, Defs.b("minute_real_seconds") * float(Game.settings.get("hour_len", 1.0)))
 	if bool(Game.settings.get("fast_night", true)) and _factory_empty() and not sim.is_work_time():
 		rate = maxf(rate, NIGHT_RATE)
 		fast = true
-	var gm := minf(delta, 0.1) * rate
+	# 1.26: симуляция — ровными шагами (около 10 в секунду на ×1), а не крошечным шагом в каждом кадре:
+	# стоимость шага почти не зависит от его длины, и при 144 кадрах она съедала весь кадр.
+	# Люди на экране плавно идут между двумя последними шагами (Worker.vpos).
+	var step := clampf(rate / SIM_HZ, MIN_STEP, MAX_STEP)
+	_acc = minf(_acc + minf(delta, 0.1) * rate, step * 400.0)
 	var guard := 0
 	var t0 := Time.get_ticks_usec()
-	while gm > 0.0001 and guard < 400:
-		var step := minf(gm, MAX_STEP)
+	while _acc >= step and guard < 400:
+		for w in sim.workers:
+			w.vprev = w.pos
+		for v in sim.visitors:
+			v.vprev = v.pos
 		sim.tick(step)
-		gm -= step
+		_acc -= step
 		guard += 1
+	Worker.view_alpha = clampf(_acc / step, 0.0, 1.0)
 	sim_ms = (Time.get_ticks_usec() - t0) / 1000.0
 	if _want_autosave:
 		_want_autosave = false
@@ -352,6 +370,8 @@ func _unhandled_input(e: InputEvent) -> void:
 			hud.open_window("town")
 		KEY_F1:
 			hud.show_help(false)
+		KEY_F3:
+			_toggle_fps()
 		KEY_F5:
 			var err := Game.save_sim(sim, "quicksave", "Быстрое сохранение")
 			hud.toast("Игра сохранена (F9 — загрузить)." if err == "" else err, Sim.LVL_GOOD if err == "" else Sim.LVL_BAD, 3.0)
@@ -380,3 +400,37 @@ func _unhandled_input(e: InputEvent) -> void:
 		_:
 			return
 	get_viewport().set_input_as_handled()
+
+
+## 1.26: счётчик в углу (F3): кадры в секунду, время кадра и сколько из него ушло на симуляцию.
+func _toggle_fps() -> void:
+	if fps_label:
+		fps_label.get_parent().queue_free()
+		fps_label = null
+		return
+	var cl := CanvasLayer.new()
+	cl.layer = 120
+	add_child(cl)
+	fps_label = UITheme.label("…", 13, Color("#9fe0a8"), UITheme.f_semi)
+	fps_label.position = Vector2(8, 52)
+	fps_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	fps_label.add_theme_constant_override("outline_size", 4)
+	fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cl.add_child(fps_label)
+
+
+func _fps_tick(delta: float) -> void:
+	_fps_acc += delta
+	_fps_sim += sim_ms
+	_fps_n += 1
+	if _fps_acc < 0.5:
+		return
+	var present := 0
+	for w in sim.workers:
+		if w.present:
+			present += 1
+	fps_label.text = "%d кадр/с · кадр %.1f мс · симуляция %.1f мс/кадр · людей на заводе %d" % [
+		int(Engine.get_frames_per_second()), _fps_acc * 1000.0 / _fps_n, _fps_sim / _fps_n, present]
+	_fps_acc = 0.0
+	_fps_sim = 0.0
+	_fps_n = 0

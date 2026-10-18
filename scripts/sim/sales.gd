@@ -364,9 +364,47 @@ func _contract_offers() -> void:
 	var c := _new_contract()
 	if c.is_empty():
 		return
+	if year_ok() and sim.rng.randf() < 0.4:
+		_make_year(c)
 	contracts.append(c)
-	sim.story.letter("contract", "Контракт: %s" % str(c["client"]), contract_text(c), "orders", Sim.LVL_GOOD,
+	sim.story.letter("contract", ("Договор на год: %s" if bool(c.get("year", false)) else "Контракт: %s") % str(c["client"]), contract_text(c), "orders", Sim.LVL_GOOD,
 		[{"text": "Подписать", "hint": "Поставки начнутся %s" % _day_str(int(c["start"]))}, {"text": "Отказаться", "hint": ""}, {"text": "Подумать (вкладка «Контракты»)", "hint": "Предложение действует 2 дня", "open": "orders"}], 2, {"contract": int(c["id"])})
+
+
+## 1.26: договор на год — большому заводу (от «Среднего предприятия», репутация от 55), один за раз.
+func year_ok() -> bool:
+	if sim.progress.stage < 4 or sim.reputation < 55.0:
+		return false
+	for c: Dictionary in contracts:
+		if bool(c.get("year", false)) and ["offer", "wait", "active"].has(str(c["status"])):
+			return false
+	return true
+
+
+## Сколько срывов договор терпит: обычный — один, годовой — два (третий расторгает).
+static func max_fails(c: Dictionary) -> int:
+	return 3 if bool(c.get("year", false)) else 2
+
+
+## Из обычного предложения — договор на год: партии крупнее, срок — весь игровой год, наценка меньше,
+## аванс 10% при подписании, премия 8% в конце, неустойка при расторжении — 10% от недопоставленного.
+func _make_year(c: Dictionary) -> void:
+	var p := str(c["product"])
+	var cap := capacity_week(p)
+	var per := float(int(c["per_week"])) * sim.rng.randf_range(1.3, 1.8)
+	if cap > 0.0:
+		per = maxf(per, cap * sim.rng.randf_range(0.6, 0.95))
+	var base := float(c["price"]) / (1.0 + float(c["prem"]))
+	c["year"] = true
+	c["per_week"] = maxi(4, int(round(per)))
+	c["weeks"] = maxi(12, int(sim.season.days_per_year() / 7))
+	c["prem"] = sim.rng.randf_range(0.06, 0.13)
+	c["price"] = int(round(base * (1.0 + float(c["prem"])) / 10.0) * 10)
+	c["until"] = sim.minute + 3.0 * 1440.0
+
+
+static func total(c: Dictionary) -> float:
+	return float(c["price"]) * int(c["per_week"]) * int(c["weeks"])
 
 
 func _day_str(d: int) -> String:
@@ -419,7 +457,12 @@ func contract_text(c: Dictionary) -> String:
 	var t := "%s предлагает долгосрочный контракт: %d шт. «%s» каждую неделю, %d %s подряд, по %s за штуку (на %d%% выше рынка). Всего %s.\n" % [
 		str(c["client"]), int(c["per_week"]), Defs.product_name(p), int(c["weeks"]), Defs.plural(int(c["weeks"]), "неделю", "недели", "недель"),
 		Defs.money_str(float(c["price"])), int(round(float(c["prem"]) * 100.0)), Defs.money_str(float(c["price"]) * int(c["per_week"]) * int(c["weeks"]))]
-	t += "Первая партия — в неделю со дня %d, каждая партия — к пятнице. Сорвали партию — штраф 30%% её стоимости, две — контракт расторгнут.\n" % int(c["start"])
+	if bool(c.get("year", false)):
+		t = "%s предлагает договор на год: %d шт. «%s» каждую неделю, %d недель подряд, по %s за штуку (на %d%% выше рынка). Всего %s.\n" % [
+			str(c["client"]), int(c["per_week"]), Defs.product_name(p), int(c["weeks"]), Defs.money_str(float(c["price"])), int(round(float(c["prem"]) * 100.0)), Defs.money_str(total(c))]
+		t += "При подписании — аванс 10%% (%s). Сорвали партию — штраф 30%% её стоимости; третий срыв — договор расторгнут и неустойка 10%% от недопоставленного. Выполнили — премия 8%% и большой плюс к репутации.\n" % Defs.money_str(total(c) * 0.1)
+	else:
+		t += "Первая партия — в неделю со дня %d, каждая партия — к пятнице. Сорвали партию — штраф 30%% её стоимости, две — контракт расторгнут.\n" % int(c["start"])
 	t += assess(c)
 	return t
 
@@ -463,6 +506,9 @@ func sign(id: int) -> String:
 	if c.is_empty() or str(c["status"]) != "offer":
 		return "Предложение уже недоступно"
 	c["status"] = "wait" if sim.day() < int(c["start"]) else "active"
+	if bool(c.get("year", false)):
+		c["advance"] = total(c) * 0.1
+		sim.earn(float(c["advance"]), "Оплата: аванс по договору на год, " + str(c["client"]))
 	sim.notify("Контракт подписан: %s, %d шт. «%s» в неделю. Первая партия — в неделю со дня %d." % [str(c["client"]), int(c["per_week"]), Defs.product_name(str(c["product"])), int(c["start"])], Sim.LVL_GOOD)
 	if sim.weekday() == 0 and sim.day() >= int(c["start"]):
 		_contract_orders()
@@ -510,18 +556,30 @@ func on_order_closed(o: Dictionary, ok: bool) -> void:
 		var fine := float(o["price"]) * int(o["qty"]) * 0.3
 		sim.spend(fine, "Штраф: срыв партии по контракту, " + str(c["client"]))
 		sim.market.claim("liability", fine, "штраф по контракту, " + str(c["client"]))
-		if int(c["fails"]) >= 2:
+		if int(c["fails"]) >= max_fails(c):
 			c["status"] = "broken"
+			if bool(c.get("year", false)):
+				var left := float(c["price"]) * int(c["per_week"]) * maxi(0, int(c["weeks"]) - int(c["done_w"]) - int(c["fails"]))
+				var pen := left * 0.1
+				sim.spend(pen, "Штраф: неустойка за расторжение договора на год, " + str(c["client"]))
+				sim.reputation = maxf(0.0, sim.reputation - 15.0)
+				sim.notify("%s расторг договор на год: сорваны три партии. Неустойка %s, репутация сильно упала." % [str(c["client"]), Defs.money_str(pen)], Sim.LVL_BAD)
+				return
 			sim.reputation = maxf(0.0, sim.reputation - 10.0)
 			sim.notify("%s расторг контракт: сорваны две партии. Репутация упала." % str(c["client"]), Sim.LVL_BAD)
 			return
-		sim.notify("Сорвана партия по контракту с %s: штраф %s. Ещё один срыв — и контракт расторгнут." % [str(c["client"]), Defs.money_str(fine)], Sim.LVL_BAD)
+		var left_f := max_fails(c) - int(c["fails"])
+		sim.notify("Сорвана партия по %s с %s: штраф %s. %s" % ["договору" if bool(c.get("year", false)) else "контракту", str(c["client"]), Defs.money_str(fine),
+			"Ещё один срыв — и контракт расторгнут." if left_f <= 1 else "Ещё %d срыва — и договор расторгнут." % left_f], Sim.LVL_BAD)
 	if int(c["done_w"]) + int(c["fails"]) >= int(c["weeks"]):
 		c["status"] = "done"
-		var bonus := float(c["price"]) * int(c["per_week"]) * int(c["weeks"]) * 0.05
-		sim.earn(bonus, "Оплата: премия за выполнение контракта, " + str(c["client"]))
-		sim.reputation = minf(100.0, sim.reputation + 6.0)
+		var yr := bool(c.get("year", false))
+		var bonus := total(c) * (0.08 if yr else 0.05)
+		sim.earn(bonus, "Оплата: премия за выполнение %s, %s" % ["договора на год" if yr else "контракта", str(c["client"])])
+		sim.reputation = minf(100.0, sim.reputation + (12.0 if yr else 6.0))
 		sim.stats["contracts_done"] = int(sim.stats.get("contracts_done", 0)) + 1
+		if yr:
+			sim.stats["year_contracts_done"] = int(sim.stats.get("year_contracts_done", 0)) + 1
 		sim.notify("Контракт с %s выполнен! Премия %s, репутация выросла." % [str(c["client"]), Defs.money_str(bonus)], Sim.LVL_GOOD)
 
 

@@ -86,9 +86,10 @@ func _init() -> void:
 	print("— проверка без замечаний")
 	sim.inspect.queue.clear()
 	sim.inspect.schedule("fire", sim.minute, false, "тест")
-	run(sim, 1440.0, func() -> bool: return not sim.inspect.history.is_empty())
-	check(not sim.inspect.history.is_empty(), "инспектор пришёл и ушёл")
-	if not sim.inspect.history.is_empty():
+	var fire_done := func() -> bool: return not sim.inspect.history.is_empty() and str(sim.inspect.history[0]["type"]) == "fire"
+	run(sim, 1440.0, fire_done)   # 1.26: до пожарного может зайти и другая проверка — ждём именно его
+	check(fire_done.call(), "инспектор пришёл и ушёл")
+	if fire_done.call():
 		var h: Dictionary = sim.inspect.history[0]
 		print("    итог: нарушений %d, штраф %s" % [int(h["n"]), Defs.money_str(float(h["fine"]))])
 		check(int(h["n"]) == 0, "пожарный надзор: без замечаний")

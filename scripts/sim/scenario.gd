@@ -52,6 +52,7 @@ static func _base(seed_value: int, scn: String, profile: String, story_mode: Str
 	var sim := Sim.new()
 	if seed_value != 0:
 		sim.rng.seed = seed_value
+		sim.social.rng.seed = seed_value + 7177   # 1.26: разговоры тоже от зерна игры (раньше — от случайного)
 	sim.scenario = scn
 	sim.story.mode = story_mode if Story.MODES.has(story_mode) else "market"
 	sim.progress.profile = profile if Defs.profiles.has(profile) and not bool(Defs.profiles[profile].get("locked", false)) else "mech"

@@ -89,6 +89,8 @@ var look: Dictionary = {}
 var needs: Dictionary = {"food": 100.0, "bladder": 100.0, "rest": 100.0}
 var present := false
 var pos := Vector2.ZERO     ## в тайлах; центр клетки = клетка + 0.5
+var vprev := Vector2(-1e9, 0.0)   ## 1.26: где был до последнего шага симуляции — экран рисует между ними
+static var view_alpha := 1.0      ## 1.26: доля пути от vprev к pos (ставит игровая сцена каждый кадр)
 var dir := "down"
 var anim := "idle"
 var path: Array[Vector2i] = []
@@ -407,3 +409,10 @@ static func from_dict(d: Dictionary) -> Worker:
 	w.controlled = bool(d.get("ctl", false))
 	w.activity = "На месте" if w.present else "Дома"
 	return w
+
+
+## 1.26: где рисовать человека: симуляция идёт крупными шагами, экран — плавно между ними.
+func vpos() -> Vector2:
+	if vprev.x < -1e8 or vprev.distance_squared_to(pos) > 4.0:
+		return pos
+	return vprev.lerp(pos, view_alpha)

@@ -44,8 +44,8 @@ func _process(delta: float) -> void:
 					continue
 				if sim.rooms.space_id_at(wk.cell()) != r.space:
 					continue
-				ty = wk.pos.y - 0.15
-				tx = wk.pos.x + (-0.55 if wk.dir == "left" else 0.55)
+				ty = wk.vpos().y - 0.15
+				tx = wk.vpos().x + (-0.55 if wk.dir == "left" else 0.55)
 				st["load"] = wk.carrying
 				work = true
 				break

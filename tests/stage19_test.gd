@@ -135,6 +135,10 @@ func _init() -> void:
 	var nurse := S.hire(sim, "nurse", "medicine", 6)
 	_to(sim, 9.0 * 60.0 + 30.0)
 	_run(sim, 30.0)
+	var wait := 0
+	while not (nurse.present and t.medbay_ready()) and wait < 360:   # 1.26: дорога у фельдшера бывает дольше
+		sim.tick(0.5)
+		wait += 1
 	check(nurse.present and t.medbay_ready(), "фельдшер на смене — медпункт работает")
 	var inj: Worker = sim.workers[1]
 	inj.sick_until = -1.0

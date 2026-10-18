@@ -20,6 +20,8 @@ var settings: Dictionary = {
 	"vol_people": 0.75,      ## 1.25: голоса и быт (кашель, посуда, двери, телефон)
 	"vol_city": 0.6,         ## 1.25: город, поезд, гудки, животные
 	"vol_ui": 0.75,          ## 1.25: интерфейс и уведомления
+	"vsync": 0.0,            ## 1.26: вертикальная синхронизация (1 — вкл.; по умолчанию выкл., кадры не ограничены частотой монитора)
+	"fps_cap": 0.0,          ## 1.26: предел кадров в секунду, 0 — без предела
 	"quality": 2,            ## 1.25: качество эффектов: 0 — низкое, 1 — среднее, 2 — высокое
 	"hour_len": 1.0,         ## длительность игрового часа: множитель (0.5 — вдвое быстрее)
 	"ui_scale": 1.0,         ## масштаб интерфейса
@@ -74,6 +76,8 @@ func apply_ui_scale() -> void:
 
 
 func apply_window() -> void:
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if float(settings.get("vsync", 0.0)) > 0.5 else DisplayServer.VSYNC_DISABLED)
+	Engine.max_fps = int(settings.get("fps_cap", 0.0))
 	if bool(settings.get("fullscreen", false)):
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	elif DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:

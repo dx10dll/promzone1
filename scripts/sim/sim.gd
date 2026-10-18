@@ -127,6 +127,15 @@ func _init() -> void:
 
 # ---------------------------------------------------------------- время
 
+## 1.26: перемешать своим генератором (Array.shuffle() берёт общий, со случайным зерном, — игра с одним зерном шла по-разному).
+func shuffle(a: Array) -> void:
+	for i in range(a.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var t: Variant = a[i]
+		a[i] = a[j]
+		a[j] = t
+
+
 func day() -> int:
 	return int(minute / 1440.0) + 1
 
@@ -995,11 +1004,25 @@ func things_of(kind: String, only_built: bool = true) -> Array[Thing]:
 
 ## Построенные объекты, которыми можно пользоваться: стоят в своей зоне (1.13).
 func usable_of(kind: String) -> Array[Thing]:
-	var out: Array[Thing] = []
-	for t: Thing in things.values():
-		if t.kind() == kind and t.built and rooms.zone_ok(t):
-			out.append(t)
-	return out
+	# 1.26: из готового списка по виду и раз за шаг (раньше — перебор всех объектов на каждый вызов)
+	if _uo_min != minute or _uo_rev != thing_rev:
+		_uo_min = minute
+		_uo_rev = thing_rev
+		_uo.clear()
+	var c: Variant = _uo.get(kind)
+	if c == null:
+		var out: Array[Thing] = []
+		for t: Thing in things_of(kind):
+			if rooms.zone_ok(t):
+				out.append(t)
+		_uo[kind] = out
+		c = out
+	return (c as Array[Thing]).duplicate()
+
+
+var _uo := {}
+var _uo_min := -1.0
+var _uo_rev := -1
 
 
 func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -> String:
@@ -1388,9 +1411,12 @@ func buy_lot(k: int) -> bool:
 	var r := world.lot_rect(k)
 	var side := world.lot_side(k)
 	world.own_lot(k)
+	# 1.26: на участке — старое здание прежних хозяев (склад, пилорама, гаражи)
+	var ob := OldBuild.place(self, k)
 	world.flora_rev += 1
 	world.refresh_all()
-	notify("Участок %s куплен: ещё %d×%d клеток. Старый забор между участками снесите (Снос), деревья спилят строители." % [side, r.size.x, r.size.y], LVL_GOOD, r.get_center())
+	notify("Участок %s куплен: ещё %d×%d клеток%s. Старый забор между участками снесите (Снос), деревья спилят строители." % [side, r.size.x, r.size.y,
+		(", на нём %s — стены и ворота целы, нужны свет, проводка и уборка" % ob) if ob != "" else ""], LVL_GOOD, r.get_center())
 	return true
 
 

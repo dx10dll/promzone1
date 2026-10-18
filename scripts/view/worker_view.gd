@@ -311,7 +311,8 @@ func _is_winter() -> bool:
 
 
 func _update_pos() -> void:
-	position = Vector2(worker.pos.x * T, worker.pos.y * T + 6.0)
+	var vp := worker.vpos()
+	position = Vector2(vp.x * T, vp.y * T + 6.0)
 
 
 func _process(delta: float) -> void:

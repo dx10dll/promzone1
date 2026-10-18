@@ -355,7 +355,7 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 		var acc := v.access_cell(sim.world.sidewalk_row)
 		for iid in (sim.veh_items.get(v.id, []) as Array):
 			var it: Item = sim.items.get(iid)
-			if it == null or it.reserved_by >= 0 or b._cool(w, "item%d" % it.id):
+			if it == null or it.reserved_by >= 0 or b._coolf(w, "item%d", it.id):
 				continue
 			var sc := 75.0 + haul_bonus - b._dist(wc, acc) * 0.2
 			if it.kind == "crate":
@@ -396,7 +396,7 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 	# 2. ящики на земле: к месту установки, а лишние — на склад оборудования
 	for gid in sim.ground_items:
 		var it2: Item = sim.items.get(gid)
-		if it2 == null or it2.kind != "crate" or it2.reserved_by >= 0 or b._cool(w, "item%d" % it2.id):
+		if it2 == null or it2.kind != "crate" or it2.reserved_by >= 0 or b._coolf(w, "item%d", it2.id):
 			continue
 		var t2: Thing = sim.things.get(it2.dest)
 		if t2 and not t2.built:
