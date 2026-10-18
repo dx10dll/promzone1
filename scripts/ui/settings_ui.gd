@@ -10,7 +10,8 @@ const TOGGLES := [
 	["names_on_map", "Фамилии под людьми на карте"],
 	["fullscreen", "Полноэкранный режим"],
 ]
-const VOLUMES := [["vol_master", "Общая громкость"], ["vol_music", "Музыка"], ["vol_sfx", "Звуки"], ["vol_amb", "Окружение"]]
+const VOLUMES := [["vol_master", "Общая громкость"], ["vol_music", "Музыка"], ["vol_sfx", "Станки и инструмент"], ["vol_amb", "Цех, столовая, бытовка"],
+	["vol_people", "Люди и быт"], ["vol_city", "Город и поезд"], ["vol_ui", "Интерфейс"]]
 
 
 ## on_toggle(key, value) — для того, что нужно применить в текущей сцене (камера, снабжение).
@@ -37,7 +38,7 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable()) -> void:
 		var key2 := str(vo[0])
 		var h := UITheme.hbox(10)
 		var l := UITheme.label(str(vo[1]), 14)
-		l.custom_minimum_size = Vector2(150, 0)
+		l.custom_minimum_size = Vector2(200, 0)
 		h.add_child(l)
 		var sl := HSlider.new()
 		sl.min_value = 0.0
@@ -58,6 +59,8 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable()) -> void:
 		h.add_child(pct)
 		v.add_child(h)
 	v.add_child(UITheme.label("Экран", 16, UITheme.TEXT, UITheme.f_semi))
+	v.add_child(_choice("Качество эффектов", [[0.0, "низкое — без искр и дыма"], [1.0, "среднее"], [2.0, "высокое"]], "quality",
+		"Искры, стружка, пар, дым, листья и облака. На слабых компьютерах поставьте пониже"))
 	v.add_child(_choice("Масштаб интерфейса", [[0.85, "85%"], [1.0, "100%"], [1.15, "115%"], [1.3, "130%"]], "ui_scale", "Размер кнопок и текста", func() -> void: Game.apply_ui_scale()))
 
 

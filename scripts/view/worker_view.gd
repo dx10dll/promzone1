@@ -21,6 +21,10 @@ var held := Node2D.new()
 var bubble := Node2D.new()
 var ring := Node2D.new()
 var smoke: Array[Sprite2D] = []
+var puff := Sprite2D.new()   ## 1.25: выдох дыма на перекуре
+var gest := Node2D.new()     ## 1.25: мелочь в руке — ложка, кружка
+var _gest := ""
+var _gest_at := Vector2.ZERO
 var _dir := ""
 var _t := 0.0
 var _carry_sig := ""
@@ -77,6 +81,10 @@ func setup(s: Sim, w: Worker) -> void:
 	prop_sp.visible = false
 	add_child(bubble)
 	bubble.draw.connect(_draw_bubble)
+	gest.draw.connect(_draw_gest)
+	puff.texture = Tex.fx("smoke")
+	puff.visible = false
+	add_child(puff)
 	for i in 3:
 		var sp := Sprite2D.new()
 		sp.texture = Tex.fx("smoke")
@@ -176,6 +184,7 @@ func _rebuild(dir: String) -> void:
 			body.add_child(hand_a)
 			body.add_child(hand_b)
 			body.add_child(prop_sp)
+			body.add_child(gest)
 			body.add_child(headn)
 			_face_layers("front", fc, g, beard, mouth, masked)
 			if hair != "bald" or hat == "":
@@ -211,6 +220,7 @@ func _rebuild(dir: String) -> void:
 			body.add_child(held)
 			body.add_child(hand_a)
 			body.add_child(prop_sp)
+			body.add_child(gest)
 			body.add_child(headn)
 			_face_layers("side", fc, g, beard, mouth, false)
 			if hair != "bald" or hat == "":
@@ -507,6 +517,15 @@ func _update_carry() -> void:
 
 func _animate() -> void:
 	var a := worker.anim
+	# 1.25: живые мелочи поверх тех же поз — обед с ложкой, чай на отдыхе, потягивания без дела
+	var tk := worker.task.kind if worker.task else ""
+	if tk == "eat" and (a == "sit" or a == "idle"):
+		a = "eat_sit" if a == "sit" else "eat_stand"
+	elif tk == "rest" and a == "sit":
+		a = "tea"
+	elif tk == "wander" and a == "idle" and fmod(_t + float(worker.id) * 3.7, 16.0) < 2.6:
+		a = "stretch"
+	_gest = ""
 	var side := _dir == "left" or _dir == "right"
 	var back := _dir == "up"
 	var bob := 0.0
@@ -576,7 +595,49 @@ func _animate() -> void:
 			var ph := fmod(_t, 4.0)
 			if ph < 1.2:
 				hb = Vector2(4, -22) if not side else Vector2(7, -20)
+			elif ph > 3.2:
+				# стряхивает пепел
+				hb = (Vector2(11, -12) if not side else Vector2(-3, -11)) + Vector2(0, sin(_t * 30.0) * 0.8)
 			bob = sin(_t * 2.0) * 0.3
+		"eat_sit", "eat_stand":
+			# ложка: зачерпнуть — к губам — обратно (раз в 2,6 с, вразнобой)
+			var pe := fmod(_t * 0.38 + float(worker.id) * 0.21, 1.0)
+			var up := clampf(sin(pe * PI) * 1.6, 0.0, 1.0) if pe < 0.55 else 0.0
+			var low := Vector2(8, -6) if not side else Vector2(8, -7)
+			var mouth := Vector2(3, -20) if not side else Vector2(7, -19)
+			if back:
+				low = Vector2(8, -9)
+				mouth = Vector2(5, -15)
+			hb = low.lerp(mouth, up)
+			ha = Vector2(-9, -6) if not side else Vector2(4, -7)
+			bob = 3.0 if a == "eat_sit" else sin(_t * 2.0) * 0.3
+			if not back:
+				_gest = "spoon"
+				_gest_at = hb
+		"tea":
+			# чай: кружка в руке, изредка отпивает
+			bob = 3.0
+			var pt := fmod(_t * 0.17 + float(worker.id) * 0.13, 1.0)
+			var sip := clampf(sin(clampf((pt - 0.7) / 0.3, 0.0, 1.0) * PI) * 1.5, 0.0, 1.0)
+			var rest := Vector2(9, -9) if not side else Vector2(8, -9)
+			var lip := Vector2(4, -19) if not side else Vector2(8, -18)
+			hb = rest.lerp(lip, sip)
+			ha = Vector2(-11, -7) if not side else Vector2(6, -7)
+			if not back:
+				_gest = "mug"
+				_gest_at = hb
+		"stretch":
+			# потягивается: руки вверх, чуть покачивается
+			var pk := fmod(_t + float(worker.id) * 3.7, 16.0) / 2.6
+			var rise := sin(clampf(pk, 0.0, 1.0) * PI)
+			var top := -9.0 - 22.0 * rise
+			if side:
+				ha = Vector2(3 + rise * 2.0, top)
+				hb = Vector2(-3, top + 2.0)
+			else:
+				ha = Vector2(-13 + rise * 6.0, top)
+				hb = Vector2(13 - rise * 6.0, top)
+			bob = -rise * 1.2
 		_:
 			bob = sin(_t * 2.0) * 0.35
 	if carrying:
@@ -624,8 +685,19 @@ func _animate() -> void:
 	held.visible = carrying and _carry_kind != "crane"
 	if _prop != "":
 		_place_prop(ha, hb, side, back)
+	gest.visible = _gest != ""
+	if gest.visible:
+		gest.queue_redraw()
 	# дым сигареты
 	var smoking := a == "smoke"
+	var pf := fmod(_t, 4.0)
+	puff.visible = smoking and pf > 1.3 and pf < 2.9
+	if puff.visible:
+		var k := (pf - 1.3) / 1.6
+		var fwd := Vector2(0, 2) if not side else Vector2(4 * doll.scale.x, 0)
+		puff.position = Vector2(2, -22) + fwd * k * 3.0 + Vector2(0, -k * 7.0) if not side else Vector2(7 * doll.scale.x, -21) + fwd * k * 3.0 + Vector2(0, -k * 6.0)
+		puff.scale = Vector2.ONE * (0.18 + k * 0.4)
+		puff.modulate = Color(1, 1, 1, (1.0 - k) * 0.55)
 	for i in smoke.size():
 		var sp := smoke[i]
 		sp.visible = smoking
@@ -635,6 +707,20 @@ func _animate() -> void:
 			sp.position = base + Vector2(sin(ph2 * 6.0 + i) * 2.0, -ph2 * 16.0)
 			sp.modulate = Color(1, 1, 1, (1.0 - ph2) * 0.7)
 			sp.scale = Vector2.ONE * (0.15 + ph2 * 0.25)
+
+
+## 1.25: ложка или кружка у кисти (рисуется поверх руки).
+func _draw_gest() -> void:
+	var p := _gest_at
+	match _gest:
+		"spoon":
+			gest.draw_line(p + Vector2(-1, 1), p + Vector2(4, -3), Color(0.78, 0.8, 0.82), 1.2)
+			gest.draw_circle(p + Vector2(4.6, -3.6), 1.4, Color(0.86, 0.88, 0.9))
+		"mug":
+			var r := Rect2(p + Vector2(-2.5, -3.5), Vector2(5, 5.5))
+			gest.draw_rect(r, Color(0.86, 0.84, 0.78))
+			gest.draw_rect(Rect2(r.position, Vector2(5, 1.2)), Color(0.45, 0.28, 0.16))
+			gest.draw_arc(p + Vector2(3.2, -0.8), 1.6, -PI * 0.5, PI * 0.5, 6, Color(0.86, 0.84, 0.78), 1.0)
 
 
 ## Реквизит в руке: плакат над головой, лопата и огнетушитель — перед собой, папка — у груди.

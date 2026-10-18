@@ -3,7 +3,12 @@ extends Node
 ## музыка с плейлистом и плавной сменой, фоновые петли с плавной громкостью.
 ## Все звуки синтезированы tools/gen_sounds.py и лежат в assets/sound.
 
-const BUSES := ["Music", "SFX", "Ambient"]
+const BUSES := ["Music", "SFX", "Ambient", "People", "City", "UI"]
+## 1.25: громкость по категориям — шина и ключ настройки.
+const BUS_VOL := {"Music": "vol_music", "SFX": "vol_sfx", "Ambient": "vol_amb", "People": "vol_people", "City": "vol_city", "UI": "vol_ui"}
+const CITY := ["train_horn", "car_horn", "van_horn", "factory_horn", "bark", "meow", "pigeon_coo", "pigeon_flap", "squeak",
+	"amb_city", "amb_train", "amb_day", "amb_night", "amb_wind", "amb_rain"]
+const PEOPLE := ["cough", "dishes", "door", "doorbell", "kettle", "phone", "injury", "amb_crowd"]
 const LOOPS := ["m_", "amb_"]
 
 var _cache: Dictionary = {}
@@ -44,6 +49,19 @@ func _ready() -> void:
 	apply_volumes()
 
 
+## 1.25: на какую шину идёт звук: интерфейс, город, люди, остальное (станки и инструмент) — «Звуки».
+static func bus_for(name: String) -> String:
+	if name.begins_with("ui_") or name.begins_with("n_") or name in ["letter", "fanfare", "cash", "place"]:
+		return "UI"
+	if name in CITY:
+		return "City"
+	if name in PEOPLE:
+		return "People"
+	if name.begins_with("amb_"):
+		return "Ambient"
+	return "SFX"
+
+
 func stream(name: String) -> AudioStream:
 	if _cache.has(name):
 		return _cache[name]
@@ -69,11 +87,10 @@ func apply_volumes() -> void:
 	var st: Dictionary = Game.settings
 	AudioServer.set_bus_volume_db(0, lin_db(float(st.get("vol_master", 0.8))))
 	AudioServer.set_bus_mute(0, float(st.get("vol_master", 0.8)) <= 0.001)
-	var map := {"Music": "vol_music", "SFX": "vol_sfx", "Ambient": "vol_amb"}
-	for b in map.keys():
+	for b in BUS_VOL.keys():
 		var i := AudioServer.get_bus_index(b)
 		if i >= 0:
-			var v := float(st.get(map[b], 0.7))
+			var v := float(st.get(BUS_VOL[b], 0.7))
 			AudioServer.set_bus_volume_db(i, lin_db(v))
 			AudioServer.set_bus_mute(i, v <= 0.001)
 
@@ -96,6 +113,7 @@ func play(name: String, vol_db: float = 0.0, pitch_var: float = 0.0, gap: float 
 	for p in _pool:
 		if not p.playing:
 			p.stream = s
+			p.bus = bus_for(name)
 			p.volume_db = vol_db
 			p.pitch_scale = 1.0 + randf_range(-pitch_var, pitch_var)
 			p.play()
@@ -112,6 +130,7 @@ func play_at(name: String, pos: Vector2, vol_db: float = 0.0, gap: float = 0.08)
 	for p in _pool2d:
 		if not p.playing:
 			p.stream = s
+			p.bus = bus_for(name)
 			p.global_position = pos
 			p.volume_db = vol_db
 			p.pitch_scale = randf_range(0.93, 1.07)
@@ -172,7 +191,7 @@ func ambient(name: String, target: float) -> void:
 		if target <= 0.001:
 			return
 		var p := AudioStreamPlayer.new()
-		p.bus = "Ambient"
+		p.bus = bus_for(name)
 		p.stream = stream(name)
 		p.volume_db = -60.0
 		add_child(p)

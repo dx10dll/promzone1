@@ -53,7 +53,7 @@ func setup(g: GameMain) -> void:
 		add_child(zp)
 		zone_players[nm] = zp
 	_train = AudioStreamPlayer2D.new()
-	_train.bus = "Ambient"
+	_train.bus = "City"
 	_train.stream = Snd.stream("amb_train")
 	_train.max_distance = 2600.0
 	_train.attenuation = 1.0

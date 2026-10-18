@@ -16,6 +16,8 @@ func _ready() -> void:
 		wait = 60
 		if args.size() > 6 and args[6] == "newgame":
 			target.call_deferred("_show_new_game")
+		if args.size() > 6 and args[6] == "settings":
+			target.call_deferred("_show_settings")
 		if args.size() > 6 and args[6].begins_with("scene:"):
 			var mm2: Node = target
 			var si := int(args[6].substr(6))
@@ -92,6 +94,26 @@ func _ready() -> void:
 		S.big_shop(gm.sim)
 		S.complex_orders(gm.sim, 12)
 	var setup := args[7] if args.size() > 7 else ""
+	if setup == "fx125":
+		# 1.25: искры, пар, стружка — держим станки «в работе» для снимка
+		var S5 := preload("res://tests/setups.gd")
+		S5.big_shop(gm.sim)
+		var keep := func() -> void:
+			for m: Thing in gm.sim.things_of("machine"):
+				m.working = true
+				m.progress = 0.5
+			for n in get_tree().root.find_children("*", "ThingView", true, false):
+				var tv := n as ThingView
+				if tv.thing.kind() != "machine":
+					continue
+				match tv.thing.process():
+					"assembly":
+						tv._t = fposmod(0.2 - float(tv.thing.id) * 0.17, 1.0) / 0.33 + fmod(tv._t, 0.05)
+					"welding":
+						tv._t = 0.3 + fmod(tv._t, 0.08)
+					"heat":
+						tv._steam_until = tv._t + 3.0
+		get_tree().process_frame.connect(keep)
 	if setup == "fauna":
 		# 1.22: кот, голуби во дворе и в цеху, мыши в грязном помещении
 		var fs := gm.sim

@@ -11,6 +11,8 @@ var root: Node2D
 var _t := 0.0
 var lights: Array[PointLight2D] = []
 var flakes: Array[Vector3] = []   ## x, y (доля экрана), скорость
+## 1.25: качество эффектов из настроек: 0 — без искр и стружки, 1 — поменьше, 2 — всё.
+static var quality := 2
 
 
 func setup(s: Sim, world_root: Node2D) -> void:
@@ -41,6 +43,8 @@ func _process(delta: float) -> void:
 	if sim == null:
 		return
 	_t += delta
+	if Engine.get_process_frames() % 30 == 0:
+		quality = clampi(int(float(Game.settings.get("quality", 2))), 0, 2)
 	_update_lights()
 	queue_redraw()
 

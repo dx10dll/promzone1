@@ -466,6 +466,7 @@ func _draw_machine() -> void:
 				_fx_assembly()
 	if pr == "heat":
 		_fx_furnace()
+		_fx_steam()
 	if thing.working:
 		_bar(thing.progress, Color("#6fbf86") if not thing.is_batch() else Color("#e8853a"))
 	# входы и выходы
@@ -572,6 +573,9 @@ func _fx_welding() -> void:
 			var ang := k * 0.9 + 0.4
 			var q := p + Vector2(cos(ang) * ph * 14.0, -absf(sin(ang)) * ph * 10.0 + ph * ph * 16.0)
 			over.draw_line(q, q + Vector2(cos(ang), 0.6) * 1.6, Color(1.0, 0.82, 0.35, 1.0 - ph), 1.0)
+		if FxLayer.quality >= 2:
+			# 1.25: брызги металла падают на пол и гаснут там красными точками
+			_sparks(p, 12, Color(1.0, 0.78, 0.38), 1.0, Vector2.ZERO, 22.0)
 	# дымок сварки
 	var sm := Tex.fx("smoke")
 	if sm:
@@ -604,6 +608,9 @@ func _fx_assembly() -> void:
 	if a.is_empty():
 		return
 	var p := tp(a[0], a[1])
+	# 1.25: слесарь зачищает болгаркой — короткими очередями сноп оранжевых искр в сторону
+	if FxLayer.quality > 0 and fmod(_t * 0.33 + float(thing.id) * 0.17, 1.0) < 0.42:
+		_sparks(p + Vector2(4, -2), 14 if FxLayer.quality >= 2 else 6, Color(1.0, 0.6, 0.2), 1.5, Vector2(1.0, -0.35), 18.0)
 	if fmod(_t, 1.4) < 0.5:
 		var r := 2.0 + fmod(_t, 0.5) * 8.0
 		over.draw_arc(p, r, 0.0, TAU, 12, Color(1, 1, 1, 0.5 - fmod(_t, 0.5)), 1.0)
@@ -612,6 +619,28 @@ func _fx_assembly() -> void:
 		it_id = thing.product
 	if it_id != "" and thing.progress > 0.3:
 		_draw_item(Tex.item(it_id), p + Vector2(0, -3), 11.0)
+
+
+## 1.25: сноп искр — разлетаются дугой и падают; dir — куда летят (ноль — во все стороны), floor — где пол.
+func _sparks(at: Vector2, n: int, col: Color, spd: float, dir: Vector2, floor_y: float) -> void:
+	for k in n:
+		var sd := float(k) * 1.618 + float(thing.id) * 0.73
+		var life := 0.5 + fmod(sd * 0.37, 0.35)
+		var ph := fmod(_t / life + fmod(sd, 1.0), 1.0)
+		var ang := fmod(sd * 2.399, TAU)
+		var v := Vector2(cos(ang), sin(ang) * 0.6 - 0.7)
+		if dir != Vector2.ZERO:
+			v = dir.normalized() + Vector2(cos(ang), sin(ang)) * 0.45
+		v *= 20.0 * spd
+		var q := at + v * ph + Vector2(0, 30.0 * ph * ph)
+		if q.y > at.y + floor_y:
+			# упала: тлеет на полу
+			q.y = at.y + floor_y
+			over.draw_circle(q, 0.9, Color(1.0, 0.35, 0.1, 0.8 * (1.0 - ph)))
+			continue
+		var pq := maxf(0.0, ph - 0.1)
+		var tail := at + v * pq + Vector2(0, 30.0 * pq * pq)
+		over.draw_line(tail, q, Color(col.r, col.g, col.b, 1.0 - ph * 0.7), 1.1)
 
 
 func _fx_furnace() -> void:
@@ -640,6 +669,30 @@ func _fx_furnace() -> void:
 			var ph := fmod(_t * 0.5 + j * 0.33, 1.0)
 			var x := w * 0.42 + sin(ph * 7.0 + j) * 4.0
 			over.draw_line(Vector2(x - 4, top + 4 - ph * 14.0), Vector2(x + 4, top + 2 - ph * 14.0), Color(1, 0.9, 0.8, 0.25 * (1.0 - ph)), 1.5)
+
+
+var _was_work := false
+var _steam_until := -1.0
+
+
+func _fx_steam() -> void:
+	# 1.25: пар — над работающей печью понемногу, а когда садка вышла (закалка) — густые клубы
+	if _was_work and not thing.working:
+		_steam_until = _t + 4.0
+	_was_work = thing.working
+	if FxLayer.quality > 0 and (thing.working or _t < _steam_until):
+		var w2 := float(meta.get("w", 64)) * 0.5
+		var top2 := -float(meta.get("oy", 64)) * 0.5
+		var burst := _t < _steam_until
+		var n := (9 if burst else 4) if FxLayer.quality >= 2 else 3
+		var sm := Tex.fx("smoke")
+		for j2 in n:
+			var ph3 := fmod(_t * (0.32 if burst else 0.2) + float(j2) / float(n), 1.0)
+			var c3 := Vector2(w2 * (0.3 + float(j2 % 3) * 0.2) + sin(_t * 0.9 + j2 * 1.7) * 5.0, top2 + 6.0 - ph3 * (46.0 if burst else 30.0))
+			var sz := (10.0 + ph3 * (26.0 if burst else 16.0))
+			var al := (1.0 - ph3) * (0.55 if burst else 0.28)
+			if sm:
+				over.draw_texture_rect(sm, Rect2(c3 - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false, Color(1, 1, 1, al))
 
 
 func _fx_broken() -> void:

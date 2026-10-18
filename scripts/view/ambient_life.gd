@@ -31,6 +31,9 @@ func _view() -> Rect2:
 func _process(delta: float) -> void:
 	if sim == null:
 		return
+	visible = FxLayer.quality > 0   # 1.25: на низком качестве — без листьев, облаков и бабочек
+	if not visible:
+		return
 	var d := minf(delta, 0.1)
 	_t += d
 	var view := _view().grow(64.0)
