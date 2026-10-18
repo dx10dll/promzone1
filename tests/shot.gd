@@ -213,6 +213,40 @@ func _ready() -> void:
 		cs.crisis.arrears_quits = [cs.day() - 1]
 		cs.crisis.debt_days = 3
 		cs.money = -48000.0
+	if setup == "veh130fire":
+		# 1.30: пожар в цеху до прихода смены — приезжают пожарные
+		var sf := gm.sim
+		for c130 in [Vector2i(24, 17), Vector2i(25, 17), Vector2i(24, 18), Vector2i(25, 18), Vector2i(26, 18)]:
+			sf.story.fires[sf.world.idx(c130)] = 1.0   # без письма «Пожар!» поверх снимка
+		sf.story.fire_start = sf.minute
+		sf.story.brigade.request()
+		sf.story.brigade.dispatch_at = sf.minute
+	if setup == "veh130cargo":
+		# 1.30: грузы по назначению — металл, оборудование, заказ клиента, лом
+		var sc := gm.sim
+		var specs := [["delivery", "flatbed", 1.0, "bars"], ["delivery", "flatbed", 8.0, "crates"], ["pickup", "flatbed", 15.0, ""], ["pickup", "truck", 22.0, ""], ["scrap", "truck", 30.0, ""], ["delivery", "truck", 38.0, "bars"]]
+		for sp5: Array in specs:
+			var v5 := sc.spawn_vehicle(str(sp5[0]))
+			v5.body = str(sp5[1])
+			v5.state = "parked"
+			v5.hold = true
+			v5.x = float(sp5[2])
+			v5.park_x = v5.x
+			v5.loaded = 1
+			if str(sp5[3]) == "bars":
+				v5.supply_id = 1
+				sc.put_in_vehicle(sc.new_item("mat", "bar45", "raw"), v5)
+			elif str(sp5[3]) == "crates":
+				v5.equip = [1]
+				sc.put_in_vehicle(sc.new_item("mat", "bar45", "raw"), v5)
+	if setup == "veh130scrap":
+		# 1.30: ломовоз у ворот, водитель несёт стружку
+		var ss := gm.sim
+		var b130 := ss.place_thing("chip_bin", Vector2i(26, 25), true, false)
+		ss.upkeep.bin_kg[b130.id] = 240.0
+		var b131 := ss.place_thing("chip_bin", Vector2i(18, 25), true, false)
+		ss.upkeep.bin_kg[b131.id] = 150.0
+		ss.upkeep.call_truck()
 	if setup == "upkeep":
 		var SU := preload("res://tests/setups.gd")
 		var su := gm.sim
@@ -600,6 +634,22 @@ func _ready() -> void:
 			if er7 != "":
 				print("v117t: ", e7[0], " ", er7)
 		Scenario.hire_builders(gm.sim, 3)
+	if setup.begins_with("chk130"):
+		# 1.30: проходная с турникетами в заборе у ворот и охранник на смене
+		var SK := preload("res://tests/setups.gd")
+		var sk := gm.sim
+		sk.progress.all_open = true
+		var kc := Vector2i(sk.gate_x - 4, sk.world.plot.end.y)
+		var krot := 0
+		if setup == "chk130v":
+			kc = Vector2i(sk.world.plot.position.x - 1, sk.world.plot.end.y - 6)
+			krot = 1
+		print("chk130 place ", kc, " ", sk.can_place("checkpoint", kc, krot))
+		var kt := sk.place_thing("checkpoint", kc, true, false, krot)
+		print("chk130 cells ", kt.cells(), " walk ", kt.walk_cells(), " seat ", kt.seat_cell())
+		var kg := SK.hire(sk, "guard", "security", 6)
+		kg.shift = 0
+		sk.story.guard = true
 	if setup == "v117p":
 		# план будущего цеха: стены с воротами и окнами, пол, зоны цеха и склада, станки
 		var pl := gm.sim.plan
@@ -695,6 +745,33 @@ func _ready() -> void:
 		if not s8.ground_items.is_empty():
 			print("v118 pile ", (s8.items[s8.ground_items[0]] as Item).cell)
 		s8.power.tick(0.0)
+	if setup.begins_with("chk130"):
+		var sk2 := gm.sim
+		var kcp := sk2.crew.post()
+		for kw in sk2.workers:
+			print("chk130 ", kw.full_name(), " ", kw.prof, " present=", kw.present, " cell=", kw.cell(), " task=", kw.task.label if kw.task else "-", " anim=", kw.anim)
+		print("chk130 search_on=", sk2.crew.search_on(), " post=", kcp != null)
+		# поза для снимка: охранник сидит в будке, двое проходят через турникеты
+		var wcs := kcp.walk_cells()
+		var others: Array[Worker] = []
+		for kw2 in sk2.workers:
+			if kw2.prof == "guard":
+				sk2.brain.abort(kw2)
+				kw2.present = true
+				kw2.pos = Vector2(kcp.seat_cell()) + Brain.BOOTH_SEAT
+				kw2.anim = "sit"
+				kw2.dir = Thing.rot_face("down", kcp.rot)
+			elif others.size() < 2:
+				others.append(kw2)
+		for k2 in others.size():
+			var ow := others[k2]
+			sk2.brain.abort(ow)
+			ow.present = true
+			ow.dressed = false
+			var vert := kcp.rot % 2 == 0
+			ow.pos = Vector2(wcs[k2]) + (Vector2(0.5, 0.35 + 0.3 * k2) if vert else Vector2(0.35 + 0.3 * k2, 0.5))
+			ow.anim = "walk"
+			ow.dir = ("up" if k2 == 0 else "down") if vert else ("right" if k2 == 0 else "left")
 	if setup == "v115o":
 		# приказ: Громов идёт в правый угол бокса — флажок и пунктир
 		var gw := gm.sim.workers[0]
@@ -748,6 +825,8 @@ func _ready() -> void:
 		for tk: String in args[6].substr(5).split(","):
 			var bb: Button = gm.hud.bottom_btns[tk]
 			bb.pressed.emit()
+	if args.size() > 6 and args[6].begins_with("ov:"):   # 1.30: включённый слой (значки панели «Слои»)
+		gm.hud.set_overlay(args[6].substr(3))
 	if args.size() > 6 and args[6].begins_with("obj:"):
 		gm.hud.obj_cat = args[6].substr(4)
 		gm.hud.toggle_sub("objects")

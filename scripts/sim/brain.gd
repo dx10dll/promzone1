@@ -711,6 +711,20 @@ func _guard_task(w: Worker) -> Task:
 				taken = true
 				break
 		if not taken:
+			# 1.30: в будке у турникетов — заходит через турникет рядом и садится за стол
+			var seat := cp.seat_cell()
+			var door := Vector2i(-1, -1)
+			for wc in cp.walk_cells():
+				if seat.x >= 0 and absi(wc.x - seat.x) + absi(wc.y - seat.y) == 1 and sim.world.passable(wc):
+					door = wc
+					break
+			if door.x >= 0 and sim.world.reachable(w.cell(), door):
+				t.label = "Дежурит в будке на проходной"
+				t.data["post"] = "1"
+				t.add({"t": "goto", "cell": door})
+				t.add({"t": "seat", "thing": cp.id, "back": door, "face": Thing.rot_face("down", cp.rot)})
+				t.add({"t": "work", "what": "guard", "dur": sim.rng.randf_range(40.0, 70.0), "anim": "sit"})
+				return t
 			var acc := best_access(cp, w.cell())
 			if acc.x >= 0 and sim.world.reachable(w.cell(), acc):
 				t.label = "Дежурит на проходной"
@@ -2567,8 +2581,33 @@ func _run(w: Worker, dt: float) -> void:
 			_route_inspected(w)
 		"despawn":
 			_despawn(w)
+		"seat":
+			# 1.30: сесть в будку проходной (клетка будки непроходима — переносим внутрь)
+			var st: Thing = sim.things.get(int(tl.get("thing", -1)))
+			if st == null or not st.built or st.seat_cell().x < 0:
+				_fail(w)
+				return
+			w.pos = Vector2(st.seat_cell()) + BOOTH_SEAT
+			w.set_meta("booth", tl["back"])
+			w.path.clear()
+			w.path_target = Vector2i(-999, -999)
+			_face(w, str(tl.get("face", "down")))
+			w.task.next()
 		_:
 			w.task.next()
+
+
+const BOOTH_SEAT := Vector2(0.5, 0.5)   ## 1.30: где в клетке будки сидит охранник (у окна, перед задней стенкой)
+
+
+## 1.30: выйти из будки обратно к турникету.
+func _unseat(w: Worker) -> void:
+	if not w.has_meta("booth"):
+		return
+	var b: Vector2i = w.get_meta("booth")
+	w.remove_meta("booth")
+	if sim.world.passable(b):
+		w.pos = Vector2(b) + Vector2(0.5, 0.5)
 
 
 func _put(w: Worker, tl: Dictionary) -> void:
@@ -3245,7 +3284,9 @@ func _move(w: Worker, target: Vector2i, dt: float) -> int:
 	if target.x < 0:
 		return -1
 	if w.path_target != target or w.path.is_empty():
-		var p := sim.world.find_path(w.cell(), target)
+		var p := sim.crew.gate_path(w.cell(), target)   # 1.30: на смену и домой — через турникет
+		if p.is_empty():
+			p = sim.world.find_path(w.cell(), target)
 		if p.is_empty():
 			return -1
 		w.path = p
@@ -3420,6 +3461,7 @@ func _finish(w: Worker) -> void:
 
 ## Отмена задачи: снять все резервирования, бросить груз на пол.
 func abort(w: Worker) -> void:
+	_unseat(w)
 	if w.task != null:
 		sim.logi.release(w)
 		var tk := w.task

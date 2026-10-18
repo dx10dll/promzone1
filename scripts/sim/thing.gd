@@ -134,6 +134,37 @@ func blocks() -> bool:
 	return bool(def().get("blocks", true))
 
 
+## 1.30: перекрывает ли объект именно эту клетку. У проходной клетки турникетов («walk») проходимы.
+func blocks_at(cc: Vector2i) -> bool:
+	if not blocks():
+		return false
+	var wl: Array = def().get("walk", [])
+	if wl.is_empty():
+		return true
+	var bs := base_size()
+	for o: Array in wl:
+		if cell + Thing.rot_offset(Vector2i(int(o[0]), int(o[1])), bs, rot) == cc:
+			return false
+	return true
+
+
+## 1.30: проходимые клетки объекта (турникеты проходной) с учётом поворота.
+func walk_cells() -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	var bs := base_size()
+	for o: Array in def().get("walk", []):
+		out.append(cell + Thing.rot_offset(Vector2i(int(o[0]), int(o[1])), bs, rot))
+	return out
+
+
+## 1.30: клетка, где сидит охранник (будка проходной); (-1, -1) — нет.
+func seat_cell() -> Vector2i:
+	var a: Array = def().get("seat", [])
+	if a.size() < 2:
+		return Vector2i(-1, -1)
+	return cell + Thing.rot_offset(Vector2i(int(a[0]), int(a[1])), base_size(), rot)
+
+
 ## Светильник под потолком: не занимает клетку на полу, может висеть над станком.
 func is_ceiling() -> bool:
 	return bool(def().get("ceiling", false))

@@ -46,6 +46,7 @@ var _winter := false
 var _outside := false
 var _tex_rev := -1   ## ступень разрешения текстур людей, под которую собрана кукла
 var _mood_b := 0     ## 1.15: настроение на лице (улыбка / уголки вниз)
+var _sanim := ""     ## 1.30: анимация на улице за краем карты (StreetFolk), "" — из симуляции
 ## 1.23: видимая часть мира (с запасом) — кто за краем экрана, того не анимируем. Ставит EntityLayer.
 static var view := Rect2(-1e9, -1e9, 2e9, 2e9)
 
@@ -317,20 +318,31 @@ func _update_pos() -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	visible = worker.present and not worker.hidden
+	# 1.30: на улице за краем карты (ушёл домой, идёт на смену, горожанин) — поза от StreetFolk
+	var st: Array = StreetFolk.pose.get(worker.id, [])
+	var street := not st.is_empty() and (st[0] as Vector2) != Vector2.INF
+	visible = street or (worker.present and not worker.hidden)
+	var fade := float(st[3]) if not st.is_empty() else 1.0
+	if modulate.a != fade:
+		modulate.a = fade
 	if not visible:
 		return
-	_update_pos()
+	_sanim = str(st[2]) if street else ""
+	var wdir := str(st[1]) if street else worker.dir
+	if street:
+		position = (st[0] as Vector2) + Vector2(0, 6.0)
+	else:
+		_update_pos()
 	if not view.has_point(position) and not selected:
 		return
 	# 1.29: зима и «на улице» меняются медленно — проверяем раз в 8 кадров (вразнобой), а не каждый кадр
 	var slow := (Engine.get_process_frames() + absi(worker.id)) % 8 == 0
-	if worker.dir != _dir or worker.dressed != _dressed or worker.muffs != _muffs or _mood_bucket() != _mood_b \
+	if wdir != _dir or worker.dressed != _dressed or worker.muffs != _muffs or _mood_bucket() != _mood_b \
 			or (slow and (_is_winter() != _winter or (_winter and _is_outside() != _outside))):
-		_rebuild(worker.dir)
+		_rebuild(wdir)
 	elif _tex_rev != Tex.people_rev and (Engine.get_process_frames() + absi(worker.id)) % 4 == 0:
 		# сменился масштаб — пересобираем куклу в новом разрешении (вразнобой, чтобы не дёргало)
-		_rebuild(worker.dir)
+		_rebuild(wdir)
 	if worker.prop != _prop:
 		_prop = worker.prop
 		prop_sp.texture = Tex.person("prop_" + _prop) if _prop != "" else null
@@ -519,7 +531,7 @@ func _update_carry() -> void:
 
 
 func _animate() -> void:
-	var a := worker.anim
+	var a := _sanim if _sanim != "" else worker.anim
 	# 1.25: живые мелочи поверх тех же поз — обед с ложкой, чай на отдыхе, потягивания без дела
 	var tk := worker.task.kind if worker.task else ""
 	if tk == "eat" and (a == "sit" or a == "idle"):
@@ -784,6 +796,19 @@ func _place_prop(ha: Vector2, hb: Vector2, side: bool, back: bool) -> void:
 				prop_sp.rotation = -0.4
 		"camera":
 			prop_sp.position = Vector2(0, -30) if worker.anim == "idle" and not back else hb + Vector2(0, 2)
+		"nozzle":
+			# 1.30: пожарный ствол — двумя руками у пояса, наконечником вперёд (струю рисует VehicleFx)
+			prop_sp.scale = Vector2(0.62, 0.62)
+			prop_sp.position = (ha + hb) * 0.5 + Vector2(0, 2)
+			if worker.dir == "up":
+				prop_sp.rotation = -PI * 0.5
+			elif worker.dir == "down":
+				prop_sp.rotation = PI * 0.5
+		"chips":
+			# 1.30: короб со стружкой — перед собой двумя руками
+			prop_sp.scale = Vector2(0.7, 0.7)
+			prop_sp.position = (ha + hb) * 0.5 + Vector2(0, -2)
+			prop_sp.z_index = -1 if back else 1
 		"flowers":
 			prop_sp.position = hb + Vector2(0, -4)
 		"toolbox":

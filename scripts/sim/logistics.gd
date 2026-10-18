@@ -351,6 +351,7 @@ func tick() -> void:
 	if due.is_empty():
 		return
 	var v := sim.spawn_vehicle("delivery")
+	v.body = "flatbed"   # 1.30: ящики с оборудованием видно на платформе; станки — в фуре
 	var names: Array[String] = []
 	for e3: Dictionary in due:
 		var dk := str(Defs.objects.get(str(e3["def"]), {}).get("kind", ""))

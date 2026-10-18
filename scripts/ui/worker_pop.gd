@@ -21,7 +21,7 @@ func setup(h: Hud) -> void:
 	hud = h
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	add_theme_stylebox_override("panel", UITheme.sbs(Color(0.075, 0.083, 0.094, 0.97), UITheme.LINE2, 1, 10, 10, 8, 14, 0.55, 4))
+	add_theme_stylebox_override("panel", UITheme.sbs(Color(0.106, 0.108, 0.112, 0.97), UITheme.LINE2, 1, 10, 10, 8, 14, 0.55, 4))
 	var v := UITheme.vbox(6)
 	add_child(v)
 	var top := UITheme.hbox(8)

@@ -16,7 +16,7 @@ var _t := 0.0
 func setup(h: Hud) -> void:
 	hud = h
 	sim = h.sim
-	add_theme_stylebox_override("panel", UITheme.sbs(Color(0.075, 0.083, 0.094, 0.9), UITheme.LINE, 1, 10, 10, 8, 12, 0.4, 3))
+	add_theme_stylebox_override("panel", UITheme.sbs(Color(0.106, 0.108, 0.112, 0.9), UITheme.LINE, 1, 10, 10, 8, 12, 0.4, 3))
 	custom_minimum_size = Vector2(380, 0)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var v := UITheme.vbox(4)
@@ -29,6 +29,11 @@ func setup(h: Hud) -> void:
 	_head.add_theme_font_size_override("font_size", 13)
 	_head.add_theme_color_override("font_color", UITheme.MUTED)
 	_head.add_theme_color_override("font_hover_color", UITheme.TEXT)
+	# 1.30: значок «Задачи» из набора владельца
+	_head.icon = UITheme.micon("tasks")
+	_head.expand_icon = false
+	_head.add_theme_constant_override("icon_max_width", 20)
+	UITheme.micon_colors(_head)
 	var e := UITheme.sb(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6, 2, 0)
 	for st in ["normal", "hover", "pressed", "hover_pressed"]:
 		_head.add_theme_stylebox_override(st, e)
@@ -177,6 +182,9 @@ func _items() -> Array:
 
 
 ## Какой отдел открыть следующим: первый по порядку, который уже доступен по этапу и ещё не работает.
+## 1.30: строки списка дел, у которых есть цветной значок из набора владельца.
+const TODO_ICONS := {"build": "construction", "plan": "blueprint", "orders": "orders", "goals": "goals",
+	"office": "management", "money": "money"}
 const DEPT_ORDER := ["accounting", "hr", "foreman", "supply", "sales", "safety", "pdo", "chief", "tech", "engineer", "legal"]
 
 
@@ -252,11 +260,13 @@ func _line(it: Array) -> Button:
 	b.add_child(h)
 	if not sub:
 		var ic := TextureRect.new()
-		ic.texture = Tex.ui(str(it[0]))
-		ic.custom_minimum_size = Vector2(20, 20)
+		var mt := UITheme.micon(str(TODO_ICONS.get(str(it[0]), "")))
+		ic.texture = mt if mt != null else Tex.ui(str(it[0]))
+		ic.custom_minimum_size = Vector2(22, 22) if mt != null else Vector2(20, 20)
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		ic.modulate = col if col != UITheme.TEXT else UITheme.TEXT
+		# цветной значок не перекрашиваем: срочность видна по цветной планке слева и тексту
+		ic.modulate = Color.WHITE if mt != null else col
 		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(ic)

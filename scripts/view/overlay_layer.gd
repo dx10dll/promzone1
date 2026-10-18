@@ -747,7 +747,7 @@ func _draw_crew() -> void:
 			if not ok:
 				_text_px(rr.get_center() + Vector2(0, -14.0), "камера · нет тока", 12, cc, true)
 		elif t.def_id == "checkpoint":
-			var on := cr.on_watch() or (sim.story.guard and sim.story.has_checkpoint())
+			var on := cr.on_watch() or cr.search_on()
 			var c3 := Color("#8fcf78") if on else Color("#e0a83a")
 			draw_rect(rr.grow(3), c3, false, 2.5)
 			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 6.0), "проходная · " + ("охрана на посту" if on else "без охраны"), 12, c3, true)

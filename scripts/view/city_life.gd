@@ -76,7 +76,7 @@ func _process(delta: float) -> void:
 	# машины
 	for c: Dictionary in _cars:
 		var ln: Array = backdrop.lanes[int(c["lane"])]
-		var len := maxf(1.0, (ln[1] as Vector2).distance_to(ln[0] as Vector2))
+		var len := maxf(1.0, _lane_len(ln))
 		c["k"] = float(c["k"]) + float(c["v"]) * d * (1000.0 / len)
 		if float(c["k"]) > 1.0:
 			c["k"] = 0.0
@@ -107,9 +107,10 @@ func _draw() -> void:
 	# машины
 	for c: Dictionary in _cars:
 		var ln: Array = backdrop.lanes[int(c["lane"])]
-		var a: Vector2 = ln[0]
-		var b: Vector2 = ln[1]
-		var p := a.lerp(b, float(c["k"]))
+		var seg := _lane_seg(ln, float(c["k"]))
+		var a: Vector2 = seg[0]
+		var b: Vector2 = seg[1]
+		var p: Vector2 = seg[2]
 		var horiz := absf(b.x - a.x) > absf(b.y - a.y)
 		var big := bool(c["truck"])
 		var sz := (Vector2(34, 13) if big else Vector2(20, 11)) if horiz else (Vector2(13, 34) if big else Vector2(11, 20))
@@ -135,6 +136,29 @@ func _draw() -> void:
 		for ch: Array in backdrop.chimneys:
 			if float(ch[1]) >= 12.0:
 				draw_circle(ch[0], 3.0, Color(1.0, 0.25, 0.2, 0.9))
+		for bp: Vector2 in backdrop.beacons:   # 1.30: заградительные огни телебашни
+			draw_circle(bp, 4.0, Color(1.0, 0.25, 0.2, 0.95))
+			draw_circle(bp, 9.0, Color(1.0, 0.3, 0.2, 0.25))
+
+
+func _lane_len(ln: Array) -> float:
+	var l := 0.0
+	for i in range(1, ln.size()):
+		l += (ln[i] as Vector2).distance_to(ln[i - 1] as Vector2)
+	return l
+
+
+## 1.30: проезд может быть ломаной (поворот с боковой улицы на главную): [начало отрезка, конец, точка на доле k].
+func _lane_seg(ln: Array, k: float) -> Array:
+	var s := k * _lane_len(ln)
+	for i in range(1, ln.size()):
+		var a: Vector2 = ln[i - 1]
+		var b: Vector2 = ln[i]
+		var d := a.distance_to(b)
+		if s <= d or i == ln.size() - 1:
+			return [a, b, a.lerp(b, clampf(s / maxf(d, 1.0), 0.0, 1.0))]
+		s -= d
+	return [ln[0], ln[0], ln[0]]
 
 
 ## Вагон сверху (центр в p): -1 тепловоз, 0 цистерна, 1 полувагон, 2 крытый, 3 платформа с лесом.

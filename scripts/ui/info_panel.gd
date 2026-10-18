@@ -621,7 +621,8 @@ func show_visitor(s: Sim, v: Worker) -> void:
 	var col := UITheme.vbox(2)
 	col.add_child(UITheme.title(v.formal_name(), 16))
 	var t := str(sim.inspect.visit.get("type", ""))
-	col.add_child(UITheme.label(str(sim.inspect.tdef(t).get("who", "Гость завода")), 13, UITheme.MUTED))
+	var guest := v.has_meta("who")   # 1.30: пожарный, водитель ломовоза — не инспектор
+	col.add_child(UITheme.label(str(v.get_meta("who")) if guest else str(sim.inspect.tdef(t).get("who", "Гость завода")), 13, UITheme.MUTED))
 	var act := UITheme.label("", 13, UITheme.INFO)
 	act.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	act.custom_minimum_size = Vector2(200, 0)
@@ -632,7 +633,9 @@ func show_visitor(s: Sim, v: Worker) -> void:
 	var found := _wrap("", 13, UITheme.WARN)
 	box.add_child(found)
 	dyn["found"] = found
-	if not Inspections.VISIT_KINDS.has(t):
+	if guest:
+		box.add_child(_wrap("Приехал по делу и уедет сам — ничего делать не нужно." if str(v.get_meta("who")) != "Пожарный" else "Пожарный расчёт тушит огонь и уедет, когда пожар потушат.", 12, UITheme.MUTED))
+	elif not Inspections.VISIT_KINDS.has(t):
 		box.add_child(UITheme.label("Что проверяет:", 13, UITheme.MUTED, UITheme.f_med))
 		for line in sim.inspect.checklist(t):
 			box.add_child(_wrap("• " + str(line), 12, UITheme.TEXT))
@@ -1193,6 +1196,9 @@ func refresh() -> void:
 			_refresh_worker()
 		"visitor":
 			var v := sim.get_person(id)
+			if v != null and v.has_meta("who") and sim.visitors.has(v):
+				(dyn["act"] as Label).text = "Сейчас: " + v.activity   # 1.30: пожарный, водитель
+				return
 			if v == null or sim.inspect.visit.is_empty():
 				visible = false
 				return

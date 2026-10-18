@@ -20,35 +20,36 @@ static var train_where := "class"  ## где учить: свой класс и�
 
 ## Окна объединены в группы с боковой навигацией (1.7.5): раздел = содержимое «старого» окна и его вкладка.
 ## [ключ раздела, название, значок, вид содержимого, вкладка содержимого]
+## 1.30: значок группы — из набора владельца (assets/ui/icons), значки разделов — прежние.
 const GROUPS := {
 	"orders": {"title": "Заказы", "icon": "orders", "secs": [
 		["active", "В работе", "orders", "orders", "active"], ["market", "Рынок", "chart_up", "orders", "market"],
 		["contracts", "Контракты", "handshake", "orders", "contracts"], ["compet", "Конкуренты", "factory", "orders", "compet"],
 		["plan", "План ПДО", "calendar", "orders", "plan"], ["done", "Архив", "log", "orders", "done"]]},
-	"prod": {"title": "Производство", "icon": "shop", "secs": [
+	"prod": {"title": "Производство", "icon": "production", "secs": [
 		["machines", "Станки", "shop", "shop", ""], ["stall", "Простой", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
 		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
-	"people": {"title": "Люди", "icon": "staff", "secs": [
+	"people": {"title": "Люди", "icon": "people", "secs": [
 		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "orders", "staff", "hire"],
 		["train", "Обучение", "idea", "staff", "train"], ["safety", "Охрана труда", "injury", "staff", "safety"],
 		["brig", "Бригады", "crew", "crew", "brig"], ["sched", "График смены", "clock", "crew", "sched"],
 		["sec", "Охрана", "thief", "crew", "sec"], ["union", "Профсоюз", "handshake", "crew", "union"],
 		["honor", "Доска почёта", "medal", "honor", ""]]},
-	"finance": {"title": "Финансы", "icon": "finance", "secs": [
+	"finance": {"title": "Финансы", "icon": "finances", "secs": [
 		["summary", "Сводка", "finance", "finance", "summary"], ["charts", "Графики", "chart_up", "finance", "charts"],
 		["weeks", "По неделям", "log", "finance", "weeks"], ["loans", "Кредиты и лизинг", "money", "finance", "loans"],
 		["insurance", "Страхование", "shield", "finance", "insurance"], ["grants", "Гранты", "medal", "finance", "grants"]]},
-	"office": {"title": "Управление", "icon": "office", "secs": [
+	"office": {"title": "Управление", "icon": "management", "secs": [
 		["develop", "Развитие и отделы", "develop", "develop", ""], ["research", "Разработки", "research", "research", ""],
 		["iso", "ISO 9001", "iso", "market", "iso"], ["advisor", "Главный инженер", "engineer", "market", "advisor"]]},
 	"goals": {"title": "Цели", "icon": "goals", "secs": [
 		["stage", "Этап роста", "stage_up", "goals", "stage"], ["rating", "Рейтинг", "star", "goals", "rating"],
 		["scn", "Сценарий", "scn_garage", "goals", "scn"], ["ach", "Достижения", "medal", "goals", "ach"]]},
-	"events": {"title": "События", "icon": "calendar", "secs": [
+	"events": {"title": "События", "icon": "events", "secs": [
 		["now", "Сейчас", "calendar", "events", "now"], ["insp", "Проверки", "inspect", "events", "insp"],
 		["cal", "Календарь", "clock", "events", "cal"], ["hist", "Хроника", "log", "events", "hist"],
 		["paper", "Многотиражка", "paper", "paper", ""], ["log", "Журнал", "letter", "log", ""]]},
-	"town": {"title": "Город", "icon": "town", "secs": [
+	"town": {"title": "Город", "icon": "city", "secs": [
 		["overview", "Обзор", "town", "town", "overview"], ["dorm", "Общежитие", "bed", "town", "dorm"],
 		["canteen", "Столовая и медпункт", "med", "town", "canteen"], ["kg", "Детсад и ДК", "kid", "town", "kg"],
 		["radio", "Заводское радио", "radio", "town", "radio"], ["cat", "Кот", "cat", "town", "cat"]]},
@@ -156,7 +157,7 @@ func setup(s: Sim, h: Node, k: String, first_sec: String = "", w: float = 1180.0
 
 
 func _rail_sb() -> StyleBoxFlat:
-	var s := UITheme.sb(Color("#15171a"), Color(0, 0, 0, 0), 0, 0, 12, 14)
+	var s := UITheme.sb(Color("#161718"), Color(0, 0, 0, 0), 0, 0, 12, 14)
 	s.corner_radius_top_left = 12
 	s.corner_radius_bottom_left = 12
 	return s
@@ -175,9 +176,10 @@ func _rail_item(sdef: Array) -> Button:
 	b.custom_minimum_size = Vector2(0, 38)
 	var n := UITheme.sb(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 7, 10, 4)
 	var hv := UITheme.sb(Color(1, 1, 1, 0.05), Color(0, 0, 0, 0), 0, 7, 10, 4)
-	var pr := UITheme.sb(Color(UITheme.ACCENT.r, UITheme.ACCENT.g, UITheme.ACCENT.b, 0.16), Color(0, 0, 0, 0), 0, 7, 10, 4)
+	# 1.30: выбранный раздел — кирпичная планка (как на панелях HUD), значок кремовый
+	var pr := UITheme.sb(Color(UITheme.BRICK.r, UITheme.BRICK.g, UITheme.BRICK.b, 0.18), Color(0, 0, 0, 0), 0, 7, 10, 4)
 	pr.border_width_left = 3
-	pr.border_color = UITheme.ACCENT
+	pr.border_color = UITheme.BRICK
 	b.add_theme_stylebox_override("normal", n)
 	b.add_theme_stylebox_override("hover", hv)
 	b.add_theme_stylebox_override("pressed", pr)
@@ -187,8 +189,8 @@ func _rail_item(sdef: Array) -> Button:
 	b.add_theme_color_override("font_pressed_color", UITheme.TEXT)
 	b.add_theme_color_override("font_hover_pressed_color", UITheme.TEXT)
 	b.add_theme_color_override("icon_normal_color", UITheme.MUTED)
-	b.add_theme_color_override("icon_pressed_color", UITheme.ACCENT)
-	b.add_theme_color_override("icon_hover_pressed_color", UITheme.ACCENT)
+	b.add_theme_color_override("icon_pressed_color", UITheme.CREAM)
+	b.add_theme_color_override("icon_hover_pressed_color", UITheme.CREAM)
 	b.add_theme_font_size_override("font_size", 14)
 	b.pressed.connect(func() -> void:
 		_open_sec(key)

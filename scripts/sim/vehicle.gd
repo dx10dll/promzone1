@@ -1,6 +1,7 @@
 class_name Vehicle
 extends RefCounted
 ## Грузовой фургон: привозит металл или забирает готовые заказы.
+## 1.30: ещё ломовоз (kind "scrap": забирает стружку и брак) и пожарная машина (kind "fire").
 
 var id := 0
 var kind := "delivery"   ## "delivery" — поставка металла, "pickup" — забирает заказ
@@ -18,7 +19,9 @@ var color := 0
 var cargo_desc := ""
 var equip: Array = []      ## заказы оборудования в кузове (id из Logistics.equip)
 var bmat_order := -1       ## 1.13: заказ стройматериалов в кузове
-var body := "van"          ## van — фургон, flatbed — бортовой грузовик
+var body := "van"          ## van — фургон, flatbed — бортовой грузовик, truck, semi, fire — пожарная машина
+var lane := 0              ## 1.30: 0 — ближняя полоса (едет вправо), 1 — дальняя (встречная, едет влево)
+var hold := false          ## 1.30: стоит, пока её не отпустит своя служба (пожарные, ломовоз)
 
 
 func access_cell(sidewalk_row: int) -> Vector2i:
@@ -30,7 +33,7 @@ func to_dict() -> Dictionary:
 		"id": id, "kind": kind, "x": x, "state": state, "park_x": park_x,
 		"order": order_id, "supply": supply_id, "need": need, "loaded": loaded,
 		"color": color, "desc": cargo_desc, "parked": parked_time, "equip": equip,
-		"bmat": bmat_order, "body": body,
+		"bmat": bmat_order, "body": body, "lane": lane, "hold": hold,
 	}
 
 
@@ -51,4 +54,11 @@ static func from_dict(d: Dictionary) -> Vehicle:
 	v.equip = d.get("equip", [])
 	v.bmat_order = int(d.get("bmat", -1))
 	v.body = str(d.get("body", "van"))
+	v.lane = int(d.get("lane", 0))
+	v.hold = bool(d.get("hold", false))
 	return v
+
+
+## 1.30: в какую сторону едет: ближняя полоса — вправо, встречная — влево.
+func dir() -> float:
+	return 1.0 if lane == 0 else -1.0

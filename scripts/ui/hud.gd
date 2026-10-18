@@ -90,7 +90,7 @@ func setup(game: GameMain) -> void:
 	toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toasts.add_theme_constant_override("separation", 6)
 	toasts.alignment = BoxContainer.ALIGNMENT_END
-	_anchor(toasts, 1, 1, 1, 1, -458, -96, -60, -96)
+	_anchor(toasts, 1, 1, 1, 1, -458, -102, -60, -102)
 	toasts.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	add_child(toasts)
 	crisis_bar = PanelContainer.new()
@@ -164,7 +164,7 @@ func _center(c: Control) -> void:
 
 func _build_top() -> void:
 	var p := PanelContainer.new()
-	var st := UITheme.sb(Color(0.075, 0.083, 0.094, 0.96), Color(0, 0, 0, 0), 0, 0, 10, 4)
+	var st := UITheme.sb(Color(0.106, 0.108, 0.112, 0.96), Color(0, 0, 0, 0), 0, 0, 10, 4)
 	st.border_width_bottom = 1
 	st.border_color = UITheme.LINE
 	st.shadow_size = 10
@@ -197,7 +197,7 @@ func _build_top() -> void:
 	mc.add_child(money_d)
 	h.add_child(_chips["money"])
 	# этап и звёзды
-	var gc := _chip("goals", "goals", func() -> void: open_window("goals"))
+	var gc := _chip("level", "goals", func() -> void: open_window("goals"))
 	stage_l = UITheme.label("", 14, UITheme.TEXT, UITheme.f_semi)
 	stars_l = UITheme.label("", 12, UITheme.ACCENT)
 	gc.add_child(stage_l)
@@ -205,7 +205,7 @@ func _build_top() -> void:
 	h.add_child(_chips["goals"])
 	goal_l = stage_l
 	# репутация
-	var rc := _chip("star", "rep", func() -> void:
+	var rc := _chip("reputation", "rep", func() -> void:
 		open_window("goals")
 		if win:
 			win.select_tab("rating"))
@@ -236,13 +236,13 @@ func _build_top() -> void:
 	dic.queue_free()
 	h.add_child(_chips["date"])
 	shift_l = time_l
-	var wc := _chip("thermo", "weather", func() -> void: open_window("events"))
+	var wc := _chip("temperature", "weather", func() -> void: open_window("events"))
 	weather_l = UITheme.label("", 15, UITheme.TEXT, UITheme.f_semi)
 	wc.add_child(weather_l)
 	weather_i = (_chips["weather"] as Control).get_meta("icon")
 	weather_l.set_meta("box", _chips["weather"])
 	h.add_child(_chips["weather"])
-	var ec := _chip("power", "power", func() -> void: toggle_sub("power"))
+	var ec := _chip("energy", "power", func() -> void: toggle_sub("power"))
 	power_l = UITheme.label("", 13, UITheme.TEXT, UITheme.f_semi)
 	power_bar = UITheme.bar(0, UITheme.GOOD, 86, 5)
 	ec.add_child(power_l)
@@ -256,16 +256,25 @@ func _build_top() -> void:
 	var tips := ["Пауза (Пробел)", "Обычная скорость ×1 (клавиша 1)", "Быстро ×2 (клавиша 2)", "Очень быстро ×4 (клавиша 3)"]
 	for i in 4:
 		var b := Button.new()
-		b.icon = Tex.ui(["pause", "play1", "play2", "play3"][i])
+		b.icon = _top_tex(["pause", "play", "speed_2", "speed_3"][i])
 		b.toggle_mode = true
 		b.button_group = g2
 		b.focus_mode = Control.FOCUS_NONE
 		b.tooltip_text = tips[i]
 		b.custom_minimum_size = Vector2(40, 34)
-		b.expand_icon = true
-		b.add_theme_constant_override("icon_max_width", 20)
+		b.expand_icon = false
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.add_theme_constant_override("icon_max_width", 26)
+		UITheme.micon_colors(b)
 		for stn in ["normal", "hover", "pressed", "hover_pressed"]:
 			var base: StyleBoxFlat = (UITheme.theme.get_stylebox(stn, "Button") as StyleBoxFlat).duplicate()
+			if stn.begins_with("pressed") or stn == "hover_pressed":
+				# 1.30: включённая скорость — светлый графит с кирпичной рамкой (цветной значок не тонет в янтаре)
+				base.bg_color = Color("#4a4640")
+				base.border_color = UITheme.BRICK
+				base.border_width_bottom = 3
+			base.content_margin_top = 4
+			base.content_margin_bottom = 4
 			base.corner_radius_top_left = 7 if i == 0 else 0
 			base.corner_radius_bottom_left = 7 if i == 0 else 0
 			base.corner_radius_top_right = 7 if i == 3 else 0
@@ -294,6 +303,15 @@ func _build_top() -> void:
 	lb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(lb)
 	var mbtn := UITheme.icon_button("menu", "", show_pause_menu, "Меню игры (Esc)")
+	mbtn.icon = _top_tex("menu")
+	mbtn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mbtn.add_theme_constant_override("icon_max_width", 26)
+	for stn in ["normal", "hover", "pressed", "hover_pressed"]:
+		var ms: StyleBoxFlat = (UITheme.theme.get_stylebox(stn, "Button") as StyleBoxFlat).duplicate()
+		ms.content_margin_top = 4
+		ms.content_margin_bottom = 4
+		mbtn.add_theme_stylebox_override(stn, ms)
+	UITheme.micon_colors(mbtn)
 	mbtn.custom_minimum_size = Vector2(40, 34)
 	mbtn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(mbtn)
@@ -302,8 +320,8 @@ func _build_top() -> void:
 ## Панель оверлеев (1.12): столбик значков у правого края — всегда на виду; легенда — карточкой слева внизу.
 func _build_overlays() -> void:
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.075, 0.083, 0.094, 0.92), UITheme.LINE, 1, 10, 4, 6, 12, 0.4, 3))
-	_anchor(p, 1, 0.5, 1, 0.5, -50, -250, -8, -250)
+	p.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.106, 0.108, 0.112, 0.92), UITheme.LINE, 1, 10, 4, 6, 12, 0.4, 3))
+	_anchor(p, 1, 0.5, 1, 0.5, -54, -250, -8, -250)
 	p.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	add_child(p)
 	ov_panel = p
@@ -315,35 +333,44 @@ func _build_overlays() -> void:
 	for o: Array in OVERLAYS:
 		var key := str(o[0])
 		var b := Button.new()
-		b.icon = Tex.ui("ov_" + key)
-		b.expand_icon = true
-		b.custom_minimum_size = Vector2(36, 34)
+		b.icon = _ov_tex(key)
+		b.expand_icon = false
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.add_theme_constant_override("icon_max_width", 34)
+		b.custom_minimum_size = Vector2(42, 40)
 		b.toggle_mode = true
 		b.focus_mode = Control.FOCUS_NONE
 		b.tooltip_text = "%s\n%s" % [str(o[1]), str(o[2])]
-		var n := UITheme.sb(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 7, 5, 4)
-		var hv := UITheme.sb(Color(1, 1, 1, 0.08), Color(0, 0, 0, 0), 0, 7, 5, 4)
-		var on := UITheme.sb(Color(UITheme.ACCENT.r, UITheme.ACCENT.g, UITheme.ACCENT.b, 0.22), UITheme.ACCENT, 1, 7, 5, 4)
+		var n := UITheme.sb(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 7, 4, 3)
+		var hv := UITheme.sb(Color(UITheme.CREAM.r, UITheme.CREAM.g, UITheme.CREAM.b, 0.09), Color(0, 0, 0, 0), 0, 7, 4, 3)
+		var on := UITheme.sb(Color(UITheme.BRICK.r, UITheme.BRICK.g, UITheme.BRICK.b, 0.24), UITheme.BRICK, 2, 7, 4, 3)
 		b.add_theme_stylebox_override("normal", n)
 		b.add_theme_stylebox_override("hover", hv)
 		b.add_theme_stylebox_override("pressed", on)
 		b.add_theme_stylebox_override("hover_pressed", on)
-		b.add_theme_color_override("icon_normal_color", Color("#b9b5aa"))
-		b.add_theme_color_override("icon_hover_color", Color.WHITE)
-		b.add_theme_color_override("icon_pressed_color", UITheme.ACCENT)
-		b.add_theme_color_override("icon_hover_pressed_color", UITheme.ACCENT)
+		UITheme.micon_colors(b)
 		b.pressed.connect(func() -> void: set_overlay(key))
 		v.add_child(b)
 		ov_btns[key] = b
 	legend_panel = PanelContainer.new()
-	legend_panel.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.075, 0.083, 0.094, 0.94), UITheme.LINE, 1, 10, 12, 10, 12, 0.4, 3))
-	_anchor(legend_panel, 0, 1, 0, 1, 12, -96, 312, -96)
+	legend_panel.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.106, 0.108, 0.112, 0.94), UITheme.LINE, 1, 10, 12, 10, 12, 0.4, 3))
+	_anchor(legend_panel, 0, 1, 0, 1, 12, -102, 312, -102)
 	legend_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	legend_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	legend_panel.visible = false
 	add_child(legend_panel)
 	legend_box = UITheme.vbox(4)
 	legend_panel.add_child(legend_box)
+
+
+## 1.30: значки слоёв — из набора владельца (зоны → «слои», сети → «коммуникации», …).
+const OV_ICONS := {"rooms": "layers", "nets": "utilities", "light": "lighting", "temp": "heating",
+	"traffic": "routes", "load": "statistics", "dirt": "cleaning", "crew": "team"}
+
+
+func _ov_tex(key: String) -> Texture2D:
+	var t := UITheme.micon(str(OV_ICONS.get(key, "")))
+	return t if t != null else Tex.ui("ov_" + key)
 
 
 ## Включить оверлей (тот же ещё раз — выключить).
@@ -375,10 +402,10 @@ func _sync_overlays() -> void:
 			title = str(o[1])
 	var hh := UITheme.hbox(8)
 	var ic := TextureRect.new()
-	ic.texture = Tex.ui("ov_" + cur)
-	ic.custom_minimum_size = Vector2(20, 20)
+	ic.texture = _ov_tex(cur)
+	ic.custom_minimum_size = Vector2(24, 24)
 	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	ic.modulate = UITheme.ACCENT
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	hh.add_child(ic)
 	hh.add_child(UITheme.label(title, 14, UITheme.TEXT, UITheme.f_semi))
 	legend_box.add_child(hh)
@@ -409,9 +436,9 @@ func _chip(icon: String, key: String, cb: Callable) -> VBoxContainer:
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(h)
 	var ic := _ticon(icon)
-	ic.custom_minimum_size = Vector2(22, 22)
+	ic.custom_minimum_size = Vector2(32, 32)
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ic.modulate = Color(1, 1, 1, 0.75)
 	h.add_child(ic)
 	p.set_meta("icon", ic)
 	var v := VBoxContainer.new()
@@ -429,9 +456,15 @@ func _short_money(v: float) -> String:
 	return "%d тыс." % int(v / 1000.0)
 
 
+## 1.30: значок верхней панели — цветной из набора владельца, если он есть, иначе прежний векторный.
+func _top_tex(n: String) -> Texture2D:
+	var t := UITheme.micon(n)
+	return t if t != null else Tex.ui(n)
+
+
 func _ticon(n: String) -> TextureRect:
 	var r := TextureRect.new()
-	r.texture = Tex.ui(n)
+	r.texture = _top_tex(n)
 	r.custom_minimum_size = Vector2(28, 28)
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -562,7 +595,8 @@ func _refresh_top() -> void:
 	var tt := int(round(se.outside_temp()))
 	weather_l.text = "%+d °C" % tt
 	weather_l.add_theme_color_override("font_color", Color("#9cd0f0") if tt <= -10 else (UITheme.WARN if tt >= 28 else UITheme.TEXT))
-	weather_i.texture = Tex.ui("snow" if se.is_snowing() or tt < 0 else "thermo")
+	# снег и мороз — прежний голубой значок, иначе термометр из новых значков
+	weather_i.texture = Tex.ui("snow") if se.is_snowing() or tt < 0 else _top_tex("temperature")
 	var wtip := "%s, %s. На улице %+d °C." % [se.season_name(), se.long_date(), tt]
 	if se.is_snowing():
 		wtip += " Идёт снег."
@@ -635,7 +669,7 @@ func on_speed_changed() -> void:
 
 func _build_bottom() -> void:
 	var p := PanelContainer.new()
-	var st := UITheme.sbs(Color(0.075, 0.083, 0.094, 0.96), UITheme.LINE, 1, 14, 10, 6, 16, 0.5, 4)
+	var st := UITheme.sbs(Color(0.106, 0.108, 0.112, 0.96), UITheme.LINE, 1, 14, 10, 6, 16, 0.5, 4)
 	p.add_theme_stylebox_override("panel", st)
 	_anchor(p, 0.5, 1, 0.5, 1, 0, -76, 0, -8)
 	p.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -650,34 +684,34 @@ func _build_bottom() -> void:
 	dv.add_child(hz)
 	var h := UITheme.hbox(2)
 	dv.add_child(h)
-	_bbtn(h, "build", "build", "Стройка", "Полы, стены, окна, двери, ворота (B)", func() -> void: toggle_sub("build"))
+	_bbtn(h, "build", "construction", "Стройка", "Полы, стены, окна, двери, ворота (B)", func() -> void: toggle_sub("build"))
 	_bbtn(h, "objects", "objects", "Объекты", "Станки, стеллажи, бытовка (O)", func() -> void: toggle_sub("objects"))
-	_bbtn(h, "rooms", "rooms", "Зоны", "Зоны: цех, склад, бытовка, столовая, кабинеты… Рисуются клетками внутри помещений (R)", func() -> void: open_rooms())
-	_bbtn(h, "plan", "plan", "План", "Планировка: нарисуйте будущий завод на кальке — стены, полы, зоны, станки. Бесплатно, рабочие план не трогают. Потом «Утвердить план» (V)", toggle_plan)
-	_bbtn(h, "power", "power", "Сети", "Электричество, свет, водопровод, вентиляция, сжатый воздух (E)", func() -> void: toggle_sub("power"))
-	_bbtn(h, "demolish", "demolish", "Снос", "Снести стены, полы, объекты (X)", func() -> void: set_tool("demolish"))
-	_bbtn(h, "cancel", "cancel", "Отмена", "Отменить чертежи — деньги вернутся", func() -> void: set_tool("cancel"))
+	_bbtn(h, "rooms", "zones", "Зоны", "Зоны: цех, склад, бытовка, столовая, кабинеты… Рисуются клетками внутри помещений (R)", func() -> void: open_rooms())
+	_bbtn(h, "plan", "blueprint", "План", "Планировка: нарисуйте будущий завод на кальке — стены, полы, зоны, станки. Бесплатно, рабочие план не трогают. Потом «Утвердить план» (V)", toggle_plan)
+	_bbtn(h, "power", "networks", "Сети", "Электричество, свет, водопровод, вентиляция, сжатый воздух (E)", func() -> void: toggle_sub("power"))
+	_bbtn(h, "demolish", "demolition", "Снос", "Снести стены, полы, объекты (X)", func() -> void: set_tool("demolish"))
+	_bbtn(h, "cancel", "undo", "Отмена", "Отменить чертежи — деньги вернутся", func() -> void: set_tool("cancel"))
 	h.add_child(_dock_sep())
 	var ob := _bbtn(h, "orders", "orders", "Заказы", "Заказы в работе, рынок, контракты, план ПДО", func() -> void: open_window("orders"))
 	order_badge = UITheme.badge("0", UITheme.BAD)
 	order_badge.position = Vector2(48, 2)
 	ob.add_child(order_badge)
-	_bbtn(h, "prod", "shop", "Производство", "Станки и ППР, металл и расходники, склад оборудования (P)", func() -> void: open_window("prod"))
-	var pb := _bbtn(h, "people", "staff", "Люди", "Сотрудники, найм, обучение, охрана труда, бригады, график, профсоюз (L)", func() -> void: open_window("people"))
+	_bbtn(h, "prod", "production", "Производство", "Станки и ППР, металл и расходники, склад оборудования (P)", func() -> void: open_window("prod"))
+	var pb := _bbtn(h, "people", "people", "Люди", "Сотрудники, найм, обучение, охрана труда, бригады, график, профсоюз (L)", func() -> void: open_window("people"))
 	people_badge = UITheme.badge("", UITheme.INFO)
 	people_badge.visible = false
 	pb.add_child(people_badge)
-	_bbtn(h, "finance", "finance", "Финансы", "Сводка, отчёты по неделям, кредиты, гранты (F)", func() -> void: open_window("finance"))
-	_bbtn(h, "office", "office", "Управление", "ИТР-отделы, политики и разработки техотдела (M)", func() -> void: open_window("office"))
+	_bbtn(h, "finance", "finances", "Финансы", "Сводка, отчёты по неделям, кредиты, гранты (F)", func() -> void: open_window("finance"))
+	_bbtn(h, "office", "management", "Управление", "ИТР-отделы, политики и разработки техотдела (M)", func() -> void: open_window("office"))
 	h.add_child(_dock_sep())
 	_bbtn(h, "goals", "goals", "Цели", "Этап роста завода, рейтинг в звёздах, цели сценария, достижения (G)", func() -> void: open_window("goals"))
-	var eb := _bbtn(h, "events", "calendar", "События", "Письма, проверки, календарь, многотиражка, журнал (C)", func() -> void: open_window("events"))
+	var eb := _bbtn(h, "events", "events", "События", "Письма, проверки, календарь, многотиражка, журнал (C)", func() -> void: open_window("events"))
 	events_badge = UITheme.badge("0", UITheme.ACCENT_D)
 	events_badge.position = Vector2(48, 2)
 	eb.add_child(events_badge)
 	paper_badge = UITheme.badge("!", UITheme.INFO)
 	paper_badge.visible = false
-	_bbtn(h, "town", "town", "Город", "Общежитие, столовая и медпункт, детсад и ДК, заводское радио, кот (H)", func() -> void: open_window("town"))
+	_bbtn(h, "town", "city", "Город", "Общежитие, столовая и медпункт, детсад и ДК, заводское радио, кот (H)", func() -> void: open_window("town"))
 
 
 func _dock_sep() -> Control:
@@ -694,33 +728,39 @@ func _dock_sep() -> Control:
 func _bbtn(parent: Control, key: String, icon: String, text: String, tip: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
-	b.icon = Tex.ui(icon)
+	# 1.30: цветной значок владельца (assets/ui/icons), крупнее; «открыто» — кирпичная планка снизу
+	var mt := UITheme.micon(icon)
+	b.icon = mt if mt != null else Tex.ui(icon)
 	b.tooltip_text = tip
 	b.focus_mode = Control.FOCUS_NONE
 	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	# у значков владельца ~12% прозрачных полей: 40 px — сам рисунок около 30 px
 	b.expand_icon = false
-	b.add_theme_constant_override("icon_max_width", 24)
-	b.add_theme_constant_override("h_separation", 2)
+	b.add_theme_constant_override("icon_max_width", 40 if mt != null else 24)
+	b.add_theme_constant_override("h_separation", 0)
 	b.add_theme_font_size_override("font_size", 12)
-	b.custom_minimum_size = Vector2(76, 60)
-	var n := UITheme.sb(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 9, 6, 5)
-	var hv := UITheme.sb(Color(1, 1, 1, 0.07), Color(0, 0, 0, 0), 0, 9, 6, 5)
-	var on := UITheme.sb(Color(UITheme.ACCENT.r, UITheme.ACCENT.g, UITheme.ACCENT.b, 0.18), Color(0, 0, 0, 0), 0, 9, 6, 5)
-	on.border_width_bottom = 2
-	on.border_color = UITheme.ACCENT
+	b.custom_minimum_size = Vector2(78, 64)
+	var n := UITheme.sb(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 9, 6, 3)
+	var hv := UITheme.sb(Color(UITheme.CREAM.r, UITheme.CREAM.g, UITheme.CREAM.b, 0.07), Color(0, 0, 0, 0), 0, 9, 6, 3)
+	var on := UITheme.sb(Color(UITheme.BRICK.r, UITheme.BRICK.g, UITheme.BRICK.b, 0.22), Color(0, 0, 0, 0), 0, 9, 6, 3)
+	on.border_width_bottom = 3
+	on.border_color = UITheme.BRICK
 	b.add_theme_stylebox_override("normal", n)
 	b.add_theme_stylebox_override("hover", hv)
 	b.add_theme_stylebox_override("pressed", on)
 	b.add_theme_stylebox_override("hover_pressed", on)
 	b.add_theme_color_override("font_color", UITheme.MUTED)
-	b.add_theme_color_override("font_hover_color", UITheme.TEXT)
-	b.add_theme_color_override("font_pressed_color", UITheme.ACCENT)
-	b.add_theme_color_override("font_hover_pressed_color", UITheme.ACCENT)
-	b.add_theme_color_override("icon_normal_color", Color("#c9c5ba"))
-	b.add_theme_color_override("icon_hover_color", Color.WHITE)
-	b.add_theme_color_override("icon_pressed_color", UITheme.ACCENT)
-	b.add_theme_color_override("icon_hover_pressed_color", UITheme.ACCENT)
+	b.add_theme_color_override("font_hover_color", UITheme.CREAM)
+	b.add_theme_color_override("font_pressed_color", UITheme.CREAM)
+	b.add_theme_color_override("font_hover_pressed_color", UITheme.CREAM)
+	if mt != null:
+		UITheme.micon_colors(b)
+	else:
+		b.add_theme_color_override("icon_normal_color", Color("#c9c5ba"))
+		b.add_theme_color_override("icon_hover_color", Color.WHITE)
+		b.add_theme_color_override("icon_pressed_color", UITheme.CREAM)
+		b.add_theme_color_override("icon_hover_pressed_color", UITheme.CREAM)
 	b.toggle_mode = true
 	b.pressed.connect(func() -> void:
 		b.set_pressed_no_signal(false)
@@ -765,8 +805,8 @@ func _active_bottom() -> String:
 
 func _build_sub() -> void:
 	sub_panel = PanelContainer.new()
-	sub_panel.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.075, 0.083, 0.094, 0.97), UITheme.LINE, 1, 10, 8, 6, 14, 0.5, 4))
-	_anchor(sub_panel, 0.5, 1, 0.5, 1, 0, -96, 0, -96)
+	sub_panel.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.106, 0.108, 0.112, 0.97), UITheme.LINE, 1, 10, 8, 6, 14, 0.5, 4))
+	_anchor(sub_panel, 0.5, 1, 0.5, 1, 0, -102, 0, -102)
 	sub_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	sub_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	sub_panel.visible = false
@@ -891,7 +931,7 @@ func _refresh_plan_panel() -> void:
 	plan_panel.offset_right = 0
 	var h := UITheme.hbox(12)
 	plan_panel.add_child(h)
-	var ic := _ticon("plan")
+	var ic := _ticon("blueprint")
 	ic.custom_minimum_size = Vector2(26, 26)
 	ic.modulate = Color(0.62, 0.8, 1.0)
 	h.add_child(ic)
@@ -949,7 +989,7 @@ func _build_hint() -> void:
 	hint_panel = PanelContainer.new()
 	hint_panel.add_theme_stylebox_override("panel", UITheme.sb(Color(0.08, 0.09, 0.1, 0.9), UITheme.LINE, 1, 6, 12, 6))
 	hint_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_anchor(hint_panel, 0.5, 1, 0.5, 1, 0, -96, 0, -96)
+	_anchor(hint_panel, 0.5, 1, 0.5, 1, 0, -102, 0, -102)
 	hint_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	hint_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	hint_l = UITheme.label("", 14)
@@ -1016,7 +1056,7 @@ func _refresh_hint() -> void:
 		hint_l.text = txt
 		hint_panel.offset_left = 0
 		hint_panel.offset_right = 0
-	hint_panel.offset_bottom = -96.0 - (sub_panel.size.y + 8.0 if sub_panel.visible else 0.0)
+	hint_panel.offset_bottom = -102.0 - (sub_panel.size.y + 8.0 if sub_panel.visible else 0.0)
 	hint_panel.offset_top = hint_panel.offset_bottom
 	hint_panel.visible = true
 
@@ -1071,7 +1111,7 @@ func on_notified(text: String, level: int, cell: Vector2i) -> void:
 func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2i(-1, -1), link: bool = false) -> void:
 	var col: Color = LEVEL_COLORS[clampi(level, 0, 3)]
 	var p := PanelContainer.new()
-	var st := UITheme.sbs(Color(0.075, 0.083, 0.094, 0.95), col, 0, 9, 12, 8, 10, 0.4, 3)
+	var st := UITheme.sbs(Color(0.106, 0.108, 0.112, 0.95), col, 0, 9, 12, 8, 10, 0.4, 3)
 	st.border_width_left = 3
 	p.add_theme_stylebox_override("panel", st)
 	p.mouse_filter = Control.MOUSE_FILTER_STOP

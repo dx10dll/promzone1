@@ -608,10 +608,30 @@
  },
  "checkpoint": {
   "file": "res://assets/objects/checkpoint.svg",
-  "w": 144,
-  "h": 154,
+  "w": 272,
+  "h": 184,
   "ox": 0,
-  "oy": 138
+  "oy": 168,
+  "anchors": {
+   "hub1": [
+    145,
+    122,
+    30,
+    8
+   ],
+   "hub2": [
+    209,
+    122,
+    30,
+    8
+   ],
+   "glass": [
+    11,
+    86,
+    106,
+    40
+   ]
+  }
  },
  "test_stand": {
   "file": "res://assets/objects/test_stand.svg",
@@ -5422,5 +5442,80 @@
     98
    ]
   }
+ },
+ "checkpoint_b": {
+  "file": "res://assets/objects/checkpoint_b.svg",
+  "w": 272,
+  "h": 184,
+  "ox": 0,
+  "oy": 168,
+  "anchors": {
+   "hub1": [
+    111,
+    122,
+    -30,
+    8
+   ],
+   "hub2": [
+    47,
+    122,
+    -30,
+    8
+   ],
+   "glass": [
+    141,
+    86,
+    60,
+    40
+   ]
+  }
+ },
+ "checkpoint_v": {
+  "file": "res://assets/objects/checkpoint_v.svg",
+  "w": 80,
+  "h": 368,
+  "ox": 0,
+  "oy": 352,
+  "anchors": {
+   "hub1": [
+    32,
+    250,
+    10,
+    20
+   ],
+   "hub2": [
+    32,
+    314,
+    10,
+    20
+   ],
+   "glass": [
+    14,
+    152,
+    36,
+    36
+   ]
+  }
+ },
+ "checkpoint_in": {
+  "file": "res://assets/objects/checkpoint_in.svg",
+  "w": 272,
+  "h": 184,
+  "ox": 0,
+  "oy": 168
+ },
+ "checkpoint_b_in": {
+  "file": "res://assets/objects/checkpoint_b_in.svg",
+  "w": 272,
+  "h": 184,
+  "ox": 0,
+  "oy": 168
+ },
+ "checkpoint_v_in": {
+  "file": "res://assets/objects/checkpoint_v_in.svg",
+  "w": 80,
+  "h": 368,
+  "ox": 0,
+  "oy": 352
  }
 }

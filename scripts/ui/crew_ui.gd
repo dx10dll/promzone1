@@ -434,7 +434,7 @@ static func _security(win: GameWindow) -> void:
 		GameWindow.ad_prof = "guard"
 		win.select_tab("hire"), "Откроется найм; можно дать объявление на охранника")
 	var g := win._cards(4)
-	g.add_child(UITheme.stat("Проходная", "есть" if cp else "нет", UITheme.GOOD if cp else UITheme.WARN, "" if cp else "Объекты → Безопасность", UITheme.MUTED, "Проходная с вахтой у въезда: без неё охраннику негде стоять"))
+	g.add_child(UITheme.stat("Проходная", "есть" if cp else "нет", UITheme.GOOD if cp else UITheme.WARN, "" if cp else "Объекты → Безопасность", UITheme.MUTED, "Проходная с турникетами у въезда: люди проходят через турникеты, охранник сидит в будке"))
 	g.add_child(UITheme.stat("Охранники", str(gs.size()), UITheme.TEXT if not gs.is_empty() else UITheme.WARN, "на смене %d" % cr.guards(true).size() if not gs.is_empty() else "наймите в «Найме»"))
 	g.add_child(UITheme.stat("Камеры", "%d / %d" % [on, cams.size()], UITheme.GOOD if on > 0 and on == cams.size() else (UITheme.WARN if cams.size() > on else UITheme.MUTED), "работают / всего", UITheme.MUTED, ("Смотрят: " + ", ".join(PackedStringArray(rooms))) if not rooms.is_empty() else "Камере нужен ток"))
 	g.add_child(UITheme.stat("Задержано", str(cr.caught_total), UITheme.TEXT, "недостача %s" % Defs.money_str(cr.shortage_total), UITheme.BAD if cr.shortage_total > 0 else UITheme.MUTED))
@@ -444,7 +444,7 @@ static func _security(win: GameWindow) -> void:
 	bar.add_child(bh)
 	bh.add_child(_check("Досмотр силами ЧОП · %s в день" % Defs.money_str(Defs.ev("guard_cost_day")), sim.story.guard, func(v: bool) -> void:
 		sim.story.guard = v
-		win.rebuild(true), "Нанятая охранная фирма досматривает всех на проходной: ловит 85% несунов, но людям неприятно" + ("" if cp else ". Нужна проходная."), cp == null))
+		win.rebuild(true), "Нанятая охранная фирма досматривает всех на проходной: ловит 85% несунов, но людям неприятно. Работает, только когда в будке охранник на смене" + ("" if cp else ". Нужна проходная."), cp == null))
 	bh.add_child(UITheme.spacer())
 	if not cr.missing.is_empty():
 		var mv := 0.0

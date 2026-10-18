@@ -4,7 +4,7 @@ extends Camera2D
 
 const T := World.T
 
-var min_zoom := 0.55
+var min_zoom := 0.42   ## 1.30: можно отдалиться и разглядеть Тамбов вокруг
 var max_zoom := 3.2
 var pan_speed := 900.0
 var bounds := Rect2(-6 * T, -6 * T, 60 * T, 48 * T)
@@ -90,6 +90,12 @@ func _zoom_at(factor: float, screen_pos: Vector2) -> void:
 
 
 func _clamp() -> void:
+	# 1.30: город вокруг карты тянется на CityBackdrop.M клеток — на широком экране не даём отдалиться так,
+	# чтобы стал виден его край (1.30: центр камеры — не дальше 12 клеток за картой по бокам)
+	var vs := get_viewport_rect().size
+	var zmin := maxf(min_zoom, maxf(vs.x, vs.y) * 0.5 / ((CityBackdrop.M - 18) * T))
+	if zoom.x < zmin:
+		zoom = Vector2(zmin, zmin)
 	position.x = clampf(position.x, bounds.position.x, bounds.end.x)
 	position.y = clampf(position.y, bounds.position.y, bounds.end.y)
 

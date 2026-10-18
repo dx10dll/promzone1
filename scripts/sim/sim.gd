@@ -1066,13 +1066,14 @@ func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -
 		if ceil_at.has(ci) and int(ceil_at[ci]) != ignore_id:
 			return "Здесь под потолком уже что-то висит"
 		return ""
+	var on_fence := str(d.get("kind", "")) == "checkpoint" and fence_fit(c, s, ignore_id)   # 1.30: проходная — прямо в заборе
 	for y in s.y:
 		for x in s.x:
 			var cc := c + Vector2i(x, y)
-			if not world.in_plot(cc):
+			if not on_fence and not world.in_plot(cc):
 				return "Только внутри участка"
 			var i := world.idx(cc)
-			if world.wall[i] != World.W_NONE or world.bp_wall[i] != World.BP_NONE:
+			if not on_fence and (world.wall[i] != World.W_NONE or world.bp_wall[i] != World.BP_NONE):
 				return "Мешает стена"
 			if world.occ[i] >= 0 and world.occ[i] != ignore_id:
 				return "Место занято"
@@ -1115,6 +1116,82 @@ func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -
 		if nb >= Power.BATT_MAX:
 			return "У подстанции уже %d аккумуляторов — больше не поместится" % Power.BATT_MAX
 	return ""
+
+
+## 1.30: проходная встаёт в наружный забор участка: все клетки — забор (или уже её проём),
+## с одной стороны — свой участок. Ворота для машин не трогаем.
+func fence_fit(c: Vector2i, s: Vector2i, ignore_id: int = -1) -> bool:
+	if s.x > 1 and s.y > 1:
+		return false
+	for y in s.y:
+		for x in s.x:
+			var cc := c + Vector2i(x, y)
+			if not world.inb(cc) or world.in_plot(cc):
+				return false
+			var i := world.idx(cc)
+			var v := world.wall[i]
+			if not ((v == World.W_FENCE and world.bp_wall[i] == World.BP_NONE) or (v == World.W_NONE and ignore_id >= 0 and world.occ[i] == ignore_id)):
+				return false
+			var side := [Vector2i(0, -1), Vector2i(0, 1)] if s.y == 1 else [Vector2i(-1, 0), Vector2i(1, 0)]
+			if not (world.in_plot(cc + side[0]) or world.in_plot(cc + side[1])):
+				return false
+	return true
+
+
+## 1.30: проходная из старого сохранения была 2×1 — теперь 4×1 (будка и два турникета). Если новые
+## клетка занята, сдвигаем её на ближайшее свободное место рядом; некуда — разбираем с полным возвратом.
+func _fit_old_checkpoint(t: Thing) -> void:
+	var in_fence := true   # уже стоит в заборе (проём открыт): клетки ещё не помечены — проверяем сами
+	for cc in t.cells():
+		if not world.inb(cc) or world.in_plot(cc) or not (world.wall[world.idx(cc)] == World.W_NONE or world.wall[world.idx(cc)] == World.W_FENCE) \
+				or (world.occ[world.idx(cc)] >= 0 and world.occ[world.idx(cc)] != t.id):
+			in_fence = false
+	if in_fence:
+		return
+	var all := progress.all_open
+	progress.all_open = true
+	if can_place(t.def_id, t.cell, t.rot, t.id) == "" or fence_fit(t.cell, t.size(), t.id):
+		progress.all_open = all
+		return
+	var found := Vector2i(-1, -1)
+	for r in range(0, 5):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if found.x >= 0 or (absi(dx) != r and absi(dy) != r):
+					continue
+				var c := t.cell + Vector2i(dx, dy)
+				if can_place(t.def_id, c, t.rot, t.id) == "":
+					found = c
+	progress.all_open = all
+	if found.x >= 0:
+		t.cell = found
+		return
+	things.erase(t.id)
+	if t.built:
+		earn(t.cost_paid if t.cost_paid > 0.0 else thing_cost(t.def_id), "Возврат: " + t.title())
+	notify("Проходная стала шире (будка и два турникета) и не поместилась на старом месте — её разобрали, деньги вернули. Поставьте новую у въезда.", LVL_WARN)
+
+
+## 1.30: собранная проходная в заборе — забор под ней убираем (проём с турникетами).
+func _open_fence(t: Thing) -> void:
+	if t.kind() != "checkpoint":
+		return
+	for cc in t.cells():
+		var i := world.idx(cc)
+		if not world.in_plot(cc) and world.wall[i] == World.W_FENCE:
+			world.wall[i] = World.W_NONE
+			world.refresh_cell(cc)
+
+
+## 1.30: проходную снесли — заделываем проём забором.
+func _close_fence(t: Thing) -> void:
+	if t.kind() != "checkpoint":
+		return
+	for cc in t.cells():
+		var i := world.idx(cc)
+		if world.inb(cc) and not world.in_plot(cc) and world.wall[i] == World.W_NONE and world.ground[i] != World.Ground.ROAD:
+			world.wall[i] = World.W_FENCE
+			world.refresh_cell(cc)
 
 
 func place_thing(def_id: String, c: Vector2i, built: bool, pay: bool = true, rot: int = 0) -> Thing:
@@ -1166,9 +1243,11 @@ func finish_thing(t: Thing) -> void:
 	if t.kind() == "machine":
 		for w in workers:
 			Mood.add(self, w, "new_machine")
+	_open_fence(t)
 	if t.blocks():
 		for cc in t.cells():
-			world.block[world.idx(cc)] = t.id
+			if t.blocks_at(cc):
+				world.block[world.idx(cc)] = t.id
 			world.refresh_cell(cc)
 			nudge_from(cc)
 	thing_rev += 1
@@ -1236,7 +1315,7 @@ func rotate_thing(t: Thing) -> String:
 	for cc2 in t.cells():
 		var i2 := world.idx(cc2)
 		world.occ[i2] = t.id
-		if t.built and t.blocks():
+		if t.built and t.blocks_at(cc2):
 			world.block[i2] = t.id
 			world.refresh_cell(cc2)
 			nudge_from(cc2)
@@ -1276,6 +1355,7 @@ func remove_thing(t: Thing, refund_rate: float) -> void:
 			if world.block[i] == t.id:
 				world.block[i] = -1
 			world.refresh_cell(cc)
+		_close_fence(t)
 	things.erase(t.id)
 	slot_items.erase(t.id)
 	var refund := t.cost_paid * refund_rate
@@ -1736,33 +1816,41 @@ func _tick_supply() -> void:
 			v.cargo_desc = "%s × %d" % [Defs.material_name(str(s["mat"])), int(s["qty"])]
 			if int(s["qty"]) >= 18:
 				v.body = "truck"   # большую партию металла везёт грузовик с бортами
+			else:
+				v.body = "flatbed"   # 1.30: прутки видно на бортовой платформе
 			s["spawned"] = true
 
 
 func _tick_vehicles(dt: float) -> void:
 	var active: Vehicle = null
 	for v in vehicles:
-		if v.state == "arriving" or v.state == "parked":
+		if (v.state == "arriving" or v.state == "parked") and v.lane == 0:
 			active = v
 			break
 	if active == null:
 		for v in vehicles:
-			if v.state == "queued":
+			if v.state == "queued" and v.lane == 0:
 				v.state = "arriving"
 				break
 	var speed := Defs.b("van_speed")
 	for v in vehicles:
+		var sp := speed * (2.0 if v.kind == "fire" else 1.0)   # 1.30: пожарные — с сиреной, без очереди
 		match v.state:
+			"queued":
+				if v.lane == 1:
+					v.state = "arriving"   # встречная полоса: к воротам не встаёт
 			"arriving":
-				v.x += speed * dt
-				if v.x >= v.park_x:
+				v.x += sp * dt * v.dir()
+				if (v.x - v.park_x) * v.dir() >= 0.0:
 					v.x = v.park_x
 					v.state = "parked"
 					v.parked_time = 0.0
 					_on_park(v)
 			"parked":
 				v.parked_time += dt
-				if v.kind == "visit":
+				if v.hold:
+					pass   # 1.30: уедет, когда отпустят (пожарный расчёт, ломовоз — FireBrigade/Upkeep)
+				elif v.kind == "visit":
 					if v.parked_time > 25.0:
 						v.state = "leaving"   # ломовоз забрал металлолом и уехал
 				elif v.kind == "delivery":
@@ -1773,6 +1861,9 @@ func _tick_vehicles(dt: float) -> void:
 						_dump_cargo(v)
 					if cargo.is_empty():
 						v.state = "leaving"
+				elif v.kind != "pickup":
+					if v.parked_time > 30.0:
+						v.state = "leaving"   # 1.30: ломовоз или пожарные без своей службы — постоят и уедут
 				else:
 					if v.loaded >= v.need:
 						v.state = "leaving"
@@ -1785,8 +1876,8 @@ func _tick_vehicles(dt: float) -> void:
 							v.state = "leaving"
 							orders.on_partial_pickup(v)
 			"leaving":
-				v.x += speed * dt
-				if v.x > world.w + 10:
+				v.x += sp * dt * v.dir()
+				if v.x > world.w + 10 or v.x < -14.0:
 					v.state = "gone"
 	for k in range(vehicles.size() - 1, -1, -1):
 		if vehicles[k].state == "gone":
@@ -1822,7 +1913,13 @@ func dispose() -> void:
 
 func _on_park(v: Vehicle) -> void:
 	var cell := Vector2i(int(v.park_x), world.sidewalk_row)
+	if v.kind == "fire":
+		story.brigade.on_park(v)   # 1.30: пожарный расчёт выходит из машины
+		return
 	sfx.emit("van_horn", cell)
+	if v.kind == "scrap":
+		upkeep.on_truck_park(v)    # 1.30: водитель ломовоза идёт за стружкой и браком
+		return
 	if v.kind == "delivery" and v.bmat_order >= 0:
 		bmats.on_park(v)
 	elif v.kind == "delivery" and not v.equip.is_empty():
@@ -2066,15 +2163,27 @@ static func from_dict(d: Dictionary) -> Sim:
 	s.orders.list = d.get("orders", [])
 	if d.has("rng"):
 		s.rng.state = int(d["rng"])
+	var late_cp: Array[Thing] = []
 	for td: Dictionary in d["things"]:
 		var t := Thing.from_dict(td)
 		s.things[t.id] = t
 		if t.is_ceiling():
 			s.ceil_at[s.world.idx(t.cell)] = t.id
 			continue
+		if t.kind() == "checkpoint":
+			late_cp.append(t)   # 1.30: проходная стала 4×1 — ставим после остальных, чтобы видеть соседей
+			continue
 		for cc in t.cells():
 			s.world.occ[s.world.idx(cc)] = t.id
-			if t.built and t.blocks():
+			if t.built and t.blocks_at(cc):
+				s.world.block[s.world.idx(cc)] = t.id
+	for t: Thing in late_cp:
+		s._fit_old_checkpoint(t)
+		if not s.things.has(t.id):
+			continue
+		for cc in t.cells():
+			s.world.occ[s.world.idx(cc)] = t.id
+			if t.built and t.blocks_at(cc):
 				s.world.block[s.world.idx(cc)] = t.id
 	for wd: Dictionary in d["workers"]:
 		var w := Worker.from_dict(wd)

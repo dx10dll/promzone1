@@ -3,15 +3,22 @@ extends RefCounted
 ## Тема интерфейса и маленькие помощники для сборки окон кодом.
 
 ## Палитра 1.7.5: глубокий графит, тёплый текст, янтарный акцент «промышленной безопасности».
-const BG := Color("#1a1d21")          ## фон окон
-const BG2 := Color("#22262b")         ## карточки, строки
-const BG3 := Color("#2b3037")         ## кнопки, поля
-const BG4 := Color("#343a42")         ## наведение
-const LINE := Color("#363c44")
-const LINE2 := Color("#454d57")
-const TEXT := Color("#ece8dc")
-const MUTED := Color("#99a1a9")
-const DIM := Color("#6f7780")
+## 1.30: под новые значки владельца — графит чуть теплее и нейтральнее (без синевы), текст кремовый.
+const BG := Color("#1c1d1f")          ## фон окон
+const BG2 := Color("#242527")         ## карточки, строки
+const BG3 := Color("#2e2f32")         ## кнопки, поля
+const BG4 := Color("#3a3b3e")         ## наведение
+const LINE := Color("#3a3b3d")
+const LINE2 := Color("#4a4b4e")
+const TEXT := Color("#ece4d0")
+const MUTED := Color("#a39e93")
+const DIM := Color("#77746d")
+## 1.30: цвета значков меню — кремовый, кирпичный, оливковый; панели HUD — тёмный графит.
+const CREAM := Color("#e6dcc5")
+const BRICK := Color("#c8492f")       ## «включено» на панелях HUD (вместо янтаря)
+const BRICK_L := Color("#e0705a")     ## кирпичный текст на тёмном — читается лучше
+const OLIVE := Color("#8a9358")
+const PANEL := Color(0.106, 0.108, 0.112, 0.96)   ## фон верхней/нижней панели, слоёв, списка дел
 const ACCENT := Color("#e0a83a")      ## выбранное, главное действие
 const ACCENT_D := Color("#b9862a")
 const ACCENT_T := Color("#1b1d20")    ## текст на янтарном
@@ -74,10 +81,10 @@ static func build() -> Theme:
 	t.set_stylebox("panel", "Panel", sb(BG, LINE, 1, RADIUS))
 	# кнопки: спокойные, выбранная — янтарная
 	t.set_stylebox("normal", "Button", sb(BG3, LINE2, 1, RADIUS - 1, 11, 5))
-	t.set_stylebox("hover", "Button", sb(BG4, Color("#5b6570"), 1, RADIUS - 1, 11, 5))
+	t.set_stylebox("hover", "Button", sb(BG4, Color("#625f59"), 1, RADIUS - 1, 11, 5))
 	t.set_stylebox("pressed", "Button", sb(ACCENT, ACCENT, 1, RADIUS - 1, 11, 5))
 	t.set_stylebox("hover_pressed", "Button", sb(Color("#ecb84c"), Color("#ecb84c"), 1, RADIUS - 1, 11, 5))
-	t.set_stylebox("disabled", "Button", sb(Color("#202328"), Color("#2c3138"), 1, RADIUS - 1, 11, 5))
+	t.set_stylebox("disabled", "Button", sb(Color("#212123"), Color("#2e2e30"), 1, RADIUS - 1, 11, 5))
 	t.set_stylebox("focus", "Button", StyleBoxEmpty.new())
 	t.set_color("font_color", "Button", TEXT)
 	t.set_color("font_hover_color", "Button", Color.WHITE)
@@ -92,12 +99,12 @@ static func build() -> Theme:
 	t.set_constant("h_separation", "Button", 7)
 	t.set_font_size("font_size", "Button", 14)
 	t.set_color("font_color", "Label", TEXT)
-	t.set_stylebox("normal", "LineEdit", sb(Color("#15181b"), LINE2, 1, RADIUS - 2, 9, 5))
-	t.set_stylebox("focus", "LineEdit", sb(Color("#15181b"), ACCENT, 1, RADIUS - 2, 9, 5))
+	t.set_stylebox("normal", "LineEdit", sb(Color("#161718"), LINE2, 1, RADIUS - 2, 9, 5))
+	t.set_stylebox("focus", "LineEdit", sb(Color("#161718"), ACCENT, 1, RADIUS - 2, 9, 5))
 	t.set_color("font_color", "LineEdit", TEXT)
-	t.set_stylebox("background", "ProgressBar", sb(Color("#121417"), Color("#121417"), 0, 4, 0, 0))
+	t.set_stylebox("background", "ProgressBar", sb(Color("#131415"), Color("#131415"), 0, 4, 0, 0))
 	t.set_stylebox("fill", "ProgressBar", sb(GOOD, GOOD, 0, 4, 0, 0))
-	t.set_stylebox("panel", "TooltipPanel", sbs(Color("#101215"), LINE2, 1, 8, 11, 8, 10, 0.55, 4))
+	t.set_stylebox("panel", "TooltipPanel", sbs(Color("#121213"), LINE2, 1, 8, 11, 8, 10, 0.55, 4))
 	t.set_color("font_color", "TooltipLabel", TEXT)
 	t.set_font_size("font_size", "TooltipLabel", 14)
 	t.set_stylebox("panel", "TabContainer", sb(BG, LINE, 1, RADIUS, 10, 10))
@@ -125,7 +132,7 @@ static func build() -> Theme:
 	t.set_icon("radio_unchecked", "CheckBox", _check_icon(false))
 	t.set_constant("h_separation", "CheckBox", 8)
 	t.set_stylebox("panel", "PopupPanel", sbs(BG, LINE2, 1, RADIUS, 10, 10, 12, 0.5, 4))
-	t.set_stylebox("panel", "PopupMenu", sbs(Color("#16191c"), LINE2, 1, RADIUS, 6, 6, 12, 0.5, 4))
+	t.set_stylebox("panel", "PopupMenu", sbs(Color("#171819"), LINE2, 1, RADIUS, 6, 6, 12, 0.5, 4))
 	t.set_stylebox("hover", "PopupMenu", sb(BG4, BG4, 0, 5, 6, 4))
 	t.set_color("font_color", "PopupMenu", TEXT)
 	t.set_color("font_hover_color", "PopupMenu", Color.WHITE)
@@ -133,14 +140,14 @@ static func build() -> Theme:
 	t.set_constant("v_separation", "PopupMenu", 8)
 	# выпадающие списки
 	t.set_stylebox("normal", "OptionButton", sb(BG3, LINE2, 1, RADIUS - 1, 11, 5))
-	t.set_stylebox("hover", "OptionButton", sb(BG4, Color("#5b6570"), 1, RADIUS - 1, 11, 5))
+	t.set_stylebox("hover", "OptionButton", sb(BG4, Color("#625f59"), 1, RADIUS - 1, 11, 5))
 	t.set_stylebox("pressed", "OptionButton", sb(BG4, ACCENT, 1, RADIUS - 1, 11, 5))
 	t.set_stylebox("focus", "OptionButton", StyleBoxEmpty.new())
 	t.set_color("font_pressed_color", "OptionButton", TEXT)
 	t.set_color("font_hover_pressed_color", "OptionButton", TEXT)
 	# полосы прокрутки — тонкие
-	var grab := sb(Color("#4a525c"), Color("#4a525c"), 0, 4, 0, 0)
-	var grab_h := sb(Color("#5f6873"), Color("#5f6873"), 0, 4, 0, 0)
+	var grab := sb(Color("#4f4e4c"), Color("#4f4e4c"), 0, 4, 0, 0)
+	var grab_h := sb(Color("#66645f"), Color("#66645f"), 0, 4, 0, 0)
 	var track := sb(Color(0, 0, 0, 0.18), Color(0, 0, 0, 0), 0, 4, 0, 0)
 	for cls2 in ["VScrollBar", "HScrollBar"]:
 		t.set_stylebox("scroll", cls2, track)
@@ -165,7 +172,7 @@ static func _check_icon(on: bool, disabled: bool = false) -> Texture2D:
 	var img := Image.create(sz * 2, sz * 2, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0, 0, 0, 0))
 	var k := 2
-	var fill := ACCENT if on else Color("#15181b")
+	var fill := ACCENT if on else Color("#161718")
 	var edge := ACCENT if on else LINE2
 	if disabled:
 		fill = fill.darkened(0.45)
@@ -220,6 +227,27 @@ static func button(text: String, cb: Callable, tip: String = "") -> Button:
 	if cb.is_valid():
 		b.pressed.connect(cb)
 	return b
+
+
+## 1.30: значки меню, нарисованные владельцем игры (assets/ui/icons, 128 px с mip-уровнями):
+## цветные, без перекраски — показываем «как есть», состояние кнопки рисует сама кнопка.
+static var _micons: Dictionary = {}
+
+
+static func micon(id: String) -> Texture2D:
+	if _micons.has(id):
+		return _micons[id]
+	var path := "res://assets/ui/icons/%s.png" % id
+	var t: Texture2D = load(path) if ResourceLoader.exists(path) else null
+	_micons[id] = t
+	return t
+
+
+## Кнопка-значок с цветной иконкой меню: значок не перекрашивается, неактивная — полупрозрачная.
+static func micon_colors(b: Button) -> void:
+	for k in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_hover_pressed_color", "icon_focus_color"]:
+		b.add_theme_color_override(k, Color.WHITE)
+	b.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.4))
 
 
 static func icon_button(icon: String, text: String, cb: Callable, tip: String = "") -> Button:
@@ -356,9 +384,9 @@ static func small(text: String, cb: Callable, tip: String = "") -> Button:
 	var b := button(text, cb, tip)
 	b.add_theme_font_size_override("font_size", 12)
 	b.add_theme_stylebox_override("normal", sb(BG3, LINE2, 1, 6, 8, 2))
-	b.add_theme_stylebox_override("hover", sb(BG4, Color("#5b6570"), 1, 6, 8, 2))
+	b.add_theme_stylebox_override("hover", sb(BG4, Color("#625f59"), 1, 6, 8, 2))
 	b.add_theme_stylebox_override("pressed", sb(ACCENT, ACCENT, 1, 6, 8, 2))
-	b.add_theme_stylebox_override("disabled", sb(Color("#202328"), Color("#2c3138"), 1, 6, 8, 2))
+	b.add_theme_stylebox_override("disabled", sb(Color("#212123"), Color("#2e2e30"), 1, 6, 8, 2))
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return b
 

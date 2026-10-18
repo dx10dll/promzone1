@@ -203,7 +203,7 @@ func _sync_vans() -> void:
 		var n: Node2D = vans.get(v.id)
 		if n == null:
 			n = Node2D.new()
-			var kind := v.body if v.body in ["flatbed", "truck", "semi"] else "van"
+			var kind := v.body if v.body in ["flatbed", "truck", "semi", "fire"] else "van"
 			var body := Sprite2D.new()
 			body.texture = Tex.get_tex("res://assets/vehicles/%s_body.svg" % kind)
 			body.centered = false
@@ -214,6 +214,8 @@ func _sync_vans() -> void:
 				body.modulate = TRUCK_COLORS[(v.color + v.id) % TRUCK_COLORS.size()]
 			elif kind == "semi":
 				body.modulate = SEMI_COLORS[(v.color + v.id) % SEMI_COLORS.size()]
+			elif kind == "fire":
+				body.modulate = Color.WHITE   # 1.30: пожарная машина — своего красного цвета
 			n.add_child(body)
 			var det := Sprite2D.new()
 			det.texture = Tex.get_tex("res://assets/vehicles/%s_details.svg" % kind)
@@ -224,21 +226,25 @@ func _sync_vans() -> void:
 			if kind == "flatbed" or kind == "truck":
 				var cg := Sprite2D.new()
 				cg.name = "cargo"
-				cg.texture = Tex.get_tex("res://assets/vehicles/%s_cargo.svg" % kind)
+				cg.texture = Tex.get_tex(cargo_tex(v, kind))   # 1.30: груз по назначению машины
 				cg.centered = false
 				cg.offset = Vector2(0, -104)
 				cg.scale = Vector2(0.5, 0.5)
 				n.add_child(cg)
 			add_child(n)
 			vans[v.id] = n
-		var vx := v.x if v.px < -1e8 or absf(v.px - v.x) > 3.0 else lerpf(v.px, v.x, Worker.view_alpha)   # 1.29: плавно между шагами
-		n.position = Vector2(vx * T - 4.0, (sim.world.road_row + 0.7) * T)
+		var vx := v.x if v.px < -1e8 or absf(v.px - v.x) > 6.0 else lerpf(v.px, v.x, Worker.view_alpha)   # 1.29: плавно между шагами
+		# 1.30: встречная полоса — машина развёрнута (кабиной влево), x — по-прежнему задний край
+		n.position = Vector2(vx * T - 4.0, (sim.world.road_row + 0.7) * T) if v.lane == 0 else Vector2(vx * T + 4.0, (sim.world.road_row + 2.55) * T)
+		n.scale.x = 1.0 if v.lane == 0 else -1.0
 		var cgn := n.get_node_or_null("cargo")
 		if cgn:
 			# поддоны в кузове видны, пока их не разгрузили (до прибытия — тоже)
 			var full := (sim.veh_items.get(v.id, []) as Array).size() > 0 or v.state == "arriving"
 			if v.kind == "visit":
 				full = v.state == "leaving"    # ломовоз увозит лом
+			elif v.kind == "scrap":
+				full = v.loaded > 0            # 1.30: лом в кузове по мере погрузки
 			elif v.kind == "pickup":
 				full = v.loaded > 0            # машина клиента полнеет по мере погрузки
 			(cgn as Sprite2D).visible = full
@@ -246,6 +252,22 @@ func _sync_vans() -> void:
 		if not seen.has(id):
 			vans[id].queue_free()
 			vans.erase(id)
+
+
+## 1.30: какой груз видно в открытом кузове: прутки металла, ящики с оборудованием,
+## поддоны с деталями для заказчика, стружка и лом у ломовоза; стройматериалы — поддоны (как было).
+static func cargo_tex(v: Vehicle, kind: String) -> String:
+	var key := ""
+	if v.kind == "scrap" or v.kind == "visit":
+		key = "scrap"
+	elif v.kind == "pickup":
+		key = "parts"
+	elif v.kind == "delivery" and not v.equip.is_empty():
+		key = "crates"
+	elif v.kind == "delivery" and v.supply_id >= 0:
+		key = "bars" if kind == "flatbed" else ""
+	var p := "res://assets/vehicles/%s_cargo%s.svg" % [kind, "_" + key if key != "" else ""]
+	return p if ResourceLoader.exists(p) else "res://assets/vehicles/%s_cargo.svg" % kind
 
 
 func _sync_ground() -> void:

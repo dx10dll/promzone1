@@ -22,11 +22,13 @@ static func plate(text: String, icon: String = "", font_px: int = 15) -> PanelCo
 	p.add_child(h)
 	if icon != "":
 		var ic := TextureRect.new()
-		ic.texture = Tex.ui(icon)
-		ic.custom_minimum_size = Vector2(20, 20)
+		# 1.30: цветной значок из набора владельца, если есть (без перекраски); иначе прежний кремовый
+		var mt := UITheme.micon(icon)
+		ic.texture = mt if mt != null else Tex.ui(icon)
+		ic.custom_minimum_size = Vector2(30, 30) if mt != null else Vector2(20, 20)
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		ic.modulate = CREAM
+		ic.modulate = Color.WHITE if mt != null else CREAM
 		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(ic)
 	var l := UITheme.label(text.to_upper(), font_px, CREAM, UITheme.f_caps)

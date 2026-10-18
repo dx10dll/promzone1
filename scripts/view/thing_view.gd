@@ -15,6 +15,11 @@ var flip := false
 var _fshift := 0.0   ## сдвиг отражённого спрайта: тело объекта остаётся на своих клетках, а не уезжает на поле тени
 var _t := 0.0
 var _check := 0.0
+## 1.30: проходная — внутренний слой будки (позади сидящего охранника) и планки турникетов
+var inner: Sprite2D = null
+var _spin: Array[float] = [0.0, 0.0]
+var _spin_goal: Array[float] = [0.0, 0.0]
+var _occ: Array[bool] = [false, false]
 
 
 func setup(s: Sim, t: Thing) -> void:
@@ -27,6 +32,13 @@ func setup(s: Sim, t: Thing) -> void:
 	over.draw.connect(_draw_over)
 	if t.is_ceiling():
 		z_index = 6   # светильники под потолком — поверх людей и станков
+	if t.def_id == "checkpoint":
+		# будка: «нутро» (задняя стенка, стул), охранник, стены с окном — сортируются вместе с людьми
+		y_sort_enabled = true
+		inner = Sprite2D.new()
+		inner.centered = false
+		inner.scale = Vector2(0.5, 0.5)
+		add_child(inner)
 	_refresh_texture(true)
 
 
@@ -49,6 +61,9 @@ func _refresh_texture(force: bool = false) -> void:
 	if flip:
 		_fshift = maxf(0.0, float(meta.get("w", 64)) - float(thing.size().x * 64))
 	sprite.offset = Vector2(-float(meta.get("ox", 0)) - _fshift, -float(meta.get("oy", 64)))
+	if inner:
+		inner.texture = Tex.obj(key + "_in")
+		inner.flip_h = flip
 	_place()
 
 
@@ -65,6 +80,17 @@ func _place() -> void:
 	sprite.position = Vector2(0, bottom.y - sort_y)
 	_spr_base = sprite.position
 	over.position = sprite.position
+	if inner:
+		# 1.30: проходная сортируется по низу будки (а не всего футпринта): люди в проходах сбоку — перед
+		# тумбами турникетов. «Нутро» будки — по верху клетки охранника: он сидит перед ним, стены с окном — впереди.
+		var base := sprite.position
+		var off0 := sprite.offset
+		var st := thing.seat_cell()
+		sprite.position = Vector2(0, float(st.y + 1) * T - sort_y)
+		sprite.offset = off0 + (base - sprite.position) * 2.0
+		_spr_base = sprite.position
+		inner.position = Vector2(0, float(st.y) * T + 4.0 - sort_y)
+		inner.offset = off0 + (base - inner.position) * 2.0
 
 
 func _chair_key() -> Array:
@@ -100,9 +126,48 @@ func _process(delta: float) -> void:
 		sprite.modulate = Color(1.0, 0.6, 0.55, 0.95)
 	else:
 		sprite.modulate = Color(1, 1, 1, 0.94) if thing.is_ceiling() else Color.WHITE
+	if inner:
+		inner.modulate = sprite.modulate
+		_turnstiles(delta)
 	# 1.29: эффекты и подписи перерисовываем только у объектов на экране — за краем их всё равно не видно
 	if WorkerView.view.size.x <= 0.0 or WorkerView.view.has_point(position):
 		over.queue_redraw()
+
+
+## 1.30: турникет: человек вошёл в проход — планки проворачиваются на треть оборота, щелчок.
+func _turnstiles(delta: float) -> void:
+	if not thing.built:
+		return
+	var wc := thing.walk_cells()
+	for i in mini(2, wc.size()):
+		var here := false
+		for w in sim.workers:
+			if w.present and not w.hidden and w.cell() == wc[i]:
+				here = true
+				break
+		if here and not _occ[i]:
+			_spin_goal[i] += TAU / 3.0
+			Snd.play_at("turnstile", (Vector2(wc[i]) + Vector2(0.5, 0.5)) * T, -4.0, 0.12)
+		_occ[i] = here
+		_spin[i] = move_toward(_spin[i], _spin_goal[i], delta * 5.0)
+
+
+func _draw_turnstile_arms() -> void:
+	for i in 2:
+		var hb := _anchor("hub%d" % (i + 1))
+		if hb.size() < 4:
+			continue
+		var c := tp(hb[0], hb[1])
+		var rx := float(hb[2]) * 0.5 * (-1.0 if flip else 1.0)
+		var ry := float(hb[3]) * 0.5
+		for k in 3:
+			var a := _spin[i] + float(k) * TAU / 3.0
+			var e := c + Vector2(cos(a) * rx, sin(a) * ry)
+			over.draw_line(c, e, Color("#23262a"), 3.4, true)
+			over.draw_line(c, e, Color("#cfd6da"), 2.0, true)
+			over.draw_circle(e, 1.5, Color("#23262a"))
+		over.draw_circle(c, 2.2, Color("#5a6064"))
+		over.draw_circle(c, 1.1, Color("#9aa3a8"))
 
 
 ## Пиксель текстуры -> локальные координаты слоя.
@@ -181,6 +246,8 @@ func _draw_over() -> void:
 			_bar(thing.progress, Color("#6fbf86"))
 		return
 	match thing.kind():
+		"checkpoint":
+			_draw_turnstile_arms()
 		"machine":
 			_draw_machine()
 		"storage":

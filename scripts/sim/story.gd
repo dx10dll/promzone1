@@ -20,7 +20,8 @@ var strike: Dictionary = {}          ## {active, demand, leader, since, days, pr
 var fires: Dictionary = {}           ## индекс клетки -> сила огня 0–1
 var soot: Dictionary = {}            ## индекс клетки -> true (следы пожара)
 var fire_start := -1.0
-var brigade_at := -1.0
+var brigade_at := -1.0               ## когда вызвали пожарных (−1 — не вызывали)
+var brigade: FireBrigade             ## 1.30: пожарный расчёт — машина и пожарные на карте
 var receivables: Array = []          ## долги клиентов [{amount, due, client, risk}]
 var departures: Array = []           ## уход людей с задержкой [{wid, at, why}]
 var scheduled: Array = []            ## события на сегодня [{ev, at}]
@@ -37,6 +38,7 @@ var _mach_t := 0.0
 
 func _init(s: Sim) -> void:
 	sim = s
+	brigade = FireBrigade.new(s)
 
 
 func mdef() -> Dictionary:
@@ -320,6 +322,7 @@ func tick(dt: float) -> void:
 			var key := str(mods[i]["key"])
 			mods.remove_at(i)
 			_mod_ended(key)
+	brigade.tick(dt)
 	_tick_fire(dt)
 	_mach_t -= dt
 	if _mach_t <= 0.0:
@@ -340,6 +343,9 @@ func morning() -> void:
 	if not enabled:
 		return
 	var d := sim.day()
+	if guard and has_checkpoint() and sim.crew.guards().is_empty():
+		guard = false   # 1.30: досматривать некому — без охранника досмотр не работает
+		sim.notify("Досмотр на проходной отменён: нет охранника. Наймите охранника (Люди → Найм) и включите досмотр снова.", Sim.LVL_WARN)
 	if guard and has_checkpoint():
 		sim.spend(Defs.ev("guard_cost_day"), "Охрана на проходной")
 		if sim.is_workday():
@@ -673,7 +679,7 @@ func extinguish(i: int, amount: float) -> void:
 		fires.erase(i)
 		soot[i] = true
 		if fires.is_empty():
-			_fire_out(false)
+			_fire_out(brigade.deployed())   # 1.30: расчёт уже на месте — тушили пожарные
 	else:
 		fires[i] = v
 
@@ -689,7 +695,7 @@ func _fire_out(brigade: bool) -> void:
 	sim.sfx.emit("extinguish", Vector2i(-1, -1))
 	if brigade:
 		sim.reputation = maxf(0.0, sim.reputation - 3.0)
-		info("Пожарные потушили огонь", "Расчёт пожарной охраны справился за четверть часа. Будет внеплановая проверка пожарного надзора.", "fire", Sim.LVL_WARN)
+		info("Пожар потушен пожарными", "Расчёт пожарной охраны потушил огонь, пожар шёл %d мин. Будет внеплановая проверка пожарного надзора." % maxi(1, dur), "fire", Sim.LVL_WARN)
 		sim.inspect.schedule("fire", sim.minute + sim.rng.randf_range(1.0, 2.0) * 1440.0, false, "после пожара")
 	else:
 		info("Пожар потушен", "Огонь потушили своими силами за %d мин." % maxi(1, dur), "fire", Sim.LVL_GOOD)
@@ -750,14 +756,10 @@ func _tick_fire(dt: float) -> void:
 		if wk.present and fires.has(w.idx(wk.cell())) and sim.rng.randf() < 0.01 * dt:
 			injure(wk, "burn")
 	# пожарная охрана
+	# пожарная охрана (1.30: приезжает машина, пожарные тушат сами — FireBrigade)
 	if brigade_at < 0.0 and (fires.size() >= int(Defs.ev("fire_brigade_cells")) or sim.minute - fire_start >= Defs.ev("fire_brigade_after")):
-		brigade_at = sim.minute + 15.0
-		sim.notify("Огонь не удержать — вызвана пожарная охрана, будут через 15 минут.", Sim.LVL_BAD)
-	if brigade_at >= 0.0 and sim.minute >= brigade_at:
-		for i2 in fires.keys():
-			soot[i2] = true
-		fires.clear()
-		_fire_out(true)
+		brigade_at = sim.minute
+		brigade.request()
 
 
 ## Риск возгорания от горячих станков (печь, покраска, сварка), особенно изношенных и без огнетушителя.
@@ -1065,9 +1067,9 @@ func _ev_theft() -> void:
 		info("Собаки подняли лай", "Ночью кто-то лез через забор к складу, но заводские собаки подняли такой лай, что вор сбежал без металла.", "thief", Sim.LVL_GOOD)
 		sim.paper.add("Бдительность", "Жучка на страже", "Заводские собаки отогнали несуна от склада. Профком выделил им по косточке.")
 		return
-	if guard and has_checkpoint() and sim.rng.randf() < 0.85:
-		info("Вахта задержала несуна", "Вахтёрша на проходной нашла в сумке у рабочего три прутка. Металл вернули на склад.", "thief", Sim.LVL_GOOD)
-		sim.paper.add("Бдительность", "Вахта не дремлет", "Тётя Валя с проходной снова на посту: несун задержан, металл возвращён. Спасибо за бдительность!")
+	if sim.crew.search_on() and sim.rng.randf() < 0.85:
+		info("Вахта задержала несуна", "Охранник на проходной нашёл в сумке у рабочего три прутка. Металл вернули на склад.", "thief", Sim.LVL_GOOD)
+		sim.paper.add("Бдительность", "Вахта не дремлет", "Охрана на проходной снова на посту: несун задержан, металл возвращён. Спасибо за бдительность!")
 		return
 	var mats := _materials()
 	var n := mini(mats.size(), sim.rng.randi_range(2, 6))
@@ -1081,9 +1083,9 @@ func _ev_theft() -> void:
 	var txt := "Со склада пропало %d прутков («%s»). Кто-то вынес через забор или проходную." % [n, mat_name]
 	if cp:
 		letter("theft", "Кража на складе", txt, "thief", Sim.LVL_WARN,
-			[{"text": "Ввести досмотр на проходной (%s в день)" % Defs.money_str(Defs.ev("guard_cost_day")), "hint": "Людям не нравится, но кражи почти прекратятся"}, {"text": "Ничего не делать", "hint": ""}], 1)
+			[{"text": "Ввести досмотр на проходной (%s в день)" % Defs.money_str(Defs.ev("guard_cost_day")), "hint": "Людям не нравится, но кражи почти прекратятся. Досматривает охранник — без него досмотра нет"}, {"text": "Ничего не делать", "hint": ""}], 1)
 	else:
-		info("Кража на складе", txt + " Поставьте у въезда проходную с вахтой (Объекты → Безопасность) — с ней можно ввести досмотр.", "thief", Sim.LVL_WARN, Vector2i(-1, -1), true)
+		info("Кража на складе", txt + " Поставьте у въезда проходную с турникетами (Объекты → Безопасность) и наймите охранника — тогда можно ввести досмотр.", "thief", Sim.LVL_WARN, Vector2i(-1, -1), true)
 	sim.paper.add("Происшествия", "Несуны снова в деле", "Со склада ушло %d прутков. Товарищи, металл — народное достояние, а не дачный забор!" % n)
 
 
@@ -1793,7 +1795,7 @@ func to_dict() -> Dictionary:
 	return {
 		"mode": mode, "tension": tension, "last": last_event_day, "cd": cooldowns, "letters": letters,
 		"archive": archive.slice(0, 50), "mods": mods, "perks": perks, "strike": strike, "fires": _keys_to_str(fires),
-		"soot": soot.keys(), "fire_start": fire_start, "brigade": brigade_at, "recv": receivables, "dep": departures,
+		"soot": soot.keys(), "fire_start": fire_start, "brigade": brigade_at, "brig": brigade.to_dict(), "recv": receivables, "dep": departures,
 		"sched": scheduled, "inj": injuries, "plan": plan, "guard": guard, "lowd": low_mood_days, "hol": done_holidays,
 		"fires_n": fires_total, "strikes_n": strikes_total, "lid": _next_letter_id,
 	}
@@ -1827,6 +1829,9 @@ func from_dict(d: Dictionary) -> void:
 		soot[int(k3)] = true
 	fire_start = float(d.get("fire_start", -1.0))
 	brigade_at = float(d.get("brigade", -1.0))
+	brigade.from_dict(d.get("brig", {}))
+	if not d.has("brig") and brigade_at >= 0.0 and not fires.is_empty():
+		brigade.dispatch_at = sim.minute   # старое сохранение: пожарных уже вызвали — выезжают
 	receivables = d.get("recv", [])
 	departures = d.get("dep", [])
 	scheduled = d.get("sched", [])

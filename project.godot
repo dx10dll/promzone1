@@ -7,10 +7,10 @@ config_version=5
 
 config/name="Промзона"
 config/description="Симулятор строительства и управления российским заводом"
-config/version="1.29"
+config/version="1.30"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="res://icon.png"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Promzona"
 boot_splash/bg_color=Color(0.113725, 0.12549, 0.141176, 1)

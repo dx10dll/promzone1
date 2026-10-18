@@ -690,6 +690,52 @@ func post() -> Thing:
 	return null
 
 
+## 1.30: досмотр на проходной работает, только когда охранник на смене (и проходная есть).
+func search_on() -> bool:
+	return sim.story.guard and post() != null and on_watch()
+
+
+var _ts_rev := -1
+var _ts: Array[Vector2i] = []
+
+
+## 1.30: клетки турникетов собранной проходной (кэш до перестройки объектов).
+func turnstiles() -> Array[Vector2i]:
+	if _ts_rev != sim.thing_rev:
+		_ts_rev = sim.thing_rev
+		_ts.clear()
+		var cp := post()
+		if cp:
+			_ts = cp.walk_cells()
+	return _ts
+
+
+## 1.30: путь через турникет, если он пересекает границу участка (пришёл на смену или уходит домой).
+## Входят через дальний турникет, выходят через ближний к будке. Пусто — турникетов нет или путь
+## не через границу: тогда обычный поиск пути.
+func gate_path(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
+	var none: Array[Vector2i] = []
+	var ts := turnstiles()
+	if ts.is_empty() or ts.has(a) or ts.has(b):
+		return none
+	var wd := sim.world
+	var in_a := wd.in_plot(a)
+	var in_b := wd.in_plot(b)
+	if in_a == in_b:
+		return none
+	var t: Vector2i = ts[ts.size() - 1] if in_b else ts[0]
+	if not wd.passable(t):
+		return none
+	var p1 := wd.find_path(a, t)
+	if p1.is_empty():
+		return none
+	var p2 := wd.find_path(t, b)
+	if p2.is_empty():
+		return none
+	p1.append_array(p2.slice(1))
+	return p1
+
+
 func cams() -> Array[Thing]:
 	var out: Array[Thing] = []
 	for t in sim.things_of("camera"):
@@ -720,7 +766,7 @@ func detect_k() -> float:
 	var p := 0.0
 	for g in guards(true):
 		p = maxf(p, 0.5 + 0.05 * g.skill("security") + (0.1 if post() else 0.0))
-	if sim.story.guard and sim.story.has_checkpoint():
+	if search_on():
 		p = maxf(p, 0.85)
 	return clampf(p, 0.0, 0.95)
 
@@ -736,7 +782,7 @@ func steal_chance(w: Worker) -> float:
 	p *= float(w.get_meta("thief_k", 1.0))
 	if p <= 0.0:
 		return 0.0
-	if sim.story.guard and sim.story.has_checkpoint():
+	if search_on():
 		p *= 0.3
 	elif on_watch():
 		p *= 0.6
@@ -899,7 +945,7 @@ func _inventory() -> void:
 			_caught(w, {"what": m0["what"], "n": m0["n"], "kind": "mat"}, true)
 			who = " Запись с камеры выдала одного из несунов."
 	sim.notify("Инвентаризация: недостача на %s — %s.%s%s" % [Defs.money_str(total), ", ".join(PackedStringArray(parts.slice(0, 4))), who,
-		"" if on_watch() or (sim.story.guard and sim.story.has_checkpoint()) else " Наймите охранника на проходную и поставьте камеры на склад."], Sim.LVL_WARN)
+		"" if on_watch() or search_on() else " Наймите охранника на проходную и поставьте камеры на склад."], Sim.LVL_WARN)
 	sim.paper.add("Происшествия", "Недостача на складе", "Инвентаризация показала недостачу на %s. Товарищи, металл — не дачный забор!" % Defs.money_str(total))
 
 
@@ -923,7 +969,7 @@ func stop_outside_theft() -> bool:
 
 ## Охрана на проходной отбивает охоту проносить спиртное.
 func booze_k() -> float:
-	if on_watch() or (sim.story.guard and sim.story.has_checkpoint()):
+	if on_watch() or search_on():
 		return 0.5
 	return 1.0
 

@@ -361,6 +361,8 @@ func tick(dt: float) -> void:
 				v.body = "semi"
 			elif heavy or v.need >= 24:
 				v.body = "truck"
+			elif v.need >= 8:
+				v.body = "flatbed"   # 1.30: поддоны с деталями видно в кузове
 			v.cargo_desc = short(o)
 			o["pickup_spawned"] = true
 			o["status"] = "shipping"

@@ -190,17 +190,25 @@ func _draw() -> void:
 			var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
 			draw_string(f, Vector2(any_zone) * T + Vector2(3, 12), str(zk[2]), HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(zc, 0.85))
 	# соседние участки (1.13): дымка и табличка «Продаётся» — в FxLayer, поверх деревьев (1.18)
+	# продолжение улицы за краями карты (1.30: сначала асфальт, потом разметка — раньше асфальт её закрывал,
+	# и за краем карты дорога выглядела оборванной; плюс газон и южный тротуар вдоль жилого квартала)
+	var grass: Array[Texture2D] = []
+	for i in 4:
+		grass.append(Tex.tile("grass_%d" % i))
+	for x in range(-CityBackdrop.M, 0):
+		_draw_outside_column(x, side, road, grass)
+	for x in range(w.w, w.w + CityBackdrop.M):
+		_draw_outside_column(x, side, road, grass)
+	for x2 in range(-CityBackdrop.M, w.w + CityBackdrop.M):
+		draw_texture_rect(side, Rect2(x2 * T, w.h * T, T, T), false)
+	draw_rect(Rect2(-CityBackdrop.M * T, (w.h + 1) * T - 2, (w.w + 2 * CityBackdrop.M) * T, 3), Color("#8e8c84"))
 	# разметка дороги
 	var mid := (w.road_row + 1) * T
 	for x in range(-CityBackdrop.M, w.w + CityBackdrop.M):
-		if x % 2 == 0:
+		if x % 2 == 0 and StreetFolk.zebra_at(w, x) == 0:
 			draw_rect(Rect2(x * T + 4, mid - 1.5, 22, 3), Color(0.92, 0.92, 0.86, 0.85))
 	draw_rect(Rect2(-CityBackdrop.M * T, (w.road_row + 3) * T - 2, (w.w + 2 * CityBackdrop.M) * T, 2), Color(0.9, 0.9, 0.85, 0.6))
-	# продолжение дороги и тротуара за краями карты
-	for x in range(-CityBackdrop.M, 0):
-		_draw_outside_column(x, side, road)
-	for x in range(w.w, w.w + CityBackdrop.M):
-		_draw_outside_column(x, side, road)
+	_draw_crossings()
 
 
 # ---------------------------------------------------------------- 1.19: земля богаче
@@ -332,11 +340,36 @@ func _grad(n: Node2D, a: Vector2, b: Vector2, d: Vector2, c0: Color, c1: Color) 
 	n.draw_polygon(PackedVector2Array([a, b, b + d, a + d]), PackedColorArray([c0, c0, c1, c1]))
 
 
-func _draw_outside_column(x: int, side: Texture2D, road: Array) -> void:
+func _draw_outside_column(x: int, side: Texture2D, road: Array, grass: Array[Texture2D]) -> void:
 	var w := sim.world
-	draw_texture_rect(side, Rect2(x * T, w.sidewalk_row * T, T, T), false)
+	if StreetFolk.side_street_at(w, x) or CityBackdrop.avenue_at(w, x):
+		draw_rect(Rect2(x * T, w.sidewalk_row * T, T, T), CityBackdrop.C_ASPH)   # въезд боковой улицы (и Мичуринской) — перекрёсток
+	else:
+		draw_texture_rect(side, Rect2(x * T, w.sidewalk_row * T, T, T), false)
 	for y in range(w.sidewalk_row + 1, w.sidewalk_row + 5):
 		draw_texture_rect(road[vhash(x, y) % 2], Rect2(x * T, y * T, T, T), false)
+	# 1.30: газон между дорогой и южным тротуаром; у переходов и остановок — плитка
+	var gy := w.sidewalk_row + 5
+	if gy < w.h:
+		if StreetFolk.zebra_at(w, x) != 0 or StreetFolk.platform_at(w, x) or CityBackdrop.bridge_at(w, x):
+			draw_texture_rect(side, Rect2(x * T, gy * T, T, T), false)   # 1.30: и на мосту через Цну
+		else:
+			draw_texture_rect(grass[vhash(x, gy) % 4], Rect2(x * T, gy * T, T, T), false)
+
+
+## 1.30: зебры через главную дорогу и через въезды боковых улиц.
+func _draw_crossings() -> void:
+	var w := sim.world
+	var zc := Color(0.93, 0.93, 0.88, 0.85)
+	for sd: int in [-1, 1]:
+		var xc := StreetFolk.cross_x(w, sd)
+		for y in range(w.sidewalk_row + 1, w.sidewalk_row + 5):
+			for k in 2:
+				draw_rect(Rect2((xc - 0.5) * T + 2, y * T + 3 + k * 16, 2 * T - 4, 9), zc)
+		# въезд боковой улицы: полосы поперёк тротуара
+		var x0 := -3 if sd < 0 else w.w
+		for k2 in 6:
+			draw_rect(Rect2(x0 * T + 4 + k2 * 16, w.sidewalk_row * T + 3, 9, T - 6), zc)
 
 
 func _draw_cross(n: Node2D, r: Rect2, col: Color) -> void:

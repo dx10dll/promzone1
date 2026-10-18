@@ -49,6 +49,11 @@ func _ready() -> void:
 	world_root.add_child(city)
 	world_view.sim = sim
 	world_root.add_child(world_view)
+	var street := StreetFolk.new()   # 1.30: люди, автобус и деревья на улице за краем карты
+	street.sim = sim
+	street.backdrop = city
+	street.ents = ents
+	world_root.add_child(street)
 	zones.sim = sim
 	world_root.add_child(zones)
 	var faults_l := FaultLayer.new()   # 1.18: лужи от прорыва водопровода
@@ -58,6 +63,9 @@ func _ready() -> void:
 	world_root.add_child(weather)
 	daynight.setup(sim, world_root, world_root)
 	add_child(daynight)
+	var vfx_low := VehicleFx.new()   # 1.30: пожарные рукава — под людьми и машинами
+	vfx_low.sim = sim
+	world_root.add_child(vfx_low)
 	ents.sim = sim
 	world_root.add_child(ents)
 	var fauna_l := FaunaLayer.new()   # 1.22: голуби и мыши
@@ -74,6 +82,10 @@ func _ready() -> void:
 	world_root.add_child(plan_l)
 	world_root.add_child(fx)
 	fx.setup(sim, world_root)
+	var vfx_top := VehicleFx.new()   # 1.30: струя воды, мигалки, дорожный указатель
+	vfx_top.sim = sim
+	vfx_top.top = true
+	world_root.add_child(vfx_top)
 	var life := AmbientLife.new()   # 1.23: облака, листья, бабочки
 	life.sim = sim
 	world_root.add_child(life)
@@ -153,7 +165,8 @@ void fragment() {
 		hud.on_notified(str(e["text"]), int(e["level"]), Vector2i(-1, -1))
 	if Game.pending == "new" and not bool(Game.settings.get("tutorial_done", false)) and sim.progress.tutorial < 0:
 		hud.show_help(true)
-	cam.bounds = Rect2(-6 * World.T, -6 * World.T, (sim.world.w + 12) * World.T, (sim.world.h + 12) * World.T)
+	# 1.30: камеру можно увести за край карты — к телебашне, Цне и центру Тамбова (юг дальше всего)
+	cam.bounds = Rect2(-12 * World.T, -10 * World.T, (sim.world.w + 24) * World.T, (sim.world.h + 34) * World.T)
 	DisplayServer.window_set_title("Промзона — %s" % Company.title(sim))
 	if sim.scenario != "garage":
 		cam.focus_cell(Vector2i(int(sim.world.plot.get_center().x), int(sim.world.plot.end.y / 2) + 4))
