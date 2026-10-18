@@ -18,6 +18,7 @@ var _music := AudioStreamPlayer.new()
 var _music_next := ""
 var _music_fade := 0.0
 var playlist: Array = []
+signal track_started(name: String)   ## 1.28: заиграл новый трек
 var _pl_i := 0
 var _amb: Dictionary = {}        ## имя -> {player, target}
 var _last: Dictionary = {}       ## имя -> время последнего проигрывания (чтобы не частить)
@@ -149,6 +150,23 @@ func set_playlist(names: Array) -> void:
 		music(str(names[0]))
 
 
+## 1.28: мягкая смена списка — текущий трек доигрывает, дальше идёт новый список.
+func set_playlist_soft(names: Array) -> void:
+	if names == playlist:
+		return
+	playlist = names
+	var cur := _current_music()
+	_pl_i = maxi(0, names.find(cur))
+	if cur == "" and _music_next == "" and not names.is_empty():
+		music(str(names[0]))
+	elif cur != "" and not names.has(cur):
+		_pl_i = -1   # следующий по кругу — первый трек нового списка
+
+
+func now_playing() -> String:
+	return _current_music()
+
+
 func music(name: String) -> void:
 	if name == _current_music():
 		return
@@ -181,6 +199,7 @@ func _start_music(name: String) -> void:
 	_music.stream = stream(name)
 	_music.volume_db = -6.0
 	_music.play()
+	track_started.emit(name)
 
 
 # ---------------------------------------------------------------- фоновые петли

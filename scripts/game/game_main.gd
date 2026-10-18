@@ -79,7 +79,8 @@ func _ready() -> void:
 	world_root.add_child(life)
 	world_root.add_child(sound)
 	sound.setup(self)
-	Snd.set_playlist(["music_calm", "music_waltz"])
+	Snd.track_started.connect(_on_track)
+	Snd.set_playlist(MusicDirector.playlist(sim, int(Game.settings.get("music_mode", 0.0))))
 	overlay.sim = sim
 	# оверлеи — на своём слое: следуют за камерой, но не темнеют ночью
 	var ov_layer := CanvasLayer.new()
@@ -193,6 +194,9 @@ func _factory_empty() -> bool:
 	return true
 
 
+var _music_t := 0.0
+
+
 func _process(delta: float) -> void:
 	Tex.set_people_scale(cam.zoom.x * get_viewport().get_final_transform().get_scale().x * 0.5)
 	Tex.ui_scale = get_viewport().get_final_transform().get_scale().x
@@ -207,6 +211,10 @@ func _process(delta: float) -> void:
 		hud.show_game_over()
 	if fps_label:
 		_fps_tick(delta)
+	_music_t -= delta
+	if _music_t <= 0.0:   # 1.28: музыка под время суток, раз в пару секунд
+		_music_t = 2.0
+		Snd.set_playlist_soft(MusicDirector.playlist(sim, int(Game.settings.get("music_mode", 0.0))))
 	sim_ms = 0.0
 	if not is_running():
 		return
@@ -417,6 +425,11 @@ func _toggle_fps() -> void:
 	fps_label.add_theme_constant_override("outline_size", 4)
 	fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cl.add_child(fps_label)
+
+
+func _on_track(name: String) -> void:
+	if hud and MusicDirector.TITLES.has(name):
+		hud.toast("Музыка: %s" % MusicDirector.TITLES[name], Sim.LVL_INFO, 4.0)
 
 
 func _fps_tick(delta: float) -> void:

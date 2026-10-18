@@ -58,6 +58,8 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable()) -> void:
 		h.add_child(sl)
 		h.add_child(pct)
 		v.add_child(h)
+	v.add_child(_choice("Подбор музыки", [[0.0, "по времени суток"], [1.0, "всё подряд"], [2.0, "только вальсы"]], "music_mode",
+		"По времени суток: утром — бодрее, днём — рабочий ритм, в аврал — марш, ночью — тихо"))
 	v.add_child(UITheme.label("Экран", 16, UITheme.TEXT, UITheme.f_semi))
 	v.add_child(_choice("Качество эффектов", [[0.0, "низкое — без искр и дыма"], [1.0, "среднее"], [2.0, "высокое"]], "quality",
 		"Искры, стружка, пар, дым, листья и облака. На слабых компьютерах поставьте пониже"))
