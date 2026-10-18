@@ -615,7 +615,7 @@ func _start(ev: String, delayed: bool) -> void:
 func hot_machines() -> Array[Thing]:
 	var out: Array[Thing] = []
 	for m in sim.things_of("machine"):
-		if m.process() in ["heat", "paint", "welding"]:
+		if m.process() in ["heat", "paint", "welding", "casting"]:
 			out.append(m)
 	return out
 

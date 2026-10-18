@@ -698,7 +698,7 @@ func _draw_vent() -> void:
 		["Зонт над сварочным постом, камерой или печью — три четверти дыма уходит сразу", Color("#8fcf78")]])
 
 
-const FUMES_SHOW := ["welding", "paint", "heat"]
+const FUMES_SHOW := ["welding", "paint", "heat", "casting"]
 
 
 ## Бригады и охрана: участки бригад цветом, люди по бригадам, камеры и проходная.

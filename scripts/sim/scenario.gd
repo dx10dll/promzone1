@@ -904,9 +904,9 @@ static func profile_processes(sim: Sim) -> Array:
 
 
 const PROC_MACHINE := {"turning": "lathe", "milling": "mill", "drilling": "drill", "welding": "weld_post",
-	"heat": "furnace", "paint": "paint_booth", "assembly": "assembly_table", "test": "test_stand"}
+	"heat": "furnace", "paint": "paint_booth", "assembly": "assembly_table", "test": "test_stand", "casting": "cast_ist", "stamping": "press_kd"}
 const PROC_PROF := {"turning": "turner", "milling": "miller", "drilling": "miller", "welding": "welder",
-	"heat": "heat_treater", "paint": "painter", "assembly": "assembler", "test": "qc"}
+	"heat": "heat_treater", "paint": "painter", "assembly": "assembler", "test": "qc", "casting": "caster", "stamping": "presser"}
 
 
 static func hire_prof(sim: Sim, prof: String, lvl_min: int = 3, lvl_max: int = 6) -> Worker:

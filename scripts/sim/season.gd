@@ -441,7 +441,7 @@ func update_rooms() -> void:
 				continue
 			if th.def_id == "radiator" and heat_on and sp.id != burst_space and sim.eng.radiator_on(th):
 				heat += rc
-			elif th.kind() == "machine" and th.process() == "heat":
+			elif th.kind() == "machine" and th.process() in ["heat", "casting"]:
 				# 1.16: печи греют цех по мощности (ТВЧ почти не греет)
 				var hmd := th.machine_def()
 				hot += float(hmd.get("power_kw", 25.0)) * (1.1 if th.working else 0.32) * float(hmd.get("room_heat", 1.0))
@@ -513,7 +513,7 @@ func _cooler_near(c: Vector2i) -> bool:
 
 
 ## Уровень шума в клетке, дБ: работающие станки, ослабление с расстоянием и через стены.
-const NOISE := {"turning": 78.0, "milling": 84.0, "drilling": 80.0, "welding": 82.0, "heat": 72.0, "paint": 74.0, "assembly": 80.0, "test": 70.0}
+const NOISE := {"turning": 78.0, "milling": 84.0, "drilling": 80.0, "welding": 82.0, "heat": 72.0, "paint": 74.0, "assembly": 80.0, "test": 70.0, "casting": 84.0, "stamping": 96.0}
 
 
 ## all_on — как если бы работало всё оборудование (замеры СОУТ).

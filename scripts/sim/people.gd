@@ -183,11 +183,11 @@ static func make(rng: RandomNumberGenerator, prof: String, female_chance: float 
 	if not w.skills.has("electric"):
 		w.skills["electric"] = rng.randi_range(0, 3)
 	# прочие навыки — понемногу у всех, основной — по профессии
-	for sk in ["milling", "welding", "heat", "paint", "assembly"]:
+	for sk in ["milling", "welding", "heat", "paint", "assembly", "casting", "stamping"]:
 		if not w.skills.has(sk):
 			w.skills[sk] = rng.randi_range(0, 2)
 	var main := str(Worker.PROF_SKILL.get(prof, ""))
-	if main in ["milling", "welding", "heat", "paint", "assembly"]:
+	if main in ["milling", "welding", "heat", "paint", "assembly", "casting", "stamping"]:
 		w.skills[main] = clampi(rng.randi_range(3, 6) + xp, 3, 10)
 		w.skills["build"] = rng.randi_range(2, 5)
 		w.skills["haul"] = rng.randi_range(2, 5)
@@ -255,6 +255,10 @@ static func wage_for(w: Worker) -> int:
 			base = 2800.0 + w.grade() * 200.0
 		"miller", "welder":
 			base = 2900.0 + w.grade() * 230.0
+		"caster":
+			base = 3000.0 + w.grade() * 240.0   # 1.27: горячий цех
+		"presser":
+			base = 2600.0 + w.grade() * 170.0
 		"heat_treater", "assembler", "fitter":
 			base = 2750.0 + w.grade() * 190.0
 		"painter":
@@ -438,6 +442,14 @@ static func random_look(rng: RandomNumberGenerator, w: Worker) -> Dictionary:
 			lk["outfit"] = "jacket"
 			lk["outfit_col"] = pick(rng, ["#6e5a3e", "#5d5038", "#7a6446"])
 			lk["hat"] = "weldmask"
+		"caster":
+			lk["outfit"] = "apron"
+			lk["outfit_col"] = pick(rng, ["#5a4a3a", "#4e4438"])
+			lk["hat"] = "helmet"
+		"presser":
+			lk["outfit"] = "overall"
+			lk["outfit_col"] = pick(rng, ["#4a5a6e", "#55606e"])
+			lk["hat"] = pick(rng, ["cap", ""]) if not w.female else "kerchief"
 		"heat_treater":
 			lk["outfit"] = "apron"
 			lk["outfit_col"] = pick(rng, ["#4a5d48", "#55606e"])

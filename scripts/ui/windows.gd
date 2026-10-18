@@ -1390,7 +1390,7 @@ func _staff_list() -> void:
 ## Найм: кандидаты карточками в две колонки, объявления — в шапке.
 ## 1.19: найм — сначала «кого ищем» (профессии группами с поиском), потом кандидаты этой профессии.
 const HIRE_GROUPS := [["У станков", ["turner", "miller", "cnc_operator", "setter", "qc"]],
-	["Рабочие", ["laborer", "builder", "electrician", "welder", "fitter", "assembler", "painter", "heat_treater", "cleaner"]],
+	["Рабочие", ["laborer", "builder", "electrician", "welder", "fitter", "assembler", "painter", "heat_treater", "caster", "presser", "cleaner"]],
 	["Быт и охрана", ["guard", "cook", "nurse"]],
 	["ИТР и офис", ["foreman", "chief", "technologist", "dispatcher", "accountant", "buyer", "hr", "sales_manager", "safety_engineer", "chief_engineer", "lawyer"]]]
 static var hire_q := ""          ## строка поиска профессии

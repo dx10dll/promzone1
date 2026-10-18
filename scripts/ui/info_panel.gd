@@ -1500,7 +1500,7 @@ func _thing_state(t: Thing) -> String:
 			if cls >= 0 and now_cls < cls:
 				ctext += " — переоценка снизит класс"
 			lines.append(ctext)
-			if t.process() in ["welding", "paint", "heat"]:
+			if t.process() in ["welding", "paint", "heat", "casting"]:
 				lines.append("Вытяжной зонт: " + ("работает" if bool(sim.eng.hooded.get(t.id, false)) else "нет — дым идёт в помещение"))
 			var op := sim.get_worker(t.user)
 			lines.append("Работает: %s · нужен %s" % [op.full_name() if op else "—", prof_nm])

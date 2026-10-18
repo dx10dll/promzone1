@@ -119,6 +119,35 @@ func _ready() -> void:
 					"heat":
 						tv._steam_until = tv._t + 3.0
 		get_tree().process_frame.connect(keep)
+	if setup == "cast127":
+		# 1.27: литейка и прессы — печь разливает металл, ползуны бьют
+		var S7 := preload("res://tests/setups.gd")
+		var g7 := gm.sim
+		S7.big_shop(g7)
+		g7.progress.stage = 4
+		g7.office.research_done.append("casting_shop")
+		g7.office.research_done.append("stamping_shop")
+		S7._box(g7, Rect2i(1, 20, 18, 7), 1, Vector2i(18, 22))
+		g7.rooms.update()
+		var rm7 := g7.rooms.room_at(Vector2i(5, 23))
+		if rm7:
+			g7.rooms.assign(rm7, "workshop")
+		for e in [["cast_ist", 2, 21], ["cast_line", 2, 24], ["press_kd", 7, 21], ["press_kb", 9, 21], ["press_kd", 12, 21], ["press_kb", 9, 24], ["pallet", 15, 21], ["pallet", 16, 21], ["extinguisher", 14, 25]]:
+			g7.place_thing(str(e[0]), Vector2i(int(e[1]), int(e[2])), true, false)
+		Scenario.autowire(g7)
+		Scenario.autolight(g7, false)
+		g7.power.update_topology()
+		g7.rooms.update()
+		var k7 := 0
+		for pf in [["caster", "casting"], ["caster", "casting"], ["presser", "stamping"], ["presser", "stamping"], ["presser", "stamping"], ["presser", "stamping"]]:
+			S7.hire(g7, str(pf[0]), str(pf[1]), 6)
+		var keep7 := func() -> void:
+			for m: Thing in g7.things_of("machine"):
+				if m.process() in ["casting", "stamping"]:
+					m.working = true
+					m.product = "cast_cover" if m.process() == "casting" else "washer"
+					m.progress = 0.62 if m.def_id == "cast_ist" else 0.75
+		get_tree().process_frame.connect(keep7)
 	if setup == "fauna":
 		# 1.22: кот, голуби во дворе и в цеху, мыши в грязном помещении
 		var fs := gm.sim

@@ -5011,5 +5011,401 @@
   "h": 128,
   "ox": 0,
   "oy": 112
+ },
+ "cast_ist": {
+  "file": "res://assets/objects/cast_ist.svg",
+  "w": 144,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    95,
+    78
+   ],
+   "glow": [
+    22.0,
+    59,
+    32,
+    8
+   ],
+   "pour": [
+    71,
+    58
+   ],
+   "work": [
+    57.6,
+    180
+   ],
+   "in": [
+    14,
+    162
+   ],
+   "out": [
+    104,
+    178
+   ]
+  }
+ },
+ "cast_ist_v": {
+  "file": "res://assets/objects/cast_ist_v.svg",
+  "w": 144,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    95,
+    78
+   ],
+   "glow": [
+    22.0,
+    59,
+    32,
+    8
+   ],
+   "pour": [
+    71,
+    58
+   ],
+   "work": [
+    57.6,
+    180
+   ],
+   "in": [
+    14,
+    162
+   ],
+   "out": [
+    104,
+    178
+   ]
+  }
+ },
+ "cast_ist_b": {
+  "file": "res://assets/objects/cast_ist_b.svg",
+  "w": 144,
+  "h": 208,
+  "ox": 0,
+  "oy": 192,
+  "anchors": {
+   "lamp": [
+    25,
+    78
+   ],
+   "glow": [
+    54.0,
+    59,
+    32,
+    8
+   ],
+   "pour": [
+    44,
+    58
+   ],
+   "work": [
+    70.4,
+    180
+   ],
+   "in": [
+    114,
+    162
+   ],
+   "out": [
+    24,
+    178
+   ]
+  }
+ },
+ "cast_line": {
+  "file": "res://assets/objects/cast_line.svg",
+  "w": 208,
+  "h": 224,
+  "ox": 0,
+  "oy": 208,
+  "anchors": {
+   "lamp": [
+    165,
+    80
+   ],
+   "glow": [
+    21,
+    71,
+    32,
+    8
+   ],
+   "pour": [
+    104,
+    58
+   ],
+   "work": [
+    76.80000000000001,
+    196
+   ],
+   "in": [
+    16,
+    194
+   ],
+   "out": [
+    170,
+    196
+   ]
+  }
+ },
+ "cast_line_v": {
+  "file": "res://assets/objects/cast_line_v.svg",
+  "w": 144,
+  "h": 288,
+  "ox": 0,
+  "oy": 272,
+  "anchors": {
+   "lamp": [
+    114,
+    84
+   ],
+   "glow": [
+    48.0,
+    71,
+    32,
+    8
+   ],
+   "pour": [
+    82.0,
+    74
+   ],
+   "work": [
+    57.6,
+    176.0
+   ],
+   "in": [
+    14,
+    150
+   ],
+   "out": [
+    110,
+    252
+   ]
+  }
+ },
+ "cast_line_b": {
+  "file": "res://assets/objects/cast_line_b.svg",
+  "w": 208,
+  "h": 224,
+  "ox": 0,
+  "oy": 208,
+  "anchors": {
+   "lamp": [
+    15,
+    80
+   ],
+   "glow": [
+    139,
+    71,
+    32,
+    8
+   ],
+   "pour": [
+    88,
+    58
+   ],
+   "work": [
+    115.19999999999999,
+    196
+   ],
+   "in": [
+    176,
+    194
+   ],
+   "out": [
+    22,
+    196
+   ]
+  }
+ },
+ "press_kd": {
+  "file": "res://assets/objects/press_kd.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    23,
+    18
+   ],
+   "ram": [
+    16,
+    50,
+    18,
+    12
+   ],
+   "work": [
+    25,
+    72
+   ],
+   "in": [
+    8,
+    82
+   ],
+   "out": [
+    44,
+    90
+   ]
+  }
+ },
+ "press_kd_v": {
+  "file": "res://assets/objects/press_kd_v.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    23,
+    18
+   ],
+   "ram": [
+    16,
+    50,
+    18,
+    12
+   ],
+   "work": [
+    25,
+    72
+   ],
+   "in": [
+    8,
+    82
+   ],
+   "out": [
+    44,
+    90
+   ]
+  }
+ },
+ "press_kd_b": {
+  "file": "res://assets/objects/press_kd_b.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134,
+  "anchors": {
+   "lamp": [
+    40,
+    18
+   ],
+   "ram": [
+    30,
+    50,
+    18,
+    12
+   ],
+   "work": [
+    39,
+    72
+   ],
+   "in": [
+    56,
+    82
+   ],
+   "out": [
+    20,
+    90
+   ]
+  }
+ },
+ "press_kb": {
+  "file": "res://assets/objects/press_kb.svg",
+  "w": 144,
+  "h": 176,
+  "ox": 0,
+  "oy": 160,
+  "anchors": {
+   "lamp": [
+    76.0,
+    19
+   ],
+   "ram": [
+    34,
+    56,
+    60,
+    14
+   ],
+   "work": [
+    64.0,
+    100
+   ],
+   "in": [
+    14,
+    98
+   ],
+   "out": [
+    112,
+    98
+   ]
+  }
+ },
+ "press_kb_v": {
+  "file": "res://assets/objects/press_kb_v.svg",
+  "w": 80,
+  "h": 240,
+  "ox": 0,
+  "oy": 224,
+  "anchors": {
+   "lamp": [
+    32,
+    19
+   ],
+   "ram": [
+    22,
+    56,
+    20,
+    14
+   ],
+   "work": [
+    32,
+    136
+   ],
+   "in": [
+    32,
+    98
+   ],
+   "out": [
+    32,
+    186
+   ]
+  }
+ },
+ "press_kb_b": {
+  "file": "res://assets/objects/press_kb_b.svg",
+  "w": 144,
+  "h": 176,
+  "ox": 0,
+  "oy": 160,
+  "anchors": {
+   "lamp": [
+    52.0,
+    19
+   ],
+   "ram": [
+    34,
+    56,
+    60,
+    14
+   ],
+   "work": [
+    64.0,
+    100
+   ],
+   "in": [
+    114,
+    98
+   ],
+   "out": [
+    16,
+    98
+   ]
+  }
  }
 }

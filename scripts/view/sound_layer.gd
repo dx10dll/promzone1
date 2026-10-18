@@ -12,7 +12,7 @@ extends Node2D
 const T := World.T
 const MAX_MACHINES := 6
 const PROC_SND := {"turning": "m_lathe", "milling": "m_mill", "drilling": "m_drill", "welding": "m_weld",
-	"heat": "m_furnace", "paint": "m_paint", "assembly": "m_assembly", "test": "m_test"}
+	"heat": "m_furnace", "paint": "m_paint", "assembly": "m_assembly", "test": "m_test", "casting": "m_casting", "stamping": "m_stamp"}
 
 var game: GameMain
 var sim: Sim

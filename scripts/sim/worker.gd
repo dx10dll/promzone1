@@ -12,6 +12,8 @@ const PROF_NAMES := {
 	"miller": "Фрезеровщик",
 	"welder": "Сварщик",
 	"heat_treater": "Термист",
+	"caster": "Литейщик",
+	"presser": "Штамповщик",
 	"painter": "Маляр",
 	"assembler": "Слесарь-сборщик",
 	"fitter": "Слесарь",
@@ -43,7 +45,7 @@ const PROF_DEPT := {"foreman": "foreman", "chief": "chief", "accountant": "accou
 ## Основной навык профессии.
 const PROF_SKILL := {
 	"turner": "turning", "qc": "qc", "laborer": "haul", "builder": "build", "electrician": "electric",
-	"miller": "milling", "welder": "welding", "heat_treater": "heat", "painter": "paint", "assembler": "assembly", "fitter": "fitting",
+	"miller": "milling", "welder": "welding", "heat_treater": "heat", "caster": "casting", "presser": "stamping", "painter": "paint", "assembler": "assembly", "fitter": "fitting",
 	"foreman": "manage", "chief": "manage", "accountant": "office", "buyer": "office", "dispatcher": "office",
 	"hr": "office", "technologist": "engineering", "cleaner": "clean", "setter": "setup", "cnc_operator": "cnc", "guard": "security",
 	"cook": "cook", "nurse": "medicine",
@@ -58,6 +60,8 @@ const SKILL_NAMES := {
 	"milling": "Фрезерное дело",
 	"welding": "Сварка",
 	"heat": "Термообработка",
+	"casting": "Литьё",
+	"stamping": "Штамповка",
 	"paint": "Покраска",
 	"assembly": "Сборка",
 	"fitting": "Слесарное дело",

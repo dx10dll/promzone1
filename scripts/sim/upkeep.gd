@@ -4,7 +4,7 @@ extends RefCounted
 ## заготовительный участок (ленточная пила режет пруток заранее), уровень обустройства помещений.
 
 ## Сколько «грязи» оставляет одна операция по переделу (стружка, окалина, брызги, пыль).
-const CHIPS := {"turning": 26, "milling": 32, "drilling": 18, "welding": 14, "paint": 10, "assembly": 4, "heat": 8}
+const CHIPS := {"turning": 26, "milling": 32, "drilling": 18, "welding": 14, "paint": 10, "assembly": 4, "heat": 8, "casting": 14, "stamping": 6}
 const BIN_CAP := 300.0          ## кг стружки в контейнере
 const CHIP_PRICE := 12.0        ## ₽ за килограмм стружки
 const SCRAP_K := 0.35           ## бракованные детали сдают в лом за 35% цены металла

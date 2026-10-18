@@ -54,5 +54,19 @@
   "prof": "qc",
   "cons": "",
   "cons_use": 0.0
+ },
+ "casting": {
+  "name": "Литьё",
+  "skill": "casting",
+  "prof": "caster",
+  "cons": "sand",
+  "cons_use": 1.0
+ },
+ "stamping": {
+  "name": "Штамповка",
+  "skill": "stamping",
+  "prof": "presser",
+  "cons": "",
+  "cons_use": 0.0
  }
 }

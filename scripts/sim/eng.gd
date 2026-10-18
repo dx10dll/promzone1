@@ -6,7 +6,7 @@ extends RefCounted
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 ## Выбросы работающего станка: «единиц загазованности в час» для помещения в 30 клеток.
-const FUMES := {"welding": 40.0, "paint": 34.0, "heat": 14.0, "milling": 3.0, "turning": 2.0, "drilling": 1.5, "assembly": 0.6}
+const FUMES := {"welding": 40.0, "paint": 34.0, "heat": 14.0, "casting": 36.0, "milling": 3.0, "turning": 2.0, "drilling": 1.5, "assembly": 0.6}
 const STUFFY := 35.0             ## душно
 const SMOKY := 65.0              ## дым и пары: тяжело работать
 const HOOD_K := 0.25             ## под вытяжным зонтом в помещение уходит четверть выбросов
@@ -295,7 +295,7 @@ func _fumes_step(hours: float) -> void:
 func needs_vent(r: Rooms.Room) -> bool:
 	for tid in r.things:
 		var m: Thing = sim.things.get(tid)
-		if m and m.kind() == "machine" and m.process() in ["welding", "paint", "heat"]:
+		if m and m.kind() == "machine" and m.process() in ["welding", "paint", "heat", "casting"]:
 			return true
 	return false
 

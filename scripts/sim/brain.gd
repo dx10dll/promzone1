@@ -283,7 +283,7 @@ func _go_home(w: Worker) -> void:
 	assign(w, t)
 
 
-const DIRTY_PROFS := ["turner", "miller", "welder", "heat_treater", "painter", "assembler", "fitter", "laborer", "builder", "setter", "electrician"]
+const DIRTY_PROFS := ["turner", "miller", "welder", "heat_treater", "caster", "presser", "painter", "assembler", "fitter", "laborer", "builder", "setter", "electrician"]
 
 
 ## Свободная душевая кабина в душевой, с водой.
@@ -3107,7 +3107,7 @@ func _op_skill(m: Thing, w: Worker = null) -> String:
 
 func _op_label(m: Thing) -> String:
 	var verbs := {"turning": "Точит", "milling": "Фрезерует", "drilling": "Сверлит", "welding": "Варит",
-		"heat": "Загружает печь", "paint": "Красит", "assembly": "Собирает"}
+		"heat": "Загружает печь", "paint": "Красит", "assembly": "Собирает", "casting": "Льёт", "stamping": "Штампует"}
 	return "%s: %s" % [str(verbs.get(m.process(), "Работает")), Defs.product_name(m.product)]
 
 

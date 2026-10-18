@@ -467,6 +467,10 @@ func _draw_machine() -> void:
 	if pr == "heat":
 		_fx_furnace()
 		_fx_steam()
+	elif pr == "casting":
+		_fx_casting()
+	elif pr == "stamping":
+		_fx_stamping()
 	if thing.working:
 		_bar(thing.progress, Color("#6fbf86") if not thing.is_batch() else Color("#e8853a"))
 	# входы и выходы
@@ -788,3 +792,89 @@ func _draw_qc() -> void:
 		var it: Item = sim.items.get(ids[k])
 		if it:
 			_draw_item(Tex.for_item(it), r.position + Vector2(5.0 + (k % 3) * 7.5, 4.0 + int(k / 3) * 6.0), 9.0)
+
+
+## 1.27: литьё — зеркало расплава в тигле светится; на середине цикла ковш наклоняют, струя металла
+## бьёт в опоку, летят искры, над залитой опокой — дымок.
+func _fx_casting() -> void:
+	var g := _anchor("glow")
+	if g.is_empty():
+		return
+	var r := Rect2(tp(g[0], g[1]), Vector2(g[2], g[3]) * 0.5)
+	var k := 0.0
+	if thing.working:
+		k = 0.8 + 0.2 * sin(_t * 4.0 + sin(_t * 1.7))
+	elif thing.product != "" and sim.count_slot(thing, 0) > 0:
+		k = 0.3
+	if k > 0.0:
+		var c := r.get_center()
+		over.draw_set_transform(c, 0.0, Vector2(1.0, r.size.y / maxf(1.0, r.size.x)))
+		over.draw_circle(Vector2.ZERO, r.size.x * 0.5, Color(1.0, 0.42, 0.1, 0.9 * k))
+		over.draw_circle(Vector2.ZERO, r.size.x * 0.32, Color(1.0, 0.82, 0.35, 0.8 * k))
+		over.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		var gl := Tex.fx("glow")
+		if gl and thing.working:
+			over.draw_texture_rect(gl, Rect2(c - Vector2(36, 36), Vector2(72, 72)), false, Color(1.0, 0.5, 0.18, 0.3 * k))
+	if not thing.working:
+		return
+	var pour := _anchor("pour")
+	if pour.is_empty():
+		return
+	var ph := thing.progress
+	var p0 := tp(pour[0], pour[1])
+	var p1 := p0 + Vector2(1.5, 15.0)   # струя падает почти отвесно в опоку под носиком
+	if ph > 0.55 and ph < 0.85:
+		# струя: волнистая, толще в начале
+		var n := 8
+		var prev := p0
+		for j in range(1, n + 1):
+			var f := float(j) / n
+			var q := p0.lerp(p1, f) + Vector2(sin(_t * 22.0 + f * 9.0) * 0.6 * f, 0)
+			over.draw_line(prev, q, Color(1.0, 0.62 + 0.2 * (1.0 - f), 0.18, 0.95), 2.4 - f * 0.9)
+			prev = q
+		over.draw_circle(p1, 2.4, Color(1.0, 0.85, 0.4, 0.9))
+		if FxLayer.quality > 0:
+			_sparks(p1, 10 if FxLayer.quality >= 2 else 4, Color(1.0, 0.75, 0.3), 1.1, Vector2.ZERO, 6.0)
+	if ph > 0.7 and FxLayer.quality > 0:
+		var sm := Tex.fx("smoke")
+		if sm:
+			for j2 in 3:
+				var q2 := fmod(_t * 0.35 + j2 * 0.33, 1.0)
+				var c2 := p1 + Vector2(sin(_t + j2 * 2.1) * 4.0, -q2 * 26.0)
+				var sz := 8.0 + q2 * 14.0
+				over.draw_texture_rect(sm, Rect2(c2 - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false, Color(0.75, 0.72, 0.7, 0.4 * (1.0 - q2)))
+
+
+## 1.27: штамповка — ползун ходит вниз-вверх раз в 0,9 с (резко вниз, плавно вверх), в момент удара —
+## вспышка металла и пыль, станок вздрагивает.
+const STAMP_T := 0.9
+
+
+func _fx_stamping() -> void:
+	var ram := _anchor("ram")
+	if ram.is_empty():
+		return
+	var r := Rect2(tp(ram[0], ram[1]), Vector2(ram[2], 6.0) * 0.5)
+	var stroke := float(ram[3]) * 0.5
+	var y := 0.0
+	var hit := false
+	if thing.working:
+		var ph := fmod(_t + float(thing.id) * 0.13, STAMP_T) / STAMP_T
+		if ph < 0.18:
+			y = stroke * ph / 0.18
+		elif ph < 0.26:
+			y = stroke
+			hit = true
+		else:
+			y = stroke * (1.0 - (ph - 0.26) / 0.74)
+		if hit:
+			sprite.position = _spr_base + Vector2(0, 0.6)
+	var rr := Rect2(r.position + Vector2(0, y), r.size)
+	over.draw_rect(Rect2(Vector2(rr.position.x + rr.size.x * 0.5 - 1.5, r.position.y - 2.0), Vector2(3.0, y + 2.0)), Color("#9aa3a8"))
+	over.draw_rect(rr, Color("#7b8286"))
+	over.draw_rect(Rect2(rr.position, Vector2(rr.size.x, 1.2)), Color("#cdd3d7"))
+	if hit and FxLayer.quality > 0:
+		var w := _anchor("work")
+		var at := tp(w[0], w[1]) if not w.is_empty() else rr.get_center() + Vector2(0, 6)
+		_sparks(at, 5 if FxLayer.quality >= 2 else 2, Color(1.0, 0.9, 0.6), 0.6, Vector2.ZERO, 4.0)
+		over.draw_circle(at, 5.0, Color(1, 1, 1, 0.18))

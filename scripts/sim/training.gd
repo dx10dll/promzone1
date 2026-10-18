@@ -5,7 +5,7 @@ extends RefCounted
 ## отношения в коллективе (дружба и вражда), практиканты из ПТУ.
 
 ## Чему учат на курсах.
-const SKILLS := ["turning", "milling", "welding", "heat", "paint", "assembly", "qc", "electric", "build"]
+const SKILLS := ["turning", "milling", "welding", "heat", "casting", "stamping", "paint", "assembly", "qc", "electric", "build"]
 ## Цена и длительность: up — повышение разряда (+2 к навыку), new — смежная профессия (навык до 3).
 const COURSE := {
 	"up": {"cls": 6000.0, "ctr": 15000.0, "study": 720.0, "days": 3},

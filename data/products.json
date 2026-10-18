@@ -793,5 +793,155 @@
     "heavy": true,
     "paint_col": "#4a5a3a",
     "desc": "Изделие по госзаказу. Сдаётся военной приёмке."
+  },
+  "cast_cover": {
+    "name": "Крышка литая",
+    "size": "m",
+    "material": "charge",
+    "mat_qty": 3,
+    "route": [
+      {
+        "op": "casting",
+        "time": 40,
+        "skill": 2
+      },
+      {
+        "op": "turning",
+        "time": 20,
+        "skill": 2
+      }
+    ],
+    "qc_time": 8,
+    "price": [
+      5200,
+      6300
+    ],
+    "qty": [
+      6,
+      18
+    ],
+    "heavy": true,
+    "research": "casting_shop",
+    "desc": "Крышка подшипникового узла: отливка и подрезка торца на токарном."
+  },
+  "cast_body": {
+    "name": "Корпус редуктора литой",
+    "size": "m",
+    "material": "charge",
+    "mat_qty": 6,
+    "route": [
+      {
+        "op": "casting",
+        "time": 70,
+        "skill": 4
+      },
+      {
+        "op": "milling",
+        "time": 40,
+        "skill": 3
+      },
+      {
+        "op": "drilling",
+        "time": 20,
+        "skill": 2
+      }
+    ],
+    "qc_time": 14,
+    "price": [
+      17800,
+      21500
+    ],
+    "qty": [
+      2,
+      8
+    ],
+    "heavy": true,
+    "research": "casting_shop",
+    "paint_col": "#4a5a6a",
+    "desc": "Чугунный корпус: отливка, фрезеровка плоскостей и сверловка под крепёж."
+  },
+  "washer": {
+    "name": "Шайба пружинная",
+    "size": "s",
+    "material": "strip2",
+    "mat_qty": 1,
+    "route": [
+      {
+        "op": "stamping",
+        "time": 2,
+        "skill": 1
+      }
+    ],
+    "qc_time": 1,
+    "price": [
+      210,
+      260
+    ],
+    "qty": [
+      120,
+      400
+    ],
+    "research": "stamping_shop",
+    "desc": "Вырубка и разводка — одним ударом пресса. Заказывают сотнями."
+  },
+  "clamp": {
+    "name": "Хомут крепёжный",
+    "size": "s",
+    "material": "strip2",
+    "mat_qty": 1,
+    "route": [
+      {
+        "op": "stamping",
+        "time": 4,
+        "skill": 2
+      },
+      {
+        "op": "paint",
+        "time": 3,
+        "skill": 1,
+        "cons": 1
+      }
+    ],
+    "qc_time": 2,
+    "price": [
+      640,
+      790
+    ],
+    "qty": [
+      60,
+      200
+    ],
+    "research": "stamping_shop",
+    "paint_col": "#3d4a5a",
+    "desc": "Вырубка, гибка и покраска: дёшево и много."
+  },
+  "bracket_st": {
+    "name": "Кронштейн гнутый",
+    "size": "s",
+    "material": "strip2",
+    "mat_qty": 2,
+    "route": [
+      {
+        "op": "stamping",
+        "time": 6,
+        "skill": 2
+      },
+      {
+        "op": "drilling",
+        "time": 5,
+        "skill": 1
+      }
+    ],
+    "qc_time": 3,
+    "price": [
+      1250,
+      1500
+    ],
+    "qty": [
+      30,
+      100
+    ],
+    "research": "stamping_shop",
+    "desc": "Штампованный уголок с отверстиями — замена фрезерованному там, где не нужна точность."
   }
 }

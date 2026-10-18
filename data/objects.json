@@ -3267,5 +3267,135 @@
 		"prestige": 1,
 		"desc": "Приказы, график отпусков и «Продам гараж». Ставят у проходной, в бытовке или в коридоре.",
 		"hand": true
+	},
+	"cast_ist": {
+		"name": "Индукционная печь ИСТ-0,16",
+		"cat": "Литьё и штамповка",
+		"cost": 680000,
+		"build_time": 180,
+		"size": [
+			2,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				2,
+				"up"
+			]
+		],
+		"research": "casting_shop",
+		"machine": {
+			"in_cap": 6,
+			"out_cap": 4,
+			"power_kw": 40.0,
+			"process": "casting",
+			"part_size": "m",
+			"room_heat": 0.35,
+			"smoke": true
+		},
+		"desc": "Плавит шихту в тигле токами высокой частоты, литейщик разливает металл по опокам. Даёт заготовки сложной формы, которых не выточить из прутка. Очень много тока, жарко, нужна вытяжка.",
+		"stage": 3,
+		"crates": 4
+	},
+	"cast_line": {
+		"name": "Литейный участок ЛУ-2",
+		"cat": "Литьё и штамповка",
+		"cost": 1450000,
+		"build_time": 260,
+		"size": [
+			3,
+			2
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				1,
+				2,
+				"up"
+			]
+		],
+		"research": "casting_shop",
+		"machine": {
+			"in_cap": 10,
+			"out_cap": 6,
+			"power_kw": 55.0,
+			"process": "casting",
+			"part_size": "l",
+			"speed_k": 0.6,
+			"room_heat": 0.45,
+			"smoke": true
+		},
+		"desc": "Печь, ковш на тельфере и рольганг с опоками: льют быстрее и крупнее, но и тока надо как на целый цех.",
+		"stage": 4,
+		"crates": 6
+	},
+	"press_kd": {
+		"name": "Пресс кривошипный КД2126",
+		"cat": "Литьё и штамповка",
+		"cost": 260000,
+		"build_time": 80,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"research": "stamping_shop",
+		"machine": {
+			"in_cap": 10,
+			"out_cap": 12,
+			"power_kw": 4.0,
+			"process": "stamping",
+			"part_size": "s"
+		},
+		"desc": "Пресс на 16 тонн: вырубает и гнёт мелкие детали из полосы за один удар. Быстро и дёшево, но очень громко — нужны беруши.",
+		"stage": 3,
+		"crates": 2
+	},
+	"press_kb": {
+		"name": "Пресс листоштамповочный КБ235",
+		"cat": "Литьё и штамповка",
+		"cost": 720000,
+		"build_time": 160,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "machine",
+		"needs_floor": true,
+		"spots": [
+			[
+				0,
+				1,
+				"up"
+			]
+		],
+		"research": "stamping_shop",
+		"machine": {
+			"in_cap": 14,
+			"out_cap": 16,
+			"power_kw": 15.0,
+			"process": "stamping",
+			"part_size": "m",
+			"speed_k": 0.55
+		},
+		"desc": "Пресс двойного действия на 100 тонн: штампует средние детали почти вдвое быстрее малого.",
+		"stage": 4,
+		"crates": 4
 	}
 }

@@ -78,7 +78,7 @@ func _need_ok(n: Dictionary) -> bool:
 			return sim.money < float(n.get("v", 0))
 		"smoky":
 			for m in sim.things_of("machine"):
-				if m.process() in ["welding", "paint", "heat"]:
+				if m.process() in ["welding", "paint", "heat", "casting"]:
 					return true
 			return false
 		"not_goal":
