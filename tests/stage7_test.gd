@@ -43,7 +43,10 @@ func _init() -> void:
 	for i in s.world.w * s.world.h:
 		if WallKinds.is_room_wall(s.world.wall[i]):
 			walls += 1
-	check(walls == 0 and s.things.size() <= 3, "песочница пустая: стен %d, объектов %d" % [walls, s.things.size()])
+	# 1.29: у ворот — обязательные зоны с поддонами (заготовок и готовой продукции), остальное пусто
+	var objs := s.things.values().filter(func(t: Thing) -> bool: return t.def_id != "pallet" and t.def_id != "pallet_raw").size()
+	# 1.29: и одно техпомещение 7×5 у ворот (подстанция, насосная, котёл, лампа, огнетушитель)
+	check(walls <= 20 and objs <= 5, "песочница пустая: стен %d, объектов %d (кроме поддонов и техпомещения у ворот)" % [walls, objs])
 
 	print("— люди: имена без отчеств, телосложение, прозвища")
 	var g := Scenario.new_game("garage", "mech", "market", 7)

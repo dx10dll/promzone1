@@ -140,6 +140,10 @@ void fragment() {
 	tool.room_clicked.connect(hud.on_room_clicked)
 	tool.control_click.connect(func(c: Vector2i, scr: Vector2) -> void: hud.ctl.on_map_click(c, scr))
 	tool.cell_clicked.connect(func(c: Vector2i) -> void:
+		var lot := FxLayer.sign_at(sim, fx.get_local_mouse_position())
+		if lot >= 0:   # 1.29: щелчок по табличке «Продаётся» — сразу к покупке участка
+			open_lot(lot)
+			return
 		hud.info.near_screen = tool.recent_click()
 		hud.info.show_cell(sim, c))
 	# уведомления, накопленные до открытия сцены (приветствие сценария)
@@ -234,6 +238,11 @@ func _process(delta: float) -> void:
 			w.vprev = w.pos
 		for v in sim.visitors:
 			v.vprev = v.pos
+		for vh in sim.vehicles:
+			vh.px = vh.x
+		var ct := sim.town.cat if sim.town else null
+		if ct:
+			ct.vprev = ct.pos
 		sim.tick(step)
 		_acc -= step
 		guard += 1
@@ -427,6 +436,16 @@ func _toggle_fps() -> void:
 	cl.add_child(fps_label)
 
 
+## 1.29: окно «Развитие» с выбранной ступенью покупки участка k.
+func open_lot(k: int) -> void:
+	for b: Dictionary in Develop.branches():
+		for st: Dictionary in b.get("steps", []):
+			if st.has("lot") and int(st["lot"]) == k:
+				DevTree.sel = str(st["id"])
+	hud.open_window("develop")
+	Snd.play("n_info", -4.0)
+
+
 func _on_track(name: String) -> void:
 	if hud and MusicDirector.TITLES.has(name):
 		hud.toast("Музыка: %s" % MusicDirector.TITLES[name], Sim.LVL_INFO, 4.0)
@@ -442,8 +461,13 @@ func _fps_tick(delta: float) -> void:
 	for w in sim.workers:
 		if w.present:
 			present += 1
-	fps_label.text = "%d кадр/с · кадр %.1f мс · симуляция %.1f мс/кадр · людей на заводе %d" % [
-		int(Engine.get_frames_per_second()), _fps_acc * 1000.0 / _fps_n, _fps_sim / _fps_n, present]
+	# 1.29: вторая строка — чем рисуется и что ограничивает кадры (для поиска «потолка» на разных компьютерах)
+	var vs := DisplayServer.window_get_vsync_mode()
+	fps_label.text = "%d кадр/с · кадр %.1f мс · логика %.1f мс · симуляция %.1f мс/кадр · людей на заводе %d\n%s · %s · V-Sync %s · предел %s · вызовов отрисовки %d" % [
+		int(Engine.get_frames_per_second()), _fps_acc * 1000.0 / _fps_n, Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, _fps_sim / _fps_n, present,
+		RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_driver_name(),
+		"выкл." if vs == DisplayServer.VSYNC_DISABLED else "вкл.", str(Engine.max_fps) if Engine.max_fps > 0 else "нет",
+		int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))]
 	_fps_acc = 0.0
 	_fps_sim = 0.0
 	_fps_n = 0

@@ -3,8 +3,8 @@ extends Node2D
 ## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
 ## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.28"
-const WHATS_NEW := ["Шесть новых композиций", "Музыка под время суток и аврал", "Режим музыки в настройках"]
+const VERSION_TEXT := "Версия 1.29"
+const WHATS_NEW := ["Обязательные зоны и поддоны", "Справочник F1, новое обучение", "Плавнее кадры, говор людей"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -338,7 +338,7 @@ func _fill_menu() -> void:
 		var b := _big("Продолжить", func() -> void: Game.start_load(str(s["slot"])),
 			"%s%s · %s" % [(str(s["company"]) + " · ") if s.has("company") else "", Defs.money_str(float(s.get("money", 0))), Game.pc_time(str(s.get("saved_at", "")))], "play1")
 		b.primary = true
-	_big("Новая игра", _show_new_game, "Профиль, сценарий, рассказчик", "factory")
+	_big("Новая игра", _show_new_game, "Профиль, сценарий, сложность", "factory")
 	var lb := _big("Загрузить", _show_load, "", "log")
 	lb.disabled = saves.is_empty()
 	_big("Достижения", _show_achievements, "", "medal")
@@ -584,7 +584,7 @@ func _fill_new_game() -> void:
 	if not goals.is_empty():
 		c3.add_child(_wrapped("Цели: " + "; ".join(PackedStringArray(goals.map(func(g: Dictionary) -> String: return str(g.get("text", ""))))) + ".", 13, UITheme.GOOD))
 	c3.add_child(HSeparator.new())
-	c3.add_child(UITheme.label("3. Рассказчик", 17, UITheme.TEXT, UITheme.f_semi))
+	c3.add_child(UITheme.label("3. Сложность", 17, UITheme.TEXT, UITheme.f_semi))
 	var srow := UITheme.hbox(6)
 	for m in Story.MODES:
 		var md: Dictionary = Defs.events.get("modes", {}).get(m, {})
@@ -656,7 +656,7 @@ func _fill_company() -> void:
 	bh.add_child(back)
 	var sd: Dictionary = Defs.scenarios[str(ng["scn"])]
 	var pd: Dictionary = Defs.profiles[str(ng["profile"])]
-	var sum := UITheme.label("%s · «%s» · рассказчик: %s" % [str(pd["name"]), str(sd["name"]), str(Defs.events.get("modes", {}).get(str(ng["story"]), {}).get("name", ng["story"]))], 14, UITheme.MUTED)
+	var sum := UITheme.label("%s · «%s» · сложность: %s" % [str(pd["name"]), str(sd["name"]), str(Defs.events.get("modes", {}).get(str(ng["story"]), {}).get("name", ng["story"]))], 14, UITheme.MUTED)
 	sum.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sum.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	bh.add_child(sum)
@@ -763,9 +763,18 @@ func _show_achievements() -> void:
 
 
 func _show_settings() -> void:
-	var v := _panel("Настройки")
+	var top := _panel("Настройки")
 	sub.offset_top = -330
 	sub.offset_bottom = 330
+	# 1.29: настройки длиннее экрана — листаются внутри окна, окно не уползает вниз
+	var sc := ScrollContainer.new()
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	sc.custom_minimum_size = Vector2(0, 560)
+	top.add_child(sc)
+	var v := UITheme.vbox(10)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(v)
 	SettingsUI.build(v)
 	v.add_child(UITheme.label("Сохранения и настройки лежат в папке пользователя:\n" + ProjectSettings.globalize_path("user://"), 12, UITheme.MUTED))
 

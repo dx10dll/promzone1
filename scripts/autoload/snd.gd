@@ -5,11 +5,11 @@ extends Node
 
 const BUSES := ["Music", "SFX", "Ambient", "People", "City", "UI"]
 ## 1.25: громкость по категориям — шина и ключ настройки.
-const BUS_VOL := {"Music": "vol_music", "SFX": "vol_sfx", "Ambient": "vol_amb", "People": "vol_people", "City": "vol_city", "UI": "vol_ui"}
+const BUS_VOL := {"Music": "vol_music", "SFX": "vol_sfx", "Ambient": "vol_env", "People": "vol_env", "City": "vol_env", "UI": "vol_ui"}   ## 1.29: окружение — одним ползунком
 const CITY := ["train_horn", "car_horn", "van_horn", "factory_horn", "bark", "meow", "pigeon_coo", "pigeon_flap", "squeak",
 	"amb_city", "amb_train", "amb_day", "amb_night", "amb_wind", "amb_rain"]
 const PEOPLE := ["cough", "dishes", "door", "doorbell", "kettle", "phone", "injury", "amb_crowd"]
-const LOOPS := ["m_", "amb_"]
+const LOOPS := ["m_", "amb_", "v_crowd"]
 
 var _cache: Dictionary = {}
 var _pool: Array[AudioStreamPlayer] = []
@@ -56,7 +56,7 @@ static func bus_for(name: String) -> String:
 		return "UI"
 	if name in CITY:
 		return "City"
-	if name in PEOPLE:
+	if name in PEOPLE or name.begins_with("v_"):   # 1.29: голоса
 		return "People"
 	if name.begins_with("amb_"):
 		return "Ambient"

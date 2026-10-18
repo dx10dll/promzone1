@@ -100,7 +100,9 @@ func _process(delta: float) -> void:
 		sprite.modulate = Color(1.0, 0.6, 0.55, 0.95)
 	else:
 		sprite.modulate = Color(1, 1, 1, 0.94) if thing.is_ceiling() else Color.WHITE
-	over.queue_redraw()
+	# 1.29: эффекты и подписи перерисовываем только у объектов на экране — за краем их всё равно не видно
+	if WorkerView.view.size.x <= 0.0 or WorkerView.view.has_point(position):
+		over.queue_redraw()
 
 
 ## Пиксель текстуры -> локальные координаты слоя.
@@ -752,6 +754,22 @@ func _draw_storage() -> void:
 					over.draw_rect(rod, Color("#23262a"), false, 0.5)
 					if it.def_id == "bar40x":
 						over.draw_rect(Rect2(rod.end.x - 2.5, rod.position.y, 2.5, rod.size.y), Color("#3d6fb0"))
+		"pallet_raw":
+			# 1.29: поддон заготовок — пачка прутков между стойками, сколько лежит, столько и видно
+			var rp := _slot_rect(0)
+			var idsp := sim.slot_ids(thing, 0)
+			var rwp := rp.size.x * 0.5 - 1.0
+			for k5 in mini(idsp.size(), 12):
+				var it5: Item = sim.items.get(idsp[k5])
+				if it5 == null:
+					continue
+				var rod5 := Rect2(rp.position.x + (k5 % 2) * (rwp + 2.0), rp.end.y - 2.6 * (int(k5 / 2) + 1), rwp, 2.3)
+				over.draw_rect(rod5, MAT_COL.get(it5.def_id, Color("#9aa1a5")))
+				over.draw_rect(rod5, Color("#23262a"), false, 0.5)
+			if not idsp.is_empty():
+				var top := rp.end.y - 2.6 * ceilf(mini(idsp.size(), 12) / 2.0)
+				for bx in [0.3, 0.7]:
+					over.draw_rect(Rect2(rp.position.x + rp.size.x * bx - 0.8, top, 1.6, rp.end.y - top), Color("#3d6fb0"))
 		"pallet":
 			var r2 := _slot_rect(0)
 			var ids2 := sim.slot_ids(thing, 0)

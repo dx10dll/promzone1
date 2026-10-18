@@ -926,7 +926,7 @@ func _ready_machines(machines: Array[Thing]) -> Array[Thing]:
 		_rm.append(m)
 	# 1.26: одно сообщение на всех, а не по штуке на каждый станок
 	if not no_zone.is_empty():
-		sim.notify_once("zonem_all", "%s вне цеха — на %s не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство). Список — «Производство → Что стоит»." % [_names(no_zone), "нём" if no_zone.size() == 1 else "них"], Sim.LVL_WARN, no_zone[0].cell, 720.0)
+		sim.notify_once("zonem_all", "%s вне цеха — на %s не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство). Список — «Производство → Простой»." % [_names(no_zone), "нём" if no_zone.size() == 1 else "них"], Sim.LVL_WARN, no_zone[0].cell, 720.0)
 	if not no_water.is_empty():
 		sim.notify_once("drym_all", "Нет воды: %s. Протяните трубу от насоса (меню «Сети»)." % _names(no_water), Sim.LVL_WARN, no_water[0].cell, 720.0)
 	return _rm
@@ -1192,7 +1192,9 @@ func _find_work(w: Worker) -> Task:
 		if o.is_empty():
 			continue
 		var p := str(o["product"])
-		var pred_ok := func(i: Item) -> bool: return i.kind == "part" and i.def_id == p and i.q == "ok" and _in_general_storage(i)
+		# 1.29: грузят только из зоны отгрузки (запасной путь — со склада, см. Logistics.ship_only)
+		var only_ship := sim.logi.ship_only(v, p)
+		var pred_ok := func(i: Item) -> bool: return i.kind == "part" and i.def_id == p and i.q == "ok" and (i.loc == Item.Loc.GROUND and sim.logi.in_ship(i.cell) if only_ship else _in_general_storage(i))
 		var it4 := _nearest_item(pred_ok, v.access_cell(sim.world.sidewalk_row), w)
 		if it4 == null:
 			continue

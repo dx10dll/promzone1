@@ -96,9 +96,11 @@ static func new_garage(seed_value: int = 0, story_mode: String = "market", profi
 	assign_at(sim, Vector2i(12, 17), "locker")
 	assign_at(sim, TECH.position + Vector2i(3, 3), "tech_room")
 	sim.power.update_topology()
+	add_yard_zones(sim)   # 1.29: обязательные зоны у ворот, поддоны заготовок
 	sim.events.clear()
 	sim.notify("Добро пожаловать в «Промзону»! У вас бокс в промзоне, старый токарный станок и трое работников.", Sim.LVL_GOOD)
 	sim.notify("Первый заказ уже принят: 12 втулок для ИП Сидоренко. Металл лежит на стеллаже.", Sim.LVL_INFO)
+	sim.notify("У ворот отмечены зона разгрузки (сюда фургоны сгружают металл — на поддоны заготовок) и зона отгрузки (сюда несут готовый заказ, отсюда его грузит машина клиента).", Sim.LVL_INFO)
 	return sim
 
 
@@ -981,6 +983,7 @@ static func _new_field(seed_value: int, story_mode: String, profile: String) -> 
 	# 1.17: на участке только бытовка — склад, цех и всё остальное игрок строит сам
 	put(sim, "urn", Vector2i(15, 33))
 	# люди: только бригада строителей — станочников нанимают, когда будет где работать
+	add_yard_zones(sim)   # 1.29: обязательные зоны у ворот
 	hire_builders(sim, 3)
 	sim.refresh_candidates()
 	sim.progress.quiet_until = sim.day() + Progress.QUIET_DAYS   # 1.17: неделя на стройку без заказов
@@ -999,18 +1002,16 @@ static func _new_sandbox(seed_value: int, story_mode: String, profile: String, o
 	var sim := _base(seed_value, "sandbox", profile, story_mode, 64 if big else 48, 44 if big else 36)
 	sim.gate_x = int(sim.world.plot.get_center().x) - 2
 	_lay_ground(sim, Rect2i(0, 0, 0, 0), Rect2i(sim.gate_x - 2, sim.world.plot.end.y - 6, 8, 7), 50 if big else 34)
-	# пустой участок: только подстанция и насосная у ворот, без построек (работают и без техпомещения)
-	var py := sim.world.plot.end.y - 3
-	for yy in range(py - 1, py + 2):
-		for xx in range(sim.gate_x - 10, sim.gate_x - 3):
-			sim.world.flr[sim.world.idx(Vector2i(xx, yy))] = 1   # бетонная площадка
-	var sub := put(sim, "substation", Vector2i(sim.gate_x - 6, py))
-	var pmp := put(sim, "pump_house", Vector2i(sim.gate_x - 9, py))
-	var htr := put(sim, "water_heater", Vector2i(sim.gate_x - 7, py))
-	for t0: Thing in [sub, pmp, htr]:
-		if t0:
-			sim.rooms.legacy[t0.id] = true
+	# пустой участок: у ворот только техпомещение — подстанция и насосная под крышей (1.29: раньше стояли под открытым небом)
+	var tr := Rect2i(sim.gate_x - 11, sim.world.plot.end.y - 6, 7, 5)
+	_build_tech(sim, tr, Vector2i(tr.end.x - 1, tr.position.y + 2))   # дверь — к воротам
+	sim.world.refresh_all()
+	sim.rooms.update()
+	var trm := sim.rooms.room_at(tr.position + Vector2i(2, 2))
+	if trm:
+		sim.rooms.assign(trm, "tech_room")
 	autowire(sim)
+	add_yard_zones(sim)   # 1.29: обязательные зоны у ворот
 	hire_builders(sim, 3)
 	sim.refresh_candidates()
 	sim.progress.quiet_until = sim.day() + Progress.QUIET_DAYS
@@ -1030,3 +1031,112 @@ static func hire_builders(sim: Sim, n: int) -> void:
 	for k in n:
 		var b := hire_prof(sim, "builder", 4, 7)
 		b.skills["haul"] = maxi(b.skill("haul"), 5)
+
+
+# ================================================================ 1.29: обязательные зоны у ворот
+
+## Зона разгрузки (с поддонами заготовок) и зона отгрузки на свободной земле у ворот, плюс поддоны
+## готовой продукции, если их нет. Чего уже хватает — не трогает. Возвращает, что добавлено.
+static func add_yard_zones(sim: Sim, with_pallets: bool = true) -> Array[String]:
+	var out: Array[String] = []
+	var w := sim.world
+	var gy := w.plot.end.y - 2
+	var lane := Rect2i(sim.gate_x - 1, w.plot.position.y, 6, w.plot.size.y)   # проезд от ворот — свободен
+	var avoid: Array[Rect2i] = [lane]
+	if sim.logi.has_zone():
+		avoid.append(_cells_rect(sim.logi.zone_cells()).grow(1))
+	else:
+		var r := _yard_rect(sim, Vector2i(4, 3), Vector2(sim.gate_x + 7, gy), avoid)
+		if r.size.x > 0 and sim.set_area(r, Logistics.A_UNLOAD) > 0:
+			out.append("unload")
+			avoid.append(r.grow(1))
+			if with_pallets:
+				for k in 2:
+					if put(sim, Logistics.RAW_PALLET, Vector2i(r.end.x - 1 - k, r.position.y)):
+						out.append(Logistics.RAW_PALLET)
+	var sr := Rect2i()
+	if sim.logi.has_ship():
+		sr = _cells_rect(sim.logi.ship_cells())
+	else:
+		sr = _yard_rect(sim, Vector2i(3, 3), Vector2(sim.gate_x + 12, gy), avoid)
+		if sr.size.x > 0 and sim.set_area(sr, Logistics.A_SHIP) > 0:
+			out.append("ship")
+		else:
+			sr = Rect2i()
+	if with_pallets and sr.size.x > 0:
+		var have := false
+		for t: Thing in sim.things.values():
+			if t.def_id == "pallet":
+				have = true
+				break
+		if not have:
+			# склад готовой продукции — у зоны отгрузки, чтобы носить недалеко
+			for k2 in 2:
+				var c := Vector2i(sr.position.x + k2, sr.position.y - 1)
+				if sim.world.area[sim.world.idx(c)] == 0 and put(sim, "pallet", c):
+					out.append("pallet")
+	return out
+
+
+static func _cells_rect(cells: Array[Vector2i]) -> Rect2i:
+	if cells.is_empty():
+		return Rect2i()
+	var r := Rect2i(cells[0], Vector2i.ONE)
+	for c in cells:
+		r = r.expand(c).merge(Rect2i(c, Vector2i.ONE))
+	return r
+
+
+## Свободный прямоугольник size на участке, ближайший центром к anchor: без стен, объектов, чертежей и зон.
+static func _yard_rect(sim: Sim, size: Vector2i, anchor: Vector2, avoid: Array[Rect2i]) -> Rect2i:
+	var w := sim.world
+	var best := Rect2i()
+	var bd := INF
+	for y in range(w.plot.position.y, w.plot.end.y - size.y + 1):
+		for x in range(w.plot.position.x, w.plot.end.x - size.x + 1):
+			var r := Rect2i(x, y, size.x, size.y)
+			var d := (Vector2(r.position) + Vector2(size) * 0.5 - anchor).length_squared()
+			if d >= bd:
+				continue
+			var bad := false
+			for a in avoid:
+				if a.intersects(r):
+					bad = true
+					break
+			if bad or not _yard_free(sim, r):
+				continue
+			bd = d
+			best = r
+	return best
+
+
+static func _yard_free(sim: Sim, r: Rect2i) -> bool:
+	var w := sim.world
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			var c := Vector2i(x, y)
+			var i := w.idx(c)
+			if not w.in_plot(c) or w.wall[i] != World.W_NONE or w.occ[i] >= 0 or w.area[i] != 0:
+				return false
+			if not w.passable(c) or sim.bp_cells.has(i) or w.flora[i] != 0:
+				return false
+			if w.bp_floor[i] != World.BP_NONE or w.bp_wall[i] != World.BP_NONE:
+				return false
+	return true
+
+
+## Миграция (1.29): в старом сохранении нет обязательных зон — отмечаем их у ворот, если есть место.
+static func migrate_v13(sim: Sim) -> void:
+	if sim.logi.has_zone() and sim.logi.has_ship():
+		return
+	var added := add_yard_zones(sim)
+	var names: Array[String] = []
+	if added.has("unload"):
+		names.append("разгрузки")
+	if added.has("ship"):
+		names.append("отгрузки")
+	if not names.is_empty():
+		var extra := " и поддоны заготовок" if added.has(Logistics.RAW_PALLET) else ""
+		sim.notify("Обновление 1.29: зоны разгрузки и отгрузки теперь обязательны — у ворот отмечена зона %s%s. Фургоны сгружают металл на поддоны заготовок, а машина клиента грузит заказ только из зоны отгрузки. Зоны можно расширить или перенести (Стройка → Зоны на улице)." % [" и ".join(names), extra], Sim.LVL_INFO)
+	if not sim.logi.has_zone() or not sim.logi.has_ship():
+		sim.notify("Обновление 1.29: у ворот нет свободного места под зону %s. Освободите место и отметьте её (Стройка → Зоны на улице)." % ("разгрузки" if not sim.logi.has_zone() else "отгрузки"), Sim.LVL_WARN)

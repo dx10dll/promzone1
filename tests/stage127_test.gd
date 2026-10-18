@@ -105,7 +105,7 @@ func _init() -> void:
 		if str(o2.get("product", "")) in ["washer", "clamp", "cast_cover"]:
 			arch += 1
 	check(shipped + arch >= 1, "хотя бы один заказ из новых изделий готов (%d + %d в архиве)" % [shipped, arch])
-	check(Stall.list(g).size() <= g.things_of("machine").size(), "«Что стоит» понимает новые станки")
+	check(Stall.list(g).size() <= g.things_of("machine").size(), "«Простой» понимает новые станки")
 	var again := Sim.from_dict(JSON.parse_string(JSON.stringify(g.to_dict())))
 	check(again.things.size() == g.things.size(), "сохраняется")
 

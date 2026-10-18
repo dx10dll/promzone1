@@ -612,7 +612,7 @@ func load_days(extra_p: String = "", extra_qty: int = 0) -> float:
 	return float(load_info(extra_p, extra_qty)[0])
 
 
-## [дней, узкое место (процесс)].
+## [дней, проблемный участок (процесс)].
 func load_info(extra_p: String = "", extra_qty: int = 0) -> Array:
 	var acc := {}
 	for o: Dictionary in sim.orders.by_status(["active"]):

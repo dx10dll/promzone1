@@ -26,7 +26,7 @@ const GROUPS := {
 		["contracts", "Контракты", "handshake", "orders", "contracts"], ["compet", "Конкуренты", "factory", "orders", "compet"],
 		["plan", "План ПДО", "calendar", "orders", "plan"], ["done", "Архив", "log", "orders", "done"]]},
 	"prod": {"title": "Производство", "icon": "shop", "secs": [
-		["machines", "Станки", "shop", "shop", ""], ["stall", "Что стоит", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
+		["machines", "Станки", "shop", "shop", ""], ["stall", "Простой", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
 		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
 	"people": {"title": "Люди", "icon": "staff", "secs": [
 		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "orders", "staff", "hire"],
@@ -988,7 +988,7 @@ func _offer_row(o: Dictionary, parent: Control = null) -> void:
 		var dd := float(li[0])
 		var fits := dd <= float(lead) * 0.85
 		var tight := dd <= float(lead)
-		v.add_child(_cl("загрузка ~%.1f раб. дн. (узкое место — %s): %s" % [dd, Defs.process_name(str(li[1])).to_lower(), "успеваем" if fits else ("впритык" if tight else "не успеем без найма")], 12, UITheme.GOOD if fits else (UITheme.WARN if tight else UITheme.BAD)))
+		v.add_child(_cl("загрузка ~%.1f раб. дн. (проблемный участок — %s): %s" % [dd, Defs.process_name(str(li[1])).to_lower(), "успеваем" if fits else ("впритык" if tight else "не успеем без найма")], 12, UITheme.GOOD if fits else (UITheme.WARN if tight else UITheme.BAD)))
 	else:
 		v.add_child(UITheme.para("Нет оборудования: " + ", ".join(miss) + " — принять можно, но сделать не получится", 12, UITheme.BAD))
 	var bh := UITheme.hbox(8)
@@ -1897,7 +1897,7 @@ func _shop() -> void:
 				closed.emit(), 48.0, "Показать станок на заводе")
 
 
-## 1.24: «Что стоит» — все простаивающие станки с причиной; щелчок — показать станок.
+## 1.24: «Простой» — все простаивающие станки с причиной; щелчок — показать станок.
 func _stall() -> void:
 	var ms := sim.things_of("machine")
 	var lst := Stall.list(sim)
@@ -2231,7 +2231,7 @@ func _plan() -> void:
 		return
 	var li := sim.office.load_info()
 	var ld := float(li[0])
-	var bott := (" · узкое место — %s" % Defs.process_name(str(li[1])).to_lower()) if ld > 0.3 and str(li[1]) != "" else ""
+	var bott := (" · проблемный участок — %s" % Defs.process_name(str(li[1])).to_lower()) if ld > 0.3 and str(li[1]) != "" else ""
 	_info("загрузка ~%.1f раб. дн.%s" % [ld, bott])
 	_intro("Зелёное — сделано, тёмно-зелёное — прогноз до готовности, жёлтая черта — срок. Шкала — две недели от сегодняшнего дня.")
 	var act := sim.orders.by_status(["active", "ready", "shipping"])
@@ -3342,7 +3342,7 @@ func _advisor() -> void:
 	var fl := UITheme.label(("%s, главный инженер" % ew.first) if ew else "Пётр, главный инженер", 13, UITheme.MUTED)
 	fl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lv.add_child(fl)
-	var quote: String = ["«Завод — не станки. Завод — это порядок».", "«Сначала узкое место, потом всё остальное».", "«Брак дешевле поймать в цеху, чем у заказчика».", "«Станок любит смазку, а человек — уважение»."][sim.day() % 4]
+	var quote: String = ["«Завод — не станки. Завод — это порядок».", "«Сначала проблемный участок, потом всё остальное».", "«Брак дешевле поймать в цеху, чем у заказчика».", "«Станок любит смазку, а человек — уважение»."][sim.day() % 4]
 	var ql := UITheme.para(quote, 13, UITheme.INFO)
 	ql.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lv.add_child(ql)

@@ -63,7 +63,7 @@ func _init() -> void:
 	for b in ["People", "City", "UI"]:
 		check(src.contains("\"%s\"" % b), "есть шина %s" % b)
 	var gsrc := FileAccess.get_file_as_string("res://scripts/autoload/game.gd")
-	for k2 in ["vol_people", "vol_city", "vol_ui", "quality"]:
+	for k2 in ["vol_env", "vol_ui", "quality"]:
 		check(gsrc.contains("\"%s\"" % k2), "настройка %s" % k2)
 
 	print("")

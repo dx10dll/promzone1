@@ -79,6 +79,25 @@ func _draw() -> void:
 		_draw_rain()
 
 
+const SIGN_W := 132.0
+
+
+## 1.29: прямоугольник таблички «Продаётся» участка k (в координатах карты) — по нему можно щёлкнуть.
+static func sign_rect(s: Sim, k: int) -> Rect2:
+	var lr := s.world.lot_rect(k)
+	var sx := (float(lr.position.x) + float(lr.size.x) * 0.5) * T
+	var sy := (lr.end.y - 0.6) * T
+	return Rect2(sx - SIGN_W * 0.5, sy - 56, SIGN_W, 52)
+
+
+## Табличка какого некупленного участка под точкой карты (−1 — ни одной).
+static func sign_at(s: Sim, p: Vector2) -> int:
+	for k in s.world.lots.size():
+		if not s.world.lot_bought(k) and sign_rect(s, k).has_point(p):
+			return k
+	return -1
+
+
 ## Соседние участки, которые ещё не куплены (1.18): лёгкая дымка поверх травы и деревьев —
 ## чужая земля не отвлекает; табличка «Продаётся» у забора — поверх дымки.
 func _draw_lots() -> void:
@@ -99,13 +118,16 @@ func _draw_lots() -> void:
 			draw_rect(rr.grow(-float(e) * T * 0.5), Color(haze.r, haze.g, haze.b, 0.05))
 		var sx := (float(lr.position.x) + float(lr.size.x) * 0.5) * T
 		var sy := (lr.end.y - 0.6) * T
-		var bw := 132.0
+		var bw := SIGN_W
+		var sr := sign_rect(sim, k)
+		var hot := sr.has_point(get_local_mouse_position())
 		draw_rect(Rect2(sx - 2, sy - 6, 4, 18), Color("#5a4a3a"))
-		draw_rect(Rect2(sx - bw * 0.5, sy - 44, bw, 40), Color("#2c3a2c"))
-		draw_rect(Rect2(sx - bw * 0.5, sy - 44, bw, 40), Color("#d8d4c4"), false, 1.5)
-		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 29), "ПРОДАЁТСЯ", HORIZONTAL_ALIGNMENT_CENTER, bw, 12, Color("#f0d070"))
+		draw_rect(sr, Color("#3a4c3a") if hot else Color("#2c3a2c"))
+		draw_rect(sr, Color("#f0d070") if hot else Color("#d8d4c4"), false, 2.0 if hot else 1.5)
+		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 41), "ПРОДАЁТСЯ", HORIZONTAL_ALIGNMENT_CENTER, bw, 12, Color("#f0d070"))
 		var sub := "%s · %d×%d" % [Defs.money_str(float(w.lots[k].get("price", 0))), lr.size.x, lr.size.y]
-		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 13), sub, HORIZONTAL_ALIGNMENT_CENTER, bw, 10, Color("#e7e4d8") if k == nxt else Color("#a8a49a"))
+		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 25), sub, HORIZONTAL_ALIGNMENT_CENTER, bw, 10, Color("#e7e4d8") if k == nxt else Color("#a8a49a"))
+		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 11), "щёлкните — купить", HORIZONTAL_ALIGNMENT_CENTER, bw, 9, Color("#f0d070") if hot else Color("#8a9a86"))
 
 
 ## 1.18: обрыв провода — искры и вспышки; прорыв трубы — фонтанчик брызг.

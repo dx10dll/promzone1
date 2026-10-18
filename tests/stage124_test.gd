@@ -1,6 +1,6 @@
 extends SceneTree
 ## Тест версии 1.24 «Порядок»: старые сохранения 1.21–1.23 грузятся и играются,
-## «Что стоит» объясняет простои, поиск и фильтры людей, фон меню.
+## «Простой» объясняет простои, поиск и фильтры людей, фон меню.
 ## godot --headless --path . -s res://tests/stage124_test.gd
 
 const S := preload("res://tests/setups.gd")
@@ -54,7 +54,7 @@ func _init() -> void:
 		check(is_finite(sim.money), "%s: деньги в порядке (%d ₽)" % [v, int(sim.money)])
 		check(made > made0, "%s: завод работает после загрузки (+%d операций)" % [v, made - made0])
 		var st := Stall.list(sim)
-		check(st.size() <= sim.things_of("machine").size(), "%s: «Что стоит» строится" % v)
+		check(st.size() <= sim.things_of("machine").size(), "%s: «Простой» строится" % v)
 		var keys_ok := true
 		for w in sim.workers:
 			if w.search_key() == "":
@@ -63,7 +63,7 @@ func _init() -> void:
 		var again := Sim.from_dict(JSON.parse_string(JSON.stringify(sim.to_dict())))
 		check(again.workers.size() == sim.workers.size() and again.things.size() == sim.things.size(), "%s: пересохраняется в 1.24" % v)
 
-	print("— «Что стоит»")
+	print("— «Простой»")
 	var g := Scenario.new_garage(124)
 	g.story.enabled = false
 	g.progress.tutorial = -1
@@ -116,10 +116,18 @@ func _init() -> void:
 		if steps > 400:
 			break
 	check(a.minute >= target, "мир проматывается к обеду")
+	# 1.29: люди сходятся к столовой несколько минут — смотрим наполнение за первые полчаса обеда
 	var eating := 0
-	for w in a.workers:
-		if w.present and MenuScenes.CANTEEN.has_point(w.cell()):
-			eating += 1
+	for k in 30:
+		var now := 0
+		for w in a.workers:
+			if w.present and MenuScenes.CANTEEN.has_point(w.cell()):
+				now += 1
+		eating = maxi(eating, now)
+		if eating >= 8:
+			break
+		for j in 2:
+			a.tick(0.5)
 	check(eating >= 8, "в обед в столовой люди (%d)" % eating)
 
 	print("")

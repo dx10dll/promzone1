@@ -187,10 +187,12 @@ func _on_release(c: Vector2i) -> void:
 				message.emit("Не хватает денег на кабель.", false)
 		"zone":
 			var nz := sim.set_area(r, int(arg))
-			if int(arg) == Logistics.A_UNLOAD:
-				message.emit("Зона разгрузки: %d кл. Сюда будут разгружать металл и ящики с оборудованием." % nz if nz > 0 else "Здесь нельзя отметить зону.", nz > 0)
+			if nz < 0:
+				message.emit(sim.area_refusal, false)   # 1.29: последнюю клетку обязательной зоны не стереть
+			elif int(arg) == Logistics.A_UNLOAD:
+				message.emit("Зона разгрузки: %d кл. Сюда будут разгружать металл (на поддоны заготовок) и ящики с оборудованием." % nz if nz > 0 else "Здесь нельзя отметить зону.", nz > 0)
 			elif int(arg) == Logistics.A_SHIP:
-				message.emit("Зона отгрузки: %d кл. Сюда понесут готовые заказы, пока едет машина клиента, — грузить будут быстрее." % nz if nz > 0 else "Здесь нельзя отметить зону.", nz > 0)
+				message.emit("Зона отгрузки: %d кл. Сюда понесут готовые заказы — машина клиента грузит только отсюда." % nz if nz > 0 else "Здесь нельзя отметить зону.", nz > 0)
 			else:
 				message.emit("Зона убрана: %d кл." % nz if nz > 0 else "Здесь нет зоны.", nz > 0)
 		"pipe":

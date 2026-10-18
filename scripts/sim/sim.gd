@@ -7,9 +7,14 @@ signal notified(text: String, level: int, cell: Vector2i)
 signal morning(day: int)
 signal sfx(name: String, cell: Vector2i)   ## звуковой эффект для отображения (клетка −1 — без места)
 
-const VERSION := 12
+const VERSION := 13
 const MAP_W := 48
 const MAP_H := 36
+## 1.29: зачем нужна каждая зона — отказ, когда игрок стирает её последнюю клетку
+const AREA_NEED := {
+	1: "Зона разгрузки обязательна: сюда фургоны сгружают металл и ящики с оборудованием, без неё груз некуда класть. Сначала отметьте новую зону, потом стирайте старую.",
+	2: "Зона отгрузки обязательна: сюда приносят готовый заказ, и только отсюда грузит машина клиента. Сначала отметьте новую зону, потом стирайте старую.",
+}
 const LVL_INFO := 0
 const LVL_GOOD := 1
 const LVL_WARN := 2
@@ -56,6 +61,7 @@ var honor_log: Array = []   ## лучшие работники недели (д�
 var traffic := PackedFloat32Array()  ## сколько раз проходили по клетке (оверлей потоков, затухает)  ## гости завода: инспекторы, губернатор, журналист
 var cons: Dictionary = {}       ## расходники на складе: код -> единиц
 var cons_supply: Array = []     ## заказанные расходники в пути [{cons, packs, eta}]
+var area_refusal := ""        ## 1.29: почему не удалось стереть зону (последняя клетка)
 var ppr := false                ## планово-предупредительный ремонт: обслуживать станки раньше
 var minute := 0.0
 var money := 0.0
@@ -765,13 +771,13 @@ func release_incoming(t: Thing, s: int) -> void:
 
 
 ## Ближайший склад, куда можно положить груз. Возвращает [Thing, слот] или [].
-func find_storage(it: Item, near: Vector2i) -> Array:
+func find_storage(it: Item, near: Vector2i, skip_def: String = "") -> Array:
 	var cat := it.cat()
 	var key := it.stack_key()
 	var best: Array = []
 	var best_d := INF
 	for t: Thing in things.values():
-		if not t.built or t.demolish or not t.is_storage():
+		if not t.built or t.demolish or not t.is_storage() or t.def_id == skip_def:
 			continue
 		for s in t.slot_count():
 			if not t.slot_accepts(s, cat):
@@ -783,6 +789,8 @@ func find_storage(it: Item, near: Vector2i) -> Array:
 				d -= 4.0
 			if rooms.thing_in(t, "storage"):
 				d -= 6.0
+			if t.def_id == Logistics.RAW_PALLET:
+				d += 8.0   # 1.29: поддоны заготовок — для разгрузки фургона, хранить лучше на стеллажах
 			if d < best_d:
 				best_d = d
 				best = [t, s]
@@ -1166,8 +1174,25 @@ func finish_thing(t: Thing) -> void:
 	thing_rev += 1
 
 
-## Отметить (v=1) или снять (v=0) зону разгрузки на прямоугольнике. Возвращает число клеток.
+## Отметить зону (v=1 — разгрузка, 2 — отгрузка) или снять (v=0) на прямоугольнике. Возвращает число клеток.
+## 1.29: обе зоны обязательны — стереть (или закрасить другой зоной) последнюю клетку нельзя: вернёт -1,
+## причина — в area_refusal.
 func set_area(r: Rect2i, v: int) -> int:
+	area_refusal = ""
+	var lost := {Logistics.A_UNLOAD: 0, Logistics.A_SHIP: 0}
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			var c0 := Vector2i(x, y)
+			if not world.in_plot(c0):
+				continue
+			var a0 := int(world.area[world.idx(c0)])
+			if a0 != v and lost.has(a0) and _area_ok(c0, v):
+				lost[a0] = int(lost[a0]) + 1
+	for zv: int in lost.keys():
+		var have := logi.area_count(zv)
+		if have > 0 and int(lost[zv]) >= have:
+			area_refusal = str(AREA_NEED.get(zv, ""))
+			return -1
 	var n := 0
 	for y in range(r.position.y, r.end.y):
 		for x in range(r.position.x, r.end.x):
@@ -1175,7 +1200,7 @@ func set_area(r: Rect2i, v: int) -> int:
 			if not world.in_plot(c):
 				continue
 			var i := world.idx(c)
-			if v > 0 and (Defs.wall_solid(world.wall[i]) or WallKinds.is_door(world.wall[i]) or WallKinds.is_gate(world.wall[i])):
+			if not _area_ok(c, v):
 				continue
 			if world.area[i] != v:
 				world.area[i] = v
@@ -1184,6 +1209,11 @@ func set_area(r: Rect2i, v: int) -> int:
 		world.area_rev += 1
 		world.rev += 1
 	return n
+
+
+func _area_ok(c: Vector2i, v: int) -> bool:
+	var i := world.idx(c)
+	return v == 0 or not (Defs.wall_solid(world.wall[i]) or WallKinds.is_door(world.wall[i]) or WallKinds.is_gate(world.wall[i]))
 
 
 ## Повернуть объект на месте (по часовой стрелке). Пустая строка — получилось.
@@ -2103,6 +2133,8 @@ static func from_dict(d: Dictionary) -> Sim:
 		Scenario.migrate_v11(s)
 	if int(d.get("version", 1)) < 12:
 		Scenario.migrate_v12(s)
+	if int(d.get("version", 1)) < 13:
+		Scenario.migrate_v13(s)   # 1.29: обязательные зоны разгрузки и отгрузки
 	s.faults.from_dict(d.get("faults", {}))
 	# 1.18: сразу после загрузки — сеть, вода и помещения посчитаны (насосная качает до первого тика)
 	s.rooms.update()

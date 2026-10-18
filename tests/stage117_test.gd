@@ -56,7 +56,8 @@ func _init() -> void:
 
 	print("— чистое поле: только бытовка, неделя стройки")
 	var f := Scenario.new_game("field", "mech", "calm", 173)
-	check(f.things_of("storage").is_empty(), "в чистом поле нет склада — только бытовка")
+	# 1.29: поддоны у ворот в обязательных зонах — не склад
+	check(f.things_of("storage").filter(func(t: Thing) -> bool: return t.def_id != "pallet" and t.def_id != "pallet_raw").is_empty(), "в чистом поле нет склада — только бытовка")
 	check(f.progress.quiet() and f.progress.quiet_left() == 7, "неделя стройки: заказов не будет 7 дней")
 	check(f.orders.list.is_empty(), "заявок с утра нет")
 	f.story.enabled = false

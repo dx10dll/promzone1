@@ -323,8 +323,10 @@ func _process(delta: float) -> void:
 	_update_pos()
 	if not view.has_point(position) and not selected:
 		return
-	if worker.dir != _dir or worker.dressed != _dressed or worker.muffs != _muffs or _is_winter() != _winter or (_winter and _is_outside() != _outside) \
-			or _mood_bucket() != _mood_b:
+	# 1.29: зима и «на улице» меняются медленно — проверяем раз в 8 кадров (вразнобой), а не каждый кадр
+	var slow := (Engine.get_process_frames() + absi(worker.id)) % 8 == 0
+	if worker.dir != _dir or worker.dressed != _dressed or worker.muffs != _muffs or _mood_bucket() != _mood_b \
+			or (slow and (_is_winter() != _winter or (_winter and _is_outside() != _outside))):
 		_rebuild(worker.dir)
 	elif _tex_rev != Tex.people_rev and (Engine.get_process_frames() + absi(worker.id)) % 4 == 0:
 		# сменился масштаб — пересобираем куклу в новом разрешении (вразнобой, чтобы не дёргало)
@@ -724,9 +726,45 @@ func _draw_gest() -> void:
 			gest.draw_arc(p + Vector2(3.2, -0.8), 1.6, -PI * 0.5, PI * 0.5, 6, Color(0.86, 0.84, 0.78), 1.0)
 
 
+## 1.29: метла и лопата — длинный черенок: держат рукой за черенок (поворот вокруг кисти), низ — у пола.
+## Метлой метут (качается из стороны в сторону), лопатой копают (наклон и подъём); по дороге несут наискосок.
+func _place_long_tool(ha: Vector2, hb: Vector2, side: bool, back: bool) -> void:
+	var broom := _prop == "broom"
+	prop_sp.scale = Vector2(0.72, 0.72)
+	prop_sp.offset = Vector2(0, 10.0)   # точка хвата (верх черенка) — в начале координат спрайта
+	var flip := -1.0 if _dir == "right" else 1.0   # низ инструмента — впереди, по ходу
+	var hp := (ha if side else hb) + Vector2(0, 1)
+	var rot := 0.0
+	match worker.anim:
+		"work":
+			var ph := _t * (5.0 if broom else 3.2) + float(worker.id)
+			if broom:
+				rot = 0.45 + sin(ph) * 0.32
+				hp += Vector2(sin(ph) * 2.5, 0)
+			else:
+				var dig := maxf(0.0, sin(ph))
+				rot = 0.55 - dig * 0.45
+				hp += Vector2(0, -dig * 3.0)
+		"walk":
+			rot = 0.75 + sin(_t * 10.0) * 0.05
+		_:
+			rot = 0.22
+	if side:
+		prop_sp.rotation = rot * flip
+		prop_sp.flip_h = flip > 0.0
+		hand_a.position = hp
+	else:
+		# спереди и сзади черенок отклонён наружу, от тела
+		prop_sp.rotation = -rot * 0.6 if not back else rot * 0.6
+		prop_sp.flip_h = false
+		hand_b.position = hp
+	prop_sp.position = hp
+
+
 ## Реквизит в руке: плакат над головой, лопата и огнетушитель — перед собой, папка — у груди.
 func _place_prop(ha: Vector2, hb: Vector2, side: bool, back: bool) -> void:
 	prop_sp.rotation = 0.0
+	prop_sp.flip_h = false
 	prop_sp.offset = Vector2.ZERO
 	prop_sp.z_index = -1 if back else 0
 	prop_sp.scale = Vector2(0.75, 0.75) if _prop == "sign" else Vector2(0.5, 0.5)
@@ -738,10 +776,8 @@ func _place_prop(ha: Vector2, hb: Vector2, side: bool, back: bool) -> void:
 			hand_a.position = Vector2(-4, -26)
 			hand_b.position = Vector2(4, -26)
 			prop_sp.z_index = 1
-		"shovel":
-			var dig := sin(_t * 6.0 + float(worker.id)) * 0.25 if worker.anim == "work" else 0.0
-			prop_sp.position = (Vector2(10, -4) if side else Vector2(6, -2))
-			prop_sp.rotation = 0.35 + dig
+		"shovel", "broom":
+			_place_long_tool(ha, hb, side, back)
 		"ext":
 			prop_sp.position = ha + Vector2(2, 2)
 			if worker.anim == "work":

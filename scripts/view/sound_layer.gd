@@ -8,6 +8,8 @@ extends Node2D
 ## слышно ближайшее живое помещение, и тем громче, чем сильнее приближение. Рядом с камерой — случайные звуки
 ## по месту: болгарка, лязг, удары по металлу в цеху, посуда и чайник в столовой, телефон в конторе,
 ## хлопают двери, кашляют, скрипит тележка; голуби, кот, мыши. При отдалении слышен город, поезд.
+## 1.29: голоса — при сильном приближении слышно, как люди в кадре болтают, ругаются, смеются
+## (неразборчивый «бубнёж», по очереди, не больше трёх голосов сразу); у людной столовой и курилки — гомон.
 
 const T := World.T
 const MAX_MACHINES := 6
@@ -26,6 +28,17 @@ var _coo := 8.0
 var _meow := 25.0
 var _squeak := 6.0
 var _train: AudioStreamPlayer2D
+
+## 1.29: голоса
+const MAX_VOICES := 3
+const CROWD_ROOMS := ["canteen", "restroom"]
+var voices: Array[AudioStreamPlayer2D] = []
+var _voice_who: Array[int] = []      ## кто сейчас говорит в каждом плеере (-1 — никто)
+var _vnext: Dictionary = {}          ## id человека -> когда ему можно заговорить снова (часы _vclock)
+var _vlast: Dictionary = {}          ## id -> последняя реплика (чтобы не повторяться)
+var _vclock := 0.0
+var _vrng := RandomNumberGenerator.new()
+var _crowd: AudioStreamPlayer2D
 
 const ZONE_SND := {"canteen": "amb_canteen", "restroom": "amb_canteen", "locker": "amb_locker", "shower": "amb_locker",
 	"wc": "amb_locker", "dorm": "amb_locker", "workshop": "amb_shop", "storage": "amb_shop", "toolroom": "amb_shop",
@@ -58,6 +71,22 @@ func setup(g: GameMain) -> void:
 	_train.max_distance = 2600.0
 	_train.attenuation = 1.0
 	add_child(_train)
+	_vrng.randomize()
+	for i2 in MAX_VOICES:
+		var vp := AudioStreamPlayer2D.new()
+		vp.bus = "People"
+		vp.max_distance = 2200.0
+		vp.attenuation = 1.0
+		add_child(vp)
+		voices.append(vp)
+		_voice_who.append(-1)
+	_crowd = AudioStreamPlayer2D.new()
+	_crowd.bus = "People"
+	_crowd.stream = Snd.stream("v_crowd")
+	_crowd.max_distance = 1800.0
+	_crowd.attenuation = 1.2
+	_crowd.volume_db = -60.0
+	add_child(_crowd)
 	sim.sfx.connect(_on_sfx)
 
 
@@ -104,6 +133,8 @@ func _process(delta: float) -> void:
 		elif p.playing:
 			p.stop()
 	_zones(running, center, z)
+	_voices(running, center, z)
+	_crowd_murmur(running, center, z)
 	_city(center, z)
 	if not running:
 		_ambience(false)
@@ -302,3 +333,165 @@ func _spot_sound(w: Worker) -> String:
 		"amb_boiler":
 			return "hiss" if x < 0.5 else "clank1"
 	return "cough" if x < 0.15 else ("cart" if carry and x < 0.5 else "")
+
+
+# ---------------------------------------------------------------- 1.29: голоса
+
+## Часть мира, видимая на экране.
+func _view_rect(center: Vector2, z: float) -> Rect2:
+	var sz := get_viewport_rect().size / maxf(z, 0.05)
+	return Rect2(center - sz * 0.5, sz)
+
+
+## С кем человек разговаривает (-1 — ни с кем, например ведёт инструктаж).
+func _partner(w: Worker) -> int:
+	if w.task and w.task.kind == "social":
+		return int(w.task.data.get("other", -1))
+	for e: Dictionary in sim.social.events:
+		if int(e["a"]) == w.id:
+			return int(e["b"])
+		if int(e["b"]) == w.id:
+			return int(e["a"])
+	return -1
+
+
+func _voice_clip(w: Worker) -> String:
+	var pool := Voices.pool(w)
+	if (w.bubble == "laugh" and _vrng.randf() < 0.45) or ((pool == Voices.OLD_M or pool == Voices.OLD_F) and _vrng.randf() < 0.35):
+		pool = Voices.TALK_F if w.female else Voices.TALK_M      # смеются, но и говорят; у пожилых — и обычный голос
+	# «свои» две реплики из набора, чередуются; изредка — любая другая
+	var k := (w.id * 7 + 3) % pool.size()
+	var pick := str(pool[k])
+	if pool.size() > 1:
+		var alt := str(pool[(k + 1 + w.id % maxi(1, pool.size() - 1)) % pool.size()])
+		if pick == str(_vlast.get(w.id, "")) or _vrng.randf() < 0.4:
+			pick = alt
+		if _vrng.randf() < 0.15:
+			pick = str(pool[_vrng.randi() % pool.size()])
+	_vlast[w.id] = pick
+	return pick
+
+
+func _voices(running: bool, center: Vector2, z: float) -> void:
+	_vclock += 0.25
+	var on := running and z >= Voices.ZOOM
+	var speaking := {}
+	for i in MAX_VOICES:
+		var vp := voices[i]
+		if not vp.playing:
+			_voice_who[i] = -1
+		elif not on:
+			vp.volume_db -= 5.0
+			if vp.volume_db < -40.0:
+				vp.stop()
+				_voice_who[i] = -1
+		if _voice_who[i] >= 0:
+			speaking[_voice_who[i]] = true
+			var ws := sim.get_worker(_voice_who[i])
+			if ws:
+				vp.global_position = ws.pos * T + Vector2(0, -20)
+	if not on:
+		return
+	var view := _view_rect(center, z).grow(-16.0)
+	var half := view.size.length() * 0.5
+	var cands: Array = []
+	for w in sim.workers:
+		if not Voices.is_talking(w):
+			continue
+		var wp := w.pos * T
+		if not view.has_point(wp):
+			continue
+		cands.append([wp.distance_to(center), w])
+	if cands.is_empty():
+		return
+	cands.sort_custom(func(a: Array, b: Array) -> bool: return float(a[0]) < float(b[0]))
+	for c: Array in cands:
+		var free := _voice_who.find(-1)
+		if free < 0:
+			break
+		var w2: Worker = c[1]
+		if speaking.has(w2.id):
+			continue
+		if not _vnext.has(w2.id):            # только начали — заговорят не сразу
+			_vnext[w2.id] = _vclock + _vrng.randf_range(0.0, 1.2)
+			continue
+		if float(_vnext[w2.id]) > _vclock:
+			continue
+		var mate := _partner(w2)
+		var loud := w2.bubble in ["argue", "fight"]
+		if mate >= 0 and speaking.has(mate) and not loud:
+			continue                          # собеседник ещё говорит — ждём
+		var clip := _voice_clip(w2)
+		var st := Snd.stream(clip)
+		if st == null:
+			continue
+		var vp2 := voices[free]
+		vp2.stream = st
+		vp2.pitch_scale = Voices.pitch(w2) * _vrng.randf_range(0.97, 1.03)
+		vp2.global_position = w2.pos * T + Vector2(0, -20)
+		vp2.volume_db = Voices.db(z, float(c[0]) / maxf(half, 1.0), loud)
+		vp2.play()
+		_voice_who[free] = w2.id
+		speaking[w2.id] = true
+		var ln := st.get_length() / vp2.pitch_scale
+		# по очереди: собеседник отвечает после короткой паузы, в ссоре — перебивает
+		_vnext[w2.id] = _vclock + ln + _vrng.randf_range(1.0, 3.0)
+		if mate >= 0 and not speaking.has(mate):
+			var reply := _vclock + (ln * _vrng.randf_range(0.45, 0.8) if loud else ln + _vrng.randf_range(0.15, 0.6))
+			_vnext[mate] = reply
+	if _vnext.size() > 200:                  # забыть тех, кто давно молчит
+		for id: int in _vnext.keys():
+			if float(_vnext[id]) < _vclock - 60.0:
+				_vnext.erase(id)
+				_vlast.erase(id)
+
+
+## Где сейчас людная компания: столовая или комната отдыха с четырьмя и больше людьми,
+## или курилка, где курят четверо. Возвращает [точка, сколько людей] или пусто.
+func crowd_spot(center: Vector2) -> Array:
+	var occ := {}
+	var smokers: Array[Worker] = []
+	for w in sim.workers:
+		if not w.present:
+			continue
+		if w.anim == "smoke":
+			smokers.append(w)
+		var r := sim.rooms.room_at(w.cell())
+		if r and r.type in CROWD_ROOMS:
+			occ[r.id] = int(occ.get(r.id, 0)) + 1
+	var best: Array = []
+	var bd := INF
+	for r2 in sim.rooms.list:
+		var cnt := int(occ.get(r2.id, 0))
+		if cnt < 4:
+			continue
+		var rr := Rect2(Vector2(r2.rect.position) * T, Vector2(r2.rect.size) * T)
+		var p := Vector2(clampf(center.x, rr.position.x, rr.end.x), clampf(center.y, rr.position.y, rr.end.y))
+		if p.distance_to(center) < bd:
+			bd = p.distance_to(center)
+			best = [p, cnt]
+	for s0: Worker in smokers:
+		var near := 0
+		for s1: Worker in smokers:
+			if s0.pos.distance_to(s1.pos) < 4.0:
+				near += 1
+		var sp := s0.pos * T
+		if near >= 4 and sp.distance_to(center) < bd:
+			bd = sp.distance_to(center)
+			best = [sp, near]
+	return best
+
+
+func _crowd_murmur(running: bool, center: Vector2, z: float) -> void:
+	var spot: Array = crowd_spot(center) if running and z >= 0.85 else []
+	if not spot.is_empty() and _view_rect(center, z).grow(300.0).has_point(spot[0]):
+		_crowd.global_position = spot[0]
+		var target := lerpf(-24.0, -11.0, clampf((z - 0.85) / 1.4, 0.0, 1.0)) + minf(4.0, float(int(spot[1]) - 4))
+		if not _crowd.playing:
+			_crowd.volume_db = -45.0
+			_crowd.play(_vrng.randf() * 5.0)
+		_crowd.volume_db = move_toward(_crowd.volume_db, target, 2.0)
+	elif _crowd.playing:
+		_crowd.volume_db -= 3.0
+		if _crowd.volume_db < -45.0:
+			_crowd.stop()

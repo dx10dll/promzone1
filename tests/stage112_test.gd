@@ -97,9 +97,10 @@ func _init() -> void:
 	var g := Scenario.new_game("garage", "mech", "calm", 113)
 	g.story.enabled = false
 	var gy := g.world.plot.end.y - 3
+	var ship0 := g.logi.ship_cells().size()   # 1.29: зона отгрузки уже есть с начала игры
 	var nz := g.set_area(Rect2i(g.gate_x - 2, gy, 4, 2), Logistics.A_SHIP)
 	check(nz >= 6 and g.logi.has_ship(), "отмечена зона отгрузки: %d кл." % nz)
-	check(g.logi.ship_cells().size() == nz, "клетки отгрузки в отдельном слое")
+	check(g.logi.ship_cells().size() == nz + ship0, "клетки отгрузки в отдельном слое")
 	check(not g.logi.in_zone(g.logi.ship_cells()[0]), "это не зона разгрузки")
 	# готовый заказ: детали на складе
 	var o := g.orders.make_offer("pin")
@@ -182,7 +183,7 @@ func _init() -> void:
 	check(s2.rooms.room_at(Vector2i(41, 6)).type == "storage" and s2.rooms.room_at(Vector2i(32, 5)).type == "workshop", "разметка зон сохраняется")
 	var gd: Dictionary = JSON.parse_string(JSON.stringify(g.to_dict()))
 	var g2 := Sim.from_dict(gd)
-	check(g2.logi.ship_cells().size() == nz, "зона отгрузки сохраняется")
+	check(g2.logi.ship_cells().size() == nz + ship0, "зона отгрузки сохраняется")
 
 	print("РЕЗУЛЬТАТ: " + ("OK" if fails.is_empty() else "ОШИБКИ: " + ", ".join(fails)))
 	quit(0 if fails.is_empty() else 1)

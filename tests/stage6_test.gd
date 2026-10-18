@@ -60,7 +60,7 @@ func _init() -> void:
 				for i in sim.world.w * sim.world.h:
 					if WallKinds.is_room_wall(sim.world.wall[i]):
 						walls += 1
-				check(walls == 0, "песочница: пустой участок без построек (стен %d)" % walls)
+				check(walls <= 20, "песочница: пустой участок, только техпомещение у ворот (стен %d)" % walls)   # 1.29
 				check(builders == sim.workers.size(), "песочница: бригада строителей")
 		var d := sim.to_dict()
 		var s2 := Sim.from_dict(JSON.parse_string(JSON.stringify(d)))

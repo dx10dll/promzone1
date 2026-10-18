@@ -231,7 +231,8 @@ func _sync_vans() -> void:
 				n.add_child(cg)
 			add_child(n)
 			vans[v.id] = n
-		n.position = Vector2(v.x * T - 4.0, (sim.world.road_row + 0.7) * T)
+		var vx := v.x if v.px < -1e8 or absf(v.px - v.x) > 3.0 else lerpf(v.px, v.x, Worker.view_alpha)   # 1.29: плавно между шагами
+		n.position = Vector2(vx * T - 4.0, (sim.world.road_row + 0.7) * T)
 		var cgn := n.get_node_or_null("cargo")
 		if cgn:
 			# поддоны в кузове видны, пока их не разгрузили (до прибытия — тоже)
@@ -381,7 +382,8 @@ func _sync_cat() -> void:
 			sp.scale = Vector2(0.5, 0.5)
 			cat_node.add_child(sp)
 		add_child(cat_node)
-	cat_node.position = Vector2(c.pos.x * T, c.pos.y * T + 7.0)
+	var cp := c.vpos()
+	cat_node.position = Vector2(cp.x * T, cp.y * T + 7.0)
 	var pose := "sit"
 	match c.state:
 		"walk":

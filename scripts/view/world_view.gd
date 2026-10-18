@@ -8,17 +8,81 @@ var sim: Sim
 var _rev := -1
 
 
+## 1.29: земля рисуется кусками по CH×CH клеток. Раньше любая стройка (клетка пола, зона, спиленное дерево)
+## перерисовывала всю карту — 20–60 мс за кадр, отсюда рывки. Теперь перерисовываются только изменившиеся куски.
+const CH := 12
+var _chunks: Array[Node2D] = []
+var _sig: PackedInt64Array = PackedInt64Array()
+var _cw := 0
+var _chh := 0
+var _cur := Rect2i()   ## клетки куска, который сейчас рисуется
+
+
 func _process(_d: float) -> void:
 	if sim and sim.world.rev != _rev:
 		_rev = sim.world.rev
-		queue_redraw()
+		_refresh_chunks()
+
+
+func _refresh_chunks() -> void:
+	var w := sim.world
+	var cw := ceili(float(w.w) / CH)
+	var chh := ceili(float(w.h) / CH)
+	if cw != _cw or chh != _chh:
+		for n in _chunks:
+			n.queue_free()
+		_chunks.clear()
+		_cw = cw
+		_chh = chh
+		_sig.resize(cw * chh)
+		_sig.fill(-1)
+		# сначала все куски земли и полов, затем — кромки травы и тени у стен (они залезают на соседний кусок)
+		for pass_i in 2:
+			for k in cw * chh:
+				var n2 := Node2D.new()
+				n2.show_behind_parent = true
+				var rc := Rect2i((k % cw) * CH, int(k / cw) * CH, CH, CH).intersection(Rect2i(0, 0, w.w, w.h))
+				n2.draw.connect(_draw_chunk.bind(n2, rc, pass_i == 1))
+				add_child(n2)
+				_chunks.append(n2)
+	var nk := cw * chh
+	for k2 in nk:
+		var h := _chunk_sig(Rect2i((k2 % cw) * CH, int(k2 / cw) * CH, CH, CH))
+		if h != _sig[k2]:
+			_sig[k2] = h
+			_chunks[k2].queue_redraw()
+			_chunks[k2 + nk].queue_redraw()
+	queue_redraw()
+
+
+## Отпечаток куска (с полями в клетку — кромки травы и тени у стен зависят от соседей).
+func _chunk_sig(r: Rect2i) -> int:
+	var w := sim.world
+	var a := PackedInt32Array()
+	var x0 := maxi(0, r.position.x - 1)
+	var x1 := mini(w.w, r.end.x + 1)
+	for y in range(maxi(0, r.position.y - 1), mini(w.h, r.end.y + 1)):
+		for x in range(x0, x1):
+			var i := y * w.w + x
+			a.append(int(w.flr[i]) | (int(w.ground[i]) << 8) | ((int(w.bp_floor[i]) & 0xff) << 12) | (int(w.area[i]) << 20) | (int(w.wall[i]) << 24))
+	return hash(a)
+
+
+func _draw_chunk(n: Node2D, rc: Rect2i, edges: bool) -> void:
+	_cur = rc
+	if edges:
+		_noise_cache(sim.world)
+		_draw_grass_edges(n)
+		_draw_ao(n)
+	else:
+		_draw_cells(n)
 
 
 static func vhash(x: int, y: int) -> int:
 	return absi((x * 73856093) ^ (y * 19349663) ^ 0x5bd1e995)
 
 
-func _draw() -> void:
+func _draw_cells(n: Node2D) -> void:
 	if sim == null:
 		return
 	var w := sim.world
@@ -44,8 +108,8 @@ func _draw() -> void:
 		if tk != "" and tk != "concrete":
 			ftex[int(fid)] = Tex.tile(tk)
 	_noise_cache(w)
-	for y in w.h:
-		for x in w.w:
+	for y in range(_cur.position.y, _cur.end.y):
+		for x in range(_cur.position.x, _cur.end.x):
 			var c := Vector2i(x, y)
 			var i := w.idx(c)
 			var r := Rect2(x * T, y * T, T, T)
@@ -55,16 +119,16 @@ func _draw() -> void:
 				var gk := w.ground[i]
 				match gk:
 					World.Ground.GRASS:
-						_ground_cell(grass[hv % 4], x, y, hv, gk)
+						_ground_cell(n, grass[hv % 4], x, y, hv, gk)
 					World.Ground.ASPHALT:
 						var av := hv % 23
-						_ground_cell(asph[4 if av == 0 else (2 if av == 1 else (3 if av == 2 else (hv >> 5) % 2))], x, y, hv, gk)
+						_ground_cell(n, asph[4 if av == 0 else (2 if av == 1 else (3 if av == 2 else (hv >> 5) % 2))], x, y, hv, gk)
 					World.Ground.ROAD:
-						draw_texture_rect(road[hv % 2], r, false)
+						n.draw_texture_rect(road[hv % 2], r, false)
 					World.Ground.SIDEWALK:
-						draw_texture_rect(side, r, false)
+						n.draw_texture_rect(side, r, false)
 					_:
-						_ground_cell(dirt[hv % 4], x, y, hv, gk)
+						_ground_cell(n, dirt[hv % 4], x, y, hv, gk)
 			if fl > 0:
 				var ft: Texture2D = conc[hv % 4]
 				# плиты бетона чуть разного тона — пол не выглядит «обоями»
@@ -74,18 +138,24 @@ func _draw() -> void:
 				else:
 					var v := 0.955 + float(hv % 9) * 0.01
 					tone = Color(v, v, v * 1.005)
-				draw_texture_rect(ft, r, false, tone)
+				n.draw_texture_rect(ft, r, false, tone)
 			# чертёж пола
 			var bf := w.bp_floor[i]
 			if bf != World.BP_NONE:
 				if bf == 0:
-					_draw_cross(r, Color(0.9, 0.3, 0.25, 0.8))
+					_draw_cross(n, r, Color(0.9, 0.3, 0.25, 0.8))
 				else:
 					var gt: Texture2D = ftex.get(int(bf), conc[0]) if bf != 1 else conc[0]
-					draw_texture_rect(gt, r, false, Color(0.55, 0.75, 1.0, 0.55))
-					draw_rect(r.grow(-1), Color(0.35, 0.6, 0.95, 0.9), false, 1.0)
-	_draw_grass_edges()
-	_draw_ao()
+					n.draw_texture_rect(gt, r, false, Color(0.55, 0.75, 1.0, 0.55))
+					n.draw_rect(r.grow(-1), Color(0.35, 0.6, 0.95, 0.9), false, 1.0)
+
+
+func _draw() -> void:
+	if sim == null:
+		return
+	var w := sim.world
+	var side := Tex.tile("sidewalk")
+	var road := [Tex.tile("road_0"), Tex.tile("road_1")]
 	# зоны на улице: разгрузка — жёлтая штриховка, отгрузка — бирюзовая; рамка по краю зоны
 	for zk: Array in [[1, Color(0.95, 0.78, 0.25), "РАЗГРУЗКА"], [2, Color(0.35, 0.8, 0.78), "ОТГРУЗКА"]]:
 		var zv: int = zk[0]
@@ -187,7 +257,7 @@ func _tone(gk: int, t: float) -> Color:
 
 
 ## Клетка земли: текстура в случайном повороте/отражении, тон плавно меняется по углам клетки.
-func _ground_cell(tex: Texture2D, x: int, y: int, hv: int, gk: int) -> void:
+func _ground_cell(n: Node2D, tex: Texture2D, x: int, y: int, hv: int, gk: int) -> void:
 	var p := Vector2(x * T, y * T)
 	var pts := PackedVector2Array([p, p + Vector2(T, 0), p + Vector2(T, T), p + Vector2(0, T)])
 	var uv := [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]
@@ -198,58 +268,58 @@ func _ground_cell(tex: Texture2D, x: int, y: int, hv: int, gk: int) -> void:
 		uv = [uv[1], uv[2], uv[3], uv[0]]
 	var cols := PackedColorArray([_tone(gk, _nz[y * _nzw + x]), _tone(gk, _nz[y * _nzw + x + 1]),
 		_tone(gk, _nz[(y + 1) * _nzw + x + 1]), _tone(gk, _nz[(y + 1) * _nzw + x])])
-	draw_polygon(pts, cols, PackedVector2Array(uv), tex)
+	n.draw_polygon(pts, cols, PackedVector2Array(uv), tex)
 
 
 ## Кромки газона: пучки травы свешиваются на соседний грунт — газон не «квадратами».
-func _draw_grass_edges() -> void:
+func _draw_grass_edges(n: Node2D) -> void:
 	var w := sim.world
 	var ed := {Vector2i(0, 1): Tex.tile("grass_edge_s"), Vector2i(0, -1): Tex.tile("grass_edge_n"),
 		Vector2i(1, 0): Tex.tile("grass_edge_e"), Vector2i(-1, 0): Tex.tile("grass_edge_w")}
-	for y in w.h:
-		for x in w.w:
+	for y in range(_cur.position.y, _cur.end.y):
+		for x in range(_cur.position.x, _cur.end.x):
 			var i := w.idx(Vector2i(x, y))
 			if w.flr[i] != 0 or w.ground[i] != World.Ground.GRASS:
 				continue
 			for d: Vector2i in ed.keys():
-				var n := Vector2i(x, y) + d
-				if not w.inb(n):
+				var nb := Vector2i(x, y) + d
+				if not w.inb(nb):
 					continue
-				var j := w.idx(n)
+				var j := w.idx(nb)
 				if w.flr[j] != 0 or w.ground[j] == World.Ground.GRASS:
 					continue
 				var tex: Texture2D = ed[d]
 				var tone := _tone(World.Ground.GRASS, _nz[y * _nzw + x])
 				match d:
 					Vector2i(0, 1):
-						draw_texture_rect(tex, Rect2(x * T, (y + 1) * T, T, 8), false, tone)
+						n.draw_texture_rect(tex, Rect2(x * T, (y + 1) * T, T, 8), false, tone)
 					Vector2i(0, -1):
-						draw_texture_rect(tex, Rect2(x * T, y * T - 8, T, 8), false, tone)
+						n.draw_texture_rect(tex, Rect2(x * T, y * T - 8, T, 8), false, tone)
 					Vector2i(1, 0):
-						draw_texture_rect(tex, Rect2((x + 1) * T, y * T, 8, T), false, tone)
+						n.draw_texture_rect(tex, Rect2((x + 1) * T, y * T, 8, T), false, tone)
 					_:
-						draw_texture_rect(tex, Rect2(x * T - 8, y * T, 8, T), false, tone)
+						n.draw_texture_rect(tex, Rect2(x * T - 8, y * T, 8, T), false, tone)
 
 
 ## Затенение пола у стен (ambient occlusion): в углах и вдоль стен пол темнее — у помещений появляется глубина.
-func _draw_ao() -> void:
+func _draw_ao(n: Node2D) -> void:
 	var w := sim.world
 	var dk := Color(0.0, 0.02, 0.05, 0.30)
 	var clear := Color(0.0, 0.02, 0.05, 0.0)
-	for y in w.h:
-		for x in w.w:
+	for y in range(_cur.position.y, _cur.end.y):
+		for x in range(_cur.position.x, _cur.end.x):
 			var c := Vector2i(x, y)
 			if w.flr[w.idx(c)] <= 0 or Defs.wall_solid(w.wall[w.idx(c)]):
 				continue
 			var p := Vector2(x * T, y * T)
 			if _solid(c + Vector2i(0, -1)):
-				_grad(p, p + Vector2(T, 0), Vector2(0, 14), dk, clear)
+				_grad(n, p, p + Vector2(T, 0), Vector2(0, 14), dk, clear)
 			if _solid(c + Vector2i(-1, 0)):
-				_grad(p, p + Vector2(0, T), Vector2(11, 0), Color(dk, 0.24), clear)
+				_grad(n, p, p + Vector2(0, T), Vector2(11, 0), Color(dk, 0.24), clear)
 			if _solid(c + Vector2i(1, 0)):
-				_grad(p + Vector2(T, 0), p + Vector2(T, T), Vector2(-11, 0), Color(dk, 0.24), clear)
+				_grad(n, p + Vector2(T, 0), p + Vector2(T, T), Vector2(-11, 0), Color(dk, 0.24), clear)
 			if _solid(c + Vector2i(0, 1)):
-				_grad(p + Vector2(0, T), p + Vector2(T, T), Vector2(0, -7), Color(dk, 0.16), clear)
+				_grad(n, p + Vector2(0, T), p + Vector2(T, T), Vector2(0, -7), Color(dk, 0.16), clear)
 
 
 func _solid(c: Vector2i) -> bool:
@@ -258,8 +328,8 @@ func _solid(c: Vector2i) -> bool:
 
 
 ## Полоса тени от линии a–b внутрь на вектор d: от цвета c0 у стены к c1.
-func _grad(a: Vector2, b: Vector2, d: Vector2, c0: Color, c1: Color) -> void:
-	draw_polygon(PackedVector2Array([a, b, b + d, a + d]), PackedColorArray([c0, c0, c1, c1]))
+func _grad(n: Node2D, a: Vector2, b: Vector2, d: Vector2, c0: Color, c1: Color) -> void:
+	n.draw_polygon(PackedVector2Array([a, b, b + d, a + d]), PackedColorArray([c0, c0, c1, c1]))
 
 
 func _draw_outside_column(x: int, side: Texture2D, road: Array) -> void:
@@ -269,10 +339,10 @@ func _draw_outside_column(x: int, side: Texture2D, road: Array) -> void:
 		draw_texture_rect(road[vhash(x, y) % 2], Rect2(x * T, y * T, T, T), false)
 
 
-func _draw_cross(r: Rect2, col: Color) -> void:
+func _draw_cross(n: Node2D, r: Rect2, col: Color) -> void:
 	var a := r.grow(-6)
-	draw_line(a.position, a.end, col, 3.0)
-	draw_line(Vector2(a.end.x, a.position.y), Vector2(a.position.x, a.end.y), col, 3.0)
+	n.draw_line(a.position, a.end, col, 3.0)
+	n.draw_line(Vector2(a.end.x, a.position.y), Vector2(a.position.x, a.end.y), col, 3.0)
 
 
 func _vertical(c: Vector2i) -> bool:

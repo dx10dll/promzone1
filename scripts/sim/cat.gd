@@ -14,6 +14,13 @@ var name := "Васька"
 var female := false
 var fur := "ginger"
 var pos := Vector2(20.5, 15.5)
+var vprev := Vector2(-1e9, 0.0)   ## 1.29: плавное движение на экране (как у людей)
+
+
+func vpos() -> Vector2:
+	if vprev.x < -1e8 or vprev.distance_squared_to(pos) > 4.0:
+		return pos
+	return vprev.lerp(pos, Worker.view_alpha)
 var dir := 1                ## 1 — смотрит вправо, -1 — влево
 var state := "sit"          ## walk | sit | sleep | eat | beg
 var target := Vector2i(-1, -1)

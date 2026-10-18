@@ -1400,7 +1400,7 @@ func _thing_state(t: Thing) -> String:
 		if t.order_eta >= 0.0:
 			return "Заказано у поставщика. Фургон с оборудованием приедет %s, ящики разгрузят и принесут сюда." % sim._eta_str(t.order_eta)
 		if t.crates_in < t.crates_need:
-			return "Привезли. Ящики несут к месту установки: %d из %d.%s" % [t.crates_in, t.crates_need, "" if sim.logi.has_zone() else "\nСовет: отметьте зону разгрузки у ворот (Стройка → Зона разгрузки)."]
+			return "Привезли. Ящики несут к месту установки: %d из %d.%s" % [t.crates_in, t.crates_need, "" if sim.logi.has_zone() else "\nСовет: отметьте зону разгрузки у ворот (Стройка → Зоны на улице)."]
 		return "Всё на месте — ждёт монтажа. Прогресс: %d%%" % int(t.progress * 100.0)
 	if t.demolish:
 		return "Помечен под снос: рабочие разберут его, когда освободятся."

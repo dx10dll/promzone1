@@ -7,10 +7,15 @@ extends RefCounted
 ##   Когда все ящики у места установки — рабочие собирают объект.
 ## — Склад оборудования: демонтированное и неустановленное лежит в ящиках в помещении «Склад»
 ##   (или в зоне разгрузки), пока не понадобится. Поставили такой же объект — возьмут со склада бесплатно.
+## — 1.29: обе зоны обязательны (последнюю клетку не стереть). Металл из фургона кладут на «Поддоны
+##   заготовок» в зоне разгрузки (нет места — на пол зоны), оттуда — к станкам и на стеллажи.
+##   Готовые детали лежат на поддонах готовой продукции; заказ готов — их несут (или везут
+##   погрузчиком) в зону отгрузки, и машина клиента грузит только оттуда.
 
 const A_UNLOAD := 1
 const A_SHIP := 2                ## зона отгрузки (1.12): готовые заказы ждут машину клиента
 const MAT_PER_CELL := 24
+const RAW_PALLET := "pallet_raw"   ## 1.29: поддон заготовок в зоне разгрузки
 
 var sim: Sim
 var equip: Array = []            ## заказанное оборудование в пути: [{id, thing, def, eta, spawned}]
@@ -109,6 +114,23 @@ func ship_wanted(p: String) -> bool:
 	return false
 
 
+## 1.29: машина клиента грузит только из зоны отгрузки. Запасной путь — прямо со склада, если зоны нет,
+## в ней не нашлось места или за полтора часа ожидания туда так ничего и не принесли (заказ не застрянет).
+func ship_only(v: Vehicle, p: String) -> bool:
+	if not has_ship():
+		return false
+	if staged(p) > 0:
+		return true
+	var probe := Item.new()
+	probe.kind = "part"
+	probe.def_id = p
+	probe.q = "ok"
+	if free_cell(ship_cells(), probe, ship_cells()[0]).x < 0 or v.parked_time > 90.0:
+		sim.notify_once("ship_fallback", "Готовый заказ не донесли до зоны отгрузки — грузим в машину прямо со склада. Проверьте, свободна ли зона отгрузки и есть ли к ней проход.", Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
+		return false
+	return true
+
+
 func has_zone() -> bool:
 	return not zone_cells().is_empty()
 
@@ -116,6 +138,31 @@ func has_zone() -> bool:
 func in_zone(c: Vector2i) -> bool:
 	var w := sim.world
 	return w.inb(c) and w.area[w.idx(c)] == A_UNLOAD
+
+
+## Сколько клеток в зоне (для запрета стереть последнюю).
+func area_count(v: int) -> int:
+	return zone_cells().size() if v == A_UNLOAD else (ship_cells().size() if v == A_SHIP else 0)
+
+
+## 1.29: поддон заготовок, куда поместится металл: [Thing, слот] или []. В зоне разгрузки — в первую очередь.
+func raw_pallet(it: Item, near: Vector2i) -> Array:
+	if it.kind != "mat":
+		return []
+	var best: Array = []
+	var bd := INF
+	for t: Thing in sim.things.values():
+		if t.def_id != RAW_PALLET or not t.built or t.demolish:
+			continue
+		if sim.free_space(t, 0, it.stack_key()) <= 0:
+			continue
+		var d := Vector2(t.cell - near).length() - (30.0 if in_zone(t.cell) else 0.0)
+		if sim.slot_key(t, 0) == it.stack_key():
+			d -= 3.0
+		if d < bd:
+			bd = d
+			best = [t, 0]
+	return best
 
 
 ## Клетки склада оборудования: свободный пол в помещениях «Склад».
@@ -156,6 +203,8 @@ func _ground_on(c: Vector2i) -> Array[Item]:
 func _cell_room(c: Vector2i, it: Item) -> int:
 	if cell_res.has(sim.world.idx(c)):
 		return 0
+	if not sim.world.passable(c) or sim.world.occ[sim.world.idx(c)] >= 0:
+		return 0   # 1.29: на клетке стоит поддон или другой объект — на пол не положить
 	var here := _ground_on(c)
 	if it.kind == "crate":
 		return 1 if here.is_empty() else 0
@@ -381,7 +430,11 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 				if bc.x >= 0:
 					cands.append({"s": sc, "k": "haul_cell", "item": it, "cell": bc})
 				break
-			# металл: сначала в зону разгрузки, оттуда — на стеллажи
+			# металл (1.29): на поддон заготовок в зоне разгрузки, нет места — на пол зоны, оттуда — на стеллажи
+			var rp := raw_pallet(it, acc)
+			if not rp.is_empty():
+				cands.append({"s": sc, "k": "haul", "item": it, "dest": rp[0], "slot": rp[1]})
+				break
 			if has_zone():
 				var zc2 := free_cell(zone_cells(), it, acc)
 				if zc2.x >= 0:
@@ -389,7 +442,7 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 					break
 			var dest := sim.find_storage(it, acc)
 			if dest.is_empty():
-				sim.notify_once("nostore_mat", "Металл некуда разгружать! Отметьте зону разгрузки (Стройка → Зоны) или поставьте стеллаж.", Sim.LVL_WARN)
+				sim.notify_once("nostore_mat", "Металл некуда разгружать! Расширьте зону разгрузки (Стройка → Зоны) и поставьте в неё поддоны заготовок.", Sim.LVL_WARN)
 				break
 			cands.append({"s": sc, "k": "haul", "item": it, "dest": dest[0], "slot": dest[1]})
 			break
@@ -415,6 +468,18 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 			var sc4 := free_cell(stash_cells(), it2, it2.cell)
 			if sc4.x >= 0:
 				cands.append({"s": 40.0 + haul_bonus - b._dist(wc, it2.cell) * 0.3, "k": "haul_cell", "item": it2, "cell": sc4})
+	# 3. 1.29: металл с поддонов заготовок в зоне разгрузки — на стеллажи, чтобы освободить поддоны к следующему фургону
+	for t3: Thing in sim.things.values():
+		if t3.def_id != RAW_PALLET or not t3.built or not in_zone(t3.cell):
+			continue
+		for iid3 in sim.slot_ids(t3, 0):
+			var it3: Item = sim.items.get(iid3)
+			if it3 == null or it3.reserved_by >= 0 or b._coolf(w, "item%d", it3.id):
+				continue
+			var dst3 := sim.find_storage(it3, t3.cell, RAW_PALLET)
+			if not dst3.is_empty():
+				cands.append({"s": 42.0 + haul_bonus - b._dist(wc, t3.cell) * 0.3, "k": "haul", "item": it3, "dest": dst3[0], "slot": dst3[1]})
+			break
 
 
 ## Готовые заказы — в зону отгрузки, пока едет машина клиента (1.12).
@@ -466,7 +531,16 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 				return null
 			var extra: Array[int] = []
 			if it.kind != "crate":
-				extra = b._stack_mates(it, mini(b.carry_cap(it) - 1, maxi(0, _cell_room(c, it) - 1)))
+				var cap := b.carry_cap(it)
+				# 1.29: большую партию в зону отгрузки везут на погрузчике или тележке
+				if in_ship(c) and it.kind == "part" and not Production.is_heavy(it) and b._stack_mates(it, 30).size() >= 6:
+					var veh := b._haul_vehicle(w)
+					if veh:
+						veh.user = w.id
+						t.res_users.append(veh.id)
+						t.data["veh"] = veh.def_id
+						cap = int(Defs.b("forklift_cap")) if veh.def_id == "forklift" else int(Defs.b("cart_cap"))
+				extra = b._stack_mates(it, mini(cap - 1, maxi(0, _cell_room(c, it) - 1)))
 			for iid in [it.id] + extra:
 				var ri: Item = sim.items[iid]
 				ri.reserved_by = w.id
@@ -479,7 +553,8 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 			if in_ship(c):
 				for iid2 in t.res_items:
 					(sim.items[iid2] as Item).set_meta("to_ship", true)
-			t.label = ("Несёт %s: " % to) + what + (" ×%d" % n if n > 1 else "")
+			var verb := "Везёт на погрузчике" if t.data.get("veh", "") == "forklift" else ("Везёт на тележке" if t.data.has("veh") else "Несёт")
+			t.label = ("%s %s: " % [verb, to]) + what + (" ×%d" % n if n > 1 else "")
 			t.data["cool"] = "item%d" % it.id
 			t.add({"t": "goto", "cell": src})
 			t.add({"t": "pickup", "item": it.id, "extra": extra})

@@ -101,7 +101,7 @@ func verdict(o: Dictionary) -> Array:
 		return ["маржа %d%% ниже порога %d%%" % [int(round(mg * 100.0)), int(round(min_margin() * 100.0))], []]
 	var li := sim.office.load_info(p, int(o["qty"]))
 	if float(li[0]) > float(int(o.get("lead", 3))) * risk_k():
-		return ["не успеваем: узкое место — %s" % Defs.process_name(str(li[1])).to_lower(), [str(li[1])]]
+		return ["не успеваем: проблемный участок — %s" % Defs.process_name(str(li[1])).to_lower(), [str(li[1])]]
 	var mat := sim.planner.material_of(p)
 	if mat != "":
 		# платить только за то, чего нет на складе и не едет
@@ -257,7 +257,7 @@ func absent_note(pr: String) -> String:
 	return "все, кто работает на переделе «%s», на больничном или в отпуске (вернутся в день %d)" % [Defs.process_name(pr), int(back / 1440.0) + 1]
 
 
-## Что сделать, чтобы передел перестал быть узким местом.
+## Что сделать, чтобы передел перестал быть проблемным участком.
 func advice(pr: String) -> String:
 	var an := absent_note(pr)
 	if an != "":

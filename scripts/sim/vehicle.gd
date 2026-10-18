@@ -5,6 +5,7 @@ extends RefCounted
 var id := 0
 var kind := "delivery"   ## "delivery" — поставка металла, "pickup" — забирает заказ
 var x := -5.0            ## координата задней части фургона (в тайлах)
+var px := -1e9           ## 1.29: где был до последнего шага симуляции — экран рисует между px и x
 var state := "queued"    ## queued, arriving, parked, leaving, gone
 var park_x := 22.0
 var order_id := -1

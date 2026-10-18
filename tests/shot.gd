@@ -717,7 +717,16 @@ func _ready() -> void:
 	if args.size() > 6 and args[6].begins_with("tut:"):
 		var parts6 := args[6].split(":")
 		gm.sim.progress.tutorial = int(parts6[1])
-		if parts6.size() > 2:
+		if parts6.size() > 2 and parts6[2].begins_with("w="):   # 1.29: обучение — шаг внутри окна
+			gm.hud.open_window(parts6[2].substr(2))
+		elif parts6.size() > 2 and parts6[2] == "pop":   # 1.29: обучение — шаг в меню человека
+			for pw: Worker in gm.sim.workers:
+				if pw.present and not pw.visitor:
+					gm.tool.select_worker(pw.id)
+					gm.hud.info.visible = false
+					gm.hud.worker_pop.show_for(pw)
+					break
+		elif parts6.size() > 2:
 			gm.hud.toggle_sub(parts6[2])
 	if args.size() > 6 and args[6] == "tpl":
 		BuildMenu.build_cat = "frame"
@@ -727,6 +736,18 @@ func _ready() -> void:
 		gm.hud.confirm_start_early()
 	if args.size() > 6 and args[6] == "passport":
 		gm.hud.show_passport()
+	if args.size() > 6 and (args[6] == "help" or args[6].begins_with("help:")):   # 1.29: справочник F1
+		var hq := args[6].split(":")
+		if hq.size() > 2:
+			gm.hud.show_help(false, hq[1])
+			(gm.hud.modal as HelpBook)._search.text = hq[2]
+			(gm.hud.modal as HelpBook)._fill_list()
+		else:
+			gm.hud.show_help(false, hq[1] if hq.size() > 1 else "")
+	if args.size() > 6 and args[6].begins_with("tabs:"):   # 1.29: несколько вкладок нижней панели подряд
+		for tk: String in args[6].substr(5).split(","):
+			var bb: Button = gm.hud.bottom_btns[tk]
+			bb.pressed.emit()
 	if args.size() > 6 and args[6].begins_with("obj:"):
 		gm.hud.obj_cat = args[6].substr(4)
 		gm.hud.toggle_sub("objects")
