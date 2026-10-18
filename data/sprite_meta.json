@@ -4816,5 +4816,200 @@
     144.0
    ]
   }
+ },
+ "cactus": {
+  "file": "res://assets/objects/cactus.svg",
+  "w": 80,
+  "h": 110,
+  "ox": 0,
+  "oy": 94
+ },
+ "monstera": {
+  "file": "res://assets/objects/monstera.svg",
+  "w": 80,
+  "h": 124,
+  "ox": 0,
+  "oy": 108
+ },
+ "flower_bed": {
+  "file": "res://assets/objects/flower_bed.svg",
+  "w": 144,
+  "h": 94,
+  "ox": 0,
+  "oy": 78
+ },
+ "bust": {
+  "file": "res://assets/objects/bust.svg",
+  "w": 80,
+  "h": 150,
+  "ox": 0,
+  "oy": 134
+ },
+ "floor_clock": {
+  "file": "res://assets/objects/floor_clock.svg",
+  "w": 80,
+  "h": 156,
+  "ox": 0,
+  "oy": 140,
+  "anchors": {
+   "face": [
+    32,
+    30
+   ],
+   "pend": [
+    32,
+    50
+   ]
+  }
+ },
+ "water_cooler": {
+  "file": "res://assets/objects/water_cooler.svg",
+  "w": 80,
+  "h": 136,
+  "ox": 0,
+  "oy": 120,
+  "anchors": {
+   "bottle": [
+    32,
+    46
+   ]
+  }
+ },
+ "coat_rack": {
+  "file": "res://assets/objects/coat_rack.svg",
+  "w": 80,
+  "h": 144,
+  "ox": 0,
+  "oy": 128
+ },
+ "radio": {
+  "file": "res://assets/objects/radio.svg",
+  "w": 80,
+  "h": 116,
+  "ox": 0,
+  "oy": 100,
+  "anchors": {
+   "dial": [
+    42,
+    21
+   ]
+  }
+ },
+ "samovar": {
+  "file": "res://assets/objects/samovar.svg",
+  "w": 80,
+  "h": 130,
+  "ox": 0,
+  "oy": 114,
+  "anchors": {
+   "steam": [
+    32,
+    4
+   ]
+  }
+ },
+ "trophy_case": {
+  "file": "res://assets/objects/trophy_case.svg",
+  "w": 80,
+  "h": 146,
+  "ox": 0,
+  "oy": 130
+ },
+ "globe": {
+  "file": "res://assets/objects/globe.svg",
+  "w": 80,
+  "h": 120,
+  "ox": 0,
+  "oy": 104
+ },
+ "ny_tree": {
+  "file": "res://assets/objects/ny_tree.svg",
+  "w": 80,
+  "h": 160,
+  "ox": 0,
+  "oy": 144,
+  "anchors": {
+   "lights": [
+    [
+     18,
+     108
+    ],
+    [
+     26,
+     104
+    ],
+    [
+     38,
+     103
+    ],
+    [
+     46,
+     106
+    ],
+    [
+     22,
+     83
+    ],
+    [
+     30,
+     79
+    ],
+    [
+     40,
+     81
+    ],
+    [
+     26,
+     59
+    ],
+    [
+     34,
+     56
+    ],
+    [
+     40,
+     58
+    ],
+    [
+     32,
+     36
+    ],
+    [
+     28,
+     90
+    ],
+    [
+     36,
+     70
+    ]
+   ]
+  }
+ },
+ "flagpole": {
+  "file": "res://assets/objects/flagpole.svg",
+  "w": 80,
+  "h": 192,
+  "ox": 0,
+  "oy": 176,
+  "anchors": {
+   "flag": [
+    31,
+    8
+   ]
+  }
+ },
+ "statue_worker": {
+  "file": "res://assets/objects/statue_worker.svg",
+  "w": 80,
+  "h": 172,
+  "ox": 0,
+  "oy": 156
+ },
+ "notice_board": {
+  "file": "res://assets/objects/notice_board.svg",
+  "w": 144,
+  "h": 128,
+  "ox": 0,
+  "oy": 112
  }
 }

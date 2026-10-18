@@ -564,7 +564,7 @@ func _wt_rel(w: Worker) -> void:
 		var v := tr.rel(w, o)
 		var h2 := UITheme.hbox(7)
 		var por := Portrait.new()
-		por.set_look(o.look, 0.42, {"age": o.age, "mood": o.mood})
+		por.set_look(o.look, 0.6, {"age": o.age, "mood": o.mood})
 		h2.add_child(por)
 		var vv := UITheme.vbox(1)
 		vv.size_flags_horizontal = Control.SIZE_EXPAND_FILL

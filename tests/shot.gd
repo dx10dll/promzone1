@@ -113,6 +113,20 @@ func _ready() -> void:
 		fs.fauna.mice.append({"pos": Vector2(10.6, 21.4), "to": Vector2(10.6, 21.4), "room": 0, "st": "sit", "until": fs.minute + 999.0, "dir": 1})
 		fs.fauna.rng.seed = 1
 		fs.fauna._t = 9999.0
+	if setup == "decor123":
+		# 1.23: новый декор в ряд перед гаражом
+		var ds := gm.sim
+		var ids := ["cactus", "monstera", "flower_bed", "bust", "floor_clock", "water_cooler", "coat_rack", "radio",
+			"samovar", "trophy_case", "globe", "ny_tree", "flagpole", "statue_worker", "notice_board"]
+		var x0 := 8
+		var y0 := 22
+		for id: String in ids:
+			var sz: Array = Defs.objects[id]["size"]
+			if x0 + int(sz[0]) > 26:
+				x0 = 8
+				y0 += 3
+			ds.place_thing(id, Vector2i(x0, y0), true, false)
+			x0 += int(sz[0]) + 1
 	if setup == "bodies":
 		# 1.22: все телосложения в ряд — спереди и сбоку
 		var bs := gm.sim

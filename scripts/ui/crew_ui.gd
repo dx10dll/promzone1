@@ -458,7 +458,7 @@ static func _security(win: GameWindow) -> void:
 	for gd in gs:
 		var h := UITheme.hbox(8)
 		var por := Portrait.new()
-		por.set_look(gd.look, 0.42, {"age": gd.age, "mood": gd.mood})
+		por.set_look(gd.look, 0.6, {"age": gd.age, "mood": gd.mood})
 		h.add_child(por)
 		var cell := win._cl2(gd.formal_name(), "охрана %d · %s · %s" % [gd.skill("security"), str(Worker.SHIFT_NAMES[gd.shift]).to_lower(), gd.activity])
 		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL

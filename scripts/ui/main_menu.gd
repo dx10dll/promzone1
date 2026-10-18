@@ -1,7 +1,7 @@
 extends Node2D
 ## Главное меню. На фоне идёт живая симуляция гаража, камера медленно плывёт.
 
-const VERSION_TEXT := "Версия 1.22"
+const VERSION_TEXT := "Версия 1.23"
 
 var sim: Sim
 var cam := Camera2D.new()

@@ -9,6 +9,11 @@ const WORK_KINDS := ["haul", "build", "operate", "inspect", "office", "study"]
 var sim: Sim
 
 
+
+
+var _idle: Dictionary = {}   ## 1.23: кто в последний раз не нашёл работы (id → true)
+
+
 func _init(s: Sim) -> void:
 	sim = s
 
@@ -25,7 +30,7 @@ func _tick_worker(w: Worker, dt: float) -> void:
 	var win := sim.shift_window(w, m)
 	if win.x != w.shift_anchor:
 		_new_shift(w, win)
-		if not sim.workers.has(w):
+		if sim.get_worker(w.id) != w:
 			return  # уволился
 	if not w.present:
 		if w.sick_until > m:
@@ -74,7 +79,16 @@ func _tick_worker(w: Worker, dt: float) -> void:
 			var nt := _choose(w)
 			if nt == null:
 				# 1.22: работы нет — следующий раз думать чуть позже (раньше каждые 1,5 мин — 90% впустую)
-				w.think_cd = 2.5 + float(w.id % 5) * 0.1
+				# 1.23: когда без дела стоят многие, каждый думает ещё реже — работы на всех всё равно нет,
+				# а поиск — самое дорогое в ходе (на 300 человек — 9 из 10 мс). На маленьком заводе ничего не меняется.
+				_idle[w.id] = true
+				if _idle.size() > sim.workers.size():
+					for k: int in _idle.keys():
+						if sim.get_worker(k) == null:
+							_idle.erase(k)
+				w.think_cd = 2.5 + float(w.id % 5) * 0.1 + clampf(float(_idle.size() - 8) * 0.06, 0.0, 9.0)
+			else:
+				_idle.erase(w.id)
 			if nt:
 				abort(w)
 				assign(w, nt)
@@ -875,8 +889,55 @@ func _cool(w: Worker, key: String) -> bool:
 	return w.fail_cool.has(key) and sim.minute < float(w.fail_cool[key])
 
 
+## 1.23: станки, на которых сейчас вообще можно работать (ток, вода, зона, заготовки, расходники) —
+## от человека это не зависит, поэтому считаем раз за ход, а не для каждого из сотен.
+var _rm_key := ""
+var _rm: Array[Thing] = []
+
+
+func _ready_machines(machines: Array[Thing]) -> Array[Thing]:
+	var key := "%s|%d" % [str(sim.minute), sim.thing_rev]
+	if key == _rm_key:
+		return _rm
+	_rm_key = key
+	_rm = []
+	for m in machines:
+		if m.demolish or m.product == "" or m.broken or m.condition < 15.0:
+			continue
+		if not m.enabled or not sim.power.powered(m) or sim.inspect.is_suspended(m):
+			continue
+		if not sim.rooms.zone_ok(m):
+			sim.notify_once("zonem%d" % m.id, "%s стоит вне цеха — на нём не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство)." % m.title(), Sim.LVL_WARN, m.cell, 720.0)
+			continue
+		if not sim.water.has_water(m):
+			sim.notify_once("drym%d" % m.id, "%s стоит: нет воды. Протяните трубу от насоса (меню «Сети»)." % m.title(), Sim.LVL_WARN, m.cell, 720.0)
+			continue
+		if m.is_batch():
+			if m.working or not _batch_ready(m):
+				continue
+		elif not sim.prod.can_start(m) or sim.count_slot(m, 1) >= m.slot_cap(1):
+			continue
+		if not sim.prod.has_cons(m):
+			var cn := str(sim.prod.cons_need(m)[0])
+			sim.notify_once("nocons_" + cn, "Станок «%s» стоит: закончился %s — ждём поставку." % [m.title(), str(Defs.consumables.get(cn, {}).get("short", cn))], Sim.LVL_WARN, m.cell, 480.0)
+			continue
+		_rm.append(m)
+	return _rm
+
+
+## 1.23: то же, но строка ключа собирается, только если у человека вообще есть «отказы» —
+## обычно их нет, а проверка идёт по каждому объекту для каждого.
+func _coolf(w: Worker, fmt: String, id: int) -> bool:
+	if w.fail_cool.is_empty():
+		return false
+	return _cool(w, fmt % id)
+
+
 func _set_cool(w: Worker, key: String, minutes: float = 30.0) -> void:
 	if key != "":
+		for k: Variant in w.fail_cool.keys():
+			if float(w.fail_cool[k]) <= sim.minute:
+				w.fail_cool.erase(k)   # 1.23: истёкшие не копим
 		w.fail_cool[key] = sim.minute + minutes
 
 
@@ -1004,7 +1065,7 @@ func _rework_item(w: Worker) -> Item:
 	pool.append_array(sim.ground_items)
 	for iid in pool:
 		var it: Item = sim.items.get(iid)
-		if it == null or it.kind != "part" or it.q != "scrap" or it.rw or it.reserved_by >= 0 or _cool(w, "item%d" % it.id):
+		if it == null or it.kind != "part" or it.q != "scrap" or it.rw or it.reserved_by >= 0 or _coolf(w, "item%d", it.id):
 			continue
 		var d := _dist(sim.item_cell(it), w.cell())
 		if d < bd:
@@ -1029,30 +1090,11 @@ func _find_work(w: Worker) -> Task:
 				cands.append({"s": 400.0, "k": "exam", "t": ep, "spot": esp})
 
 	# 1. работа на станке (у печи — загрузить и запустить партию)
-	for m in machines:
-		if m.demolish or m.user >= 0 or m.product == "" or m.broken or m.condition < 15.0:
-			continue
-		if not m.enabled or not sim.power.powered(m) or sim.inspect.is_suspended(m):
-			continue
-		if not sim.rooms.zone_ok(m):
-			sim.notify_once("zonem%d" % m.id, "%s стоит вне цеха — на нём не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство)." % m.title(), Sim.LVL_WARN, m.cell, 720.0)
-			continue
-		if not sim.water.has_water(m):
-			sim.notify_once("drym%d" % m.id, "%s стоит: нет воды. Протяните трубу от насоса (меню «Сети»)." % m.title(), Sim.LVL_WARN, m.cell, 720.0)
-			continue
-		if m.is_batch():
-			if m.working or not _batch_ready(m):
-				continue
-		elif not sim.prod.can_start(m) or sim.count_slot(m, 1) >= m.slot_cap(1):
-			continue
-		if not sim.prod.can_operate(w, m):
-			continue
-		if not sim.prod.has_cons(m):
-			var cn := str(sim.prod.cons_need(m)[0])
-			sim.notify_once("nocons_" + cn, "Станок «%s» стоит: закончился %s — ждём поставку." % [m.title(), str(Defs.consumables.get(cn, {}).get("short", cn))], Sim.LVL_WARN, m.cell, 480.0)
+	for m in _ready_machines(machines):
+		if m.user >= 0 or not sim.prod.can_operate(w, m):
 			continue
 		var sp := _free_spot(m, w)
-		if sp.is_empty() or _cool(w, "op%d" % m.id):
+		if sp.is_empty() or _coolf(w, "op%d", m.id):
 			continue
 		if not sim.crew.allowed(w, m):
 			continue
@@ -1077,7 +1119,7 @@ func _find_work(w: Worker) -> Task:
 			if not has_part:
 				continue
 			var sp2 := _free_spot(q, w)
-			if sp2.is_empty() or _cool(w, "qc%d" % q.id) or not Workplace.may_use(sim, w, q):
+			if sp2.is_empty() or _coolf(w, "qc%d", q.id) or not Workplace.may_use(sim, w, q):
 				continue
 			var sc2 := 95.0 + (60.0 if w.prof == "qc" else 0.0) + w.skill("qc") - _dist(wc, sp2["cell"]) * 0.5 + Workplace.bonus(w, q)
 			cands.append({"s": sc2, "k": "inspect", "t": q, "spot": sp2})
@@ -1104,7 +1146,7 @@ func _find_work(w: Worker) -> Task:
 	for m in machines:
 		for iid in sim.slot_ids(m, 1):
 			var it2: Item = sim.items.get(iid)
-			if it2 == null or it2.reserved_by >= 0 or _cool(w, "item%d" % it2.id):
+			if it2 == null or it2.reserved_by >= 0 or _coolf(w, "item%d", it2.id):
 				continue
 			var urgent := 20.0 if sim.count_slot(m, 1) >= m.slot_cap(1) else 0.0
 			var dst := _route_dest(it2, m.cell)
@@ -1127,7 +1169,7 @@ func _find_work(w: Worker) -> Task:
 			continue
 		for iid in sim.slot_ids(m, 0):
 			var itx: Item = sim.items.get(iid)
-			if itx == null or itx.reserved_by >= 0 or _cool(w, "item%d" % itx.id):
+			if itx == null or itx.reserved_by >= 0 or _coolf(w, "item%d", itx.id):
 				continue
 			var destx := sim.find_storage(itx, m.cell)
 			if destx.is_empty():
@@ -1162,7 +1204,7 @@ func _find_work(w: Worker) -> Task:
 	var reloc := false
 	for gid in sim.ground_items:
 		var it5: Item = sim.items.get(gid)
-		if it5 == null or it5.reserved_by >= 0 or _cool(w, "item%d" % it5.id):
+		if it5 == null or it5.reserved_by >= 0 or _coolf(w, "item%d", it5.id):
 			continue
 		if sim.logi.in_ship(it5.cell) and it5.kind == "part" and sim.logi.ship_wanted(it5.def_id):
 			continue   # ждёт машину клиента в зоне отгрузки
@@ -1186,7 +1228,7 @@ func _find_work(w: Worker) -> Task:
 	var best_bp := -1
 	var best_bp_s := -INF
 	for i in sim.bp_cells.keys():
-		if sim.bp_res.has(i) or _cool(w, "bp%d" % i) or not sim.bp_ready(i) or not sim.bmats.ready(i):
+		if sim.bp_res.has(i) or _coolf(w, "bp%d", i) or not sim.bp_ready(i) or not sim.bmats.ready(i):
 			continue
 		var c := sim.world.cell_of(i)
 		var sc7 := 50.0 + build_bonus + w.skill("build") - _dist(wc, c) * 0.3
@@ -1211,7 +1253,7 @@ func _find_work(w: Worker) -> Task:
 			var fault := any_fault and sim.faults.list.has(Faults.key(lay, ii))
 			if not fault and ((lay == "cable" and not can_cable) or (lay != "cable" and not can_pipe)):
 				continue
-			if sim.net_res.has("%s:%d" % [lay, ii]) or _cool(w, "net%d" % ii):
+			if sim.net_res.has("%s:%d" % [lay, ii]) or _coolf(w, "net%d", ii):
 				continue
 			var cc := sim.world.cell_of(ii)
 			var bonus := (45.0 if w.prof == "electrician" and lay == "cable" else 0.0) + (urgent if lay == "cable" else 0.0) + (80.0 if fault else 0.0)
@@ -1225,7 +1267,7 @@ func _find_work(w: Worker) -> Task:
 	if w.prof == "electrician" or w.skill("electric") >= 2:
 		for pair in sim.power.tripped_list():
 			var src: Thing = sim.things.get(int(pair[0]))
-			if src == null or src.user >= 0 or _cool(w, "th%d" % src.id):
+			if src == null or src.user >= 0 or _coolf(w, "th%d", src.id):
 				continue
 			var base := 230.0 if w.prof == "electrician" else 150.0
 			cands.append({"s": base - _dist(wc, src.cell) * 0.3, "k": "reset", "t": src})
@@ -1234,7 +1276,7 @@ func _find_work(w: Worker) -> Task:
 	if mechanic:
 		var svc := sim.service_at()
 		for m2 in machines:
-			if m2.demolish or m2.user >= 0 or m2.working or _cool(w, "th%d" % m2.id):
+			if m2.demolish or m2.user >= 0 or m2.working or _coolf(w, "th%d", m2.id):
 				continue
 			if m2.broken:
 				cands.append({"s": 120.0 + (20.0 if w.prof == "electrician" else 0.0) + (40.0 if w.prof in ["setter", "fitter"] else 0.0) - _dist(wc, m2.cell) * 0.3, "k": "fix", "t": m2})
@@ -1242,7 +1284,7 @@ func _find_work(w: Worker) -> Task:
 				var urgent2 := 30.0 if m2.condition < 25.0 else 0.0
 				cands.append({"s": 78.0 + urgent2 + (15.0 if w.prof in ["turner", "miller"] else 0.0) + (60.0 if w.prof == "setter" else (45.0 if w.prof == "fitter" else 0.0)) - _dist(wc, m2.cell) * 0.3, "k": "repair", "t": m2})
 	for t: Thing in sim.things.values():
-		if t.user >= 0 or _cool(w, "th%d" % t.id):
+		if (t.built and not t.demolish) or t.user >= 0 or _coolf(w, "th%d", t.id):
 			continue
 		if not t.built:
 			if t.crates_in < t.crates_need:
@@ -1267,7 +1309,7 @@ func _find_work(w: Worker) -> Task:
 	# 13. ленточная пила: нарезать заготовки впрок
 	if laborer or w.prof in ["turner", "miller", "setter", "fitter"] or w.skill("haul") >= 4:
 		for saw in sim.upkeep.saws():
-			if saw.user >= 0 or _cool(w, "th%d" % saw.id) or not Workplace.may_use(sim, w, saw):
+			if saw.user >= 0 or _coolf(w, "th%d", saw.id) or not Workplace.may_use(sim, w, saw):
 				continue
 			var mat := sim.upkeep.saw_material()
 			if mat == "":
@@ -1280,7 +1322,7 @@ func _find_work(w: Worker) -> Task:
 	if w.prof == "fitter" or w.skill("fitting") >= 5:
 		var scrap_it := _rework_item(w)
 		for wb in fit_benches():
-			if wb.user >= 0 or _cool(w, "th%d" % wb.id) or not Workplace.may_use(sim, w, wb):
+			if wb.user >= 0 or _coolf(w, "th%d", wb.id) or not Workplace.may_use(sim, w, wb):
 				continue
 			var spf := _free_spot(wb, w)
 			if spf.is_empty():
@@ -1298,7 +1340,7 @@ func _find_work(w: Worker) -> Task:
 			if m3.demolish or m3.user >= 0 or m3.working or m3.broken or m3.product == "" or m3.is_batch() or not m3.enabled:
 				continue
 			var key3 := "%s:%d" % [m3.product, m3.job_step]
-			if m3.setup_key == key3 or _cool(w, "op%d" % m3.id):
+			if m3.setup_key == key3 or _coolf(w, "op%d", m3.id):
 				continue
 			var sp3 := _free_spot(m3, w)
 			if sp3.is_empty():
@@ -1316,6 +1358,7 @@ func _find_work(w: Worker) -> Task:
 				if cd.has(key) and cd[key] is Thing and (cd[key] as Thing).id == oid:
 					return true
 			return false)
+
 	cands.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["s"]) > float(b["s"]))
 	var tries := 0
 	for cd: Dictionary in cands:
@@ -1701,7 +1744,7 @@ func _nearest_feed(m: Thing, w: Worker) -> Item:
 					fo[it.def_id] = sim.planner.free_ok(it.def_id)
 				if int(fo[it.def_id]) <= 0:
 					continue
-			if _cool(w, "item%d" % it.id):
+			if _coolf(w, "item%d", it.id):
 				continue
 			bd = d
 			best = it
@@ -1720,7 +1763,7 @@ func _nearest_item(pred: Callable, near: Vector2i, w: Worker) -> Item:
 			continue
 		if not pred.call(it):
 			continue
-		if _cool(w, "item%d" % it.id):
+		if _coolf(w, "item%d", it.id):
 			continue
 		bd = d
 		best = it

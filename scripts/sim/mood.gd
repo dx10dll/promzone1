@@ -79,9 +79,9 @@ static func breakdown(sim: Sim, w: Worker) -> Array:
 		var dm := trait_val(w, "day_mood", 0.0)
 		if dm != 0.0:
 			out.append(["Рано вставать", dm])
-	if sim and sim.training and sim.workers.has(w):
+	if sim and sim.training and sim.get_worker(w.id) == w:
 		out.append_array(sim.training.mood_parts(w))
-	if sim and sim.town and sim.workers.has(w):
+	if sim and sim.town and sim.get_worker(w.id) == w:
 		out.append_array(sim.town.mood_parts(w))
 	return out
 
@@ -124,13 +124,13 @@ static func life(sim: Sim, w: Worker) -> Dictionary:
 	if w.shift == 1:
 		var nm := trait_val(w, "night_mood", 0.0)
 		add.call("home", "Вторая смена", nm if nm != 0.0 else -2.0)
-	if sim and sim.training and sim.workers.has(w):
+	if sim and sim.training and sim.get_worker(w.id) == w:
 		for p in sim.training.mood_parts(w):
 			add.call("work", str(p[0]), float(p[1]))
-	if sim and sim.town and sim.workers.has(w):
+	if sim and sim.town and sim.get_worker(w.id) == w:
 		for p2 in sim.town.mood_parts(w):
 			add.call("home", str(p2[0]), float(p2[1]))
-	if sim and sim.workers.has(w) and veteran(sim, w):
+	if sim and sim.get_worker(w.id) == w and veteran(sim, w):
 		add.call("team", "Ветеран завода — уважают", 3.0)
 	for g2 in out.keys():
 		out[g2]["v"] = clampf(55.0 + 3.0 * float(out[g2]["v"]), 0.0, 100.0)

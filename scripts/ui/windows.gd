@@ -1317,22 +1317,22 @@ func _staff_list() -> void:
 			list.sort_custom(func(a: Worker, b: Worker) -> bool: return a.wage > b.wage)
 		_:
 			list.sort_custom(func(a: Worker, b: Worker) -> bool: return a.prof_name() < b.prof_name() if a.prof != b.prof else a.grade() > b.grade())
-	_thead([["", 34], ["Сотрудник", 220], ["Профессия", 190], ["Смена", 70], ["Ставка", 90], ["Настроение", 150], ["Сейчас", -1]])
+	_thead([["", 40], ["Сотрудник", 220], ["Профессия", 190], ["Смена", 70], ["Ставка", 90], ["Настроение", 150], ["Сейчас", -1]])
 	for w: Worker in list:
 		var por := Portrait.new()
-		por.set_look(w.look, 0.42, {"age": w.age, "mood": w.mood})
+		por.set_look(w.look, 0.6, {"age": w.age, "mood": w.mood})
 		var traits: Array[String] = []
 		for t in w.traits:
 			traits.append(str(Defs.traits.get(t, {}).get("name", t)))
 		var mood := UITheme.meter(w.mood, Mood.color(w.mood), 70, ("%d %s" % [int(w.mood), Mood.label(w.mood).to_lower()]) if sim.office.active("hr") else Mood.label(w.mood).to_lower())
 		var act := w.activity if w.present else ("не вышел" if w.skip_shift else ("в отпуске" if w.away_why == "в отпуске" else ("на больничном" if w.sick_until > sim.minute else "дома")))
 		var wid := w.id
-		_trow([[por, 34], [_cl2(w.formal_name(), ", ".join(traits)), 220], [_cl2(w.prof_name(), w.rank_text()), 190],
+		_trow([[por, 40], [_cl2(w.formal_name(), ", ".join(traits)), 220], [_cl2(w.prof_name(), w.rank_text()), 190],
 			[_cl("2-я" if w.shift == 1 else "1-я", 13, UITheme.MUTED), 70], [_cl(Defs.money_str(w.wage), 13), 90], [mood, 150],
 			[_cl(act, 13, UITheme.INFO if w.present else UITheme.MUTED), -1]],
 			func() -> void:
 				hud.select_worker(wid)
-				closed.emit(), 44.0, "Показать на заводе и открыть карточку")
+				closed.emit(), 54.0, "Показать на заводе и открыть карточку")
 
 
 ## Найм: кандидаты карточками в две колонки, объявления — в шапке.
@@ -1559,10 +1559,10 @@ func _training() -> void:
 		content.add_child(UITheme.empty("Рабочих пока нет."))
 		return
 	list.sort_custom(func(x: Worker, y: Worker) -> bool: return x.prof_name() < y.prof_name() if x.prof != y.prof else x.grade() < y.grade())
-	_thead([["", 34], ["Сотрудник", 230], ["Навыки", 230], ["Учёба и наставник", -1], ["", 214]])
+	_thead([["", 40], ["Сотрудник", 230], ["Навыки", 230], ["Учёба и наставник", -1], ["", 214]])
 	for w: Worker in list:
 		var por := Portrait.new()
-		por.set_look(w.look, 0.42, {"age": w.age, "mood": w.mood})
+		por.set_look(w.look, 0.6, {"age": w.age, "mood": w.mood})
 		var nm := w.formal_name()
 		var sub := w.prof_rank()
 		if w.practice_until >= 0:
@@ -1627,7 +1627,7 @@ func _training() -> void:
 			if err2 != "":
 				hud.toast(err2, Sim.LVL_WARN)
 			rebuild(true), "Нет подходящего: нужен опытнее на 2 (навык от 6), у кого меньше двух учеников" if cids.is_empty() else "Назначить наставника"))
-		_trow([[por, 34], [_cl2(nm, sub, UITheme.TEXT, UITheme.INFO if w.practice_until >= 0 else UITheme.MUTED), 230], [_cl(_skills_text(w), 12, UITheme.MUTED), 230], [study, -1], [acts, 214]], Callable(), 44.0)
+		_trow([[por, 40], [_cl2(nm, sub, UITheme.TEXT, UITheme.INFO if w.practice_until >= 0 else UITheme.MUTED), 230], [_cl(_skills_text(w), 12, UITheme.MUTED), 230], [study, -1], [acts, 214]], Callable(), 54.0)
 
 
 ## Маленькое выпадающее меню действий (для строк таблиц).

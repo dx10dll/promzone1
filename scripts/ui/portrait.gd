@@ -157,12 +157,20 @@ static func build_texture(lays: Array, px_w: int, is_wide: bool = false) -> Text
 func _draw() -> void:
 	if look.is_empty():
 		return
-	var px := maxi(16, roundi(size.x * _screen_k()))
+	# 1.23: мелкое фото (в списках) — крупнее лицо: показываем середину кадра, без растяжения
+	var crop := 0.66 if zoom < 0.75 else 1.0
+	var px := maxi(16, roundi(size.x * _screen_k() / crop))
 	var lays := layers()
 	var key := "%d|%s|%s" % [px, str(wide), str(lays)]
 	if key != _tex_key:
 		_tex_key = key
 		_tex = build_texture(lays, px, wide)
 	if _tex:
-		draw_texture_rect(_tex, Rect2(Vector2.ZERO, size), false)
+		var ts := _tex.get_size()
+		var sw := ts.x * crop
+		var sh := minf(ts.y, sw * size.y / maxf(1.0, size.x))
+		sw = sh * size.x / maxf(1.0, size.y)
+		var sy := (ts.y * 0.03) if crop < 1.0 else 0.0
+		sy = minf(sy, ts.y - sh)
+		draw_texture_rect_region(_tex, Rect2(Vector2.ZERO, size), Rect2((ts.x - sw) * 0.5, sy, sw, sh))
 	draw_rect(Rect2(Vector2.ZERO, size), Color("#8a949d") if doc else Color("#5a636c"), false, 1.0)

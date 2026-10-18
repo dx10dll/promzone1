@@ -90,7 +90,23 @@ func cleanliness(r: Rooms.Room) -> int:
 
 
 ## Грязные клетки в помещениях (самые грязные первыми).
+## 1.23: последний ответ запоминается, пока грязь и помещения не изменились.
+var _dc_key := ""
+var _dc: Array[Vector2i] = []
+var _avg_key := Vector2i(-1, -1)
+var _avg := 0.0
+
+
 func dirty_cells(min_v: int = 50, limit: int = 40) -> Array[Vector2i]:
+	var key := "%d|%d|%d|%d" % [dirt_rev, sim.rooms.rev, min_v, limit]
+	if key == _dc_key:
+		return _dc.duplicate()
+	_dc_key = key
+	_dc = _dirty_cells(min_v, limit)
+	return _dc.duplicate()
+
+
+func _dirty_cells(min_v: int, limit: int) -> Array[Vector2i]:
 	_ensure()
 	var cells: Array = []
 	for r in sim.rooms.list:
@@ -125,6 +141,15 @@ func has_hotspot() -> bool:
 
 
 func avg_room_dirt() -> float:
+	var key := Vector2i(dirt_rev, sim.rooms.rev)
+	if key == _avg_key:
+		return _avg
+	_avg_key = key
+	_avg = _avg_room_dirt()
+	return _avg
+
+
+func _avg_room_dirt() -> float:
 	var s := 0.0
 	var n := 0
 	for r in sim.rooms.list:

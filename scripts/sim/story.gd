@@ -789,7 +789,7 @@ func on_trip(cell: Vector2i) -> void:
 # ================================================================ травмы и больничные
 
 func injure(w: Worker, cause: String) -> void:
-	if not sim.workers.has(w) or w.sick_until > sim.minute:
+	if sim.get_worker(w.id) != w or w.sick_until > sim.minute:
 		return
 	var sd: Array = Defs.events.get("sick_days", [2, 6])
 	var days := sim.rng.randi_range(int(sd[0]), int(sd[1]))
@@ -878,6 +878,7 @@ func _leave(w: Worker, why: String) -> void:
 	sim.training.on_leave(w)
 	sim.crew.on_leave(w)
 	sim.workers.erase(w)
+	sim.worker_rev += 1
 	sim.notify("%s %s." % [w.full_name(), why], Sim.LVL_WARN)
 
 

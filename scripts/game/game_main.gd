@@ -19,6 +19,8 @@ var overlay := OverlayLayer.new()
 var weather := WeatherLayer.new()
 var fx := FxLayer.new()
 var sound := SoundLayer.new()
+var sim_ms := 0.0               ## 1.23: сколько мс ушло на симуляцию в этом кадре (для замеров)
+var city: CityBackdrop          ## 1.23: город за краем карты (поезд и машины слышно)
 var cranes := CraneLayer.new()
 var hud: Hud
 var speed := 1
@@ -35,7 +37,7 @@ func _ready() -> void:
 	sim = Game.make_sim()
 	sim.auto_supply = true
 	add_child(world_root)
-	var city := CityBackdrop.new()
+	city = CityBackdrop.new()
 	city.sim = sim
 	world_root.add_child(city)
 	world_view.sim = sim
@@ -65,6 +67,9 @@ func _ready() -> void:
 	world_root.add_child(plan_l)
 	world_root.add_child(fx)
 	fx.setup(sim, world_root)
+	var life := AmbientLife.new()   # 1.23: облака, листья, бабочки
+	life.sim = sim
+	world_root.add_child(life)
 	world_root.add_child(sound)
 	sound.setup(self)
 	Snd.set_playlist(["music_calm", "music_waltz"])
@@ -201,11 +206,13 @@ func _process(delta: float) -> void:
 		fast = true
 	var gm := minf(delta, 0.1) * rate
 	var guard := 0
+	var t0 := Time.get_ticks_usec()
 	while gm > 0.0001 and guard < 400:
 		var step := minf(gm, MAX_STEP)
 		sim.tick(step)
 		gm -= step
 		guard += 1
+	sim_ms = (Time.get_ticks_usec() - t0) / 1000.0
 	if _want_autosave:
 		_want_autosave = false
 		var err := Game.autosave(sim)

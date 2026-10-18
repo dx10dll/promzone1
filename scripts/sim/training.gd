@@ -311,11 +311,26 @@ func mentor_of(w: Worker) -> Worker:
 	return sim.get_worker(w.mentor) if w.mentor >= 0 else null
 
 
+## 1.23: ученики по наставникам — одной картой на минуту (раньше перебор всех для каждого).
+## Карту сбрасывает любая смена наставника (_appr_sig = "").
+var _appr: Dictionary = {}
+var _appr_sig := ""
+
+
 func apprentices(m: Worker) -> Array[Worker]:
+	var sig := "%d|%d|%d" % [int(sim.minute), sim.workers.size(), sim.worker_rev]
+	if sig != _appr_sig:
+		_appr_sig = sig
+		_appr.clear()
+		for w in sim.workers:
+			if w.mentor >= 0:
+				if not _appr.has(w.mentor):
+					var lst: Array[Worker] = []
+					_appr[w.mentor] = lst
+				(_appr[w.mentor] as Array[Worker]).append(w)
 	var out: Array[Worker] = []
-	for w in sim.workers:
-		if w.mentor == m.id:
-			out.append(w)
+	if _appr.has(m.id):
+		out.assign(_appr[m.id])
 	return out
 
 
@@ -342,13 +357,16 @@ func set_mentor(w: Worker, m: Worker) -> String:
 	if m == null:
 		if w.mentor >= 0:
 			w.mentor = -1
+			_appr_sig = ""
 			w.add_history(sim.day(), "Наставничество снято")
 		return ""
 	if not mentor_candidates(w).has(m):
 		return "%s не может быть наставником для %s" % [m.full_name(), w.full_name()]
 	for a in apprentices(w):
 		a.mentor = -1
+		_appr_sig = ""
 	w.mentor = m.id
+	_appr_sig = ""
 	var skn := str(Worker.SKILL_NAMES.get(w.main_skill(), "")).to_lower()
 	w.add_history(sim.day(), "Наставник: %s (%s)" % [m.full_name(), skn])
 	m.add_history(sim.day(), "Взял ученика: " + w.full_name())
@@ -401,6 +419,7 @@ func _mentor_morning() -> void:
 		var m := mentor_of(w)
 		if w.mentor >= 0 and m == null:
 			w.mentor = -1
+			_appr_sig = ""
 			continue
 		if m == null:
 			continue
@@ -412,6 +431,7 @@ func _mentor_morning() -> void:
 				w.add_history(sim.day(), "Подрос у наставника: %s %d" % [str(Worker.SKILL_NAMES.get(sk, "")).to_lower(), w.skill(sk)])
 		if w.skill(sk) >= m.skill(sk) - 1 or w.skill(sk) >= 8:
 			w.mentor = -1
+			_appr_sig = ""
 			mentored += 1
 			sim.stats["mentored"] = int(sim.stats.get("mentored", 0)) + 1
 			Mood.add(sim, m, "mentor_proud")
@@ -437,6 +457,8 @@ func _add_rel(a: Worker, b: Worker, v: float) -> void:
 	var nv := clampf(old + v, -100.0, 100.0)
 	a.rel[_rk(b.id)] = nv
 	b.rel[_rk(a.id)] = nv
+	if (old >= FRIEND) != (nv >= FRIEND) or (old <= FOE) != (nv <= FOE):
+		rel_rev += 1
 	if old < FRIEND and nv >= FRIEND:
 		a.add_history(sim.day(), Nicks.gendered("Подружил{ся|ась} с ", a.female) + b.full_name())
 		b.add_history(sim.day(), Nicks.gendered("Подружил{ся|ась} с ", b.female) + a.full_name())
@@ -447,19 +469,43 @@ func _add_rel(a: Worker, b: Worker, v: float) -> void:
 		sim.notify("%s и %s не ладят — в одной смене будут цапаться. Можно развести их по разным сменам." % [a.full_name(), b.full_name()], Sim.LVL_WARN)
 
 
+## 1.23: идём только по тем, с кем есть отношения (раньше — по всем людям), порядок — по id, как в списке.
+## Списки запоминаются, пока не поменялись отношения или состав (rel_rev, число людей).
+var rel_rev := 0
+var _rel_cache: Dictionary = {}   ## id → [друзья, недруги]
+var _rel_sig := Vector3i(-1, -1, -1)
+
+
 func friends(w: Worker) -> Array[Worker]:
-	var out: Array[Worker] = []
-	for o in sim.workers:
-		if o != w and rel(w, o) >= FRIEND:
-			out.append(o)
-	return out
+	return _rel_lists(w)[0]
 
 
 func foes(w: Worker) -> Array[Worker]:
+	return _rel_lists(w)[1]
+
+
+func _rel_lists(w: Worker) -> Array:
+	var sig := Vector3i(rel_rev, sim.workers.size(), sim.worker_rev)
+	if sig != _rel_sig:
+		_rel_sig = sig
+		_rel_cache.clear()
+	var c: Variant = _rel_cache.get(w.id)
+	if c == null:
+		c = [_rel_where(w, true), _rel_where(w, false)]
+		_rel_cache[w.id] = c
+	return c
+
+
+func _rel_where(w: Worker, good: bool) -> Array[Worker]:
 	var out: Array[Worker] = []
-	for o in sim.workers:
-		if o != w and rel(w, o) <= FOE:
-			out.append(o)
+	for k: Variant in w.rel:
+		var v := float(w.rel[k])
+		if (good and v >= FRIEND) or (not good and v <= FOE):
+			var o := sim.get_worker(int(str(k)))
+			if o != null and o != w:
+				out.append(o)
+	if out.size() > 1:
+		out.sort_custom(func(a: Worker, b: Worker) -> bool: return a.id < b.id)
 	return out
 
 
@@ -664,6 +710,7 @@ func resolve_practice(d: Dictionary, choice: int) -> void:
 			sim.spend(owed, "Стипендия практиканту: " + w.full_name())
 		on_leave(w)
 		sim.workers.erase(w)
+		sim.worker_rev += 1
 		sim.notify(Nicks.gendered("%s закончил{|а} практику и вернул{ся|ась} в училище.", w.female) % w.full_name(), Sim.LVL_INFO)
 
 
@@ -679,9 +726,11 @@ func on_leave(w: Worker) -> void:
 			continue
 		if o.mentor == w.id:
 			o.mentor = -1
+			_appr_sig = ""
 		if rel(o, w) >= FRIEND:
 			Mood.add(sim, o, "friend_left")
 		o.rel.erase(_rk(w.id))
+		rel_rev += 1
 	tb_wait.erase(w.id)
 
 

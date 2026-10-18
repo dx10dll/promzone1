@@ -35,6 +35,9 @@ func _ready() -> void:
 func _process(_d: float) -> void:
 	if sim == null:
 		return
+	var inv := get_canvas_transform().affine_inverse()
+	var vr := get_viewport().get_visible_rect()
+	WorkerView.view = Rect2(inv * vr.position, inv.basis_xform(vr.size)).grow(160.0)
 	var wh := hash(sim.world.wall)
 	if wh != _wall_hash:
 		_wall_hash = wh
@@ -46,6 +49,7 @@ func _process(_d: float) -> void:
 		_item_rev = sim.item_rev
 		_sync_ground()
 	_sync_flora()
+	_sway(_d)
 	_sync_workers()
 	_sync_vans()
 	_update_doors()
@@ -120,6 +124,18 @@ func _sync_things() -> void:
 
 ## Деревья и кусты (1.13): спрайты в общем слое с сортировкой по Y — люди заходят за крону.
 ## Сезон: летом зелёные, осенью желтеют (в сентябре — не все сразу), зимой голые ветки в снегу.
+var _sway_t := 0.0
+
+
+## 1.23: деревья и кусты качаются на ветру (сильнее зимой и в дождь), каждое — со своей фазой.
+func _sway(d: float) -> void:
+	_sway_t += d
+	var wind := 0.035 if (sim.season.is_raining() or sim.season.season_id() == "winter") else 0.018
+	for sp in flora_nodes:
+		var ph := sp.position.x * 0.013 + sp.position.y * 0.007
+		sp.skew = (sin(_sway_t * 1.3 + ph) + 0.4 * sin(_sway_t * 3.1 + ph * 2.0)) * wind
+
+
 func _sync_flora() -> void:
 	var w := sim.world
 	var sea := sim.season.season_id()

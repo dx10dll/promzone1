@@ -4810,6 +4810,183 @@ def objects_v120():
     META["water_heater"]["anchors"] = {"lamp": [27, T0 + 34]}
 
 
+def objects_v123():
+    """1.23: новый декор — растения, клумба, бюст, часы, кулер, вешалка, радио, самовар, кубки, глобус,
+    ёлка, флагшток, скульптура, доска объявлений. Анимация (стрелки часов, флаг, огоньки ёлки, пар
+    самовара, пузырьки кулера) рисуется в игре по точкам привязки (anchors)."""
+    import math
+    # --- кактус
+    T0 = 30
+    b = ell(32, T0 + 56, 14, 4.5, "#000", None, 0, 0.28)
+    b += path(f"M20 {T0+34}H44L41 {T0+56}H23Z", "#b06a40", OUT, 2) + rect(18, T0 + 30, 28, 6, "#c27a4c", OUT, 1.8)
+    b += rect(26, T0 - 16, 12, 48, "#4f9a4a", OUT, 2, 6)
+    b += path(f"M26 {T0+8}H18V{T0-4}", None, OUT, 9) + path(f"M26 {T0+8}H18V{T0-4}", None, "#4f9a4a", 5.5)
+    b += path(f"M38 {T0+2}H46V{T0-10}", None, OUT, 9) + path(f"M38 {T0+2}H46V{T0-10}", None, "#4f9a4a", 5.5)
+    b += line(30, T0 - 12, 30, T0 + 28, "#7fc070", 1.4) + circ(32, T0 - 17, 3.5, "#e85a8a", OUT, 1)
+    obj("cactus", 1, 1, T0, b)
+
+    # --- монстера в большом горшке
+    T0 = 44
+    b = ell(36, T0 + 56, 17, 5, "#000", None, 0, 0.28)
+    b += path(f"M16 {T0+28}H48L44 {T0+56}H20Z", "#5a6a72", OUT, 2) + rect(14, T0 + 24, 36, 7, "#6c7c84", OUT, 2)
+    for (x, y, rx, ry, rot, c) in [(18, T0 + 2, 14, 9, -35, "#3f8f4a"), (46, T0 + 0, 14, 9, 35, "#4a9a52"), (32, T0 - 16, 13, 10, 0, "#56a85c"),
+                                   (16, T0 - 18, 12, 8, -55, "#3f8f4a"), (48, T0 - 20, 12, 8, 55, "#4a9a52"), (32, T0 + 10, 12, 7, 0, "#357a3e")]:
+        b += g(ell(0, 0, rx, ry, c, OUT, 1.5) + line(-rx * 0.8, 0, rx * 0.8, 0, "#2c6a34", 1) + line(-2, -ry * 0.9, 3, -2, "#2c6a34", 1.2) + line(4, ry * 0.9, -1, 2, "#2c6a34", 1.2), f"translate({x} {y}) rotate({rot})")
+    obj("monstera", 1, 1, T0, b)
+
+    # --- клумба 2×1 (на улице)
+    T0 = 14
+    b = shadow(6, T0 + 10, 120, 56, 10)
+    b += rect(4, T0 + 4, 120, 56, "#a8553e", OUT, 2, 10) + rect(10, T0 + 10, 108, 44, "#5a3e2a", OUT, 1.4, 8)
+    rnd = random.Random(1231)
+    for k in range(30):
+        x, y = rnd.uniform(16, 112), rnd.uniform(16, 50)
+        b += circ(x, y + 3, 5.5, "#3f7f35", None, 0)
+    for k in range(26):
+        x, y = rnd.uniform(16, 112), rnd.uniform(14, 48)
+        c = rnd.choice(["#e8484a", "#f2c84b", "#f5f1e8", "#d968b0", "#ff8a3a"])
+        b += circ(x, y, 3.4, c, OUT, 0.8) + circ(x, y, 1.1, "#f5d24a" if c != "#f2c84b" else "#a8553e", None, 0)
+    obj("flower_bed", 2, 1, T0, b)
+
+    # --- бюст на постаменте
+    T0 = 70
+    b = ell(32, T0 + 58, 16, 5, "#000", None, 0, 0.3)
+    b += box(14, T0 - 6, 36, 10, 52, "#c9c3b5", "#a9a294")
+    b += rect(18, T0 + 18, 28, 10, "#8a8478", None, 0, 1, 0.5)
+    b += path(f"M12 {T0-4}Q12 {T0-24} 32 {T0-26}Q52 {T0-24} 52 {T0-4}Z", "#8a6a3a", OUT, 2)
+    b += rect(27, T0 - 30, 10, 8, "#8a6a3a", OUT, 1.6)
+    b += path(f"M26 {T0-24}L32 {T0-14}L38 {T0-24}", None, "#6a5232", 1.4)
+    b += ell(32, T0 - 38, 11, 13, "#9a7a48", OUT, 2) + path(f"M23 {T0-40}Q32 {T0-52} 41 {T0-40}", "#6a5232", OUT, 1.4)
+    b += line(28, T0 - 34, 29, T0 - 34, "#4a3a22", 2) + line(35, T0 - 34, 36, T0 - 34, "#4a3a22", 2)
+    b += path(f"M26 {T0-20}Q32 {T0-14} 38 {T0-20}", None, "#6a5232", 1.4)
+    obj("bust", 1, 1, T0, b)
+
+    # --- напольные часы
+    T0 = 76
+    b = shadow(18, T0 + 48, 32, 10)
+    b += rect(18, T0 - 64, 28, 116, "#6a3e24", OUT, 2, 3) + rect(14, T0 - 70, 36, 10, "#5a3220", OUT, 2, 3)
+    b += circ(32, T0 - 46, 11, "#f2ead8", OUT, 1.8)
+    for k in range(12):
+        a = k * math.pi / 6
+        b += line(32 + 8.5 * math.cos(a), T0 - 46 + 8.5 * math.sin(a), 32 + 10 * math.cos(a), T0 - 46 + 10 * math.sin(a), "#3a2a1a", 1)
+    b += rect(23, T0 - 30, 18, 46, "#2e2218", OUT, 1.4, 2) + rect(25, T0 - 28, 14, 42, "#d9c27a", None, 0, 2, 0.15)
+    b += rect(18, T0 + 40, 28, 12, "#5a3220", OUT, 1.6)
+    obj("floor_clock", 1, 1, T0, b)
+    META["floor_clock"]["anchors"] = {"face": [32, T0 - 46], "pend": [32, T0 - 26]}
+
+    # --- кулер с водой
+    T0 = 56
+    b = shadow(16, T0 + 46, 34, 12)
+    b += rect(18, T0 - 6, 28, 58, "#e8ecee", OUT, 2, 4) + rect(22, T0 + 10, 20, 10, "#c8d0d4", OUT, 1.2, 2)
+    b += rect(25, T0 + 13, 4, 6, "#d9493a", None, 0) + rect(35, T0 + 13, 4, 6, "#3d7fd0", None, 0)
+    b += path(f"M22 {T0-6}V{T0-34}Q22 {T0-42} 32 {T0-42}Q42 {T0-42} 42 {T0-34}V{T0-6}Z", "#8fc8f0", OUT, 2, None, 0.85)
+    b += rect(29, T0 - 47, 6, 6, "#3d7fd0", OUT, 1.2) + line(26, T0 - 36, 26, T0 - 10, "#fff", 2, 0.45)
+    obj("water_cooler", 1, 1, T0, b)
+    META["water_cooler"]["anchors"] = {"bottle": [32, T0 - 10]}
+
+    # --- вешалка с одеждой
+    T0 = 64
+    b = ell(32, T0 + 56, 14, 4, "#000", None, 0, 0.28)
+    b += path(f"M20 {T0+54}L32 {T0+44}L44 {T0+54}", None, OUT, 3) + line(32, T0 + 46, 32, T0 - 52, "#5a3a24", 3.4)
+    b += circ(32, T0 - 54, 3, "#5a3a24", OUT, 1)
+    b += path(f"M30 {T0-46}Q16 {T0-40} 18 {T0-6}H30Z", "#3f5f7a", OUT, 1.6)
+    b += path(f"M34 {T0-46}Q48 {T0-40} 46 {T0-14}H34Z", "#7a5a3a", OUT, 1.6)
+    b += ell(38, T0 - 50, 8, 3.5, "#2e2e30", OUT, 1.2)
+    obj("coat_rack", 1, 1, T0, b)
+
+    # --- радиоприёмник на тумбе
+    T0 = 36
+    b = shadow(10, T0 + 6, 50, 52)
+    b += box(8, T0 + 4, 48, 16, 36, "#8a6a46", "#6b5236")
+    b += rect(12, T0 - 22, 40, 28, "#7a4a2a", OUT, 2, 5) + rect(15, T0 - 19, 18, 22, "#d6c8a2", OUT, 1, 3)
+    for k in range(5):
+        b += line(17, T0 - 16 + k * 4, 31, T0 - 16 + k * 4, "#8a7a5a", 1)
+    b += rect(36, T0 - 18, 13, 6, "#f2e2a0", OUT, 1) + circ(39, T0 - 3, 3, "#3a2a1a", None, 0) + circ(46, T0 - 3, 3, "#3a2a1a", None, 0)
+    obj("radio", 1, 1, T0, b)
+    META["radio"]["anchors"] = {"dial": [42, T0 - 15]}
+
+    # --- самовар на столике
+    T0 = 50
+    b = shadow(10, T0 + 6, 50, 52)
+    b += box(8, T0 + 4, 48, 14, 38, "#a07a4c", "#7a5a36")
+    b += path(f"M20 {T0+6}H44L40 {T0-2}H24Z", "#b8862e", OUT, 1.6)
+    b += ell(32, T0 - 18, 14, 16, "#d9a53a", OUT, 2) + ell(28, T0 - 22, 4, 8, "#fff", None, 0, 0.3)
+    b += rect(28, T0 - 40, 8, 8, "#b8862e", OUT, 1.4) + ell(32, T0 - 42, 6, 2.5, "#8a6a26", OUT, 1)
+    b += path(f"M18 {T0-22}H12M46 {T0-22}H52", None, "#3a2a1a", 3) + path(f"M40 {T0-10}h8v4", None, OUT, 2)
+    b += rect(48, T0 - 2, 6, 6, "#f5f1e8", OUT, 1, 2)
+    obj("samovar", 1, 1, T0, b)
+    META["samovar"]["anchors"] = {"steam": [32, T0 - 46]}
+
+    # --- шкаф с кубками
+    T0 = 66
+    b = shadow(10, T0 + 48, 52, 10)
+    b += rect(8, T0 - 58, 48, 112, "#7a4a2a", OUT, 2, 3)
+    b += rect(12, T0 - 54, 40, 96, "#c8dce6", OUT, 1.4, 2, None, 0.35)
+    for k, y in enumerate((T0 - 22, T0 + 10)):
+        b += line(12, y, 52, y, "#5a3a24", 2)
+    for (x, y, c) in [(20, T0 - 22, "#d9b13b"), (32, T0 - 22, "#c0c4c8"), (44, T0 - 22, "#c08050"), (24, T0 + 10, "#d9b13b"), (40, T0 + 10, "#d9b13b")]:
+        b += path(f"M{x-5} {y-16}H{x+5}Q{x+5} {y-8} {x} {y-6}Q{x-5} {y-8} {x-5} {y-16}Z", c, OUT, 1) + rect(x - 1, y - 6, 2, 3, c, None, 0) + rect(x - 4, y - 3, 8, 3, c, OUT, 0.8)
+    b += rect(14, T0 + 20, 36, 18, "#7a4a2a", None, 0) + rect(18, T0 + 26, 28, 4, "#f2d58a", None, 0, 1, 0.6)
+    obj("trophy_case", 1, 1, T0, b)
+
+    # --- глобус
+    T0 = 40
+    b = ell(32, T0 + 56, 14, 4, "#000", None, 0, 0.28)
+    b += path(f"M22 {T0+54}L32 {T0+36}L42 {T0+54}", None, "#5a3a24", 3) + line(32, T0 + 36, 32, T0 + 24, "#5a3a24", 3)
+    b += circ(32, T0 + 2, 20, "#4f88b8", OUT, 2)
+    b += path(f"M20 {T0-6}q6 -6 10 0t8 4q2 6 -4 8t-10 -2z", "#7aa860", None, 0) + path(f"M34 {T0+10}q6 -2 8 4t-4 6q-6 0 -4 -10z", "#7aa860", None, 0)
+    b += path(f"M14 {T0+8}A20 20 0 0 0 50 {T0-4}", None, "#b8862e", 2.4)
+    obj("globe", 1, 1, T0, b)
+
+    # --- новогодняя ёлка
+    T0 = 80
+    b = ell(32, T0 + 56, 20, 6, "#000", None, 0, 0.3)
+    b += rect(26, T0 + 38, 12, 14, "#6a4a2a", OUT, 1.6) + rect(20, T0 + 46, 24, 10, "#b0282a", OUT, 1.6, 2)
+    for (w, y) in [(26, T0 + 40), (22, T0 + 14), (18, T0 - 12), (13, T0 - 36)]:
+        b += poly([(32 - w, y), (32, y - 34), (32 + w, y)], "#2f6f3a", OUT, 1.8)
+        b += poly([(32 - w + 6, y - 2), (32, y - 26), (32 + w - 10, y - 4)], "#3f8a4a", None, 0)
+    b += poly([(32, T0 - 80), (35, T0 - 73), (42, T0 - 73), (36, T0 - 68), (38, T0 - 61), (32, T0 - 65), (26, T0 - 61), (28, T0 - 68), (22, T0 - 73), (29, T0 - 73)], "#f2c84b", OUT, 1)
+    b += path(f"M14 {T0+30}Q32 {T0+20} 50 {T0+26}M18 {T0+4}Q32 {T0-4} 46 {T0+2}M22 {T0-20}Q32 {T0-26} 42 {T0-22}", None, "#d9b13b", 1.4)
+    obj("ny_tree", 1, 1, T0, b)
+    META["ny_tree"]["anchors"] = {"lights": [[18, T0 + 28], [26, T0 + 24], [38, T0 + 23], [46, T0 + 26], [22, T0 + 3], [30, T0 - 1], [40, T0 + 1],
+                                             [26, T0 - 21], [34, T0 - 24], [40, T0 - 22], [32, T0 - 44], [28, T0 + 10], [36, T0 - 10]]}
+
+    # --- флагшток (флаг рисуется в игре — развевается)
+    T0 = 112
+    b = ell(32, T0 + 56, 14, 4, "#000", None, 0, 0.3)
+    b += rect(20, T0 + 44, 24, 10, "#9a9a92", OUT, 1.6, 2)
+    b += line(30, T0 - 108, 30, T0 + 46, "#c8ccce", 3.2) + circ(30, T0 - 110, 3, "#d9b13b", OUT, 1)
+    obj("flagpole", 1, 1, T0, b)
+    META["flagpole"]["anchors"] = {"flag": [31, T0 - 104]}
+
+    # --- скульптура «Рабочий с молотом»
+    T0 = 92
+    b = ell(32, T0 + 58, 18, 5, "#000", None, 0, 0.3)
+    b += box(12, T0 + 4, 40, 10, 44, "#b0aa9c", "#8f897c")
+    b += rect(16, T0 + 24, 32, 8, "#6f6a60", None, 0, 1, 0.5)
+    fig = "#7a8a90"
+    b += path(f"M26 {T0+6}L28 {T0-26}H36L38 {T0+6}H33L32 {T0-10}L31 {T0+6}Z", fig, OUT, 1.6)
+    b += rect(26, T0 - 52, 12, 28, fig, OUT, 1.6, 3) + circ(32, T0 - 60, 6.5, fig, OUT, 1.6)
+    b += path(f"M37 {T0-48}L48 {T0-70}", None, OUT, 5) + path(f"M37 {T0-48}L48 {T0-70}", None, fig, 3)
+    b += line(46, T0 - 66, 52, T0 - 82, "#5a6a70", 2.4) + rect(46, T0 - 88, 12, 7, "#5a6a70", OUT, 1.2, 1)
+    b += path(f"M27 {T0-46}L20 {T0-30}", None, OUT, 5) + path(f"M27 {T0-46}L20 {T0-30}", None, fig, 3)
+    obj("statue_worker", 1, 1, T0, b)
+
+    # --- доска объявлений
+    T0 = 48
+    b = shadow(6, T0 + 44, 116, 10)
+    b += rect(14, T0 + 2, 6, 50, "#5a3a24", OUT, 1.4) + rect(108, T0 + 2, 6, 50, "#5a3a24", OUT, 1.4)
+    b += rect(6, T0 - 40, 116, 50, "#a07a4c", OUT, 2, 3) + rect(10, T0 - 36, 108, 42, "#c8a878", None, 0, 2)
+    rnd = random.Random(1232)
+    for k in range(9):
+        x, y = 14 + (k % 5) * 21 + rnd.uniform(-2, 2), T0 - 32 + (k // 5) * 20 + rnd.uniform(-2, 2)
+        b += rect(x, y, 16, 15, rnd.choice(["#f5f1e8", "#f2e6a0", "#e8f0f5", "#f5e0e0"]), OUT, 0.8)
+        b += line(x + 3, y + 5, x + 13, y + 5, "#7a7a72", 1) + line(x + 3, y + 9, x + 11, y + 9, "#7a7a72", 1)
+        b += circ(x + 8, y + 1.5, 1.6, "#d9493a", None, 0)
+    b += text_svg(64, T0 - 41, "ОБЪЯВЛЕНИЯ", 8, "#f5f1e8")
+    obj("notice_board", 2, 1, T0, b)
+
+
 def main():
     tiles()
     objects()
@@ -4867,6 +5044,7 @@ def main():
     gen_people.people_v115()
     icons_v121()          # 1.21: окно, двери, ворота — вид спереди (перекрывает старые значки)
     cat_v122()            # 1.22: кот заново
+    objects_v123()        # 1.23: новый декор
     os.makedirs(os.path.join(ROOT, "data"), exist_ok=True)
     with open(os.path.join(ROOT, "data/sprite_meta.json"), "w", encoding="utf-8") as f:
         json.dump(META, f, ensure_ascii=False, indent=1)

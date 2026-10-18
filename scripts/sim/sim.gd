@@ -287,10 +287,23 @@ func get_person(id: int) -> Worker:
 	return null
 
 
+## 1.23: поиск по id через словарь (раньше — перебор всех людей; звался сотни раз за ход).
+## Словарь пересобирается, когда меняется число людей или worker_rev (увольнение, уход).
+var worker_rev := 0
+var _widx: Dictionary = {}
+var _widx_sig := Vector2i(-1, -1)
+
+
 func get_worker(id: int) -> Worker:
-	for w in workers:
-		if w.id == id:
-			return w
+	var sig := Vector2i(workers.size(), worker_rev)
+	if sig != _widx_sig:
+		_widx_sig = sig
+		_widx.clear()
+		for w in workers:
+			_widx[w.id] = w
+	var f: Variant = _widx.get(id)
+	if f != null and (f as Worker).id == id:
+		return f
 	return null
 
 
@@ -408,6 +421,7 @@ func fire(w: Worker, quit: bool = false, calm: bool = false) -> void:
 	if owed > 0.0:
 		spend(owed, "Расчёт при увольнении: " + w.full_name())
 	workers.erase(w)
+	worker_rev += 1
 	if not quit:
 		stats["fired_week"] = int(stats.get("fired_week", 0)) + 1
 	town.assign_beds()
@@ -956,12 +970,27 @@ func ceiling_at(c: Vector2i) -> Thing:
 	return things.get(int(ceil_at.get(world.idx(c), -1)))
 
 
+## 1.23: списки по видам запоминаются до изменения объектов (thing_rev, число объектов) —
+## раньше каждый вызов перебирал все объекты, а зовут его сотни раз за ход.
+var _tof: Dictionary = {}
+var _tof_sig := Vector2i(-1, -1)
+
+
 func things_of(kind: String, only_built: bool = true) -> Array[Thing]:
-	var out: Array[Thing] = []
-	for t: Thing in things.values():
-		if t.kind() == kind and (t.built or not only_built):
-			out.append(t)
-	return out
+	var sig := Vector2i(thing_rev, things.size())
+	if sig != _tof_sig:
+		_tof_sig = sig
+		_tof.clear()
+	var key := kind + ("|b" if only_built else "|a")
+	var c: Variant = _tof.get(key)
+	if c == null:
+		var out: Array[Thing] = []
+		for t: Thing in things.values():
+			if t.kind() == kind and (t.built or not only_built):
+				out.append(t)
+		_tof[key] = out
+		c = out
+	return (c as Array[Thing]).duplicate()
 
 
 ## Построенные объекты, которыми можно пользоваться: стоят в своей зоне (1.13).
@@ -1314,7 +1343,7 @@ func room_bp_cost(r: Rect2i, fid: int) -> float:
 
 ## Снос: стена, затем пол, затем объект.
 func place_demolish(c: Vector2i) -> bool:
-	if not world.in_plot(c):
+	if not world.in_plot(c) and not world.inner_fence(c):
 		return false
 	var i := world.idx(c)
 	var lamp := ceiling_at(c)

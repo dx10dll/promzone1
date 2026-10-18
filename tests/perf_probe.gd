@@ -1,6 +1,6 @@
 extends SceneTree
 ## Замер: сколько времени уходит на каждую подсистему за игровые сутки на большом заводе.
-## godot --headless --path . -s res://tests/perf_probe.gd
+## godot --headless --path . -s res://tests/perf_probe.gd -- [людей] [шагов]
 
 const S := preload("res://tests/setups.gd")
 
@@ -13,8 +13,16 @@ func _init() -> void:
 	g.bmats.enabled = false
 	S.big_shop(g)
 	S.offices(g)
+	var args := OS.get_cmdline_user_args()
+	var want := int(args[0]) if args.size() > 0 else 0
 	for p in [["turner", "turning", 5], ["turner", "turning", 5], ["miller", "milling", 5], ["laborer", "haul", 5], ["laborer", "haul", 5], ["qc", "qc", 5], ["foreman", "manage", 6], ["accountant", "office", 5], ["buyer", "office", 5], ["dispatcher", "office", 5]]:
 		S.hire(g, str(p[0]), str(p[1]), int(p[2]))
+	var profs := [["laborer", "haul"], ["turner", "turning"], ["miller", "milling"], ["laborer", "haul"], ["qc", "qc"], ["cleaner", "clean"], ["builder", "build"]]
+	var kk := 0
+	while g.workers.size() < want:
+		var pp: Array = profs[kk % profs.size()]
+		S.hire(g, str(pp[0]), str(pp[1]), 4)
+		kk += 1
 	S.complex_orders(g, 10)
 	print("людей: %d, объектов: %d, предметов: %d" % [g.workers.size(), g.things.size(), g.items.size()])
 	# прогрев
@@ -24,7 +32,7 @@ func _init() -> void:
 	var acc := {}
 	for n in names:
 		acc[n] = 0
-	var steps := 2880   # сутки по 0.5 мин
+	var steps := int(args[1]) if args.size() > 1 else 2880   # сутки по 0.5 мин
 	var t0 := Time.get_ticks_usec()
 	for i2 in steps:
 		var dt := 0.5
@@ -54,7 +62,7 @@ func _init() -> void:
 			(c[1] as Callable).call()
 			acc[str(c[0])] = int(acc[str(c[0])]) + Time.get_ticks_usec() - s
 	var total := Time.get_ticks_usec() - t0
-	print("сутки (2880 шагов): %.0f мс, на шаг %.3f мс" % [total / 1000.0, total / 1000.0 / steps])
+	print("%d шагов: %.0f мс, на шаг %.3f мс" % [steps, total / 1000.0, total / 1000.0 / steps])
 	var keys := acc.keys()
 	keys.sort_custom(func(x: Variant, y: Variant) -> bool: return int(acc[x]) > int(acc[y]))
 	for k in keys:

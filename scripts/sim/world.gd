@@ -146,10 +146,20 @@ static func flora_name(v: int) -> String:
 	return ["", "тополь", "берёза", "клён", "куст сирени", "куст шиповника"][clampi(v, 0, 5)]
 
 
-## Забор внутри своего участка — остался от границы до покупки соседнего (его можно снести).
+## Свой забор: внутри участка (остался от границы до покупки соседнего) или по краю своей земли.
+## 1.23: начальный забор вокруг участка тоже можно снести (кроме края карты).
 func inner_fence(c: Vector2i) -> bool:
 	var v := get_wall(c)
-	return (v == W_FENCE or v == W_FENCE_GATE) and in_plot(c)
+	if v != W_FENCE and v != W_FENCE_GATE:
+		return false
+	if in_plot(c):
+		return true
+	if c.x <= 0 or c.y <= 0 or c.x >= w - 1 or c.y >= h - 1:
+		return false
+	for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		if in_plot(c + d):
+			return true
+	return false
 
 
 func is_door(c: Vector2i) -> bool:

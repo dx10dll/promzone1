@@ -63,6 +63,7 @@ func _place() -> void:
 		sort_y = thing.cell.y * T + 10.0
 	position = Vector2(bottom.x, sort_y)
 	sprite.position = Vector2(0, bottom.y - sort_y)
+	_spr_base = sprite.position
 	over.position = sprite.position
 
 
@@ -76,8 +77,16 @@ func _chair_key() -> Array:
 	return ["chair_down", false]
 
 
+var _spr_base := Vector2.ZERO
+
+
 func _process(delta: float) -> void:
 	_t += delta
+	# 1.23: работающий станок чуть дрожит
+	if thing.built and thing.working and thing.kind() == "machine":
+		sprite.position = _spr_base + Vector2(sin(_t * 53.0) * 0.22, cos(_t * 41.0) * 0.12)
+	elif sprite.position != _spr_base:
+		sprite.position = _spr_base
 	_check -= delta
 	if _check <= 0.0:
 		_check = 0.5
@@ -210,6 +219,7 @@ func _draw_over() -> void:
 					var tw := f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 					var c := tp(dg[0], dg[1])
 					over.draw_string(f, c + Vector2(-tw * 0.5, fs * 0.38), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#ffcf4a"))
+			_draw_decor_anim()
 		"appliance":
 			if thing.def_id == "aquarium" and sim.power.powered(thing):
 				var bb := _anchor("bubbles")
@@ -225,6 +235,82 @@ func _draw_over() -> void:
 	if thing.progress > 0.0 and thing.demolish:
 		_bar(thing.progress, Color("#d99a6a"))
 	_draw_power_state()
+
+
+## 1.23: живой декор — стрелки часов по игровому времени, маятник, флаг на ветру, огоньки ёлки,
+## пар над самоваром, пузырьки в кулере, светящаяся шкала радио.
+func _draw_decor_anim() -> void:
+	match thing.def_id:
+		"floor_clock":
+			var fc := _anchor("face")
+			if fc.is_empty():
+				return
+			var c := tp(fc[0], fc[1])
+			var mins := fmod(sim.minute, 1440.0)
+			var ah := (mins / 720.0) * TAU - PI * 0.5
+			var am := fmod(mins, 60.0) / 60.0 * TAU - PI * 0.5
+			over.draw_line(c, c + Vector2(cos(ah), sin(ah)) * 3.2, Color("#2a1e14"), 1.2, true)
+			over.draw_line(c, c + Vector2(cos(am), sin(am)) * 4.6, Color("#2a1e14"), 0.8, true)
+			var pd := _anchor("pend")
+			if not pd.is_empty():
+				var top := tp(pd[0], pd[1])
+				var a := sin(_t * 3.2) * 0.35
+				var tip := top + Vector2(sin(a), cos(a)) * 14.0
+				over.draw_line(top, tip, Color("#b8943a"), 0.8, true)
+				over.draw_circle(tip, 2.2, Color("#d9b13b"))
+		"flagpole":
+			var fl := _anchor("flag")
+			if fl.is_empty():
+				return
+			var o := tp(fl[0], fl[1])
+			var pts := PackedVector2Array()
+			var low := PackedVector2Array()
+			for i in 9:
+				var x := i * 2.4
+				var wv := sin(_t * 4.0 - i * 0.7) * (0.4 + i * 0.22)
+				pts.append(o + Vector2(x, wv))
+				low.append(o + Vector2(x, 11.0 + wv))
+			var poly := PackedVector2Array(pts)
+			for j in range(low.size() - 1, -1, -1):
+				poly.append(low[j])
+			over.draw_colored_polygon(poly, Color("#3a7a4a"))   # флаг завода: зелёный с белой полосой
+			var mid := PackedVector2Array()
+			for i2 in pts.size():
+				mid.append(pts[i2].lerp(low[i2], 0.5))
+			over.draw_polyline(mid, Color("#f2f0e8"), 1.8, true)
+			over.draw_polyline(pts, Color(0.1, 0.12, 0.15, 0.6), 0.6, true)
+		"ny_tree":
+			var ls: Array = meta.get("anchors", {}).get("lights", [])
+			var cols := [Color("#ff4a3a"), Color("#ffd24a"), Color("#4ab0ff"), Color("#6fe07a"), Color("#ff7ad0")]
+			for i3 in ls.size():
+				var on := fmod(_t * 1.4 + i3 * 0.37, 1.0) < 0.6
+				var lp: Array = ls[i3]
+				var col: Color = cols[i3 % cols.size()]
+				over.draw_circle(tp(lp[0], lp[1]), 1.4, col if on else col.darkened(0.6))
+				if on:
+					over.draw_circle(tp(lp[0], lp[1]), 3.0, Color(col.r, col.g, col.b, 0.25))
+		"samovar":
+			var st := _anchor("steam")
+			if st.is_empty():
+				return
+			for k in 4:
+				var ph := fmod(_t * 0.35 + k * 0.25, 1.0)
+				var p := tp(st[0], st[1]) + Vector2(sin(_t * 1.5 + k) * 2.0 + ph * 3.0, -ph * 14.0)
+				over.draw_circle(p, 1.5 + ph * 2.5, Color(1, 1, 1, 0.35 * (1.0 - ph)))
+		"water_cooler":
+			var bo := _anchor("bottle")
+			if bo.is_empty():
+				return
+			var ph2 := fmod(_t * 0.25, 1.0)
+			if ph2 < 0.5:
+				var q := ph2 / 0.5
+				over.draw_circle(tp(bo[0], bo[1] - q * 26.0), 0.8 + q * 1.4, Color(1, 1, 1, 0.75 * (1.0 - q)))
+		"radio":
+			var dl := _anchor("dial")
+			if dl.is_empty():
+				return
+			var g := 0.25 + 0.12 * sin(_t * 2.0)
+			over.draw_circle(tp(dl[0], dl[1]), 4.5, Color(1.0, 0.85, 0.4, g))
 
 
 ## Контейнер для стружки: горка стружки растёт по мере заполнения.

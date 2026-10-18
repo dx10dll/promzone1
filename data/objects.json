@@ -3012,5 +3012,260 @@
 		"prestige": 2,
 		"hand": true,
 		"desc": "Табличка с эмблемой и названием завода — на проходную, в цех или у кабинета директора. Название и эмблему меняют в паспорте завода (щелчок по эмблеме в шапке)."
+	},
+	"cactus": {
+		"name": "Кактус в горшке",
+		"cat": "Декор",
+		"cost": 900,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 1,
+		"desc": "Колючий, неприхотливый и, говорят, впитывает излучение от мониторов. Цветёт раз в год.",
+		"hand": true
+	},
+	"monstera": {
+		"name": "Монстера",
+		"cat": "Декор",
+		"cost": 3800,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Огромные резные листья. Уголок сразу похож на приёмную министерства.",
+		"hand": true
+	},
+	"flower_bed": {
+		"name": "Клумба",
+		"cat": "Декор",
+		"cost": 5000,
+		"build_time": 4,
+		"size": [
+			2,
+			1
+		],
+		"blocks": false,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Кирпичный бордюр, бархатцы и петунии. Ставится на улице у проходной или у конторы.",
+		"hand": true
+	},
+	"bust": {
+		"name": "Бюст основателя",
+		"cat": "Декор",
+		"cost": 18000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 3,
+		"desc": "Бронзовый бюст основателя завода на постаменте. Внушает уважение посетителям и проверяющим.",
+		"crates": 1
+	},
+	"floor_clock": {
+		"name": "Напольные часы",
+		"cat": "Декор",
+		"cost": 12000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Старинные часы с маятником. Идут точно — стрелки показывают игровое время.",
+		"crates": 1
+	},
+	"water_cooler": {
+		"name": "Кулер с водой",
+		"cat": "Быт",
+		"cost": 4500,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 1,
+		"desc": "Холодная и горячая вода. У кулера всегда кто-нибудь обсуждает новости.",
+		"hand": true
+	},
+	"coat_rack": {
+		"name": "Вешалка",
+		"cat": "Быт",
+		"cost": 1500,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 1,
+		"desc": "Напольная вешалка для курток и шапок. В кабинет, контору или комнату отдыха.",
+		"hand": true
+	},
+	"radio": {
+		"name": "Радиоприёмник",
+		"cat": "Декор",
+		"cost": 5500,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 1,
+		"desc": "Ламповый приёмник на тумбе. Шкала светится, пока играет музыка.",
+		"hand": true
+	},
+	"samovar": {
+		"name": "Самовар",
+		"cat": "Быт",
+		"cost": 7000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Пузатый латунный самовар на столике. Чай в перерыв — как дома.",
+		"hand": true
+	},
+	"trophy_case": {
+		"name": "Шкаф с кубками",
+		"cat": "Декор",
+		"cost": 14000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 3,
+		"desc": "Кубки за спартакиады, грамоты и вымпелы. Гордость коллектива за стеклом.",
+		"crates": 1
+	},
+	"globe": {
+		"name": "Глобус",
+		"cat": "Декор",
+		"cost": 3500,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 1,
+		"desc": "Большой глобус на деревянной ножке — для кабинета, где решают про экспорт.",
+		"hand": true
+	},
+	"ny_tree": {
+		"name": "Новогодняя ёлка",
+		"cat": "Декор",
+		"cost": 6000,
+		"build_time": 4,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Ёлка с гирляндой и звездой. Огоньки мигают, настроение праздничное.",
+		"hand": true
+	},
+	"flagpole": {
+		"name": "Флагшток",
+		"cat": "Декор",
+		"cost": 9000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 2,
+		"desc": "Флаг завода на высоком флагштоке у проходной. Развевается на ветру.",
+		"crates": 1
+	},
+	"statue_worker": {
+		"name": "Скульптура «Рабочий»",
+		"cat": "Декор",
+		"cost": 26000,
+		"build_time": 8,
+		"size": [
+			1,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 3,
+		"desc": "Рабочий с молотом на постаменте. Для заводского двора или сквера у проходной.",
+		"crates": 1
+	},
+	"notice_board": {
+		"name": "Доска объявлений",
+		"cat": "Офис",
+		"cost": 3000,
+		"build_time": 4,
+		"size": [
+			2,
+			1
+		],
+		"blocks": true,
+		"kind": "decor",
+		"needs_floor": false,
+		"no_rotate": true,
+		"prestige": 1,
+		"desc": "Приказы, график отпусков и «Продам гараж». Ставят у проходной, в бытовке или в коридоре.",
+		"hand": true
 	}
 }

@@ -40,19 +40,31 @@ func _zoom() -> float:
 ## читается на любом полу.
 func _text(pos: Vector2, s: String, size: float, col: Color, center: bool = true, outline: bool = true) -> void:
 	var z := maxf(0.3, _zoom())
-	var px := clampi(int(round(size * z)), 11, 17)
+	var px := clampi(int(round(size * z * 0.75)), 9, 12)
 	_text_px(pos, s, px, col, true)
 
 
 ## Текст фиксированного экранного размера (px) — не раздувается при приближении и не мельчит при отдалении.
-func _text_px(pos: Vector2, s: String, px: int, col: Color, bg: bool = false) -> void:
+## 1.23: подписи мельче (×0,75), а налезающие друг на друга — сдвигаются вниз или не рисуются.
+func _text_px(pos: Vector2, s: String, px0: int, col: Color, bg: bool = false, always: bool = false) -> void:
 	var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
 	var z := maxf(0.3, _zoom())
+	var px := maxi(9, int(round(px0 * 0.78)))
 	var w := f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x / z
 	var p := pos - Vector2(w * 0.5, 0)
+	var hgt := px * 1.25 / z
+	var box := Rect2(p + Vector2(-3.0 / z, -hgt * 0.8), Vector2(w + 6.0 / z, hgt))
+	if not always:
+		var tries := 0
+		while _hits(box) and tries < 2:
+			box.position.y += hgt + 1.0 / z
+			p.y += hgt + 1.0 / z
+			tries += 1
+		if _hits(box):
+			return
+	_placed.append(box)
 	if bg:
-		var hgt := px * 1.25 / z
-		draw_rect(Rect2(p + Vector2(-3.0 / z, -hgt * 0.8), Vector2(w + 6.0 / z, hgt)), Color(0.07, 0.08, 0.09, 0.85))
+		draw_rect(box, Color(0.07, 0.08, 0.09, 0.78))
 	draw_set_transform(p, 0.0, Vector2(1.0 / z, 1.0 / z))
 	if not bg:
 		draw_string_outline(f, Vector2.ZERO, s, HORIZONTAL_ALIGNMENT_LEFT, -1, px, 3, Color(0.08, 0.09, 0.1, 0.9))
@@ -60,15 +72,26 @@ func _text_px(pos: Vector2, s: String, px: int, col: Color, bg: bool = false) ->
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
+var _placed: Array[Rect2] = []
+
+
+func _hits(r: Rect2) -> bool:
+	for q in _placed:
+		if q.intersects(r):
+			return true
+	return false
+
+
 func _text_w(s: String, px: int) -> float:
 	var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
-	return f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x / maxf(0.3, _zoom())
+	return f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(9, int(round(px * 0.78)))).x / maxf(0.3, _zoom())
 
 
 func _draw() -> void:
 	if sim == null:
 		return
 	legend = []
+	_placed.clear()
 	match mode:
 		"rooms":
 			_draw_rooms()
@@ -461,7 +484,7 @@ func _draw_power() -> void:
 				hover_pos = top
 				hover_col = col2
 	if hover_txt != "":
-		_text_px(hover_pos, hover_txt, 13, hover_col, true)
+		_text_px(hover_pos, hover_txt, 13, hover_col, true, true)
 
 
 
@@ -968,7 +991,7 @@ func _draw_nets() -> void:
 			hover_pos = top
 			hover_col = Color("#8fcf78") if all_ok else Color("#d8644e")
 	if hover_txt != "":
-		_text_px(hover_pos, hover_txt, 13, hover_col, true)
+		_text_px(hover_pos, hover_txt, 13, hover_col, true, true)
 	_legend([["Жёлтый — кабель (оранжевый — перегруз, красный — выбит автомат)", Color("#f2c84b")],
 		["Синий — водопровод (серый — нет воды в трубе)", Color("#7fb8e8")],
 		["Оранжевый пунктир — сжатый воздух", Color("#f0b080")],

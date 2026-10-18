@@ -289,8 +289,19 @@ func kg_kids() -> Array[Worker]:
 	return out
 
 
+## 1.23: кто попал в садик — запоминаем на минуту (раньше пересчитывали для каждого человека).
+var _kg_cache: Dictionary = {}
+var _kg_sig := ""
+
+
 func has_kg_place(w: Worker) -> bool:
-	return kg_kids().has(w)
+	var sig := "%d|%d|%d|%d" % [sim.minute, sim.workers.size(), sim.worker_rev, kg_level]
+	if sig != _kg_sig:
+		_kg_sig = sig
+		_kg_cache.clear()
+		for k in kg_kids():
+			_kg_cache[k.id] = true
+	return _kg_cache.has(w.id)
 
 
 func kg_upgrade() -> String:

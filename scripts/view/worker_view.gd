@@ -42,6 +42,8 @@ var _winter := false
 var _outside := false
 var _tex_rev := -1   ## ступень разрешения текстур людей, под которую собрана кукла
 var _mood_b := 0     ## 1.15: настроение на лице (улыбка / уголки вниз)
+## 1.23: видимая часть мира (с запасом) — кто за краем экрана, того не анимируем. Ставит EntityLayer.
+static var view := Rect2(-1e9, -1e9, 2e9, 2e9)
 
 
 func setup(s: Sim, w: Worker) -> void:
@@ -308,6 +310,8 @@ func _process(delta: float) -> void:
 	if not visible:
 		return
 	_update_pos()
+	if not view.has_point(position) and not selected:
+		return
 	if worker.dir != _dir or worker.dressed != _dressed or worker.muffs != _muffs or _is_winter() != _winter or (_winter and _is_outside() != _outside) \
 			or _mood_bucket() != _mood_b:
 		_rebuild(worker.dir)

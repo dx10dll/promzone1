@@ -124,14 +124,14 @@ static func _dorm(win: GameWindow) -> void:
 	if res.is_empty():
 		win.content.add_child(UITheme.empty("Пока никто не живёт. Наймите иногороднего кандидата в «Люди → Найм» — у него пометка «иногородний»."))
 		return
-	win._thead([["", 34], ["Жилец", 260], ["Профессия", 200], ["Комната", -1]])
+	win._thead([["", 40], ["Жилец", 260], ["Профессия", 200], ["Комната", -1]])
 	for w: Worker in res:
 		var por := Portrait.new()
-		por.set_look(w.look, 0.42, {"age": w.age, "mood": w.mood})
+		por.set_look(w.look, 0.6, {"age": w.age, "mood": w.mood})
 		var bed := t.bed_of(w)
 		var r := sim.rooms.room_of_thing(bed) if bed else null
 		var wid := w.id
-		win._trow([[por, 34], [win._cl2(w.formal_name(), ("иногородняя" if w.female else "иногородний") if w.from_away else ("местная" if w.female else "местный")), 260], [win._cl(w.prof_name(), 13), 200],
+		win._trow([[por, 40], [win._cl2(w.formal_name(), ("иногородняя" if w.female else "иногородний") if w.from_away else ("местная" if w.female else "местный")), 260], [win._cl(w.prof_name(), 13), 200],
 			[win._cl(r.title() if r else "—", 13, UITheme.MUTED), -1]], func() -> void:
 				win.hud.select_worker(wid)
 				win.closed.emit(), 40.0, "Показать на заводе")
@@ -230,15 +230,15 @@ static func _kg(win: GameWindow) -> void:
 	if ps.is_empty():
 		win.content.add_child(UITheme.empty("Работников с маленькими детьми пока нет."))
 		return
-	win._thead([["", 34], ["Родитель", 260], ["Детей", 80], ["Садик", -1]])
+	win._thead([["", 40], ["Родитель", 260], ["Детей", 80], ["Садик", -1]])
 	for w: Worker in ps:
 		var por := Portrait.new()
-		por.set_look(w.look, 0.42, {"age": w.age, "mood": w.mood})
+		por.set_look(w.look, 0.6, {"age": w.age, "mood": w.mood})
 		var ok := placed.has(w)
 		var cw := HBoxContainer.new()
 		cw.alignment = BoxContainer.ALIGNMENT_BEGIN
 		cw.add_child(UITheme.chip("место есть" if ok else ("нет места" if t.kg_level > 0 else "садика нет"), UITheme.GOOD if ok else UITheme.MUTED))
-		win._trow([[por, 34], [win._cl2(w.formal_name(), w.prof_name()), 260], [win._cl(str(w.kids), 13), 80], [cw, -1]], Callable(), 40.0)
+		win._trow([[por, 40], [win._cl2(w.formal_name(), w.prof_name()), 260], [win._cl(str(w.kids), 13), 80], [cw, -1]], Callable(), 54.0)
 
 
 # ---------------------------------------------------------------- радио

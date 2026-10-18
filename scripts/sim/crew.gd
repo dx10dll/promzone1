@@ -1031,7 +1031,7 @@ func _res_union_form(d: Dictionary, choice: int) -> void:
 
 func _union_daily() -> void:
 	var lw := union_lead()
-	if lw == null or not sim.workers.has(lw):
+	if lw == null or sim.get_worker(lw.id) != lw:
 		_new_union_lead()
 	# переговоры о колдоговоре
 	if (union.get("offer", []) as Array).is_empty() and not signed() and sim.day() >= int(union.get("talk", 0)):
