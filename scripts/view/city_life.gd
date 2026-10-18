@@ -26,6 +26,12 @@ func train_pos() -> Vector2:
 	return Vector2(_train_x - _train_dir * _train_cars.size() * 32.0, -10 * T + T * 0.5)
 
 
+## Поезд появится через полсекунды (если сейчас его нет) — для главного меню.
+func soon() -> void:
+	if _train_x < -99000.0:
+		_train_wait = minf(_train_wait, 0.5)
+
+
 func _ready() -> void:
 	_rng.seed = 2310
 	z_index = 0

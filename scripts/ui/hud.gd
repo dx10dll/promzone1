@@ -586,6 +586,8 @@ func _refresh_top() -> void:
 		win.set_badge("now", sim.story.letters.size())
 	if win and win.group == "orders":
 		win.set_badge("contracts", sim.sales.by_state(["offer"]).size())
+	if win and win.group == "prod":
+		win.set_badge("stall", Stall.bad_count(sim))
 
 
 ## 1.20: самая серьёзная беда — красной плашкой сверху. Нажатие открывает, где её решать.

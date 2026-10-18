@@ -58,6 +58,11 @@ static func build() -> Theme:
 	f_reg = load("res://assets/fonts/IBMPlexSans-Regular.ttf")
 	f_med = load("res://assets/fonts/IBMPlexSans-Medium.ttf")
 	f_semi = load("res://assets/fonts/IBMPlexSans-SemiBold.ttf")
+	# 1.24: в IBM Plex нет ★ ▲ ⚠ ✗ ● и других значков — берём их из маленького запасного шрифта
+	# (выборка DejaVu Sans), иначе на части компьютеров вместо них были квадратики
+	var sym: Font = load("res://assets/fonts/SymbolsFallback.ttf")
+	for f: Font in [f_reg, f_med, f_semi]:
+		f.fallbacks = [sym]
 	var fv := FontVariation.new()
 	fv.base_font = f_semi
 	fv.spacing_glyph = 1

@@ -195,6 +195,19 @@ func prof_lc() -> String:
 
 
 
+## 1.24: на смене, но без дела (нет задачи или бродит).
+func idle_now() -> bool:
+	return present and (task == null or task.kind == "wander")
+
+
+## 1.24: строка для поиска в окне «Люди»: имя, профессия, разряд, занятие, черты.
+func search_key() -> String:
+	var parts: Array[String] = [formal_name(), prof_name(), rank_text(), activity]
+	for t in traits:
+		parts.append(str(Defs.traits.get(t, {}).get("name", t)))
+	return " ".join(parts).to_lower()
+
+
 func is_itr() -> bool:
 	return ITR.has(prof)
 

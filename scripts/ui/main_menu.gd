@@ -1,7 +1,10 @@
 extends Node2D
-## Главное меню. На фоне идёт живая симуляция гаража, камера медленно плывёт.
+## Главное меню. 1.24: новый вид — слева тёмная панель с логотипом и пунктами со значками,
+## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
+## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.23"
+const VERSION_TEXT := "Версия 1.24"
+const WHATS_NEW := ["Новое главное меню и фон", "Поиск и фильтры в окне «Люди»", "Панель «Что стоит» — все простои сразу"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -10,34 +13,45 @@ var menu_box: VBoxContainer
 var sub: PanelContainer = null
 var _t := 0.0
 
-## 1.17: сменяющиеся виды завода (MenuScenes) с плавным переходом через затемнение.
-const SCENE_TIME := 13.0
-const FADE := 0.7
-var sims := {}             ## ключ вида -> Sim (готовые и готовящиеся)
+const SCENE_TIME := 12.0
+const FADE := 0.55
+var worlds: Array[Sim] = []     ## два одинаковых завода: один показываем, второй проматываем к следующему виду
+var cur := 0                    ## какой из двух сейчас на экране
 var scene_i := 0
 var scene_t := 0.0
 var scene_root: Node2D = null
+var city: CityBackdrop = null
 var fade_rect: ColorRect
-var _fading := 0           ## 0 — показ, 1 — затемняем, 2 — проявляем
+var _fading := 0                ## 0 — показ, 1 — затемняем, 2 — проявляем
 var _fade_t := 0.0
+var _next_target := 0.0         ## к какой минуте проматываем второй завод
+var cap_title: Label
+var cap_time: Label
+var cap_bar: SceneBar
+var ng_dim: ColorRect           ## затемнение под окном «Новая игра»
+var _cards: Array[Control] = [] ## карточки «Сейчас на заводе» и «Что нового» — прячем под окнами
 
 
 func _ready() -> void:
-	sims["garage"] = MenuScenes.build("garage")
-	MenuScenes.advance(sims["garage"], "garage", 4000)
+	for i in 2:
+		worlds.append(MenuScenes.build())
+	var w0 := worlds[0]
+	MenuScenes.advance_to(w0, MenuScenes.next_minute(w0.minute, MenuScenes.tod_of(0)), 2000)
+	_next_target = MenuScenes.next_minute(w0.minute + 1.0, MenuScenes.tod_of(1))
 	add_child(cam)
 	cam.make_current()
 	_show_scene()
 	Snd.stop_ambient()
 	Snd.set_playlist(["music_waltz"])
-	var fl := CanvasLayer.new()
-	fl.layer = 1
-	add_child(fl)
+	var vl := CanvasLayer.new()
+	vl.layer = 1
+	add_child(vl)
+	vl.add_child(_vignette())
 	fade_rect = ColorRect.new()
 	fade_rect.color = Color(0.03, 0.035, 0.04, 0.0)
 	fade_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	fl.add_child(fade_rect)
+	vl.add_child(fade_rect)
 	var layer := CanvasLayer.new()
 	layer.layer = 2
 	add_child(layer)
@@ -49,22 +63,31 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
-	for k in sims.keys():
-		(sims[k] as Sim).dispose()
-	sims.clear()
+	for s in worlds:
+		s.dispose()
+	worlds.clear()
 
 
-func _scene_name() -> String:
-	return str(MenuScenes.ORDER[scene_i % MenuScenes.ORDER.size()])
+func _vignette() -> ColorRect:
+	var vig := ColorRect.new()
+	vig.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vig.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sh := Shader.new()
+	sh.code = """shader_type canvas_item;
+void fragment() {
+	vec2 d = (UV - vec2(0.55, 0.5)) * vec2(1.3, 1.0);
+	float v = smoothstep(0.35, 0.95, length(d));
+	COLOR = vec4(0.02, 0.025, 0.035, v * 0.55);
+}"""
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	vig.material = mat
+	return vig
 
 
-## Собрать мир для текущего вида (вид «cnc» — тот же цех, другая камера).
+## Собрать картинку текущего вида на заводе worlds[cur].
 func _show_scene() -> void:
-	var key := MenuScenes.sim_key(_scene_name())
-	if not sims.has(key):
-		sims[key] = MenuScenes.build(key)
-	MenuScenes.advance(sims[key], key, 4000)
-	sim = sims[key]
+	sim = worlds[cur]
 	if scene_root:
 		scene_root.queue_free()
 	scene_root = Node2D.new()
@@ -72,6 +95,9 @@ func _show_scene() -> void:
 	move_child(scene_root, 0)
 	var root := Node2D.new()
 	scene_root.add_child(root)
+	city = CityBackdrop.new()
+	city.sim = sim
+	root.add_child(city)
 	var wv := WorldView.new()
 	wv.sim = sim
 	root.add_child(wv)
@@ -81,21 +107,36 @@ func _show_scene() -> void:
 	var ents := EntityLayer.new()
 	ents.sim = sim
 	root.add_child(ents)
+	var fauna := FaunaLayer.new()
+	fauna.sim = sim
+	root.add_child(fauna)
+	var cranes := CraneLayer.new()
+	cranes.sim = sim
+	root.add_child(cranes)
 	var sign := CompanySign.new()
 	sign.sim = sim
 	root.add_child(sign)
+	var fx := FxLayer.new()
+	root.add_child(fx)
+	fx.setup(sim, root)
+	var life := AmbientLife.new()
+	life.sim = sim
+	root.add_child(life)
+	if MenuScenes.key(scene_i) == "overview" and city.life:
+		city.life.soon()   # с высоты — пусть по ветке как раз идёт поезд
 	scene_t = 0.0
 	_place_cam(0.0)
+	_update_caption()
 
 
 func _place_cam(k: float) -> void:
-	var cd: Array = MenuScenes.CAMS[_scene_name()]
+	var cd := MenuScenes.cam(scene_i)
 	var e := k * k * (3.0 - 2.0 * k)
-	var z := float(cd[2]) * (1.0 + 0.05 * e)
+	var z := float(cd[2]) * (1.0 + 0.06 * e)
 	cam.zoom = Vector2(z, z)
 	var vw := get_viewport().get_visible_rect().size.x
-	cam.position = (cd[0] as Vector2).lerp(cd[1] as Vector2, e) * World.T - Vector2(vw * 0.17 / z, 0.0)
-	# люди — из вектора под текущий масштаб: без этого в меню они расплывались
+	# предмет вида — правее центра: слева панель меню
+	cam.position = (cd[0] as Vector2).lerp(cd[1] as Vector2, e) * World.T - Vector2(vw * 0.16 / z, 0.0)
 	Tex.set_people_scale(z * get_viewport().get_final_transform().get_scale().x * 0.5)
 	Tex.ui_scale = get_viewport().get_final_transform().get_scale().x
 
@@ -103,105 +144,190 @@ func _place_cam(k: float) -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	scene_t += delta
-	sim.tick(minf(delta, 0.1) * 1.6)
+	sim.tick(minf(delta, 0.1) * 1.2)
 	_place_cam(clampf(scene_t / SCENE_TIME, 0.0, 1.0))
-	# следующий вид готовится заранее, понемногу каждый кадр
-	var nk := MenuScenes.sim_key(str(MenuScenes.ORDER[(scene_i + 1) % MenuScenes.ORDER.size()]))
-	if sims.has(nk) and nk != MenuScenes.sim_key(_scene_name()):
-		MenuScenes.advance(sims[nk], nk, 3)
-	elif not sims.has(nk) and scene_t > 2.0:
-		sims[nk] = MenuScenes.build(nk)
+	# второй завод тем временем проматывается к времени следующего вида
+	var other := worlds[1 - cur]
+	var ready := MenuScenes.advance_to(other, _next_target, 6)
+	if cap_bar:
+		cap_bar.k = clampf(scene_t / SCENE_TIME, 0.0, 1.0)
+		cap_bar.queue_redraw()
+	if cap_time and int(_t * 2.0) % 2 == 0:
+		cap_time.text = _time_text()
+	var big := ng_root != null and is_instance_valid(ng_root)
+	if ng_dim:
+		ng_dim.visible = big
+	var any := big or (sub != null and is_instance_valid(sub))
+	for c in _cards:
+		c.modulate.a = move_toward(c.modulate.a, 0.0 if any else 1.0, delta * 5.0)
 	match _fading:
 		0:
-			if scene_t > SCENE_TIME - FADE:
+			if scene_t > SCENE_TIME - FADE and ready:
 				_fading = 1
 				_fade_t = 0.0
 		1:
 			_fade_t += delta
 			fade_rect.color.a = clampf(_fade_t / FADE, 0.0, 1.0)
 			if _fade_t >= FADE:
-				scene_i += 1
+				scene_i = (scene_i + 1) % MenuScenes.count()
+				cur = 1 - cur
 				_show_scene()
+				var shown := worlds[cur]
+				_next_target = MenuScenes.next_minute(shown.minute + 1.0, MenuScenes.tod_of(scene_i + 1))
 				_fading = 2
 				_fade_t = 0.0
 		2:
 			_fade_t += delta
-			fade_rect.color.a = 1.0 - clampf(_fade_t / (FADE * 1.3), 0.0, 1.0)
-			if _fade_t >= FADE * 1.3:
+			fade_rect.color.a = 1.0 - clampf(_fade_t / (FADE * 1.4), 0.0, 1.0)
+			if _fade_t >= FADE * 1.4:
 				_fading = 0
 
 
+## Для снимков и тестов: сразу показать вид i (завод проматывается к его времени).
+func jump(i: int) -> void:
+	scene_i = i % MenuScenes.count()
+	var w := worlds[cur]
+	MenuScenes.advance_to(w, MenuScenes.next_minute(w.minute, MenuScenes.tod_of(scene_i)), 4000)
+	_show_scene()
+	scene_t = 4.0
+	_next_target = MenuScenes.next_minute(w.minute + 1.0, MenuScenes.tod_of(scene_i + 1))
+
+
+func _time_text() -> String:
+	var tod := int(sim.tod())
+	var days := ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"]
+	return "%02d:%02d · %s" % [tod / 60, tod % 60, days[(sim.day() - 1) % 7]]
+
+
+func _update_caption() -> void:
+	if cap_title == null:
+		return
+	cap_title.text = MenuScenes.caption(scene_i)
+	cap_time.text = _time_text()
+	cap_bar.i = scene_i
+	cap_bar.k = 0.0
+	cap_bar.queue_redraw()
+
+
 func _build_ui() -> void:
-	var shade := TextureRect.new()
-	var grad := Gradient.new()
-	grad.set_color(0, Color(0.07, 0.08, 0.09, 0.96))
-	grad.set_color(1, Color(0.07, 0.08, 0.09, 0.0))
-	grad.add_point(0.6, Color(0.07, 0.08, 0.09, 0.9))
-	var gt := GradientTexture2D.new()
-	gt.gradient = grad
-	gt.fill_from = Vector2(0, 0)
-	gt.fill_to = Vector2(1, 0)
-	gt.width = 256
-	gt.height = 8
-	shade.texture = gt
-	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	shade.stretch_mode = TextureRect.STRETCH_SCALE
-	shade.anchor_bottom = 1.0
-	shade.offset_right = 820
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ui.add_child(shade)
-	var col := UITheme.vbox(14)
-	col.anchor_top = 0.5
-	col.anchor_bottom = 0.5
-	col.offset_left = 90
-	col.offset_top = -260
-	col.offset_right = 520
-	col.offset_bottom = 260
+	var back := SidePanel.new()
+	back.anchor_bottom = 1.0
+	back.offset_right = 860
+	ui.add_child(back)
+	var col := UITheme.vbox(0)
+	col.anchor_bottom = 1.0
+	col.offset_left = 72
+	col.offset_right = 470
+	col.offset_top = 0
 	ui.add_child(col)
-	# 1.17: заголовок — векторный логотип, растеризуется под точный размер экрана (чётко на любом мониторе)
-	var t := Logo.new()
-	col.add_child(t)
-	# предупредительная полоса вместо простой черты — как на кромке станка
+	var top := Control.new()
+	top.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	top.custom_minimum_size = Vector2(0, 60)
+	col.add_child(top)
+	col.add_child(Logo.new())
+	var g1 := Control.new()
+	g1.custom_minimum_size = Vector2(0, 12)
+	col.add_child(g1)
 	var line := FactoryUI.Hazard.new()
-	line.custom_minimum_size = Vector2(200, 7)
+	line.custom_minimum_size = Vector2(150, 6)
 	line.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	col.add_child(line)
-	col.add_child(UITheme.label("Симулятор российского завода — от гаража до гиганта", 18, UITheme.MUTED))
-	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(0, 18)
-	col.add_child(gap)
-	menu_box = UITheme.vbox(10)
-	menu_box.custom_minimum_size = Vector2(340, 0)
+	var g2 := Control.new()
+	g2.custom_minimum_size = Vector2(0, 14)
+	col.add_child(g2)
+	var tag := UITheme.label("Симулятор российского завода — от гаража до гиганта", 16, Color(0.93, 0.9, 0.84, 0.78))
+	col.add_child(tag)
+	var g3 := Control.new()
+	g3.custom_minimum_size = Vector2(0, 40)
+	col.add_child(g3)
+	menu_box = UITheme.vbox(6)
+	menu_box.custom_minimum_size = Vector2(380, 0)
 	menu_box.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	col.add_child(menu_box)
 	_fill_menu()
-	var ver := UITheme.label(VERSION_TEXT + " · шрифт IBM Plex Sans (SIL OFL)", 12, Color(1, 1, 1, 0.45))
+	var bottom := Control.new()
+	bottom.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	bottom.custom_minimum_size = Vector2(0, 60)
+	col.add_child(bottom)
+	var ver := UITheme.label(VERSION_TEXT + "  ·  шрифты IBM Plex Sans (SIL OFL) и DejaVu Sans", 12, Color(1, 1, 1, 0.38))
 	ver.anchor_top = 1.0
 	ver.anchor_bottom = 1.0
-	ver.offset_left = 24
-	ver.offset_top = -34
+	ver.offset_left = 72
+	ver.offset_top = -40
 	ui.add_child(ver)
+	_build_caption()
+	_build_news()
+	ng_dim = ColorRect.new()
+	ng_dim.color = Color(0.03, 0.035, 0.04, 0.62)
+	ng_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ng_dim.visible = false
+	ui.add_child(ng_dim)
 
 
-func _big(text: String, cb: Callable, sub_text: String = "") -> Button:
-	var b := UITheme.button(text, cb)
-	b.custom_minimum_size = Vector2(340, 50)
-	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.add_theme_font_size_override("font_size", 19)
-	b.add_theme_font_override("font", UITheme.f_med)
-	if sub_text != "":
-		b.tooltip_text = sub_text
+## Подпись к фону справа внизу: что показываем, время на заводе, полоса смены видов.
+func _build_caption() -> void:
+	var box := PanelContainer.new()
+	box.add_theme_stylebox_override("panel", UITheme.sb(Color(0.07, 0.08, 0.09, 0.72), Color(1, 1, 1, 0.07), 1, 10, 18, 12))
+	box.anchor_left = 1.0
+	box.anchor_right = 1.0
+	box.anchor_top = 1.0
+	box.anchor_bottom = 1.0
+	box.offset_left = -340
+	box.offset_right = -36
+	box.offset_top = -132
+	box.offset_bottom = -36
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(box)
+	_cards.append(box)
+	var v := UITheme.vbox(4)
+	box.add_child(v)
+	v.add_child(UITheme.label("СЕЙЧАС НА ЗАВОДЕ", 11, Color(0.88, 0.66, 0.23, 0.9), UITheme.f_caps if UITheme.f_caps else UITheme.f_semi))
+	cap_title = UITheme.label("", 21, UITheme.TEXT, UITheme.f_semi)
+	v.add_child(cap_title)
+	cap_time = UITheme.label("", 13, UITheme.MUTED)
+	v.add_child(cap_time)
+	cap_bar = SceneBar.new()
+	cap_bar.n = MenuScenes.count()
+	cap_bar.custom_minimum_size = Vector2(0, 8)
+	v.add_child(cap_bar)
+	_update_caption()
+
+
+## Что нового в версии — маленькая карточка справа вверху.
+func _build_news() -> void:
+	var box := PanelContainer.new()
+	box.add_theme_stylebox_override("panel", UITheme.sb(Color(0.07, 0.08, 0.09, 0.72), Color(1, 1, 1, 0.07), 1, 10, 16, 12))
+	box.anchor_left = 1.0
+	box.anchor_right = 1.0
+	box.offset_left = -340
+	box.offset_right = -36
+	box.offset_top = 36
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(box)
+	_cards.append(box)
+	var v := UITheme.vbox(5)
+	box.add_child(v)
+	v.add_child(UITheme.label("ЧТО НОВОГО · " + VERSION_TEXT.replace("Версия ", ""), 11, Color(0.88, 0.66, 0.23, 0.9), UITheme.f_caps if UITheme.f_caps else UITheme.f_semi))
+	for s in WHATS_NEW:
+		var h := UITheme.hbox(8)
+		var dot := ColorRect.new()
+		dot.color = UITheme.ACCENT
+		dot.custom_minimum_size = Vector2(5, 5)
+		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		h.add_child(dot)
+		h.add_child(UITheme.label(str(s), 13, Color(0.93, 0.9, 0.84, 0.86)))
+		v.add_child(h)
+
+
+## Пункт меню: значок, надпись, при наведении — янтарная планка слева и сдвиг вправо.
+func _big(text: String, cb: Callable, sub_text: String = "", icon: String = "") -> MenuItem:
+	var b := MenuItem.new()
+	b.title = text
+	b.hint = sub_text
+	b.icon_tex = Tex.ui(icon) if icon != "" else null
+	b.pressed.connect(cb)
 	menu_box.add_child(b)
 	return b
-
-
-## Главная кнопка: янтарная, тёмный текст (читается лучше светлого на жёлтом).
-func _amber(b: Button) -> void:
-	b.add_theme_stylebox_override("normal", UITheme.sb(UITheme.ACCENT, UITheme.ACCENT, 1, 7, 16, 6))
-	b.add_theme_stylebox_override("hover", UITheme.sb(Color("#ecb84c"), Color("#ecb84c"), 1, 7, 16, 6))
-	b.add_theme_color_override("font_color", UITheme.ACCENT_T)
-	b.add_theme_color_override("font_hover_color", UITheme.ACCENT_T)
-	b.add_theme_font_override("font", UITheme.f_semi)
 
 
 func _fill_menu() -> void:
@@ -209,16 +335,112 @@ func _fill_menu() -> void:
 	var saves := Game.list_saves()
 	if not saves.is_empty() and not bool((saves[0] as Dictionary).get("broken", false)):
 		var s: Dictionary = saves[0]
-		var b := _big("Продолжить", func() -> void: Game.start_load(str(s["slot"])))
-		var hint := UITheme.label("   %s%s · сохранено %s" % [(str(s["company"]) + " · ") if s.has("company") else "", Defs.money_str(float(s.get("money", 0))), Game.pc_time(str(s.get("saved_at", "")))], 13, UITheme.MUTED)
-		menu_box.add_child(hint)
-		_amber(b)
-	_big("Новая игра", _show_new_game, "Выбор профиля завода, сценария и рассказчика.")
-	var lb := _big("Загрузить", _show_load)
+		var b := _big("Продолжить", func() -> void: Game.start_load(str(s["slot"])),
+			"%s%s · %s" % [(str(s["company"]) + " · ") if s.has("company") else "", Defs.money_str(float(s.get("money", 0))), Game.pc_time(str(s.get("saved_at", "")))], "play1")
+		b.primary = true
+	_big("Новая игра", _show_new_game, "Профиль, сценарий, рассказчик", "factory")
+	var lb := _big("Загрузить", _show_load, "", "log")
 	lb.disabled = saves.is_empty()
-	_big("Достижения", _show_achievements)
-	_big("Настройки", _show_settings)
-	_big("Выход", func() -> void: get_tree().quit())
+	_big("Достижения", _show_achievements, "", "medal")
+	_big("Настройки", _show_settings, "", "control")
+	_big("Выход", func() -> void: get_tree().quit(), "", "cancel")
+
+
+## Полупрозрачная панель слева с мягким краем и тонкой янтарной линией.
+class SidePanel:
+	extends Control
+	var _fade: GradientTexture2D
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var g := Gradient.new()
+		var base := Color(0.055, 0.062, 0.072)
+		g.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+		g.colors = PackedColorArray([Color(base, 0.9), Color(base, 0.45), Color(base, 0.0)])
+		_fade = GradientTexture2D.new()
+		_fade.gradient = g
+		_fade.width = 256
+		_fade.height = 4
+		_fade.fill_to = Vector2(1, 0)
+
+	func _draw() -> void:
+		var h := size.y
+		draw_rect(Rect2(0, 0, 500, h), Color(0.055, 0.062, 0.072, 0.9))
+		draw_texture_rect(_fade, Rect2(500, 0, 360, h), false)
+		draw_rect(Rect2(0, 0, 4, h), Color(0.88, 0.66, 0.23, 0.85))
+
+
+## Полоска смены видов: n отрезков, текущий заполняется по времени показа.
+class SceneBar:
+	extends Control
+	var n := 5
+	var i := 0
+	var k := 0.0
+
+	func _draw() -> void:
+		var gap := 5.0
+		var w := (size.x - gap * (n - 1)) / float(n)
+		for j in n:
+			var r := Rect2(j * (w + gap), size.y * 0.5 - 1.5, w, 3)
+			draw_rect(r, Color(1, 1, 1, 0.14))
+			var f := 1.0 if j < i % n else (k if j == i % n else 0.0)
+			if f > 0.0:
+				draw_rect(Rect2(r.position, Vector2(r.size.x * f, r.size.y)), Color(0.88, 0.66, 0.23, 0.95))
+
+
+## Пункт главного меню.
+class MenuItem:
+	extends Button
+	var title := ""
+	var hint := ""
+	var icon_tex: Texture2D = null
+	var primary := false
+	var _h := 0.0
+
+	func _init() -> void:
+		custom_minimum_size = Vector2(380, 54)
+		focus_mode = Control.FOCUS_NONE
+		flat = true
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		var empty := StyleBoxEmpty.new()
+		for st in ["normal", "hover", "pressed", "disabled", "focus"]:
+			add_theme_stylebox_override(st, empty)
+
+	func _process(delta: float) -> void:
+		var want := 1.0 if is_hovered() and not disabled else 0.0
+		var nh := move_toward(_h, want, delta * 7.0)
+		if nh != _h:
+			_h = nh
+			queue_redraw()
+
+	func _draw() -> void:
+		var e := _h * _h * (3.0 - 2.0 * _h)
+		var r := Rect2(Vector2.ZERO, size)
+		if primary:
+			draw_rect(r, Color(0.88, 0.66, 0.23, 0.92 + 0.08 * e))
+		else:
+			draw_rect(r, Color(1, 1, 1, 0.035 + 0.06 * e))
+			draw_rect(Rect2(0, 0, 3.0 + 3.0 * e, size.y), Color(0.88, 0.66, 0.23, 0.35 + 0.65 * e))
+		var dx := 18.0 + 6.0 * e
+		var tc := UITheme.ACCENT_T if primary else (Color(0.93, 0.9, 0.84, 0.35) if disabled else UITheme.TEXT)
+		if icon_tex:
+			var isz := 22.0
+			draw_texture_rect(icon_tex, Rect2(dx, (size.y - isz) * 0.5, isz, isz), false, tc if not primary else UITheme.ACCENT_T)
+			dx += isz + 14.0
+		var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
+		var fs := 19
+		var hf: Font = UITheme.f_reg if UITheme.f_reg else ThemeDB.fallback_font
+		if hint != "":
+			draw_string(f, Vector2(dx, size.y * 0.5 - 2.0), title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, tc)
+			var hc := Color(0.1, 0.1, 0.1, 0.75) if primary else Color(0.66, 0.69, 0.72, 0.9 if not disabled else 0.35)
+			draw_string(hf, Vector2(dx, size.y * 0.5 + 16.0), hint, HORIZONTAL_ALIGNMENT_LEFT, size.x - dx - 12.0, 12, hc)
+		else:
+			draw_string(f, Vector2(dx, size.y * 0.5 + 7.0), title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, tc)
+		if e > 0.01 and not disabled:
+			var ac := UITheme.ACCENT_T if primary else Color(0.88, 0.66, 0.23, e)
+			var ax := size.x - 26.0 + 4.0 * e
+			draw_line(Vector2(ax, size.y * 0.5 - 5), Vector2(ax + 5, size.y * 0.5), ac, 2.0, true)
+			draw_line(Vector2(ax + 5, size.y * 0.5), Vector2(ax, size.y * 0.5 + 5), ac, 2.0, true)
 
 
 func _panel(title: String) -> VBoxContainer:
@@ -231,9 +453,9 @@ func _panel(title: String) -> VBoxContainer:
 	sub.add_theme_stylebox_override("panel", UITheme.sb(UITheme.BG, UITheme.LINE, 1, 10, 20, 16))
 	sub.anchor_top = 0.5
 	sub.anchor_bottom = 0.5
-	sub.offset_left = 520
+	sub.offset_left = 500
 	sub.offset_top = -220
-	sub.offset_right = 1120
+	sub.offset_right = 1100
 	sub.offset_bottom = 220
 	ui.add_child(sub)
 	var v := UITheme.vbox(10)
@@ -580,3 +802,12 @@ class Logo:
 		if _tex:
 			draw_texture_rect(_tex, Rect2(Vector2.ZERO, Vector2(size.x, size.x / _ratio)), false)
 
+
+
+## Главная кнопка в окнах: янтарная, тёмный текст (читается лучше светлого на жёлтом).
+func _amber(b: Button) -> void:
+	b.add_theme_stylebox_override("normal", UITheme.sb(UITheme.ACCENT, UITheme.ACCENT, 1, 7, 16, 6))
+	b.add_theme_stylebox_override("hover", UITheme.sb(Color("#ecb84c"), Color("#ecb84c"), 1, 7, 16, 6))
+	b.add_theme_color_override("font_color", UITheme.ACCENT_T)
+	b.add_theme_color_override("font_hover_color", UITheme.ACCENT_T)
+	b.add_theme_font_override("font", UITheme.f_semi)

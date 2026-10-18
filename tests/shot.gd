@@ -19,10 +19,7 @@ func _ready() -> void:
 		if args.size() > 6 and args[6].begins_with("scene:"):
 			var mm2: Node = target
 			var si := int(args[6].substr(6))
-			(func() -> void:
-				mm2.set("scene_i", si)
-				mm2.call("_show_scene")
-				mm2.set("scene_t", 6.0)).call_deferred()
+			(func() -> void: mm2.call("jump", si)).call_deferred()
 		if args.size() > 6 and args[6] == "newgame2":
 			var mm: Node = target
 			(func() -> void:
@@ -694,6 +691,16 @@ func _ready() -> void:
 				gm.hud.open_window("staff")
 				gm.hud.win.tab = "hire"
 				gm.hud.win.rebuild(true)
+			"stall":
+				var ms0 := gm.sim.things_of("machine")
+				if ms0.size() > 3:
+					ms0[0].broken = true
+					ms0[1].enabled = false
+					gm.sim.cons["tools"] = 0.0
+				gm.hud.open_window("prod:stall")
+			"staffq":
+				GameWindow.staff_q = "разнораб"
+				gm.hud.open_window("staff")
 			"mill", "furnace", "weld_post", "paint_booth":
 				for t: Thing in gm.sim.things.values():
 					if t.def_id == args[6]:

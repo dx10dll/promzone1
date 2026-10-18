@@ -26,7 +26,7 @@ const GROUPS := {
 		["contracts", "Контракты", "handshake", "orders", "contracts"], ["compet", "Конкуренты", "factory", "orders", "compet"],
 		["plan", "План ПДО", "calendar", "orders", "plan"], ["done", "Архив", "log", "orders", "done"]]},
 	"prod": {"title": "Производство", "icon": "shop", "secs": [
-		["machines", "Станки", "shop", "shop", ""], ["supply", "Металл и расходники", "supply", "supply", "main"],
+		["machines", "Станки", "shop", "shop", ""], ["stall", "Что стоит", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
 		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
 	"people": {"title": "Люди", "icon": "staff", "secs": [
 		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "orders", "staff", "hire"],
@@ -286,6 +286,10 @@ func _process(delta: float) -> void:
 
 
 func _popup_open() -> bool:
+	# 1.24: пока человек печатает в поле поиска — тоже не перестраиваем, чтобы не сбить ввод
+	var fo := get_viewport().gui_get_focus_owner()
+	if fo is LineEdit and is_ancestor_of(fo):
+		return true
 	for n in find_children("*", "OptionButton", true, false):
 		var ob := n as OptionButton
 		if ob and ob.get_popup().visible:
@@ -496,7 +500,7 @@ func _signature() -> String:
 			s2.append(str(sim.item_rev))
 			return ",".join(s2)
 		"shop":
-			var s5: Array[String] = [str(sim.ppr), str(sim.thing_rev)]
+			var s5: Array[String] = [tab, str(sim.ppr), str(sim.thing_rev)]
 			for m in sim.things_of("machine"):
 				s5.append("%d%s%d%d%s%s%d" % [m.id, m.product, m.job_step, int(m.condition), str(m.broken), str(m.enabled), int(m.working)])
 			for c in Defs.consumables.keys():
@@ -1253,6 +1257,7 @@ func _staff() -> void:
 
 static var staff_filter := "all"
 static var staff_sort := "prof"
+static var staff_q := ""          ## 1.24: поиск по имени, профессии, чертам, занятию
 
 
 ## Сотрудники: плотная таблица; щелчок по строке — показать человека на заводе.
@@ -1287,14 +1292,32 @@ func _staff_list() -> void:
 	if sim.workers.is_empty():
 		content.add_child(UITheme.empty("Пока никого нет. Наймите людей в разделе «Найм»."))
 		return
-	var bar := UITheme.hbox(10)
-	bar.add_child(UITheme.segmented([["all", "Все %d" % sim.workers.size()], ["s0", "1-я смена %d" % by_shift[0]], ["s1", "2-я смена %d" % by_shift[1]], ["itr", "ИТР"], ["low", "Недовольные"]], staff_filter, func(k: String) -> void:
-		staff_filter = k
-		rebuild(true)))
-	bar.add_child(UITheme.spacer())
-	bar.add_child(UITheme.label("Сортировка:", 12, UITheme.MUTED))
-	bar.add_child(UITheme.segmented([["prof", "профессия"], ["mood", "настроение"], ["grade", "разряд"], ["wage", "ставка"]], staff_sort, func(k: String) -> void:
+	var n_idle := 0
+	var n_new := 0
+	for w1 in sim.workers:
+		if w1.idle_now():
+			n_idle += 1
+		if sim.day() - w1.hired_day < 7:
+			n_new += 1
+	var srow := UITheme.hbox(10)
+	var le := LineEdit.new()
+	le.placeholder_text = "Поиск: имя, профессия, черта, занятие…"
+	le.text = staff_q
+	le.clear_button_enabled = true
+	le.custom_minimum_size = Vector2(340, 0)
+	srow.add_child(le)
+	var found := _cl("", 12, UITheme.MUTED)
+	srow.add_child(found)
+	srow.add_child(UITheme.spacer())
+	srow.add_child(UITheme.label("Сортировка:", 12, UITheme.MUTED))
+	srow.add_child(UITheme.segmented([["prof", "профессия"], ["mood", "настроение"], ["grade", "разряд"], ["wage", "ставка"], ["new", "стаж"]], staff_sort, func(k: String) -> void:
 		staff_sort = k
+		rebuild(true)))
+	content.add_child(srow)
+	var bar := UITheme.hbox(10)
+	bar.add_child(UITheme.segmented([["all", "Все %d" % sim.workers.size()], ["s0", "1-я смена %d" % by_shift[0]], ["s1", "2-я смена %d" % by_shift[1]], ["itr", "ИТР"],
+			["low", "Недовольные"], ["idle", "Без дела %d" % n_idle], ["new", "Новички %d" % n_new], ["away", "Нет на месте"]], staff_filter, func(k: String) -> void:
+		staff_filter = k
 		rebuild(true)))
 	content.add_child(bar)
 	var list: Array = sim.workers.filter(func(w: Worker) -> bool:
@@ -1307,6 +1330,12 @@ func _staff_list() -> void:
 				return w.is_itr()
 			"low":
 				return w.mood < 35.0
+			"idle":
+				return w.idle_now()
+			"new":
+				return sim.day() - w.hired_day < 7
+			"away":
+				return not w.present
 		return true)
 	match staff_sort:
 		"mood":
@@ -1315,8 +1344,11 @@ func _staff_list() -> void:
 			list.sort_custom(func(a: Worker, b: Worker) -> bool: return a.grade() > b.grade())
 		"wage":
 			list.sort_custom(func(a: Worker, b: Worker) -> bool: return a.wage > b.wage)
+		"new":
+			list.sort_custom(func(a: Worker, b: Worker) -> bool: return a.hired_day > b.hired_day)
 		_:
 			list.sort_custom(func(a: Worker, b: Worker) -> bool: return a.prof_name() < b.prof_name() if a.prof != b.prof else a.grade() > b.grade())
+	var rows: Array = []   # [строка, ключ поиска]
 	_thead([["", 40], ["Сотрудник", 220], ["Профессия", 190], ["Смена", 70], ["Ставка", 90], ["Настроение", 150], ["Сейчас", -1]])
 	for w: Worker in list:
 		var por := Portrait.new()
@@ -1327,12 +1359,29 @@ func _staff_list() -> void:
 		var mood := UITheme.meter(w.mood, Mood.color(w.mood), 70, ("%d %s" % [int(w.mood), Mood.label(w.mood).to_lower()]) if sim.office.active("hr") else Mood.label(w.mood).to_lower())
 		var act := w.activity if w.present else ("не вышел" if w.skip_shift else ("в отпуске" if w.away_why == "в отпуске" else ("на больничном" if w.sick_until > sim.minute else "дома")))
 		var wid := w.id
-		_trow([[por, 40], [_cl2(w.formal_name(), ", ".join(traits)), 220], [_cl2(w.prof_name(), w.rank_text()), 190],
+		var row := _trow([[por, 40], [_cl2(w.formal_name(), ", ".join(traits)), 220], [_cl2(w.prof_name(), w.rank_text()), 190],
 			[_cl("2-я" if w.shift == 1 else "1-я", 13, UITheme.MUTED), 70], [_cl(Defs.money_str(w.wage), 13), 90], [mood, 150],
 			[_cl(act, 13, UITheme.INFO if w.present else UITheme.MUTED), -1]],
 			func() -> void:
 				hud.select_worker(wid)
 				closed.emit(), 54.0, "Показать на заводе и открыть карточку")
+		rows.append([row, w.search_key()])
+	var none := UITheme.empty("Никого не нашлось — попробуйте другое слово или фильтр «Все».")
+	content.add_child(none)
+	var apply := func() -> void:
+		var q := staff_q.strip_edges().to_lower()
+		var n := 0
+		for r: Array in rows:
+			var vis := q == "" or str(r[1]).contains(q)
+			(r[0] as Control).visible = vis
+			if vis:
+				n += 1
+		none.visible = n == 0
+		found.text = ("найдено %d" % n) if q != "" else ""
+	apply.call()
+	le.text_changed.connect(func(t: String) -> void:
+		staff_q = t
+		apply.call())
 
 
 ## Найм: кандидаты карточками в две колонки, объявления — в шапке.
@@ -1788,6 +1837,9 @@ func _shop() -> void:
 	if tab == "routes":
 		_routes()
 		return
+	if tab == "stall":
+		_stall()
+		return
 	var ms := sim.things_of("machine")
 	var work := 0
 	var broken := 0
@@ -1840,6 +1892,52 @@ func _shop() -> void:
 			func() -> void:
 				hud.select_thing(mid)
 				closed.emit(), 48.0, "Показать станок на заводе")
+
+
+## 1.24: «Что стоит» — все простаивающие станки с причиной; щелчок — показать станок.
+func _stall() -> void:
+	var ms := sim.things_of("machine")
+	var lst := Stall.list(sim)
+	var bad := 0
+	for r0: Dictionary in lst:
+		if int(r0["lvl"]) <= Stall.WARN:
+			bad += 1
+	_info("станков %d · работают %d · стоят %d%s" % [ms.size(), ms.size() - lst.size(), lst.size(), (" · требуют внимания %d" % bad) if bad > 0 else ""])
+	_intro("Все станки, которые сейчас не работают, и почему. Сверху — то, что само не пройдёт (поломка, нет тока, нет металла). Щёлкните по строке — камера покажет станок.")
+	if ms.is_empty():
+		content.add_child(UITheme.empty("Станков пока нет. Поставьте их через «Объекты» (O)."))
+		return
+	if lst.is_empty():
+		content.add_child(UITheme.empty("Все станки работают. Так держать!"))
+		return
+	var groups := [[Stall.BAD, "Нужно вмешаться", UITheme.BAD], [Stall.WARN, "Скоро встанет совсем", UITheme.WARN], [Stall.INFO, "Обычное ожидание", UITheme.MUTED]]
+	for g: Array in groups:
+		var part := lst.filter(func(r: Dictionary) -> bool: return int(r["lvl"]) == int(g[0]))
+		if part.is_empty():
+			continue
+		var hh := UITheme.hbox(8)
+		var ic := _icon(Tex.ui("warn" if int(g[0]) < Stall.INFO else "clock"), 18.0)
+		ic.modulate = g[2]
+		hh.add_child(ic)
+		hh.add_child(_cl("%s · %d" % [str(g[1]), part.size()], 13, g[2], UITheme.f_semi))
+		content.add_child(hh)
+		for r: Dictionary in part:
+			var m: Thing = r["m"]
+			var mid := m.id
+			var rm := sim.rooms.room_of_thing(m)
+			_trow([[_icon(Tex.obj(m.def_id), 40), 44], [_cl2(m.title(), rm.title() if rm else "без помещения", UITheme.TEXT, UITheme.MUTED), 230],
+				[_chip_box(UITheme.chip(str(r["why"]), g[2])), 190], [_cl(str(r["hint"]), 13, UITheme.TEXT), -1]],
+				func() -> void:
+					hud.select_thing(mid)
+					closed.emit(), 52.0, "Показать станок на заводе")
+
+
+func _chip_box(c: Control) -> Control:
+	var b := HBoxContainer.new()
+	c.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	c.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	b.add_child(c)
+	return b
 
 
 ## Маршруты изделий: операции по переделам, НЗП, чего не хватает.
