@@ -1,6 +1,6 @@
 extends Node
 ## Звук: шины «Музыка», «Звуки», «Окружение»; короткие эффекты (в том числе в точке мира),
-## музыка с плейлистом и плавной сменой, фоновые петли с плавной громкостью.
+## музыка с плейлистом и плавной сменой (1.31: два плеера, перекрёстное затухание), фоновые петли с плавной громкостью.
 ## Все звуки синтезированы tools/gen_sounds.py и лежат в assets/sound.
 
 const BUSES := ["Music", "SFX", "Ambient", "People", "City", "UI"]
@@ -14,12 +14,24 @@ const LOOPS := ["m_", "amb_", "v_crowd"]
 var _cache: Dictionary = {}
 var _pool: Array[AudioStreamPlayer] = []
 var _pool2d: Array[AudioStreamPlayer2D] = []
-var _music := AudioStreamPlayer.new()
-var _music_next := ""
-var _music_fade := 0.0
+## 1.31: музыка — два плеера на шине «Музыка», смена перекрёстным затуханием равной мощности (MusicFade).
+const MUSIC_DB := -6.0
+var _mp: Array[AudioStreamPlayer] = []
+var _ma := 0                      ## активный (входящий) плеер
+var _mg: Array[float] = [0.0, 0.0]   ## громкость 0–1 каждого плеера
+var _from_g := 0.0                ## громкость уходящего в начале смены
+var _xf := MusicFade.new()
+var _duck := 1.0                  ## приглушение (пауза, меню)
+var _duck_t := 1.0
+var _pending := ""                ## новый трек вступит на границе фразы текущего
+var _pending_at := 0.0            ## …когда текущий дойдёт до этой секунды
+var _prefer := ""                 ## «лицо» нового списка — сыграет следующим
+var _gap_after := -1.0            ## тишина после трека с естественным концом (−1 — без тишины, сразу смена)
+var _gap := 0.0
+var _history: Array = []          ## последние сыгранные — без повторов подряд
+var _mrng := RandomNumberGenerator.new()
 var playlist: Array = []
 signal track_started(name: String)   ## 1.28: заиграл новый трек
-var _pl_i := 0
 var _amb: Dictionary = {}        ## имя -> {player, target}
 var _last: Dictionary = {}       ## имя -> время последнего проигрывания (чтобы не частить)
 
@@ -44,9 +56,13 @@ func _ready() -> void:
 		p2.attenuation = 1.4
 		add_child(p2)
 		_pool2d.append(p2)
-	_music.bus = "Music"
-	add_child(_music)
-	_music.finished.connect(_on_music_end)
+	for i3 in 2:
+		var mp := AudioStreamPlayer.new()
+		mp.bus = "Music"
+		mp.volume_db = -80.0
+		add_child(mp)
+		_mp.append(mp)
+	_mrng.randomize()
 	apply_volumes()
 
 
@@ -141,65 +157,128 @@ func play_at(name: String, pos: Vector2, vol_db: float = 0.0, gap: float = 0.08)
 
 # ---------------------------------------------------------------- музыка
 
-func set_playlist(names: Array) -> void:
+## Новый список сразу: текущий трек плавно уступает первому из списка (меню ↔ игра).
+## Если текущий трек есть и в новом списке — он доигрывает.
+func set_playlist(names: Array, fade: float = MusicFade.XFADE_MENU) -> void:
 	playlist = names
-	_pl_i = 0
+	_pending = ""
+	_prefer = ""
+	_duck_t = 1.0
 	if names.is_empty():
-		music("")
-	else:
-		music(str(names[0]))
+		music("", fade)
+		return
+	var cur := now_playing()
+	if cur != "" and names.has(cur):
+		return
+	music(MusicDirector.first_of(names, _history, _mrng.randf()), fade)
 
 
-## 1.28: мягкая смена списка — текущий трек доигрывает, дальше идёт новый список.
+## 1.28: мягкая смена списка — текущий трек доигрывает, если подходит; если нет — новый вступает
+## на ближайшей границе музыкальной фразы (1.31), плавно.
 func set_playlist_soft(names: Array) -> void:
 	if names == playlist:
 		return
+	var old_head := "" if playlist.is_empty() else str(playlist[0])
 	playlist = names
-	var cur := _current_music()
-	_pl_i = maxi(0, names.find(cur))
-	if cur == "" and _music_next == "" and not names.is_empty():
-		music(str(names[0]))
-	elif cur != "" and not names.has(cur):
-		_pl_i = -1   # следующий по кругу — первый трек нового списка
+	if names.is_empty():
+		return
+	var cur := now_playing()
+	if cur == "":
+		if not _xf.active and _gap <= 0.0:
+			music(MusicDirector.first_of(names, _history, _mrng.randf()))
+		return
+	if names.has(cur):
+		if str(names[0]) != old_head and str(names[0]) != cur:
+			_prefer = str(names[0])   # дождь, зима: следующим сыграет «лицо» списка
+		return
+	_pending = MusicDirector.first_of(names, _history, _mrng.randf())
+	_pending_at = MusicFade.next_boundary(_mp[_ma].get_playback_position(), MusicDirector.phrase(cur))
 
 
 func now_playing() -> String:
-	return _current_music()
-
-
-func music(name: String) -> void:
-	if name == _current_music():
-		return
-	_music_next = name
-	_music_fade = 1.0 if _music.playing else 0.0
-
-
-func _current_music() -> String:
-	if _music.stream == null or not _music.playing:
+	if _mp.is_empty():
 		return ""
-	return _music.stream.resource_path.get_file().get_basename()
+	var p: AudioStreamPlayer = _mp[_ma]
+	if p.stream == null or not p.playing:
+		return ""
+	return p.stream.resource_path.get_file().get_basename()
 
 
-func _on_music_end() -> void:
-	if playlist.size() > 1:
-		_pl_i = (_pl_i + 1) % playlist.size()
-		get_tree().create_timer(12.0).timeout.connect(func() -> void:
-			if not _music.playing and not playlist.is_empty():
-				_start_music(str(playlist[_pl_i])))
-	elif playlist.size() == 1:
-		get_tree().create_timer(8.0).timeout.connect(func() -> void:
-			if not _music.playing and not playlist.is_empty():
-				_start_music(str(playlist[0])))
+## 1.31: приглушить музыку (открыто меню паузы) — плавно.
+func duck(on: bool) -> void:
+	_duck_t = 0.4 if on else 1.0
 
 
-func _start_music(name: String) -> void:
-	if name == "":
-		_music.stop()
+## Сменить трек сейчас: перекрёстное затухание за fade секунд («» — затухнуть в тишину).
+func music(name: String, fade: float = MusicFade.XFADE) -> void:
+	if name != "" and name == now_playing() and not _xf.active:
 		return
-	_music.stream = stream(name)
-	_music.volume_db = -6.0
-	_music.play()
+	_pending = ""
+	var old := _ma
+	var nw := 1 - _ma
+	var old_on := _mp[old].playing and _mg[old] > 0.01
+	_mp[nw].stop()
+	_mg[nw] = 0.0
+	_from_g = _mg[old] if _mp[old].playing else 0.0
+	_ma = nw
+	_gap = 0.0
+	_xf.start(fade if old_on else MusicFade.FADE_IN)
+	if name == "":
+		_mp[nw].stream = null
+		return
+	_mp[nw].stream = stream(name)
+	_mp[nw].volume_db = -80.0
+	_mp[nw].play()
+	_history.append(name)
+	if _history.size() > 4:
+		_history.pop_front()
+	if name == _prefer:
+		_prefer = ""
+	_gap_after = _mrng.randf_range(2.0, 7.0) if MusicDirector.soft_end(name) and _mrng.randf() < 0.4 else -1.0
 	track_started.emit(name)
+
+
+func _next_name() -> String:
+	if _prefer != "" and playlist.has(_prefer) and _prefer != now_playing():
+		return _prefer
+	return MusicDirector.pick_next(playlist, _history, _mrng.randf())
+
+
+func _music_tick(delta: float) -> void:
+	if _mp.is_empty():
+		return
+	_xf.step(delta)
+	var pr := _xf.progress()
+	_mg[_ma] = MusicFade.gain_in(pr)
+	_mg[1 - _ma] = _from_g * MusicFade.gain_out(pr)
+	if not _xf.active and _mp[1 - _ma].playing:
+		_mp[1 - _ma].stop()
+	_duck = move_toward(_duck, _duck_t, delta * 0.6)
+	for i in 2:
+		_mp[i].volume_db = MUSIC_DB + lin_db(_mg[i] * _duck) if _mg[i] > 0.0005 else -80.0
+	var cur := _mp[_ma]
+	if playlist.is_empty():
+		return
+	if _pending != "":
+		if not cur.playing or cur.get_playback_position() >= _pending_at:
+			music(_pending)
+		return
+	if _xf.active:
+		return
+	if cur.playing and cur.stream != null:
+		var nm := now_playing()
+		var left := cur.stream.get_length() - cur.get_playback_position()
+		if _gap_after < 0.0 and left <= MusicDirector.overlap(nm):
+			music(_next_name(), MusicDirector.overlap(nm))
+		return
+	# трек кончился сам — короткая тишина, потом следующий
+	if _gap <= 0.0:
+		_gap = maxf(0.05, _gap_after)
+		_gap_after = -1.0
+		return
+	_gap -= delta
+	if _gap <= 0.0:
+		music(_next_name())
 
 
 # ---------------------------------------------------------------- фоновые петли
@@ -225,19 +304,7 @@ func stop_ambient() -> void:
 
 
 func _process(delta: float) -> void:
-	# смена музыки: затухание старой, затем новая
-	if _music_next != "" or (_music_fade > 0.0 and _music_next == ""):
-		if _music.playing and _music_fade > 0.0:
-			_music_fade -= delta * 0.7
-			_music.volume_db = lerpf(-40.0, -6.0, clampf(_music_fade, 0.0, 1.0))
-			if _music_fade <= 0.0:
-				_music.stop()
-		if not _music.playing or _music_fade <= 0.0:
-			var nx := _music_next
-			_music_next = ""
-			_music_fade = 0.0
-			if nx != "":
-				_start_music(nx)
+	_music_tick(delta)
 	for k in _amb.keys():
 		var a: Dictionary = _amb[k]
 		var v := move_toward(float(a["v"]), float(a["t"]), delta * 0.5)

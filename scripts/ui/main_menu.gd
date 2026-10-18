@@ -3,8 +3,8 @@ extends Node2D
 ## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
 ## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.30"
-const WHATS_NEW := ["Тамбов за забором, улица и автобус", "Пожарные, ломовоз, проходная", "Новые иконки меню"]
+const VERSION_TEXT := "Версия 1.31"
+const WHATS_NEW := ["10 новых мелодий", "Плавные переходы музыки", "Тамбов за забором"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -42,7 +42,7 @@ func _ready() -> void:
 	cam.make_current()
 	_show_scene()
 	Snd.stop_ambient()
-	Snd.set_playlist(["music_menu", "music_waltz"])
+	Snd.set_playlist(MusicDirector.MENU)   # 1.31: плавно, из игры — перекрёстным затуханием
 	var vl := CanvasLayer.new()
 	vl.layer = 1
 	add_child(vl)

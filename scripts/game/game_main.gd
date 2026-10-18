@@ -232,6 +232,7 @@ func _process(delta: float) -> void:
 	if _music_t <= 0.0:   # 1.28: музыка под время суток, раз в пару секунд
 		_music_t = 2.0
 		Snd.set_playlist_soft(MusicDirector.playlist(sim, int(Game.settings.get("music_mode", 0.0))))
+		Snd.duck(hud != null and hud.modal_open())   # 1.31: под меню паузы музыка тише
 	sim_ms = 0.0
 	if not is_running():
 		return
