@@ -61,7 +61,7 @@ func setup(h: Hud) -> void:
 
 func show_for(w: Worker) -> void:
 	wid = w.id
-	_por.set_look(w.look, 0.62, {"age": w.age, "mood": w.mood})
+	_por.set_look(w.look, 0.62, PortraitKit.live_info(hud.sim, w))
 	_name.text = "%s · %s" % [w.full_name(), w.prof_name()]
 	_t = 0.0
 	visible = true

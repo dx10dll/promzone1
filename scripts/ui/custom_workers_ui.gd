@@ -383,7 +383,7 @@ func _bar() -> void:
 func _preview() -> void:
 	var pw := CustomPeople.preview_worker(cur)
 	pw.mood = 62.0
-	por.set_look(pw.look, POR_Z, {"age": pw.age, "mood": 62.0, "doc": true})
+	por.set_look(pw.look, POR_Z, {"age": pw.age, "mood": 62.0, "doc": true, "dressed": dressed})   # 1.34: одежда — как у человечка
 	fio_lbl.text = CustomWorkers.fio(cur)
 	sub_lbl.text = CustomWorkers.subtitle(cur)
 	doll_box.show_worker(sim, pw, dressed)

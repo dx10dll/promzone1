@@ -175,7 +175,10 @@ func show_worker(s: Sim, w: Worker) -> void:
 	var top := UITheme.hbox(14)
 	# фото с печатью
 	var por := Portrait.new()
-	por.set_look(w.look, 1.25, {"age": w.age, "mood": w.mood, "wide": true, "doc": true})
+	var pinfo := PortraitKit.live_info(sim, w)   # 1.34: одежда и головной убор — как у человечка сейчас
+	pinfo["wide"] = true
+	pinfo["doc"] = true
+	por.set_look(w.look, 1.25, pinfo)
 	var ph := Control.new()
 	ph.custom_minimum_size = por.custom_minimum_size + Vector2(10, 6)
 	ph.add_child(por)
@@ -618,7 +621,9 @@ func show_visitor(s: Sim, v: Worker) -> void:
 	actions.visible = false
 	var top := UITheme.hbox(12)
 	var por := Portrait.new()
-	por.set_look(v.look, 1.2, {"age": v.age, "mood": 50.0})
+	var vinfo := PortraitKit.live_info(s, v)
+	vinfo["mood"] = 50.0
+	por.set_look(v.look, 1.2, vinfo)
 	top.add_child(por)
 	var col := UITheme.vbox(2)
 	col.add_child(UITheme.title(v.formal_name(), 16))

@@ -24,21 +24,23 @@ var wide := false   ## кадр чуть шире (больше плеч и фо
 var doc := false    ## светлый фон, как на фото для пропуска
 var _tex: Texture2D
 var _tex_key := ""
-var _lay: _Layers          ## 1.33: слои нового портрета (свой материал-шейдер)
+var _lay: Array[_Layers] = []   ## 1.33: слои нового портрета — по группе на узел (у каждой свой шейдер с маской)
 var _rec: Dictionary = {}
+var _info: Dictionary = {}
 
-static var _mat: ShaderMaterial
 
-
-## 1.33: новый портрет рисуется отдельным дочерним узлом — у него шейдер окраски слоёв.
+## 1.34: новый портрет рисуется дочерними узлами по группам слоёв (PortraitKit.GROUPS) — у каждого материал
+## с маской группы (тело внутри воротника, волосы под головным убором); последний — рамка.
 class _Layers extends Control:
 	var host: Portrait
+	var group := ""
 
 	func _draw() -> void:
-		host.draw_layers(self)
+		host.draw_layers(self, group)
 
 
-## info: необязательные {"age": лет, "mood": настроение 0–100, "wide": шире кадр, "doc": фон как на пропуске}.
+## info: необязательные {"age": лет, "mood": настроение 0–100, "wide": шире кадр, "doc": фон как на пропуске,
+## "dressed"/"winter"/"outside": одежда и головной убор живого человека — PortraitKit.live_info()}.
 func set_look(lk: Dictionary, z: float = 1.0, info: Dictionary = {}) -> void:
 	look = lk
 	zoom = z
@@ -46,34 +48,42 @@ func set_look(lk: Dictionary, z: float = 1.0, info: Dictionary = {}) -> void:
 	mood = float(info.get("mood", mood))
 	wide = bool(info.get("wide", false))
 	doc = bool(info.get("doc", false))
+	_info = info
 	clip_contents = true
 	custom_minimum_size = (Vector2(64.0 * (WIDE_K if wide else 1.0), 74) * z).round()
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_tex_key = ""
 	_rec = {}
 	if PortraitKit.available():
-		if _lay == null:
-			if _mat == null:
-				_mat = ShaderMaterial.new()
-				_mat.shader = PortraitKit.shader()
-			_lay = _Layers.new()
-			_lay.host = self
-			_lay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			_lay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			_lay.material = _mat
-			_lay.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-			add_child(_lay, false, Node.INTERNAL_MODE_FRONT)
+		if _lay.is_empty():
+			for gname: String in PortraitKit.GROUPS + [""]:
+				var c := _Layers.new()
+				c.host = self
+				c.group = gname
+				c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				c.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+				c.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+				c.material = PortraitKit.material("")
+				add_child(c, false, Node.INTERNAL_MODE_FRONT)
+				_lay.append(c)
 		if not look.is_empty():
-			_rec = PortraitKit.recipe(look, {"age": age, "mood": mood})
-		_lay.queue_redraw()
+			var ri := {"age": age, "mood": mood}
+			for k: String in ["dressed", "winter", "outside"]:
+				if info.has(k):
+					ri[k] = info[k]
+			_rec = PortraitKit.recipe(look, ri)
+		for c: _Layers in _lay:
+			if c.group != "":
+				c.material = PortraitKit.material(str(_rec.get("mask_" + c.group, "")))
+			c.queue_redraw()
 	queue_redraw()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		queue_redraw()
-		if _lay != null:
-			_lay.queue_redraw()
+		for c: _Layers in _lay:
+			c.queue_redraw()
 
 
 ## 1.33: кадр нового портрета на холсте набора (мелкий портрет в списках — крупнее лицо).
@@ -81,10 +91,12 @@ func frame_rect() -> Rect2:
 	return PortraitKit.frame(size.x / maxf(1.0, size.y), zoom < 0.75)
 
 
-func draw_layers(ci: Control) -> void:
+func draw_layers(ci: Control, group: String) -> void:
 	if _rec.is_empty() or size.x < 2.0:
 		return
-	PortraitKit.draw(ci, Rect2(Vector2.ZERO, size), frame_rect(), _rec, zoom >= 0.75)
+	if group != "":
+		PortraitKit.draw(ci, Rect2(Vector2.ZERO, size), frame_rect(), _rec, group, zoom >= 0.75)
+		return
 	# рамка — через тот же шейдер (он делит цвет на опорный серый)
 	var bc := Color("#8a949d") if doc else Color("#5a636c")
 	ci.draw_rect(Rect2(Vector2.ZERO, size), Color(bc.r * PortraitKit.REF, bc.g * PortraitKit.REF, bc.b * PortraitKit.REF), false, 1.0)
@@ -215,7 +227,7 @@ static func build_texture(lays: Array, px_w: int, is_wide: bool = false) -> Text
 func _draw() -> void:
 	if look.is_empty():
 		return
-	if _lay != null:
+	if not _lay.is_empty():
 		_draw_bg()
 		return
 	# 1.23: мелкое фото (в списках) — крупнее лицо: показываем середину кадра, без растяжения
