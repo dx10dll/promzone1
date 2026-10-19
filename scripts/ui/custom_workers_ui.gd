@@ -616,10 +616,20 @@ func _pick(title: String, opts: Array, target: Dictionary, key: String, swatches
 		var ov: Variant = opts[i][0]
 		if have != null and (str(ov) == str(have) or (ov is float and (have is float or have is int) and absf(float(ov) - float(have)) < 0.02)):
 			ci = i
+	# 1.35: стрелка меняет только свою строку — без пересборки всей формы (≈30 мс и сотни узлов на щелчок)
+	var st := {"ci": ci}
+	var sw: ColorRect = ColorRect.new() if not swatches.is_empty() else null   # (лямбда захватывает значения — создаём заранее)
+	var vl := UITheme.label(str(opts[ci][1]), 14, UITheme.TEXT)
+	var pos := UITheme.label("%d/%d" % [ci + 1, opts.size()], 11, UITheme.DIM)
 	var step := func(d: int) -> void:
-		var ni := posmod(ci + d, opts.size())
+		var ni := posmod(int(st["ci"]) + d, opts.size())
+		st["ci"] = ni
 		target[key] = opts[ni][0]
-		_changed(true)
+		vl.text = str(opts[ni][1])
+		pos.text = "%d/%d" % [ni + 1, opts.size()]
+		if sw:
+			sw.color = Color(str(swatches[ni % swatches.size()]))
+		_changed(false)
 	var lb := UITheme.small("◀", func() -> void: step.call(-1))
 	lb.custom_minimum_size = Vector2(30, 30)
 	h.add_child(lb)
@@ -628,18 +638,15 @@ func _pick(title: String, opts: Array, target: Dictionary, key: String, swatches
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var mh := UITheme.hbox(8)
 	mid.add_child(mh)
-	if not swatches.is_empty():
-		var sw := ColorRect.new()
+	if sw:
 		sw.color = Color(str(swatches[ci % swatches.size()]))
 		sw.custom_minimum_size = Vector2(16, 16)
 		sw.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		mh.add_child(sw)
-	var vl := UITheme.label(str(opts[ci][1]), 14, UITheme.TEXT)
 	vl.clip_text = true
 	vl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vl.custom_minimum_size = Vector2(80, 0)
 	mh.add_child(vl)
-	var pos := UITheme.label("%d/%d" % [ci + 1, opts.size()], 11, UITheme.DIM)
 	mh.add_child(pos)
 	h.add_child(mid)
 	var rb := UITheme.small("▶", func() -> void: step.call(1))

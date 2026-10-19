@@ -96,6 +96,15 @@ func setup(s: Sim, w: Worker) -> void:
 	_update_pos()
 
 
+## 1.35: части куклы, которые сейчас не в дереве (в «спине» нет жеста, до первой сборки нет туловища и рук), при
+## удалении куклы не удаляются сами — висели «сиротами». Удаляем их вместе с куклой.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		for n: Node in [doll, body, trunk, headn, shadow, hand_a, hand_b, held, bubble, ring, puff, gest, veh, veh_load, prop_sp]:
+			if is_instance_valid(n) and n.get_parent() == null:
+				n.free()
+
+
 func _prep(sp: Sprite2D) -> void:
 	sp.centered = false
 	sp.offset = OFF
