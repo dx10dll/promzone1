@@ -1364,7 +1364,7 @@ func _staff_list() -> void:
 		var mood := UITheme.meter(w.mood, Mood.color(w.mood), 70, ("%d %s" % [int(w.mood), Mood.label(w.mood).to_lower()]) if sim.office.active("hr") else Mood.label(w.mood).to_lower())
 		var act := w.activity if w.present else ("не вышел" if w.skip_shift else ("в отпуске" if w.away_why == "в отпуске" else ("на больничном" if w.sick_until > sim.minute else "дома")))
 		var wid := w.id
-		var row := _trow([[por, 40], [_cl2(w.formal_name(), ", ".join(traits)), 220], [_cl2(w.prof_name(), w.rank_text()), 190],
+		var row := _trow([[por, 40], [_cl2(("★ " if w.custom_id != "" else "") + w.formal_name(), ", ".join(traits)), 220], [_cl2(w.prof_name(), w.rank_text()), 190],
 			[_cl("2-я" if w.shift == 1 else "1-я", 13, UITheme.MUTED), 70], [_cl(Defs.money_str(w.wage), 13), 90], [mood, 150],
 			[_cl(act, 13, UITheme.INFO if w.present else UITheme.MUTED), -1]],
 			func() -> void:
@@ -1391,10 +1391,7 @@ func _staff_list() -> void:
 
 ## Найм: кандидаты карточками в две колонки, объявления — в шапке.
 ## 1.19: найм — сначала «кого ищем» (профессии группами с поиском), потом кандидаты этой профессии.
-const HIRE_GROUPS := [["У станков", ["turner", "miller", "cnc_operator", "setter", "qc"]],
-	["Рабочие", ["laborer", "builder", "electrician", "welder", "fitter", "assembler", "painter", "heat_treater", "caster", "presser", "cleaner"]],
-	["Быт и охрана", ["guard", "cook", "nurse"]],
-	["ИТР и офис", ["foreman", "chief", "technologist", "dispatcher", "accountant", "buyer", "hr", "sales_manager", "safety_engineer", "chief_engineer", "lawyer"]]]
+const HIRE_GROUPS := CustomWorkers.PROF_GROUPS   ## 1.32: один список с редактором своих рабочих
 static var hire_q := ""          ## строка поиска профессии
 static var hire_all := true      ## показать всех кандидатов (пока профессию не выбрали)
 
@@ -1509,13 +1506,18 @@ func _hire() -> void:
 		h.add_child(por)
 		var v := UITheme.vbox(3)
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		v.add_child(_cl("%s, %d %s" % [c.formal_name(), c.age, Defs.plural(c.age, "год", "года", "лет")], 15, UITheme.TEXT, UITheme.f_semi))
+		var own := c.custom_id != ""   # 1.32: свой рабочий из главного меню
+		var nrow := UITheme.hbox(8)
+		nrow.add_child(_cl("%s, %d %s" % [c.formal_name(), c.age, Defs.plural(c.age, "год", "года", "лет")], 15, UITheme.TEXT, UITheme.f_semi))
+		if own:
+			nrow.add_child(UITheme.chip("★ свой", UITheme.ACCENT, "%s %s %s — свой рабочий: собран в главном меню («Создать рабочего»)" % [c.last, c.first, c.patronymic], true))
+		v.add_child(nrow)
 		v.add_child(_cl("%s · %s за смену" % [c.title(), Defs.money_str(c.wage)], 13, UITheme.INFO))
 		v.add_child(_cl(_skills_text(c), 12, UITheme.MUTED))
 		var tl := HFlowContainer.new()
 		tl.add_theme_constant_override("h_separation", 4)
 		tl.add_theme_constant_override("v_separation", 3)
-		var shown: Array = c.traits if sim.office.active("hr") else c.traits.slice(0, 1)
+		var shown: Array = c.traits if sim.office.active("hr") or own else c.traits.slice(0, 1)
 		for t in shown:
 			var d: Dictionary = Defs.traits.get(t, {})
 			tl.add_child(UITheme.chip(str(d.get("name", t)), UITheme.TEXT, str(d.get("desc", ""))))

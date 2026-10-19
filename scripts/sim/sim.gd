@@ -77,6 +77,8 @@ var bp_cells: Dictionary = {}     ## индекс клетки -> true
 var bp_res: Dictionary = {}       ## индекс клетки -> id рабочего
 var supply: Array = []            ## заказанный металл в пути
 var candidates: Array = []        ## кандидаты на работу (словари Worker)
+var customs: Array = []           ## 1.32: свои рабочие этой игры (записи из редактора меню, CustomPeople)
+var custom_chance := 0.0          ## 1.32: шанс каждого прийти кандидатом при обновлении кандидатов
 var ledger: Array = []
 var events: Array = []
 var stats: Dictionary = {"made": 0, "scrap": 0, "shipped": 0, "orders_done": 0, "orders_failed": 0, "earned": 0.0, "spent": 0.0}
@@ -380,6 +382,8 @@ func refresh_candidates(only_prof: String = "") -> void:
 			wa.from_away = true
 			wa.wage = int(round(wa.wage * 0.92 / 50.0) * 50.0)
 			candidates.append(wa.to_dict())
+	if not customs.is_empty():
+		CustomPeople.roll(self, profs, only_prof)   # 1.32: может прийти и свой рабочий
 
 
 func randi_profs_extra() -> bool:
@@ -2095,7 +2099,7 @@ func to_dict() -> Dictionary:
 		"version": VERSION, "scenario": scenario, "minute": minute, "money": money,
 		"reputation": reputation, "next_id": next_id, "world": world.to_dict(),
 		"things": th, "items": its, "workers": ws, "vehicles": vs,
-		"orders": orders.list, "supply": supply, "candidates": candidates,
+		"orders": orders.list, "supply": supply, "candidates": candidates, "customs": customs, "cust_k": custom_chance,
 		"stats": stats, "ledger": ledger.slice(0, 100), "log": events.slice(0, 60), "honor": honor_log,
 		"power": power_kwh_day, "gate_x": gate_x, "rng": rng.state, "bp_at": bp_progress_at, "build_priority": build_priority,
 		"grid": power.to_dict(), "reserve": supply_reserve, "cons": cons, "cons_supply": cons_supply, "ppr": ppr,
@@ -2160,6 +2164,8 @@ static func from_dict(d: Dictionary) -> Sim:
 	s.events = d.get("log", [])
 	s.supply = d.get("supply", [])
 	s.candidates = d.get("candidates", [])
+	s.customs = d.get("customs", [])
+	s.custom_chance = float(d.get("cust_k", 0.0))
 	s.orders.list = d.get("orders", [])
 	if d.has("rng"):
 		s.rng.state = int(d["rng"])

@@ -188,7 +188,7 @@ func show_worker(s: Sim, w: Worker) -> void:
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var sur := UITheme.label(w.last.to_upper(), 20, UITheme.TEXT, UITheme.f_semi)
 	col.add_child(sur)
-	var nm := UITheme.label(w.first + ("  «%s»" % w.nick if w.nick != "" else ""), 15, UITheme.TEXT)
+	var nm := UITheme.label(w.first + ((" " + w.patronymic) if w.custom_id != "" and w.patronymic != "" else "") + ("  «%s»" % w.nick if w.nick != "" else ""), 15, UITheme.TEXT)
 	if w.nick_why != "":
 		nm.tooltip_text = "Почему «%s»: %s" % [w.nick, w.nick_why]
 		nm.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -198,6 +198,8 @@ func show_worker(s: Sim, w: Worker) -> void:
 	chips.add_theme_constant_override("v_separation", 4)
 	chips.add_child(UITheme.chip(w.prof_name() + (" · " + w.rank_text() if w.rank_text() != "" else ""), UITheme.ACCENT, _rank_tip(w), true))
 	chips.add_child(UITheme.chip(str(Worker.SHIFT_NAMES[w.shift]).split(" ")[0] + " смена", UITheme.INFO if w.shift == 0 else Color("#a58ad8")))
+	if w.custom_id != "":
+		chips.add_child(UITheme.chip("★ свой", UITheme.ACCENT, "Свой рабочий: собран в главном меню («Создать рабочего»)"))
 	if w.brigade >= 0 and not sim.crew.brigade(w.brigade).is_empty():
 		var lead := sim.crew.lead_of(w.brigade) == w
 		chips.add_child(UITheme.chip(("★ бригадир · " if lead else "") + str(sim.crew.brigade(w.brigade)["name"]), sim.crew.color(w.brigade).lightened(0.25)))

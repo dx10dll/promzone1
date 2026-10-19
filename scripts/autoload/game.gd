@@ -132,7 +132,11 @@ func make_sim() -> Sim:
 		if s:
 			return s
 		push_warning("Не удалось загрузить сохранение %s, начинаем новую игру" % pending_slot)
-	return Scenario.new_game(pending_scn, pending_profile, pending_story, pending_seed if pending_seed != 0 else 1, pending_opts)
+	# 1.32: свои рабочие из главного меню едут в новую игру (дальше — в её сохранении)
+	var opts := pending_opts.duplicate(true)
+	if not opts.has("customs"):
+		opts.merge(CustomWorkers.game_opts())
+	return Scenario.new_game(pending_scn, pending_profile, pending_story, pending_seed if pending_seed != 0 else 1, opts)
 
 
 # ---------------------------------------------------------------- сохранения

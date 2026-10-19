@@ -11,11 +11,17 @@ func _ready() -> void:
 	args = OS.get_cmdline_user_args()
 	var scene := args[0] if args.size() > 0 else "game"
 	if scene == "menu":
+		if args.size() > 6 and args[6].begins_with("custom"):
+			# 1.32: свои рабочие — свой файл списка, не трогаем настоящий
+			CustomWorkers.path = "user://shot132_custom_workers.json"
+			CustomWorkers.save_data({"chance": 0.3, "workers": shot132_people()})
 		target = load("res://scenes/main_menu.tscn").instantiate()
 		add_child(target)
 		wait = 60
 		if args.size() > 6 and args[6] == "newgame":
 			target.call_deferred("_show_new_game")
+		if args.size() > 6 and args[6] == "custom":
+			target.call_deferred("_show_custom")
 		if args.size() > 6 and args[6] == "settings":
 			target.call_deferred("_show_settings")
 		if args.size() > 6 and args[6].begins_with("scene:"):
@@ -56,6 +62,9 @@ func _ready() -> void:
 		Game.pending_scn = "sandbox"
 		Game.pending_opts = {}
 		TodoPanel.collapsed = true
+	if args.size() > 7 and args[7] == "cust132":
+		Game.pending_opts["customs"] = shot132_people()
+		Game.pending_opts["custom_chance"] = 1.0
 	target = load("res://scenes/game.tscn").instantiate()
 	add_child(target)
 	var gm := target as GameMain
@@ -1359,6 +1368,27 @@ func _ready() -> void:
 				await get_tree().process_frame
 				var scr2 := get_viewport().get_canvas_transform() * ((Vector2(hc) + Vector2(0.5, 0.5)) * World.T)
 				Input.warp_mouse(scr2)
+			"cust132w":
+				# 1.32: нанятый свой рабочий в цеху, с личной карточкой
+				gm.set_speed(0)
+				for ci in gm.sim.candidates.size():
+					if str(gm.sim.candidates[ci].get("cust", "")) != "":
+						gm.sim.hire(ci)
+						break
+				await get_tree().process_frame
+				await get_tree().process_frame
+				for cw: Worker in gm.sim.workers:
+					if cw.custom_id != "":
+						gm.sim.brain.abort(cw)
+						cw.present = true
+						cw.dressed = true
+						cw.pos = Vector2(float(args[4]) + 0.5, float(args[5]) + 0.5)
+						cw.vprev = cw.pos
+						cw.dir = "down"
+						cw.activity = "Осматривается в цеху"
+						gm.tool.select_worker(cw.id)
+						gm.hud.info.show_worker(gm.sim, cw)
+						gm.cam.position = (cw.pos + Vector2(4.5, 0.0)) * World.T
 			"wpop":
 				for w6: Worker in gm.sim.workers:
 					if w6.present and not w6.visitor:
@@ -1715,3 +1745,18 @@ func _drama(sim: Sim) -> void:
 	for i3 in 10:
 		sim.tick(0.5)
 	sim.story.letters.clear()
+
+
+## 1.32: свои рабочие для снимков редактора и игры.
+static func shot132_people() -> Array:
+	return [
+		{"id": "s1", "enabled": true, "last": "Громова", "first": "Зинаида", "patr": "Петровна", "female": true, "age": 47, "prof": "", "traits": ["veteran", "cheerful"],
+			"look": {"skin": 1, "hair": "braid", "hair_col": "#b5562e", "beard": "", "glasses": true, "body": "stout", "h": 1.0, "street": "coat", "street_col": "#6a3a3a", "eye_col": "#5d7a4a",
+				"face_ovr": {"head": "round", "eyes": "almond", "brows": "arched", "nose": "small", "mouth": "full", "freckles": true, "earrings": true}}},
+		{"id": "s2", "enabled": true, "last": "Петров-Водкин", "first": "Кузьма", "patr": "Сергеевич", "female": false, "age": 33, "prof": "turner", "traits": ["workaholic", "handy"],
+			"look": {"skin": 0, "hair": "side", "hair_col": "#9a6a3a", "beard": "chevron", "glasses": false, "body": "strong", "h": 1.06, "street": "jacket", "street_col": "#2f3a4a", "eye_col": "#3f6a8a",
+				"face_ovr": {"head": "square", "eyes": "deep", "brows": "thick", "nose": "straight", "mouth": "neutral", "freckles": false, "earrings": false}}},
+		{"id": "s3", "enabled": false, "last": "Ахметов", "first": "Рустам", "patr": "", "female": false, "age": 58, "prof": "welder", "traits": ["smoker"],
+			"look": {"skin": 2, "hair": "receding", "hair_col": "#9a9a94", "beard": "full", "glasses": false, "body": "fat", "h": 0.94, "street": "jacket", "street_col": "#55504a", "eye_col": "#3a2a20",
+				"face_ovr": {"head": "round", "eyes": "heavy", "brows": "bushy", "nose": "wide", "mouth": "down", "freckles": false, "earrings": false}}},
+	]

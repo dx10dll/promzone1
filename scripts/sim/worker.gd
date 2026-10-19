@@ -81,6 +81,7 @@ var id := 0
 var first := ""
 var last := ""
 var patronymic := ""      ## больше не показывается (оставлено для старых сохранений)
+var custom_id := ""        ## 1.32: свой рабочий из редактора главного меню (id записи), "" — обычный
 var nick := ""             ## прозвище: «Батя», «Шпала», «Пожарный»
 var nick_why := ""         ## за что прозвали
 var tally: Dictionary = {} ## счётчики поступков для прозвищ: пожары, травмы, автоматы, перекуры
@@ -344,6 +345,7 @@ func to_dict() -> Dictionary:
 		"sick": sick_until, "away": away_why, "nick": nick, "nick_why": nick_why, "tally": tally,
 		"mentor": mentor, "rel": rel, "practice": practice_until, "ppe": ppe, "wp": workplace, "brig": brigade,
 		"kids": kids, "faraway": from_away, "grade": grade_n, "exam_cd": exam_cd, "ord": order, "ctl": controlled,
+		"cust": custom_id,
 	}
 
 
@@ -353,6 +355,7 @@ static func from_dict(d: Dictionary) -> Worker:
 	w.first = str(d["first"])
 	w.last = str(d["last"])
 	w.patronymic = str(d.get("patr", ""))
+	w.custom_id = str(d.get("cust", ""))
 	w.female = bool(d["female"])
 	w.age = int(d["age"])
 	w.prof = str(d["prof"])

@@ -34,6 +34,12 @@ static func new_game(scn: String, profile: String, story_mode: String, seed_valu
 		var crng := RandomNumberGenerator.new()
 		crng.seed = seed_value * 7 + 11
 		Company.set_data(sim, Company.random_name(crng), Company.random_emblem(crng, sim.progress.profile))
+	# 1.32: свои рабочие из главного меню — список едет в игре (и в сохранении); первый шанс — сразу
+	var cl: Variant = opts.get("customs", [])
+	if cl is Array and not (cl as Array).is_empty():
+		CustomPeople.attach(sim, cl, float(opts.get("custom_chance", 0.25)))
+		if not sim.customs.is_empty():
+			CustomPeople.roll(sim, ["laborer", "turner", "builder"])
 	sim.progress.start_staff = sim.workers.size()
 	sim.progress.start_day = sim.day()
 	sim.progress.morning()

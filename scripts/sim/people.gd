@@ -96,7 +96,8 @@ static func patronymic(father: String, female: bool) -> String:
 	return father + ("овна" if female else "ович")
 
 
-static func make(rng: RandomNumberGenerator, prof: String, female_chance: float = 0.25) -> Worker:
+## fix (1.32, свои рабочие): {"female", "first", "last", "age"} — поверх брошенного кубика (броски те же).
+static func make(rng: RandomNumberGenerator, prof: String, female_chance: float = 0.25, fix: Dictionary = {}) -> Worker:
 	var w := Worker.new()
 	w.prof = prof
 	var fchance := female_chance
@@ -124,6 +125,8 @@ static func make(rng: RandomNumberGenerator, prof: String, female_chance: float 
 		"foreman", "chief":
 			fchance = 0.12
 	w.female = rng.randf() < fchance
+	if fix.has("female"):
+		w.female = bool(fix["female"])
 	var male_names: Array = Defs.names.get("male", ["Иван"])
 	var fem_names: Array = Defs.names.get("female", ["Анна"])
 	var surnames: Array = Defs.names.get("surnames", ["Иванов"])
@@ -140,6 +143,11 @@ static func make(rng: RandomNumberGenerator, prof: String, female_chance: float 
 	w.age = rng.randi_range(20, 62)
 	if Worker.ITR.has(prof):
 		w.age = rng.randi_range(36 if prof in ["chief", "chief_engineer"] else 27, 62)
+	if not fix.is_empty():
+		w.first = str(fix.get("first", w.first))
+		w.last = str(fix.get("last", w.last))
+		w.age = int(fix.get("age", w.age))
+		w.set_meta("eth", "slav")
 	var xp := clampi(int((w.age - 20) / 6.0), 0, 6)
 	match prof:
 		"turner":
@@ -341,6 +349,8 @@ static func hair_style(lk: Dictionary) -> String:
 
 ## Цвет глаз — один и тот же в кукле и на портрете.
 static func eye_color(lk: Dictionary) -> Color:
+	if lk.has("eye_col"):
+		return Color(str(lk["eye_col"]))   # 1.32: свой рабочий — цвет глаз выбран в редакторе
 	if str(lk.get("eth", "")) == "asia":
 		return Color(EYE_COLS[6 if int(lk.get("fs", 0)) % 3 == 0 else 1])
 	return Color(EYE_COLS[absi(int(lk.get("skin", 0)) * 7 + str(lk.get("hair_col", "")).hash()) % EYE_COLS.size()])
@@ -384,6 +394,15 @@ static func face(lk: Dictionary, age: int = -1) -> Dictionary:
 	f["freckles"] = not asia and int(lk.get("skin", 0)) <= 1 and (hc.r > hc.b * 1.6 or hc.v > 0.6) and r.randf() < 0.4
 	f["earrings"] = fem and r.randf() < 0.55
 	f["lines"] = "old" if a >= 52 else ("mid" if a >= 38 else "")
+	# 1.32: свой рабочий — черты лица выбраны в редакторе (броски выше те же, просто заменяем)
+	var ov: Variant = lk.get("face_ovr", null)
+	if ov is Dictionary:
+		for k: String in ["head", "eyes", "brows", "nose", "mouth"]:
+			if (ov as Dictionary).has(k):
+				f[k] = str(ov[k])
+		for k2: String in ["freckles", "earrings"]:
+			if (ov as Dictionary).has(k2):
+				f[k2] = bool(ov[k2])
 	return f
 
 

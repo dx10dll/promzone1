@@ -3,8 +3,8 @@ extends Node2D
 ## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
 ## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.31"
-const WHATS_NEW := ["10 новых мелодий", "Плавные переходы музыки", "Тамбов за забором"]
+const VERSION_TEXT := "Версия 1.32"
+const WHATS_NEW := ["Создать рабочего: ФИО, внешность, черты", "Приходят наниматься — со звёздочкой ★", "Шанс появления — на ваш вкус"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -137,7 +137,10 @@ func _place_cam(k: float) -> void:
 	var vw := get_viewport().get_visible_rect().size.x
 	# предмет вида — правее центра: слева панель меню
 	cam.position = (cd[0] as Vector2).lerp(cd[1] as Vector2, e) * World.T - Vector2(vw * 0.16 / z, 0.0)
-	Tex.set_people_scale(z * get_viewport().get_final_transform().get_scale().x * 0.5)
+	var pe := z * get_viewport().get_final_transform().get_scale().x * 0.5
+	if ng_root is CustomWorkersUI and is_instance_valid(ng_root):
+		pe = maxf(pe, CustomWorkersUI.DOLL_Z * get_viewport().get_final_transform().get_scale().x * 0.5)   # человечек в редакторе — чёткий
+	Tex.set_people_scale(pe)
 	Tex.ui_scale = get_viewport().get_final_transform().get_scale().x
 
 
@@ -341,6 +344,11 @@ func _fill_menu() -> void:
 	_big("Новая игра", _show_new_game, "Профиль, сценарий, сложность", "factory")
 	var lb := _big("Загрузить", _show_load, "", "log")
 	lb.disabled = saves.is_empty()
+	var cw := CustomWorkers.load_data()
+	var n_cw := (cw["workers"] as Array).filter(func(e: Dictionary) -> bool: return bool(e.get("enabled", true))).size()
+	var cb := _big("Создать рабочего", _show_custom, ("В списке: %d · шанс %d%%" % [n_cw, roundi(float(cw["chance"]) * 100.0)]) if n_cw > 0 else "Придумайте людей для своего завода", "")
+	cb.icon_tex = UITheme.micon("people")
+	cb.icon_raw = true
 	_big("Достижения", _show_achievements, "", "medal")
 	_big("Настройки", _show_settings, "", "control")
 	_big("Выход", func() -> void: get_tree().quit(), "", "cancel")
@@ -394,6 +402,7 @@ class MenuItem:
 	var title := ""
 	var hint := ""
 	var icon_tex: Texture2D = null
+	var icon_raw := false   ## 1.32: цветной значок меню (assets/ui/icons) — без перекраски
 	var primary := false
 	var _h := 0.0
 
@@ -425,7 +434,13 @@ class MenuItem:
 		var tc := UITheme.ACCENT_T if primary else (Color(0.93, 0.9, 0.84, 0.35) if disabled else UITheme.TEXT)
 		if icon_tex:
 			var isz := 22.0
-			draw_texture_rect(icon_tex, Rect2(dx, (size.y - isz) * 0.5, isz, isz), false, tc if not primary else UITheme.ACCENT_T)
+			var icol := (Color(1, 1, 1, 0.4 if disabled else 1.0) if icon_raw else tc) if not primary else UITheme.ACCENT_T
+			if icon_raw:
+				isz = 28.0
+				dx -= 3.0
+			draw_texture_rect(icon_tex, Rect2(dx, (size.y - isz) * 0.5, isz, isz), false, icol)
+			if icon_raw:
+				dx -= 3.0
 			dx += isz + 14.0
 		var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
 		var fs := 19
@@ -468,6 +483,23 @@ func _panel(title: String) -> VBoxContainer:
 		sub = null))
 	v.add_child(h)
 	return v
+
+
+## 1.32: «Создать рабочего» (свои рабочие) — редактор на весь экран (как окно новой игры).
+func _show_custom() -> void:
+	if sub:
+		sub.queue_free()
+		sub = null
+	if ng_root:
+		ng_root.queue_free()
+	var ed := CustomWorkersUI.new(sim)
+	ng_root = ed
+	ui.add_child(ed)
+	ed.closed.connect(func() -> void:
+		ed.queue_free()
+		if ng_root == ed:
+			ng_root = null
+		_fill_menu())
 
 
 ## Новая игра: профиль завода, сценарий, рассказчик (и параметры песочницы).
