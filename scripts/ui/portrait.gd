@@ -1,5 +1,7 @@
 class_name Portrait
 extends Control
+## 1.33: портрет рисуется из нового слоистого набора (PortraitKit, assets/portrait2). Старый векторный
+## портрет ниже — запасной: если набор не загрузился.
 ## Портрет человека для интерфейса: отдельная детальная графика (assets/portrait, tools/gen_portraits.py),
 ## собранная из слоёв. С 1.14.2 черты те же, что у человечка на карте: форма головы, разрез глаз, брови,
 ## нос, рот, причёска, борода и телосложение. Тонируемые слои умножаются на цвет кожи, волос, глаз,
@@ -22,6 +24,18 @@ var wide := false   ## кадр чуть шире (больше плеч и фо
 var doc := false    ## светлый фон, как на фото для пропуска
 var _tex: Texture2D
 var _tex_key := ""
+var _lay: _Layers          ## 1.33: слои нового портрета (свой материал-шейдер)
+var _rec: Dictionary = {}
+
+static var _mat: ShaderMaterial
+
+
+## 1.33: новый портрет рисуется отдельным дочерним узлом — у него шейдер окраски слоёв.
+class _Layers extends Control:
+	var host: Portrait
+
+	func _draw() -> void:
+		host.draw_layers(self)
 
 
 ## info: необязательные {"age": лет, "mood": настроение 0–100, "wide": шире кадр, "doc": фон как на пропуске}.
@@ -36,12 +50,56 @@ func set_look(lk: Dictionary, z: float = 1.0, info: Dictionary = {}) -> void:
 	custom_minimum_size = (Vector2(64.0 * (WIDE_K if wide else 1.0), 74) * z).round()
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_tex_key = ""
+	_rec = {}
+	if PortraitKit.available():
+		if _lay == null:
+			if _mat == null:
+				_mat = ShaderMaterial.new()
+				_mat.shader = PortraitKit.shader()
+			_lay = _Layers.new()
+			_lay.host = self
+			_lay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_lay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			_lay.material = _mat
+			_lay.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+			add_child(_lay, false, Node.INTERNAL_MODE_FRONT)
+		if not look.is_empty():
+			_rec = PortraitKit.recipe(look, {"age": age, "mood": mood})
+		_lay.queue_redraw()
 	queue_redraw()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		queue_redraw()
+		if _lay != null:
+			_lay.queue_redraw()
+
+
+## 1.33: кадр нового портрета на холсте набора (мелкий портрет в списках — крупнее лицо).
+func frame_rect() -> Rect2:
+	return PortraitKit.frame(size.x / maxf(1.0, size.y), zoom < 0.75)
+
+
+func draw_layers(ci: Control) -> void:
+	if _rec.is_empty() or size.x < 2.0:
+		return
+	PortraitKit.draw(ci, Rect2(Vector2.ZERO, size), frame_rect(), _rec, zoom >= 0.75)
+	# рамка — через тот же шейдер (он делит цвет на опорный серый)
+	var bc := Color("#8a949d") if doc else Color("#5a636c")
+	ci.draw_rect(Rect2(Vector2.ZERO, size), Color(bc.r * PortraitKit.REF, bc.g * PortraitKit.REF, bc.b * PortraitKit.REF), false, 1.0)
+
+
+## Фон нового портрета: стена цеха (обычный) или светлый, как на фото для пропуска.
+func _draw_bg() -> void:
+	var top := Color("#dfe4e8") if doc else Color("#b3aca2")
+	var bot := Color("#a9b3bc") if doc else Color("#d6d0c7")
+	var w := size.x
+	var h := size.y
+	draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(w, 0), Vector2(w, h), Vector2(0, h)]), PackedColorArray([top, top, bot, bot]))
+	if not doc:
+		# полоса покраски стены, как в цехах
+		draw_rect(Rect2(0, h * 0.62, w, h * 0.38), Color("#7d8a80", 0.35))
 
 
 ## Слои снизу вверх: [имя слоя портрета, цвет]. Черты те же, что у человечка на карте (People.face):
@@ -156,6 +214,9 @@ static func build_texture(lays: Array, px_w: int, is_wide: bool = false) -> Text
 
 func _draw() -> void:
 	if look.is_empty():
+		return
+	if _lay != null:
+		_draw_bg()
 		return
 	# 1.23: мелкое фото (в списках) — крупнее лицо: показываем середину кадра, без растяжения
 	var crop := 0.66 if zoom < 0.75 else 1.0

@@ -1481,6 +1481,18 @@ func _ready() -> void:
 				gm.hud.open_window(wp[1])
 				if wp.size() > 2 and gm.hud.win:
 					gm.hud.win.select_tab(wp[2])
+			"brig133":
+				# 1.33: бригада с людьми — маленькие портреты у имён
+				gm.sim.office.all_depts = true
+				for i3 in 3:
+					var nw := People.make(gm.sim.rng, ["assembler", "miller", "laborer"][i3], 0.5)
+					gm.sim.add_worker(nw)
+				var bb := gm.sim.crew.add_brigade("Ударная")
+				for w7: Worker in gm.sim.workers:
+					if not w7.is_itr():
+						gm.sim.crew.set_member(w7, int(bb["id"]))
+				gm.hud.open_window("people")
+				gm.hud.win.select_tab("brig")
 			"crew_brig", "crew_sched", "crew_sec", "crew_union":
 				gm.hud.open_window("crew")
 				gm.hud.win.select_tab(args[6].substr(5))

@@ -217,7 +217,15 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 		var mb := UITheme.small(("★ " if int(b["lead"]) == w2.id else "") + w2.call_name() + "  ×", func() -> void:
 			cr.set_member(ww, -1)
 			win.rebuild(true), "%s, %s. Нажмите, чтобы убрать из бригады" % [w2.full_name(), w2.prof_lc()])
-		h4.add_child(mb)
+		# 1.33: маленький портрет рядом с именем
+		var mh := UITheme.hbox(3)
+		var mp := Portrait.new()
+		mp.set_look(w2.look, 0.42, {"age": w2.age, "mood": w2.mood})
+		mp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		mp.tooltip_text = mb.tooltip_text
+		mh.add_child(mp)
+		mh.add_child(mb)
+		h4.add_child(mh)
 	var add := OptionButton.new()
 	add.focus_mode = Control.FOCUS_NONE
 	add.fit_to_longest_item = false
