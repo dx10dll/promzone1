@@ -1,24 +1,24 @@
 extends SceneTree
-## Тест версий 1.33–1.34 «Новые портреты» (1.34 — исправленный набор: маски шеи и воротников, веки, головные уборы,
-## серая одежда в цвет спецовки): все слои и маски набора на месте и читаются; рецепт и сборка портрета
-## для 200 случайных людей (оба пола, все телосложения, причёски, бороды) — без ошибок; одно и то же лицо —
-## одна и та же картинка (хэш); кэш работает; окраска не трогает прозрачность; любая черта из редактора
-## «Создать рабочего» видна на портрете; Portrait рисует новый набор, а без него — старый.
+## Тест версий 1.33–1.36 «Новые портреты» (1.36 — набор v3: цельная основа «голова + шея + плечи» по телосложению,
+## одежда по посадке, маска body_keep, без слоёв v2): все слои и маски набора на месте и читаются, лишнего нет;
+## порядок слоёв по compose_example.py; рецепт и сборка для 200 случайных людей; одно и то же лицо — одна и та же
+## картинка (хэш); кэш; окраска не трогает прозрачность, ткань одежды — в цвет спецовки; головные уборы как у
+## человечка на карте; любая черта из редактора «Создать рабочего» видна на портрете; без набора — старый портрет.
 ## godot --headless --path . --audio-driver Dummy -s res://tests/stage133_test.gd
 
 var fails: Array[String] = []
 
-const BASE := ["head_m_oval", "head_m_square", "head_m_round", "head_m_long", "head_f_soft", "head_f_oval", "head_f_round",
-	"eyes_almond", "eyes_narrow", "eyes_round", "eyes_heavy", "eyes_deep",
+const BASE := ["eyes_almond", "eyes_narrow", "eyes_round", "eyes_heavy", "eyes_deep",
 	"brows_straight", "brows_arched", "brows_thick", "brows_thin", "brows_angled", "brows_bushy",
 	"nose_small", "nose_straight", "nose_long", "nose_wide", "nose_hooked",
 	"mouth_neutral", "mouth_smile", "mouth_thin", "mouth_full", "mouth_down",
 	"beard_mustache", "beard_full", "beard_goatee", "beard_stubble", "beard_chevron", "beard_short",
-	"glasses", "earrings", "freckles", "lines_mid", "lines_old", "kerchief_f", "collar_kerchief_f",
+	"glasses", "earrings", "freckles", "lines_mid", "lines_old", "kerchief_f",
 	"eyes_almond_lids", "eyes_narrow_lids", "eyes_round_lids", "eyes_heavy_lids", "eyes_deep_lids",
 	"cap", "helmet", "welder_mask", "ushanka"]
 const HAIRS := ["short", "crew", "side", "slick", "receding", "bald", "curly", "mullet", "bob", "bun", "ponytail", "long", "pixie", "curly_f", "braid", "perm"]
 const COLLARS := ["overall", "shirt", "jacket", "suit", "robe", "sweater", "vest", "firefighter"]
+const FITS := ["very_thin", "thin", "normal", "strong", "powerful", "full", "very_full"]
 
 
 func check(cond: bool, what: String) -> void:
@@ -48,60 +48,76 @@ func _initialize() -> void:
 	quit(0 if fails.is_empty() else 1)
 
 
+func _collars() -> Array:
+	var out: Array = []
+	for f: String in FITS:
+		for c: String in COLLARS:
+			for g: String in ["m", "f"]:
+				out.append("collar_%s_%s_%s" % [c, g, f])
+		out.append("collar_kerchief_f_" + f)
+	return out
+
+
 func _all_base() -> Array:
 	var out: Array = BASE.duplicate()
 	for h: String in HAIRS:
 		out.append("hair_%s_front" % h)
 		out.append("hair_%s_back" % h)
-	for c: String in COLLARS:
+	for f: String in FITS:
 		for g: String in ["m", "f"]:
-			out.append("collar_%s_%s" % [c, g])
-	for g2: String in ["m", "f"]:
-		for n: String in ["neck_thin_", "neck_strong_", "cheeks_full_", "chin_double_"]:
-			out.append(n + g2)
-	return out
+			out.append("base_%s_%s" % [f, g])
+	return out + _collars()
 
 
 func _layers() -> void:
-	print("— слои набора")
-	check(PortraitKit.available(), "набор assets/portrait2 найден (layers.json и текстуры)")
+	print("— слои набора v3")
+	check(PortraitKit.available(), "набор assets/portrait2 найден (layers.json версии 3 и текстуры)")
 	var base := _all_base()
-	check(base.size() == 106, "в наборе 106 игровых слоёв (без base_template и вспомогательных серых): %d" % base.size())
+	check(base.size() == 42 + 32 + 14 + 119, "в наборе 207 игровых слоёв (черты, причёски, 14 основ, 119 сочетаний одежды): %d" % base.size())
 	var bad: Array = []
 	for n: String in base:
 		if not PortraitKit.has(n) or PortraitKit.tex(n) == null:
 			bad.append(n)
-	check(bad.is_empty(), "все 106 слоёв читаются" + ("" if bad.is_empty() else ": нет " + str(bad)))
-	var extra := 0
+	check(bad.is_empty(), "все слои читаются" + ("" if bad.is_empty() else ": нет " + str(bad.slice(0, 8))))
+	var total := 0
 	for n2: Variant in PortraitKit.names():
 		if PortraitKit.tex(str(n2)) == null:
 			bad.append(n2)
-		extra += 1
-	check(bad.is_empty() and extra >= 150, "всего слоёв с производными (радужка, голова без шеи, ткань, кожа выреза): %d, все читаются" % extra)
-	check(not PortraitKit.has("base_template"), "base_template в игру не попал (только для выравнивания)")
+		total += 1
+	check(bad.is_empty() and total >= 207 + 5, "всего слоёв с производными (радужка, изнанки): %d, все читаются" % total)
+	# ничего из v2 и ничего лишнего: ни голов, шей, щёк, подбородков, ни серых копий, _fab, _skinpart
 	var junk: Array = []
-	for n3: Variant in PortraitKit.names():
+	for n3: Variant in PortraitKit.names() + PortraitKit.mask_names():
 		var s3 := str(n3)
-		if s3.ends_with("_gray") or (s3.begins_with("collar_") and (s3.ends_with("_skin") or s3.ends_with("_back"))) or s3.ends_with("_lid"):
+		for pre: String in ["head_", "neck_", "cheeks_", "chin_", "base_template"]:
+			if s3.begins_with(pre):
+				junk.append(s3)
+		if s3.ends_with("_gray") or s3.ends_with("_skinpart") or s3.ends_with("_g") or s3.ends_with("_cut") or (s3.begins_with("collar_") and s3.ends_with("_fab")) \
+				or s3.contains("keep_face") or s3.contains("skin_keep") or s3.ends_with("_skin_mask"):
 			junk.append(s3)
-	check(junk.is_empty(), "нет старых обходных слоёв 1.33 (_lid, _back, _skin) и исходных серых" + ("" if junk.is_empty() else ": " + str(junk)))
-	# маски: тело внутри каждого воротника, волосы под головными уборами
+	check(junk.is_empty(), "нет слоёв и масок v2 (head_, neck_, cheeks_, chin_, _cut, _fab, _skinpart, keep_face, skin_keep) и серых копий" + ("" if junk.is_empty() else ": " + str(junk.slice(0, 8))))
+	var dirbad: Array = []
+	for f: String in DirAccess.get_files_at(PortraitKit.DIR):
+		if f.ends_with(".png") and not PortraitKit.has(f.get_basename()) and not PortraitKit.has_mask(f.get_basename()):
+			dirbad.append(f)
+	check(dirbad.is_empty(), "в папке набора нет лишних PNG" + ("" if dirbad.is_empty() else ": " + str(dirbad.slice(0, 8))))
+	# маски: основа под каждой одеждой (body_keep), ткань каждой одежды, волосы под уборами
 	var mbad: Array = []
-	for c: String in COLLARS + ["kerchief"]:
-		for g: String in ["m", "f"]:
-			var cn := "collar_%s_%s" % [c, g]
-			if PortraitKit.has(cn) and (not PortraitKit.has_mask("mask_%s_keep" % cn) or PortraitKit.tex("mask_%s_keep" % cn) == null):
-				mbad.append(cn)
+	for cn: String in _collars():
+		for suf: String in ["_keep", "_fab"]:
+			if not PortraitKit.has_mask("mask_" + cn + suf) or PortraitKit.tex("mask_" + cn + suf) == null:
+				mbad.append(cn + suf)
+		if PortraitKit.gain(cn) < 0.8 or PortraitKit.gain(cn) > 2.6:
+			mbad.append(cn + " gain")
 	for h: String in ["cap", "helmet", "welder_mask", "ushanka"]:
 		if not PortraitKit.has_mask("mask_hat_" + h) or PortraitKit.tex("mask_hat_" + h) == null:
 			mbad.append(h)
-	check(mbad.is_empty() and PortraitKit.mask_names().size() == 21, "масок 21 (17 воротников, 4 убора), все читаются" + ("" if mbad.is_empty() else ": нет " + str(mbad)))
-	var mt := PortraitKit.tex("mask_collar_suit_m_keep")
-	check(mt != null and mt.get_size() == Vector2(512, 512), "маска на том же холсте 512")
-	for h2: String in ["head_m_oval", "head_f_round"]:
-		check(PortraitKit.has(h2 + "_cut") and PortraitKit.bbox(h2 + "_cut").end.y < PortraitKit.bbox(h2).end.y, "%s_cut: своя шея у головы срезана маской keep_face" % h2)
-	var t := PortraitKit.tex("head_m_oval")
+	check(mbad.is_empty() and PortraitKit.mask_names().size() == 119 * 2 + 4, "масок 242 (body_keep и ткань для 119 сочетаний, 4 убора), все читаются: %d" % PortraitKit.mask_names().size() + ("" if mbad.is_empty() else ": нет " + str(mbad.slice(0, 8))))
+	var mt := PortraitKit.tex("mask_collar_suit_m_normal_keep")
+	check(mt != null and mt.get_size() == Vector2(512, 512) and mt.get_image().get_format() == Image.FORMAT_L8, "маска одноканальная (L8), на том же холсте 512")
+	var t := PortraitKit.tex("base_normal_m")
 	check(t != null and t.get_size() == Vector2(512, 512), "холст 512×512: %s" % str(t.get_size() if t else Vector2.ZERO))
+	check(PortraitKit.bbox("base_normal_m").end.y >= 511.0 and PortraitKit.bbox("base_normal_m").position.y < 70.0, "основа цельная: от макушки до низа холста")
 	var bb := PortraitKit.bbox("eyes_almond")
 	check(bb.position.y > 170 and bb.end.y < 220 and absf(bb.get_center().x - 256.0) < 4.0, "глаза на своём месте холста (ось x=256): %s" % str(bb))
 
@@ -149,27 +165,35 @@ func _recipes() -> void:
 	check(missing.is_empty(), "все слои рецептов есть в наборе" + ("" if missing.is_empty() else ": " + str(missing.slice(0, 6))))
 	check(both.size() == 2, "и мужчины, и женщины")
 	check(us < 2000.0, "рецепт собирается быстро: %.0f мкс на человека" % us)
-	# телосложение: шея, щёки, второй подбородок, ширина плеч
-	var lk2 := {"fem": false, "skin": 1, "hair": "short", "hair_col": "#4a3020", "outfit": "overall", "fs": 5, "age": 40}
-	lk2["body"] = "vfat"
-	var r2 := PortraitKit.recipe(lk2, {})
-	var n2 := _names(r2)
-	check(n2.has("cheeks_full_m") and n2.has("chin_double_m") and not n2.has("neck_strong_m") and float(r2["sx"]) > 1.05, "очень полный: щёки, второй подбородок, шире плечи")
-	check(n2.has("head_m_round_cut") and n2.find("chin_double_m") > n2.find("head_m_round_cut") and n2.find("chin_double_m") < n2.find("eyes_" + str(People.face(lk2)["eyes"])), "второй подбородок — поверх круглой головы без своей шеи, до черт лица")
-	lk2["body"] = "fat"
-	var nf := _names(PortraitKit.recipe(lk2, {}))
-	check(nf.has("head_m_round") and nf.has("cheeks_full_m") and not nf.has("head_m_round_cut") and not nf.has("neck_strong_m"), "полный: круглая голова (новая), щёки, своя шея")
-	lk2["body"] = "vthin"
-	var r3 := PortraitKit.recipe(lk2, {})
-	var n3 := _names(r3)
-	check(n3.has("neck_thin_m") and n3.has("head_m_long_cut") and not n3.has("head_m_long") and float(r3["sx"]) < 0.95, "очень худой: тонкая шея вместо своей, вытянутое лицо, уже плечи")
-	check(n3.find("neck_thin_m") < n3.find("head_m_long_cut") and _col(r3, "neck_thin_m").a == 1.0 and str(r3["mask_body"]) == "mask_collar_overall_m_keep", "тонкая шея — за головой, непрозрачная, тело внутри воротника")
+	# телосложение -> посадка основы и одежды, порядок слоёв по compose_example.py
+	var lk2 := {"fem": false, "skin": 1, "hair": "short", "hair_col": "#4a3020", "outfit": "overall", "fs": 5, "age": 40, "beard": "full", "glasses": true}
+	var fits := {"vthin": "very_thin", "thin": "thin", "normal": "normal", "stout": "strong", "strong": "powerful", "fat": "full", "vfat": "very_full"}
+	var fok := true
+	for bk: String in fits:
+		lk2["body"] = bk
+		var rb := PortraitKit.recipe(lk2, {})
+		var f := str(fits[bk])
+		if str(rb["fit"]) != f or not _names(rb).has("base_%s_m" % f) \
+				or str(rb["collar"]) != "collar_overall_m_" + f or str(rb["mask_body"]) != "mask_collar_overall_m_%s_keep" % f:
+			fok = false
+	check(fok, "7 телосложений -> 7 посадок: основа, одежда и маска body_keep той же посадки")
 	lk2["body"] = "normal"
-	var rn := PortraitKit.recipe(lk2, {})
-	var hn := "head_m_" + str(rn["head"])
-	check(_names(rn).has(hn) and not str(_names(rn)).contains("_cut") and not str(_names(rn)).contains("neck_"), "обычный: своя шея головы, без дополнительной")
-	lk2["body"] = "strong"
-	check(_names(PortraitKit.recipe(lk2, {})).has("neck_strong_m"), "могучий: сильная шея")
+	var ro := PortraitKit.recipe(lk2, {"age": 60})
+	var no := _names(ro)
+	var ek2 := "eyes_" + str(People.face(lk2, 60)["eyes"])
+	var order := ["hair_short_back", "base_normal_m", ek2 + "_lids", ek2, "nose_" + str(People.face(lk2, 60)["nose"]), "mouth_" + str(People.face(lk2, 60)["mouth"]),
+		"brows_" + str(People.face(lk2, 60)["brows"]), "lines_old", "beard_full", "collar_overall_m_normal", "hair_short_front", "glasses"]
+	var idx: Array = order.map(func(x: String) -> int: return no.find(x))
+	var sorted_ok := not idx.has(-1)
+	for i in range(1, idx.size()):
+		if int(idx[i]) <= int(idx[i - 1]):
+			sorted_ok = false
+	check(sorted_ok, "порядок: волосы сзади → основа → веки, глаза, нос, рот, брови, морщины, борода → одежда → волосы спереди, очки: %s" % str(idx))
+	var lj := lk2.duplicate()
+	lj["outfit"] = "coat"
+	var rj := _names(PortraitKit.recipe(lj, {}))
+	check(rj.has("collar_robe_m_normal_inner") and rj.find("collar_robe_m_normal_inner") == 0, "изнанка одежды — первой, под всем")
+	check(PortraitKit.GROUPS == ["inner", "back", "body", "face", "cloth", "hair", "top"], "группы рисования в порядке v3")
 	# одежда по спецовке
 	var outfits := {"overall": "overall", "coat": "robe", "jacket": "jacket", "fireman": "firefighter", "shirt": "shirt"}
 	var ok := true
@@ -178,13 +202,13 @@ func _recipes() -> void:
 		lk3["body"] = "normal"
 		lk3["outfit"] = o
 		lk3["fs"] = 7
-		if not _names(PortraitKit.recipe(lk3, {})).has("collar_%s_m" % str(outfits[o])):
+		if not _names(PortraitKit.recipe(lk3, {})).has("collar_%s_m_normal" % str(outfits[o])):
 			ok = false
 			print("    одежда %s -> %s" % [o, str(_names(PortraitKit.recipe(lk3, {})))])
 	check(ok, "одежда по спецовке: комбинезон, халат, куртка, боёвка, рубашка")
 	var fk := {"fem": true, "skin": 0, "hair": "perm", "hair_col": "#9a6a3a", "outfit": "overall", "hat": "kerchief", "hat_col": "#3d5a7a", "fs": 3, "age": 50}
 	var nk := _names(PortraitKit.recipe(fk, {}))
-	check(nk.has("kerchief_f_g") and nk.has("collar_kerchief_f") and nk.find("kerchief_f_g") > nk.find("hair_perm_front"), "работница в косынке: косынка поверх волос, рабочая рубашка")
+	check(nk.has("kerchief_f") and nk.has("collar_kerchief_f_normal") and nk.find("kerchief_f") > nk.find("hair_perm_front"), "работница в косынке: косынка поверх волос, рабочая рубашка")
 	# возраст: морщины и седина
 	var old := PortraitKit.recipe(lk2, {"age": 60})
 	var young := PortraitKit.recipe(lk2, {"age": 25})
@@ -265,10 +289,10 @@ func _cache() -> void:
 
 func _alpha() -> void:
 	print("— окраска")
-	var src := PortraitKit._layer_img("head_m_oval", 128)
+	var src := PortraitKit._layer_img("base_normal_m", 128)
 	var bb := Rect2i(0, 0, 128, 128)
-	var dark := PortraitKit._tint_region(src, bb, Color(str(People.SKINS[5])), false, 1.0, 0.25)
-	var light := PortraitKit._tint_region(src, bb, Color(str(People.SKINS[0])), false, 1.0, 0.25)
+	var dark := PortraitKit.tint_region(src, bb, Color(str(People.SKINS[5])))
+	var light := PortraitKit.tint_region(src, bb, Color(str(People.SKINS[0])))
 	var same := true
 	var diff := 0.0
 	for y in range(0, 128, 3):
@@ -296,10 +320,9 @@ func _editor_options() -> void:
 	print("— редактор: каждая черта видна на портрете")
 	for fem: bool in [false, true]:
 		var base := {"fem": fem, "skin": 2, "hair": "bob" if fem else "short", "hair_col": "#4a3020", "outfit": "overall", "fs": 11, "age": 35, "body": "normal",
-			"face_ovr": {"head": "round" if fem else "oval", "eyes": "almond", "brows": "straight", "nose": "small", "mouth": "neutral", "freckles": false, "earrings": false}}
+			"face_ovr": {"eyes": "almond", "brows": "straight", "nose": "small", "mouth": "neutral", "freckles": false, "earrings": false}}
 		var bad: Array = []
-		var heads: Array = PortraitKit.heads(fem)
-		var groups := {"head": heads, "eyes": People.EYE_KINDS, "brows": People.BROW_KINDS, "nose": People.NOSE_KINDS, "mouth": People.MOUTH_KINDS}
+		var groups := {"eyes": People.EYE_KINDS, "brows": People.BROW_KINDS, "nose": People.NOSE_KINDS, "mouth": People.MOUTH_KINDS}
 		for k: String in groups:
 			var seen := {}
 			for v: Variant in groups[k]:
@@ -334,7 +357,7 @@ func _editor_options() -> void:
 			var lk5: Dictionary = base.duplicate(true)
 			lk5["body"] = b
 			var r := PortraitKit.recipe(lk5, {})
-			bodies[str(_names(r)) + str(r["sx"])] = true
+			bodies[str(_names(r))] = true
 		if bodies.size() != People.BODIES.size():
 			bad.append("телосложение")
 		var cols := {}
@@ -344,8 +367,12 @@ func _editor_options() -> void:
 			cols[str(_col(PortraitKit.recipe(lk6, {}), "eyes_almond_iris"))] = true
 		if cols.size() != People.EYE_COLS.size():
 			bad.append("цвет глаз")
-		check(bad.is_empty(), "%s: лицо, глаза, брови, нос, рот, причёска, %sочки, веснушки, серьги, телосложение, цвет глаз — все различимы%s" % ["женщина" if fem else "мужчина", "" if fem else "борода, ", "" if bad.is_empty() else ": " + str(bad)])
-	check(PortraitKit.heads(true).size() == 3 and PortraitKit.heads(false).size() == 4, "форм лица: у женщин 3, у мужчин 4 (как в наборе)")
+		check(bad.is_empty(), "%s: глаза, брови, нос, рот, причёска, %sочки, веснушки, серьги, телосложение, цвет глаз — все различимы%s" % ["женщина" if fem else "мужчина", "" if fem else "борода, ", "" if bad.is_empty() else ": " + str(bad)])
+	# 1.36: форма головы на портрете не видна — у старых сохранений поле face_ovr.head просто не учитывается
+	var o1 := {"fem": false, "skin": 2, "hair": "short", "hair_col": "#4a3020", "outfit": "overall", "fs": 11, "age": 35, "body": "normal", "face_ovr": {"head": "square"}}
+	var o2: Dictionary = o1.duplicate(true)
+	(o2["face_ovr"] as Dictionary)["head"] = "long"
+	check(str(_names(PortraitKit.recipe(o1, {}))) == str(_names(PortraitKit.recipe(o2, {}))), "старое поле «форма лица» не мешает и ни на что не влияет")
 
 
 func _portrait() -> void:
@@ -361,8 +388,12 @@ func _portrait() -> void:
 		if c.material is ShaderMaterial:
 			mats += 1
 	check(p._lay.size() == PortraitKit.GROUPS.size() + 1 and mats == p._lay.size(), "новый портрет рисуется группами слоёв с шейдером окраски: %d" % p._lay.size())
-	var bm: Variant = (p._lay[1].material as ShaderMaterial).get_shader_parameter("mask")
-	check(bm is Texture2D, "у тела — маска воротника")
+	var bi := PortraitKit.GROUPS.find("body")
+	var ci := PortraitKit.GROUPS.find("cloth")
+	var bm: Variant = (p._lay[bi].material as ShaderMaterial).get_shader_parameter("mask")
+	check(bm is Texture2D and (bm as Texture2D).resource_path.ends_with("_keep.png"), "у основы — маска body_keep своей одежды")
+	var cm := p._lay[ci].material as ShaderMaterial
+	check(cm.get_shader_parameter("fab") == 1.0 and cm == p._lay[PortraitKit.GROUPS.find("inner")].material and float(cm.get_shader_parameter("gain")) >= 0.8, "перед и изнанка одежды — общий материал перекраски ткани")
 	check(not p._rec.is_empty(), "рецепт собран")
 	check(p.custom_minimum_size == Vector2(64, 74), "размер прежний: %s" % str(p.custom_minimum_size))
 	p.queue_free()
@@ -379,28 +410,58 @@ func _portrait() -> void:
 
 
 func _v2() -> void:
-	print("— 1.34: веки, одежда в цвет спецовки, кожа в вырезе, головные уборы")
+	print("— веки, одежда в цвет спецовки, головные уборы")
 	var lk := {"fem": true, "skin": 4, "hair": "bob", "hair_col": "#4a3020", "outfit": "shirt", "outfit_col": "#2f6f4f", "street_col": "#5a2f2f", "fs": 13, "age": 30, "body": "normal",
 		"hat": "", "hat_col": "#c8a020", "street": "jacket"}
 	var r := PortraitKit.recipe(lk, {})
 	var skin := Color(str(People.SKINS[4]))
+	var sk := Color(skin.r, skin.g, skin.b, 1.0)
 	var n := _names(r)
 	var ek := "eyes_" + str(People.face(lk)["eyes"])
-	check(n.find(ek + "_lids") >= 0 and n.find(ek + "_lids") < n.find(ek) and _col(r, ek + "_lids") == Color(skin.r, skin.g, skin.b, 1.0), "веки под глазами, цвета кожи")
+	check(n.find(ek + "_lids") >= 0 and n.find(ek + "_lids") < n.find(ek) and _col(r, ek + "_lids") == sk, "веки под глазами, цвета кожи")
+	check(_col(r, str(r["base"])) == sk and _col(r, "nose_" + str(People.face(lk)["nose"])) == sk, "основа и нос — одним цветом кожи")
+	var plain := Color(PortraitKit.REF, PortraitKit.REF, PortraitKit.REF)
+	check(_col(r, "mouth_" + str(People.face(lk)["mouth"])) == plain and _col(r, ek) == plain, "губы и глаза не красятся цветом кожи")
 	var cn := str(r["collar"])
-	check(n.has(cn + "_skinpart") and _col(r, cn + "_skinpart") == Color(skin.r, skin.g, skin.b, 1.0), "кожа в вырезе женской одежды — цвета кожи (%s)" % cn)
-	check(n.has(cn + "_fab") and _col(r, cn + "_fab") == Color("#2f6f4f"), "ткань — в цвет спецовки")
+	check(cn == "collar_shirt_f_normal" and _col(r, cn) == Color("#2f6f4f") and str(r["mask_cloth"]) == "mask_%s_fab" % cn, "одежда — в цвет спецовки по маске ткани")
 	var lk2 := lk.duplicate()
 	lk2["outfit_col"] = "#8a2f2f"
 	var a := PortraitKit.compose_image(lk, {}, 128)
 	var b := PortraitKit.compose_image(lk2, {}, 128)
 	check(_hash(a) != _hash(b), "другой цвет спецовки — другой портрет")
+	# перекраска ткани: яркость рисунка × gain × цвет; вне ткани (галстук) — как есть
+	var suit := PortraitKit._layer_img("collar_suit_m_normal", 128)
+	var fm := PortraitKit._layer_img("mask_collar_suit_m_normal_fab", 128)
+	var g := PortraitKit.gain("collar_suit_m_normal")
+	var rr := Rect2i(0, 0, 128, 128)
+	var red := PortraitKit.tint_region(suit, rr, Color("#a03030"), fm, true, g)
+	var blue := PortraitKit.tint_region(suit, rr, Color("#3040a0"), fm, true, g)
+	var fab_d := 0
+	var own_same := 0
+	var own_n := 0
+	var alpha_ok := true
+	for y in range(64, 128, 2):
+		for x in range(0, 128, 2):
+			var s0 := suit.get_pixel(x, y)
+			if s0.a < 0.95:
+				continue
+			if absf(red.get_pixel(x, y).a - s0.a) > 0.003:
+				alpha_ok = false
+			var m := fm.get_pixel(x, y).r
+			if m > 0.99 and red.get_pixel(x, y).r > blue.get_pixel(x, y).r + 0.05:
+				fab_d += 1
+			elif m == 0.0:
+				own_n += 1
+				if red.get_pixel(x, y).is_equal_approx(s0) and blue.get_pixel(x, y).is_equal_approx(s0):
+					own_same += 1
+	check(fab_d > 100 and own_n > 10 and own_same == own_n and alpha_ok, "пиджак красится, галстук и рубашка своего цвета, прозрачность та же: ткань %d, своё %d/%d" % [fab_d, own_same, own_n])
 	# головные уборы — как у человечка на карте
 	var m := {"fem": false, "skin": 1, "hair": "short", "hair_col": "#4a3020", "outfit": "jacket", "outfit_col": "#3d5a7a", "fs": 5, "age": 40, "body": "normal", "hat": "helmet", "hat_col": "#e0a020", "street": "jacket", "street_col": "#3b3f44"}
 	var rh := PortraitKit.recipe(m, {})
-	check(_names(rh).has("helmet") and _col(rh, "helmet") == Color("#e0a020") and str(rh["mask_hair"]) == "mask_hat_helmet", "каска в цвет убора, волосы под каской срезаны маской")
+	check(_names(rh).has("helmet") and _col(rh, "helmet") == Color("#e0a020") and str(rh["mask_hair"]) == "mask_hat_helmet" and str(rh["mask_back"]) == "mask_hat_helmet", "каска в цвет убора, волосы под каской срезаны маской")
+	check(_names(rh).find("helmet") > _names(rh).find("hair_short_front"), "убор — поверх волос")
 	var rs := PortraitKit.recipe(m, {"dressed": false, "winter": true})
-	check(_names(rs).has("ushanka") and not _names(rs).has("helmet") and _col(rs, str(rs["collar"]) + "_fab") == Color("#3b3f44"), "не переоделся зимой: своя куртка, ушанка, без каски")
+	check(_names(rs).has("ushanka") and not _names(rs).has("helmet") and _col(rs, str(rs["collar"])) == Color("#3b3f44"), "не переоделся зимой: своя куртка, ушанка, без каски")
 	var rd := PortraitKit.recipe(m, {"dressed": false})
 	check(not _names(rd).has("helmet") and str(rd["hat"]) == "", "не переоделся летом: без каски")
 	m["hat"] = "cap"
@@ -408,8 +469,8 @@ func _v2() -> void:
 	check(_names(PortraitKit.recipe(m, {"winter": true})).has("cap"), "зимой в цеху — кепка")
 	m["hat"] = "weldmask"
 	check(_names(PortraitKit.recipe(m, {})).has("welder_mask"), "сварщик — в сварочной маске")
-	# маска тела действительно ограничивает шею и голову
+	# маска body_keep действительно ограничивает основу
 	var rv: Dictionary = PortraitKit.recipe(m, {}).duplicate()
 	var full := PortraitKit.compose_recipe(rv, 128)
 	rv["mask_body"] = ""
-	check(_hash(PortraitKit.compose_recipe(rv, 128)) != _hash(full), "маска воротника меняет картинку (тело не вылезает из воротника)")
+	check(_hash(PortraitKit.compose_recipe(rv, 128)) != _hash(full), "маска body_keep меняет картинку (основа не вылезает из одежды)")

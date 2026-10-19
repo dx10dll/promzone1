@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfr4v6iaaxq1p"
+uid="uid://if0poac1ouv5"
 path="res://.godot/imported/beard_goatee.png-9131e99ec386bcf5a82b604444fab07d.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/beard_goatee.png-9131e99ec386bcf5a82b604444fa
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

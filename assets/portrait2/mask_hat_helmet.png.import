@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://64safyg3kyi5"
+uid="uid://c0nwftv3sbv4c"
 path="res://.godot/imported/mask_hat_helmet.png-aaac21121c40a9aca381fd3f687a5ab8.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/mask_hat_helmet.png-aaac21121c40a9aca381fd3f6
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

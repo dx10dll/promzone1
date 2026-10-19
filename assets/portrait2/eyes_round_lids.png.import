@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c0lje52xubgut"
+uid="uid://b5kipk5l5esla"
 path="res://.godot/imported/eyes_round_lids.png-6e938ac4c104c046be33b5a437d5fd52.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/eyes_round_lids.png-6e938ac4c104c046be33b5a43
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

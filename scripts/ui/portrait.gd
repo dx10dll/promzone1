@@ -1,6 +1,6 @@
 class_name Portrait
 extends Control
-## 1.33: портрет рисуется из нового слоистого набора (PortraitKit, assets/portrait2). Старый векторный
+## 1.33: портрет рисуется из нового слоистого набора (PortraitKit, assets/portrait2; 1.36 — набор v3). Старый векторный
 ## портрет ниже — запасной: если набор не загрузился.
 ## Портрет человека для интерфейса: отдельная детальная графика (assets/portrait, tools/gen_portraits.py),
 ## собранная из слоёв. С 1.14.2 черты те же, что у человечка на карте: форма головы, разрез глаз, брови,
@@ -30,7 +30,7 @@ var _info: Dictionary = {}
 
 
 ## 1.34: новый портрет рисуется дочерними узлами по группам слоёв (PortraitKit.GROUPS) — у каждого материал
-## с маской группы (тело внутри воротника, волосы под головным убором); последний — рамка.
+## с маской группы (основа под одеждой, ткань одежды в цвет спецовки, волосы под головным убором); последний — рамка.
 class _Layers extends Control:
 	var host: Portrait
 	var group := ""
@@ -95,7 +95,7 @@ func draw_layers(ci: Control, group: String) -> void:
 	if _rec.is_empty() or size.x < 2.0:
 		return
 	if group != "":
-		PortraitKit.draw(ci, Rect2(Vector2.ZERO, size), frame_rect(), _rec, group, zoom >= 0.75)
+		PortraitKit.draw(ci, Rect2(Vector2.ZERO, size), frame_rect(), _rec, group)
 		return
 	# рамка — через тот же шейдер (он делит цвет на опорный серый)
 	var bc := Color("#8a949d") if doc else Color("#5a636c")

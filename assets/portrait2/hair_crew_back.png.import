@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dcm5hbwp6m16a"
+uid="uid://rsad1i18old7"
 path="res://.godot/imported/hair_crew_back.png-f9a0873d50f3747194397f3c5023138b.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/hair_crew_back.png-f9a0873d50f3747194397f3c50
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

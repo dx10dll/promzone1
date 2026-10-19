@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b4ufqe01nvhfy"
+uid="uid://bhbmynq6bid5u"
 path="res://.godot/imported/eyes_almond_iris.png-58d8e28395fa16b025a1766288956a19.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/eyes_almond_iris.png-58d8e28395fa16b025a17662
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

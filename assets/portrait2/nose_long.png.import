@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dn1i4rv53cs20"
+uid="uid://ctjqdpf6p3b6c"
 path="res://.godot/imported/nose_long.png-6e6147464229a14838c59c84dcbfe28c.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/nose_long.png-6e6147464229a14838c59c84dcbfe28
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

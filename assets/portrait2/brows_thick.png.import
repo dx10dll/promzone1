@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dp84n08xawds5"
+uid="uid://brasbwxoa5rhf"
 path="res://.godot/imported/brows_thick.png-51c8b5c265bd4873d79a32cb894a39a3.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/brows_thick.png-51c8b5c265bd4873d79a32cb894a3
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

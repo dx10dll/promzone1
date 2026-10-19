@@ -1,5 +1,219 @@
 {
+ "fits": {
+  "fat": "full",
+  "normal": "normal",
+  "stout": "strong",
+  "strong": "powerful",
+  "thin": "thin",
+  "vfat": "very_full",
+  "vthin": "very_thin"
+ },
+ "gain": {
+  "collar_firefighter_f_full": 2.4695,
+  "collar_firefighter_f_normal": 2.4357,
+  "collar_firefighter_f_powerful": 2.4911,
+  "collar_firefighter_f_strong": 2.4748,
+  "collar_firefighter_f_thin": 2.4748,
+  "collar_firefighter_f_very_full": 2.4911,
+  "collar_firefighter_f_very_thin": 2.4937,
+  "collar_firefighter_m_full": 2.6,
+  "collar_firefighter_m_normal": 2.6,
+  "collar_firefighter_m_powerful": 2.6,
+  "collar_firefighter_m_strong": 2.6,
+  "collar_firefighter_m_thin": 2.6,
+  "collar_firefighter_m_very_full": 2.6,
+  "collar_firefighter_m_very_thin": 2.6,
+  "collar_jacket_f_full": 2.2591,
+  "collar_jacket_f_normal": 2.2445,
+  "collar_jacket_f_powerful": 2.2697,
+  "collar_jacket_f_strong": 2.2591,
+  "collar_jacket_f_thin": 2.2591,
+  "collar_jacket_f_very_full": 2.2697,
+  "collar_jacket_f_very_thin": 2.2697,
+  "collar_jacket_m_full": 2.6,
+  "collar_jacket_m_normal": 2.6,
+  "collar_jacket_m_powerful": 2.6,
+  "collar_jacket_m_strong": 2.6,
+  "collar_jacket_m_thin": 2.6,
+  "collar_jacket_m_very_full": 2.6,
+  "collar_jacket_m_very_thin": 2.6,
+  "collar_kerchief_f_full": 1.5095,
+  "collar_kerchief_f_normal": 1.5031,
+  "collar_kerchief_f_powerful": 1.5158,
+  "collar_kerchief_f_strong": 1.5097,
+  "collar_kerchief_f_thin": 1.5117,
+  "collar_kerchief_f_very_full": 1.5157,
+  "collar_kerchief_f_very_thin": 1.5188,
+  "collar_overall_f_full": 2.6,
+  "collar_overall_f_normal": 2.6,
+  "collar_overall_f_powerful": 2.6,
+  "collar_overall_f_strong": 2.6,
+  "collar_overall_f_thin": 2.6,
+  "collar_overall_f_very_full": 2.6,
+  "collar_overall_f_very_thin": 2.6,
+  "collar_overall_m_full": 2.6,
+  "collar_overall_m_normal": 2.6,
+  "collar_overall_m_powerful": 2.6,
+  "collar_overall_m_strong": 2.6,
+  "collar_overall_m_thin": 2.6,
+  "collar_overall_m_very_full": 2.6,
+  "collar_overall_m_very_thin": 2.6,
+  "collar_robe_f_full": 0.918,
+  "collar_robe_f_normal": 0.9156,
+  "collar_robe_f_powerful": 0.9193,
+  "collar_robe_f_strong": 0.9181,
+  "collar_robe_f_thin": 0.9188,
+  "collar_robe_f_very_full": 0.9193,
+  "collar_robe_f_very_thin": 0.9198,
+  "collar_robe_m_full": 0.9704,
+  "collar_robe_m_normal": 0.9654,
+  "collar_robe_m_powerful": 0.9687,
+  "collar_robe_m_strong": 0.9687,
+  "collar_robe_m_thin": 0.9648,
+  "collar_robe_m_very_full": 0.9695,
+  "collar_robe_m_very_thin": 0.9669,
+  "collar_shirt_f_full": 1.0495,
+  "collar_shirt_f_normal": 1.0462,
+  "collar_shirt_f_powerful": 1.0528,
+  "collar_shirt_f_strong": 1.0501,
+  "collar_shirt_f_thin": 1.0513,
+  "collar_shirt_f_very_full": 1.0524,
+  "collar_shirt_f_very_thin": 1.055,
+  "collar_shirt_m_full": 0.9735,
+  "collar_shirt_m_normal": 0.9699,
+  "collar_shirt_m_powerful": 0.9752,
+  "collar_shirt_m_strong": 0.9738,
+  "collar_shirt_m_thin": 0.9738,
+  "collar_shirt_m_very_full": 0.9743,
+  "collar_shirt_m_very_thin": 0.9766,
+  "collar_suit_f_full": 2.6,
+  "collar_suit_f_normal": 2.6,
+  "collar_suit_f_powerful": 2.6,
+  "collar_suit_f_strong": 2.6,
+  "collar_suit_f_thin": 2.6,
+  "collar_suit_f_very_full": 2.6,
+  "collar_suit_f_very_thin": 2.6,
+  "collar_suit_m_full": 2.6,
+  "collar_suit_m_normal": 2.6,
+  "collar_suit_m_powerful": 2.6,
+  "collar_suit_m_strong": 2.6,
+  "collar_suit_m_thin": 2.6,
+  "collar_suit_m_very_full": 2.6,
+  "collar_suit_m_very_thin": 2.6,
+  "collar_sweater_f_full": 2.6,
+  "collar_sweater_f_normal": 2.6,
+  "collar_sweater_f_powerful": 2.6,
+  "collar_sweater_f_strong": 2.6,
+  "collar_sweater_f_thin": 2.6,
+  "collar_sweater_f_very_full": 2.6,
+  "collar_sweater_f_very_thin": 2.6,
+  "collar_sweater_m_full": 2.6,
+  "collar_sweater_m_normal": 2.6,
+  "collar_sweater_m_powerful": 2.6,
+  "collar_sweater_m_strong": 2.6,
+  "collar_sweater_m_thin": 2.6,
+  "collar_sweater_m_very_full": 2.6,
+  "collar_sweater_m_very_thin": 2.6,
+  "collar_vest_f_full": 2.6,
+  "collar_vest_f_normal": 2.6,
+  "collar_vest_f_powerful": 2.6,
+  "collar_vest_f_strong": 2.6,
+  "collar_vest_f_thin": 2.6,
+  "collar_vest_f_very_full": 2.6,
+  "collar_vest_f_very_thin": 2.6,
+  "collar_vest_m_full": 2.6,
+  "collar_vest_m_normal": 2.6,
+  "collar_vest_m_powerful": 2.6,
+  "collar_vest_m_strong": 2.6,
+  "collar_vest_m_thin": 2.6,
+  "collar_vest_m_very_full": 2.6,
+  "collar_vest_m_very_thin": 2.6
+ },
  "layers": {
+  "base_full_f": [
+   0,
+   32,
+   512,
+   512
+  ],
+  "base_full_m": [
+   0,
+   58,
+   512,
+   512
+  ],
+  "base_normal_f": [
+   0,
+   57,
+   512,
+   512
+  ],
+  "base_normal_m": [
+   0,
+   57,
+   512,
+   512
+  ],
+  "base_powerful_f": [
+   0,
+   56,
+   512,
+   512
+  ],
+  "base_powerful_m": [
+   0,
+   58,
+   512,
+   512
+  ],
+  "base_strong_f": [
+   0,
+   56,
+   512,
+   512
+  ],
+  "base_strong_m": [
+   0,
+   58,
+   512,
+   512
+  ],
+  "base_thin_f": [
+   0,
+   57,
+   512,
+   512
+  ],
+  "base_thin_m": [
+   0,
+   57,
+   512,
+   512
+  ],
+  "base_very_full_f": [
+   0,
+   32,
+   512,
+   512
+  ],
+  "base_very_full_m": [
+   0,
+   58,
+   512,
+   512
+  ],
+  "base_very_thin_f": [
+   18,
+   57,
+   494,
+   512
+  ],
+  "base_very_thin_m": [
+   18,
+   57,
+   494,
+   512
+  ],
   "beard_chevron": [
    203,
    263,
@@ -78,359 +292,1055 @@
    389,
    157
   ],
-  "cheeks_full_f": [
-   134,
-   210,
-   379,
-   303
+  "collar_firefighter_f_full": [
+   25,
+   323,
+   488,
+   512
   ],
-  "cheeks_full_m": [
-   134,
-   210,
-   379,
-   303
+  "collar_firefighter_f_full_inner": [
+   165,
+   318,
+   350,
+   357
   ],
-  "chin_double_f": [
-   140,
-   269,
-   373,
-   461
-  ],
-  "chin_double_m": [
-   141,
-   269,
-   372,
-   461
-  ],
-  "collar_firefighter_f": [
+  "collar_firefighter_f_normal": [
    57,
    343,
    456,
    512
   ],
-  "collar_firefighter_f_fab": [
-   57,
-   343,
-   456,
-   512
-  ],
-  "collar_firefighter_f_inner": [
+  "collar_firefighter_f_normal_inner": [
    190,
    338,
    325,
    374
   ],
-  "collar_firefighter_f_inner_fab": [
-   190,
-   338,
-   325,
-   374
+  "collar_firefighter_f_powerful": [
+   14,
+   331,
+   499,
+   512
   ],
-  "collar_firefighter_m": [
+  "collar_firefighter_f_powerful_inner": [
+   169,
+   326,
+   346,
+   364
+  ],
+  "collar_firefighter_f_strong": [
+   36,
+   331,
+   477,
+   512
+  ],
+  "collar_firefighter_f_strong_inner": [
+   176,
+   326,
+   340,
+   364
+  ],
+  "collar_firefighter_f_thin": [
+   81,
+   352,
+   431,
+   512
+  ],
+  "collar_firefighter_f_thin_inner": [
+   205,
+   346,
+   310,
+   381
+  ],
+  "collar_firefighter_f_very_full": [
+   2,
+   323,
+   511,
+   512
+  ],
+  "collar_firefighter_f_very_full_inner": [
+   157,
+   318,
+   359,
+   357
+  ],
+  "collar_firefighter_f_very_thin": [
+   95,
+   352,
+   418,
+   512
+  ],
+  "collar_firefighter_f_very_thin_inner": [
+   209,
+   346,
+   305,
+   381
+  ],
+  "collar_firefighter_m_full": [
+   0,
+   322,
+   512,
+   512
+  ],
+  "collar_firefighter_m_full_inner": [
+   148,
+   318,
+   355,
+   406
+  ],
+  "collar_firefighter_m_normal": [
    26,
    342,
    486,
    512
   ],
-  "collar_firefighter_m_fab": [
-   26,
-   342,
-   486,
-   512
-  ],
-  "collar_firefighter_m_inner": [
+  "collar_firefighter_m_normal_inner": [
    177,
    338,
    328,
    418
   ],
-  "collar_firefighter_m_inner_fab": [
-   177,
-   338,
-   328,
-   418
-  ],
-  "collar_jacket_f": [
-   57,
-   338,
-   455,
+  "collar_firefighter_m_powerful": [
+   0,
+   330,
+   512,
    512
   ],
-  "collar_jacket_f_fab": [
-   57,
-   338,
-   455,
+  "collar_firefighter_m_powerful_inner": [
+   152,
+   326,
+   352,
+   411
+  ],
+  "collar_firefighter_m_strong": [
+   3,
+   330,
+   509,
    512
   ],
-  "collar_jacket_f_skinpart": [
-   190,
-   405,
+  "collar_firefighter_m_strong_inner": [
+   160,
+   326,
+   344,
+   411
+  ],
+  "collar_firefighter_m_thin": [
+   53,
+   351,
+   459,
+   512
+  ],
+  "collar_firefighter_m_thin_inner": [
+   194,
+   346,
    311,
-   448
+   423
   ],
-  "collar_jacket_m": [
-   28,
-   337,
-   486,
+  "collar_firefighter_m_very_full": [
+   0,
+   322,
+   512,
    512
   ],
-  "collar_jacket_m_fab": [
-   28,
-   337,
-   486,
+  "collar_firefighter_m_very_full_inner": [
+   137,
+   318,
+   367,
+   406
+  ],
+  "collar_firefighter_m_very_thin": [
+   69,
+   351,
+   443,
    512
   ],
-  "collar_kerchief_f": [
-   67,
-   338,
-   455,
+  "collar_firefighter_m_very_thin_inner": [
+   200,
+   346,
+   306,
+   423
+  ],
+  "collar_jacket_f_full": [
+   25,
+   318,
+   487,
    512
   ],
-  "collar_kerchief_f_fab": [
-   67,
-   338,
-   455,
-   512
-  ],
-  "collar_kerchief_f_skinpart": [
-   190,
-   405,
-   314,
-   449
-  ],
-  "collar_overall_f": [
+  "collar_jacket_f_normal": [
    56,
    338,
    456,
    512
   ],
-  "collar_overall_f_fab": [
-   117,
-   363,
-   392,
+  "collar_jacket_f_powerful": [
+   14,
+   326,
+   498,
    512
   ],
-  "collar_overall_f_skinpart": [
-   190,
-   405,
-   322,
-   450
+  "collar_jacket_f_strong": [
+   36,
+   326,
+   476,
+   512
   ],
-  "collar_overall_m": [
+  "collar_jacket_f_thin": [
+   81,
+   346,
+   431,
+   512
+  ],
+  "collar_jacket_f_very_full": [
+   1,
+   318,
+   510,
+   512
+  ],
+  "collar_jacket_f_very_thin": [
+   95,
+   346,
+   417,
+   512
+  ],
+  "collar_jacket_m_full": [
+   0,
+   318,
+   512,
+   512
+  ],
+  "collar_jacket_m_normal": [
+   28,
+   337,
+   486,
+   512
+  ],
+  "collar_jacket_m_powerful": [
+   0,
+   326,
+   512,
+   512
+  ],
+  "collar_jacket_m_strong": [
+   6,
+   326,
+   507,
+   512
+  ],
+  "collar_jacket_m_thin": [
+   55,
+   346,
+   458,
+   512
+  ],
+  "collar_jacket_m_very_full": [
+   0,
+   318,
+   512,
+   512
+  ],
+  "collar_jacket_m_very_thin": [
+   71,
+   346,
+   442,
+   512
+  ],
+  "collar_kerchief_f_full": [
+   26,
+   318,
+   487,
+   512
+  ],
+  "collar_kerchief_f_normal": [
+   58,
+   338,
+   455,
+   512
+  ],
+  "collar_kerchief_f_powerful": [
+   15,
+   326,
+   498,
+   512
+  ],
+  "collar_kerchief_f_strong": [
+   37,
+   326,
+   476,
+   512
+  ],
+  "collar_kerchief_f_thin": [
+   83,
+   346,
+   431,
+   512
+  ],
+  "collar_kerchief_f_very_full": [
+   2,
+   318,
+   510,
+   512
+  ],
+  "collar_kerchief_f_very_thin": [
+   96,
+   346,
+   417,
+   512
+  ],
+  "collar_overall_f_full": [
+   24,
+   318,
+   488,
+   512
+  ],
+  "collar_overall_f_normal": [
+   56,
+   338,
+   456,
+   512
+  ],
+  "collar_overall_f_powerful": [
+   13,
+   326,
+   498,
+   512
+  ],
+  "collar_overall_f_strong": [
+   35,
+   326,
+   477,
+   512
+  ],
+  "collar_overall_f_thin": [
+   81,
+   346,
+   431,
+   512
+  ],
+  "collar_overall_f_very_full": [
+   1,
+   318,
+   510,
+   512
+  ],
+  "collar_overall_f_very_thin": [
+   95,
+   346,
+   417,
+   512
+  ],
+  "collar_overall_m_full": [
+   0,
+   318,
+   512,
+   512
+  ],
+  "collar_overall_m_normal": [
    30,
    338,
    486,
    512
   ],
-  "collar_overall_m_fab": [
-   90,
-   360,
-   429,
+  "collar_overall_m_powerful": [
+   0,
+   326,
+   512,
    512
   ],
-  "collar_robe_f": [
+  "collar_overall_m_strong": [
+   8,
+   326,
+   509,
+   512
+  ],
+  "collar_overall_m_thin": [
+   57,
+   346,
+   459,
+   512
+  ],
+  "collar_overall_m_very_full": [
+   0,
+   318,
+   512,
+   512
+  ],
+  "collar_overall_m_very_thin": [
+   73,
+   346,
+   443,
+   512
+  ],
+  "collar_robe_f_full": [
+   24,
+   323,
+   488,
+   512
+  ],
+  "collar_robe_f_full_inner": [
+   171,
+   318,
+   347,
+   452
+  ],
+  "collar_robe_f_normal": [
    56,
    343,
    456,
    512
   ],
-  "collar_robe_f_fab": [
-   56,
+  "collar_robe_f_normal_inner": [
+   194,
+   338,
+   323,
+   458
+  ],
+  "collar_robe_f_powerful": [
+   13,
+   331,
+   499,
+   512
+  ],
+  "collar_robe_f_powerful_inner": [
+   174,
+   326,
    343,
+   455
+  ],
+  "collar_robe_f_strong": [
+   35,
+   331,
+   477,
+   512
+  ],
+  "collar_robe_f_strong_inner": [
+   181,
+   326,
+   337,
+   454
+  ],
+  "collar_robe_f_thin": [
+   81,
+   352,
+   431,
+   512
+  ],
+  "collar_robe_f_thin_inner": [
+   209,
+   346,
+   308,
+   461
+  ],
+  "collar_robe_f_very_full": [
+   1,
+   323,
+   511,
+   512
+  ],
+  "collar_robe_f_very_full_inner": [
+   162,
+   318,
+   357,
+   452
+  ],
+  "collar_robe_f_very_thin": [
+   95,
+   352,
+   418,
+   512
+  ],
+  "collar_robe_f_very_thin_inner": [
+   213,
+   346,
+   303,
+   461
+  ],
+  "collar_robe_m_full": [
+   0,
+   323,
+   512,
+   512
+  ],
+  "collar_robe_m_full_inner": [
+   149,
+   318,
+   373,
+   391
+  ],
+  "collar_robe_m_normal": [
+   26,
+   343,
+   486,
+   512
+  ],
+  "collar_robe_m_normal_inner": [
+   177,
+   338,
+   344,
+   404
+  ],
+  "collar_robe_m_powerful": [
+   0,
+   331,
+   512,
+   512
+  ],
+  "collar_robe_m_powerful_inner": [
+   151,
+   326,
+   370,
+   397
+  ],
+  "collar_robe_m_strong": [
+   3,
+   331,
+   509,
+   512
+  ],
+  "collar_robe_m_strong_inner": [
+   161,
+   326,
+   361,
+   397
+  ],
+  "collar_robe_m_thin": [
+   53,
+   351,
+   459,
+   512
+  ],
+  "collar_robe_m_thin_inner": [
+   195,
+   346,
+   326,
+   410
+  ],
+  "collar_robe_m_very_full": [
+   0,
+   323,
+   512,
+   512
+  ],
+  "collar_robe_m_very_full_inner": [
+   137,
+   318,
+   385,
+   391
+  ],
+  "collar_robe_m_very_thin": [
+   69,
+   351,
+   443,
+   512
+  ],
+  "collar_robe_m_very_thin_inner": [
+   200,
+   346,
+   320,
+   410
+  ],
+  "collar_shirt_f_full": [
+   24,
+   318,
+   487,
+   512
+  ],
+  "collar_shirt_f_normal": [
+   56,
+   338,
+   455,
+   512
+  ],
+  "collar_shirt_f_powerful": [
+   13,
+   326,
+   498,
+   512
+  ],
+  "collar_shirt_f_strong": [
+   35,
+   326,
+   476,
+   512
+  ],
+  "collar_shirt_f_thin": [
+   81,
+   346,
+   431,
+   512
+  ],
+  "collar_shirt_f_very_full": [
+   1,
+   318,
+   510,
+   512
+  ],
+  "collar_shirt_f_very_thin": [
+   95,
+   346,
+   417,
+   512
+  ],
+  "collar_shirt_m_full": [
+   0,
+   318,
+   512,
+   512
+  ],
+  "collar_shirt_m_normal": [
+   27,
+   338,
+   483,
+   512
+  ],
+  "collar_shirt_m_powerful": [
+   0,
+   326,
+   512,
+   512
+  ],
+  "collar_shirt_m_strong": [
+   4,
+   326,
+   505,
+   512
+  ],
+  "collar_shirt_m_thin": [
+   54,
+   346,
    456,
    512
   ],
-  "collar_robe_f_inner": [
-   194,
-   338,
-   323,
-   458
+  "collar_shirt_m_very_full": [
+   0,
+   318,
+   512,
+   512
   ],
-  "collar_robe_f_inner_fab": [
-   194,
-   338,
-   323,
-   458
+  "collar_shirt_m_very_thin": [
+   70,
+   346,
+   440,
+   512
   ],
-  "collar_robe_m": [
+  "collar_suit_f_full": [
+   24,
+   318,
+   488,
+   512
+  ],
+  "collar_suit_f_normal": [
+   56,
+   338,
+   456,
+   512
+  ],
+  "collar_suit_f_powerful": [
+   13,
+   326,
+   499,
+   512
+  ],
+  "collar_suit_f_strong": [
+   35,
+   326,
+   477,
+   512
+  ],
+  "collar_suit_f_thin": [
+   81,
+   346,
+   431,
+   512
+  ],
+  "collar_suit_f_very_full": [
+   1,
+   318,
+   512,
+   512
+  ],
+  "collar_suit_f_very_thin": [
+   95,
+   346,
+   418,
+   512
+  ],
+  "collar_suit_m_full": [
+   0,
+   318,
+   512,
+   512
+  ],
+  "collar_suit_m_normal": [
    26,
-   343,
+   338,
    486,
    512
   ],
-  "collar_robe_m_fab": [
-   26,
-   343,
-   486,
+  "collar_suit_m_powerful": [
+   0,
+   326,
+   512,
    512
   ],
-  "collar_robe_m_inner": [
-   177,
-   338,
-   344,
-   404
-  ],
-  "collar_robe_m_inner_fab": [
-   177,
-   338,
-   344,
-   404
-  ],
-  "collar_shirt_f": [
-   56,
-   338,
-   455,
+  "collar_suit_m_strong": [
+   4,
+   326,
+   509,
    512
   ],
-  "collar_shirt_f_fab": [
-   56,
-   338,
-   455,
+  "collar_suit_m_thin": [
+   54,
+   346,
+   459,
    512
   ],
-  "collar_shirt_f_skinpart": [
-   191,
-   405,
+  "collar_suit_m_very_full": [
+   0,
+   318,
+   512,
+   512
+  ],
+  "collar_suit_m_very_thin": [
+   70,
+   346,
+   443,
+   512
+  ],
+  "collar_sweater_f_full": [
+   24,
    322,
-   450
-  ],
-  "collar_shirt_m": [
-   27,
-   338,
-   483,
+   488,
    512
   ],
-  "collar_shirt_m_fab": [
-   27,
-   338,
-   483,
-   512
+  "collar_sweater_f_full_inner": [
+   167,
+   318,
+   346,
+   342
   ],
-  "collar_suit_f": [
+  "collar_sweater_f_normal": [
    56,
-   338,
+   342,
    456,
    512
   ],
-  "collar_suit_f_fab": [
-   56,
-   338,
-   456,
-   512
-  ],
-  "collar_suit_f_skinpart": [
+  "collar_sweater_f_normal_inner": [
    191,
-   405,
+   338,
+   321,
+   360
+  ],
+  "collar_sweater_f_powerful": [
+   13,
+   330,
+   499,
+   512
+  ],
+  "collar_sweater_f_powerful_inner": [
+   170,
+   326,
+   342,
+   349
+  ],
+  "collar_sweater_f_strong": [
+   35,
+   331,
+   477,
+   512
+  ],
+  "collar_sweater_f_strong_inner": [
+   177,
+   326,
+   335,
+   349
+  ],
+  "collar_sweater_f_thin": [
+   81,
+   351,
+   431,
+   512
+  ],
+  "collar_sweater_f_thin_inner": [
+   206,
+   346,
+   306,
+   368
+  ],
+  "collar_sweater_f_very_full": [
+   1,
+   322,
+   511,
+   512
+  ],
+  "collar_sweater_f_very_full_inner": [
+   158,
+   318,
+   355,
+   342
+  ],
+  "collar_sweater_f_very_thin": [
+   94,
+   351,
+   418,
+   512
+  ],
+  "collar_sweater_f_very_thin_inner": [
+   210,
+   346,
    302,
-   448
+   368
   ],
-  "collar_suit_m": [
-   26,
-   338,
-   486,
+  "collar_sweater_m_full": [
+   3,
+   322,
+   509,
    512
   ],
-  "collar_suit_m_fab": [
-   26,
-   338,
-   486,
-   512
+  "collar_sweater_m_full_inner": [
+   145,
+   318,
+   368,
+   345
   ],
-  "collar_sweater_f": [
-   56,
-   342,
-   456,
-   512
-  ],
-  "collar_sweater_f_fab": [
-   56,
-   342,
-   456,
-   512
-  ],
-  "collar_sweater_f_inner": [
-   191,
-   338,
-   321,
-   360
-  ],
-  "collar_sweater_f_inner_fab": [
-   191,
-   338,
-   321,
-   360
-  ],
-  "collar_sweater_m": [
+  "collar_sweater_m_normal": [
    36,
    342,
    476,
    512
   ],
-  "collar_sweater_m_fab": [
-   36,
-   342,
-   476,
-   512
-  ],
-  "collar_sweater_m_inner": [
+  "collar_sweater_m_normal_inner": [
    173,
    338,
    340,
    363
   ],
-  "collar_sweater_m_inner_fab": [
-   173,
-   338,
-   340,
-   363
+  "collar_sweater_m_powerful": [
+   0,
+   330,
+   512,
+   512
   ],
-  "collar_vest_f": [
+  "collar_sweater_m_powerful_inner": [
+   148,
+   326,
+   365,
+   352
+  ],
+  "collar_sweater_m_strong": [
+   14,
+   330,
+   498,
+   512
+  ],
+  "collar_sweater_m_strong_inner": [
+   157,
+   326,
+   356,
+   352
+  ],
+  "collar_sweater_m_thin": [
+   62,
+   350,
+   450,
+   512
+  ],
+  "collar_sweater_m_thin_inner": [
+   191,
+   346,
+   322,
+   370
+  ],
+  "collar_sweater_m_very_full": [
+   0,
+   322,
+   512,
+   512
+  ],
+  "collar_sweater_m_very_full_inner": [
+   133,
+   318,
+   380,
+   345
+  ],
+  "collar_sweater_m_very_thin": [
+   78,
+   350,
+   434,
+   512
+  ],
+  "collar_sweater_m_very_thin_inner": [
+   197,
+   346,
+   316,
+   370
+  ],
+  "collar_vest_f_full": [
+   24,
+   326,
+   488,
+   512
+  ],
+  "collar_vest_f_full_inner": [
+   164,
+   318,
+   339,
+   406
+  ],
+  "collar_vest_f_normal": [
    56,
    344,
    456,
    512
   ],
-  "collar_vest_f_fab": [
-   56,
-   344,
-   456,
-   512
-  ],
-  "collar_vest_f_inner": [
+  "collar_vest_f_normal_inner": [
    188,
    338,
    316,
    418
   ],
-  "collar_vest_f_inner_fab": [
-   188,
-   338,
-   316,
-   418
+  "collar_vest_f_powerful": [
+   13,
+   333,
+   499,
+   512
   ],
-  "collar_vest_m": [
+  "collar_vest_f_powerful_inner": [
+   167,
+   326,
+   335,
+   411
+  ],
+  "collar_vest_f_strong": [
+   35,
+   333,
+   477,
+   512
+  ],
+  "collar_vest_f_strong_inner": [
+   174,
+   326,
+   329,
+   411
+  ],
+  "collar_vest_f_thin": [
+   81,
+   353,
+   431,
+   512
+  ],
+  "collar_vest_f_thin_inner": [
+   203,
+   346,
+   302,
+   423
+  ],
+  "collar_vest_f_very_full": [
+   1,
+   326,
+   511,
+   512
+  ],
+  "collar_vest_f_very_full_inner": [
+   154,
+   318,
+   348,
+   407
+  ],
+  "collar_vest_f_very_thin": [
+   94,
+   353,
+   418,
+   512
+  ],
+  "collar_vest_f_very_thin_inner": [
+   208,
+   346,
+   298,
+   423
+  ],
+  "collar_vest_m_full": [
+   0,
+   325,
+   512,
+   512
+  ],
+  "collar_vest_m_full_inner": [
+   143,
+   318,
+   363,
+   391
+  ],
+  "collar_vest_m_normal": [
    26,
    344,
    486,
    512
   ],
-  "collar_vest_m_fab": [
-   26,
-   344,
-   486,
+  "collar_vest_m_normal_inner": [
+   171,
+   338,
+   334,
+   404
+  ],
+  "collar_vest_m_powerful": [
+   0,
+   333,
+   512,
    512
   ],
-  "collar_vest_m_inner": [
-   171,
-   338,
-   334,
-   404
+  "collar_vest_m_powerful_inner": [
+   146,
+   326,
+   359,
+   396
   ],
-  "collar_vest_m_inner_fab": [
-   171,
-   338,
-   334,
-   404
+  "collar_vest_m_strong": [
+   3,
+   333,
+   509,
+   512
+  ],
+  "collar_vest_m_strong_inner": [
+   155,
+   326,
+   350,
+   396
+  ],
+  "collar_vest_m_thin": [
+   53,
+   353,
+   459,
+   512
+  ],
+  "collar_vest_m_thin_inner": [
+   189,
+   346,
+   317,
+   410
+  ],
+  "collar_vest_m_very_full": [
+   0,
+   325,
+   512,
+   512
+  ],
+  "collar_vest_m_very_full_inner": [
+   131,
+   318,
+   374,
+   391
+  ],
+  "collar_vest_m_very_thin": [
+   69,
+   353,
+   443,
+   512
+  ],
+  "collar_vest_m_very_thin_inner": [
+   195,
+   346,
+   311,
+   410
   ],
   "earrings": [
    128,
@@ -732,90 +1642,6 @@
    374,
    168
   ],
-  "head_f_oval": [
-   137,
-   59,
-   375,
-   412
-  ],
-  "head_f_oval_cut": [
-   137,
-   59,
-   375,
-   333
-  ],
-  "head_f_round": [
-   117,
-   59,
-   396,
-   480
-  ],
-  "head_f_round_cut": [
-   117,
-   59,
-   396,
-   327
-  ],
-  "head_f_soft": [
-   137,
-   59,
-   375,
-   412
-  ],
-  "head_f_soft_cut": [
-   137,
-   59,
-   375,
-   326
-  ],
-  "head_m_long": [
-   138,
-   59,
-   373,
-   412
-  ],
-  "head_m_long_cut": [
-   138,
-   59,
-   373,
-   326
-  ],
-  "head_m_oval": [
-   131,
-   59,
-   381,
-   412
-  ],
-  "head_m_oval_cut": [
-   131,
-   59,
-   381,
-   326
-  ],
-  "head_m_round": [
-   113,
-   59,
-   399,
-   461
-  ],
-  "head_m_round_cut": [
-   113,
-   59,
-   399,
-   327
-  ],
-  "head_m_square": [
-   126,
-   59,
-   386,
-   413
-  ],
-  "head_m_square_cut": [
-   126,
-   59,
-   386,
-   327
-  ],
   "helmet": [
    121,
    28,
@@ -823,12 +1649,6 @@
    161
   ],
   "kerchief_f": [
-   137,
-   28,
-   375,
-   218
-  ],
-  "kerchief_f_g": [
    137,
    28,
    375,
@@ -876,30 +1696,6 @@
    294,
    291
   ],
-  "neck_strong_f": [
-   114,
-   262,
-   398,
-   453
-  ],
-  "neck_strong_m": [
-   112,
-   263,
-   401,
-   453
-  ],
-  "neck_thin_f": [
-   113,
-   263,
-   399,
-   453
-  ],
-  "neck_thin_m": [
-   136,
-   262,
-   376,
-   453
-  ],
   "nose_hooked": [
    227,
    196,
@@ -944,23 +1740,244 @@
   ]
  },
  "masks": [
-  "mask_collar_firefighter_f_keep",
-  "mask_collar_firefighter_m_keep",
-  "mask_collar_jacket_f_keep",
-  "mask_collar_jacket_m_keep",
-  "mask_collar_kerchief_f_keep",
-  "mask_collar_overall_f_keep",
-  "mask_collar_overall_m_keep",
-  "mask_collar_robe_f_keep",
-  "mask_collar_robe_m_keep",
-  "mask_collar_shirt_f_keep",
-  "mask_collar_shirt_m_keep",
-  "mask_collar_suit_f_keep",
-  "mask_collar_suit_m_keep",
-  "mask_collar_sweater_f_keep",
-  "mask_collar_sweater_m_keep",
-  "mask_collar_vest_f_keep",
-  "mask_collar_vest_m_keep",
+  "mask_collar_firefighter_f_full_fab",
+  "mask_collar_firefighter_f_full_keep",
+  "mask_collar_firefighter_f_normal_fab",
+  "mask_collar_firefighter_f_normal_keep",
+  "mask_collar_firefighter_f_powerful_fab",
+  "mask_collar_firefighter_f_powerful_keep",
+  "mask_collar_firefighter_f_strong_fab",
+  "mask_collar_firefighter_f_strong_keep",
+  "mask_collar_firefighter_f_thin_fab",
+  "mask_collar_firefighter_f_thin_keep",
+  "mask_collar_firefighter_f_very_full_fab",
+  "mask_collar_firefighter_f_very_full_keep",
+  "mask_collar_firefighter_f_very_thin_fab",
+  "mask_collar_firefighter_f_very_thin_keep",
+  "mask_collar_firefighter_m_full_fab",
+  "mask_collar_firefighter_m_full_keep",
+  "mask_collar_firefighter_m_normal_fab",
+  "mask_collar_firefighter_m_normal_keep",
+  "mask_collar_firefighter_m_powerful_fab",
+  "mask_collar_firefighter_m_powerful_keep",
+  "mask_collar_firefighter_m_strong_fab",
+  "mask_collar_firefighter_m_strong_keep",
+  "mask_collar_firefighter_m_thin_fab",
+  "mask_collar_firefighter_m_thin_keep",
+  "mask_collar_firefighter_m_very_full_fab",
+  "mask_collar_firefighter_m_very_full_keep",
+  "mask_collar_firefighter_m_very_thin_fab",
+  "mask_collar_firefighter_m_very_thin_keep",
+  "mask_collar_jacket_f_full_fab",
+  "mask_collar_jacket_f_full_keep",
+  "mask_collar_jacket_f_normal_fab",
+  "mask_collar_jacket_f_normal_keep",
+  "mask_collar_jacket_f_powerful_fab",
+  "mask_collar_jacket_f_powerful_keep",
+  "mask_collar_jacket_f_strong_fab",
+  "mask_collar_jacket_f_strong_keep",
+  "mask_collar_jacket_f_thin_fab",
+  "mask_collar_jacket_f_thin_keep",
+  "mask_collar_jacket_f_very_full_fab",
+  "mask_collar_jacket_f_very_full_keep",
+  "mask_collar_jacket_f_very_thin_fab",
+  "mask_collar_jacket_f_very_thin_keep",
+  "mask_collar_jacket_m_full_fab",
+  "mask_collar_jacket_m_full_keep",
+  "mask_collar_jacket_m_normal_fab",
+  "mask_collar_jacket_m_normal_keep",
+  "mask_collar_jacket_m_powerful_fab",
+  "mask_collar_jacket_m_powerful_keep",
+  "mask_collar_jacket_m_strong_fab",
+  "mask_collar_jacket_m_strong_keep",
+  "mask_collar_jacket_m_thin_fab",
+  "mask_collar_jacket_m_thin_keep",
+  "mask_collar_jacket_m_very_full_fab",
+  "mask_collar_jacket_m_very_full_keep",
+  "mask_collar_jacket_m_very_thin_fab",
+  "mask_collar_jacket_m_very_thin_keep",
+  "mask_collar_kerchief_f_full_fab",
+  "mask_collar_kerchief_f_full_keep",
+  "mask_collar_kerchief_f_normal_fab",
+  "mask_collar_kerchief_f_normal_keep",
+  "mask_collar_kerchief_f_powerful_fab",
+  "mask_collar_kerchief_f_powerful_keep",
+  "mask_collar_kerchief_f_strong_fab",
+  "mask_collar_kerchief_f_strong_keep",
+  "mask_collar_kerchief_f_thin_fab",
+  "mask_collar_kerchief_f_thin_keep",
+  "mask_collar_kerchief_f_very_full_fab",
+  "mask_collar_kerchief_f_very_full_keep",
+  "mask_collar_kerchief_f_very_thin_fab",
+  "mask_collar_kerchief_f_very_thin_keep",
+  "mask_collar_overall_f_full_fab",
+  "mask_collar_overall_f_full_keep",
+  "mask_collar_overall_f_normal_fab",
+  "mask_collar_overall_f_normal_keep",
+  "mask_collar_overall_f_powerful_fab",
+  "mask_collar_overall_f_powerful_keep",
+  "mask_collar_overall_f_strong_fab",
+  "mask_collar_overall_f_strong_keep",
+  "mask_collar_overall_f_thin_fab",
+  "mask_collar_overall_f_thin_keep",
+  "mask_collar_overall_f_very_full_fab",
+  "mask_collar_overall_f_very_full_keep",
+  "mask_collar_overall_f_very_thin_fab",
+  "mask_collar_overall_f_very_thin_keep",
+  "mask_collar_overall_m_full_fab",
+  "mask_collar_overall_m_full_keep",
+  "mask_collar_overall_m_normal_fab",
+  "mask_collar_overall_m_normal_keep",
+  "mask_collar_overall_m_powerful_fab",
+  "mask_collar_overall_m_powerful_keep",
+  "mask_collar_overall_m_strong_fab",
+  "mask_collar_overall_m_strong_keep",
+  "mask_collar_overall_m_thin_fab",
+  "mask_collar_overall_m_thin_keep",
+  "mask_collar_overall_m_very_full_fab",
+  "mask_collar_overall_m_very_full_keep",
+  "mask_collar_overall_m_very_thin_fab",
+  "mask_collar_overall_m_very_thin_keep",
+  "mask_collar_robe_f_full_fab",
+  "mask_collar_robe_f_full_keep",
+  "mask_collar_robe_f_normal_fab",
+  "mask_collar_robe_f_normal_keep",
+  "mask_collar_robe_f_powerful_fab",
+  "mask_collar_robe_f_powerful_keep",
+  "mask_collar_robe_f_strong_fab",
+  "mask_collar_robe_f_strong_keep",
+  "mask_collar_robe_f_thin_fab",
+  "mask_collar_robe_f_thin_keep",
+  "mask_collar_robe_f_very_full_fab",
+  "mask_collar_robe_f_very_full_keep",
+  "mask_collar_robe_f_very_thin_fab",
+  "mask_collar_robe_f_very_thin_keep",
+  "mask_collar_robe_m_full_fab",
+  "mask_collar_robe_m_full_keep",
+  "mask_collar_robe_m_normal_fab",
+  "mask_collar_robe_m_normal_keep",
+  "mask_collar_robe_m_powerful_fab",
+  "mask_collar_robe_m_powerful_keep",
+  "mask_collar_robe_m_strong_fab",
+  "mask_collar_robe_m_strong_keep",
+  "mask_collar_robe_m_thin_fab",
+  "mask_collar_robe_m_thin_keep",
+  "mask_collar_robe_m_very_full_fab",
+  "mask_collar_robe_m_very_full_keep",
+  "mask_collar_robe_m_very_thin_fab",
+  "mask_collar_robe_m_very_thin_keep",
+  "mask_collar_shirt_f_full_fab",
+  "mask_collar_shirt_f_full_keep",
+  "mask_collar_shirt_f_normal_fab",
+  "mask_collar_shirt_f_normal_keep",
+  "mask_collar_shirt_f_powerful_fab",
+  "mask_collar_shirt_f_powerful_keep",
+  "mask_collar_shirt_f_strong_fab",
+  "mask_collar_shirt_f_strong_keep",
+  "mask_collar_shirt_f_thin_fab",
+  "mask_collar_shirt_f_thin_keep",
+  "mask_collar_shirt_f_very_full_fab",
+  "mask_collar_shirt_f_very_full_keep",
+  "mask_collar_shirt_f_very_thin_fab",
+  "mask_collar_shirt_f_very_thin_keep",
+  "mask_collar_shirt_m_full_fab",
+  "mask_collar_shirt_m_full_keep",
+  "mask_collar_shirt_m_normal_fab",
+  "mask_collar_shirt_m_normal_keep",
+  "mask_collar_shirt_m_powerful_fab",
+  "mask_collar_shirt_m_powerful_keep",
+  "mask_collar_shirt_m_strong_fab",
+  "mask_collar_shirt_m_strong_keep",
+  "mask_collar_shirt_m_thin_fab",
+  "mask_collar_shirt_m_thin_keep",
+  "mask_collar_shirt_m_very_full_fab",
+  "mask_collar_shirt_m_very_full_keep",
+  "mask_collar_shirt_m_very_thin_fab",
+  "mask_collar_shirt_m_very_thin_keep",
+  "mask_collar_suit_f_full_fab",
+  "mask_collar_suit_f_full_keep",
+  "mask_collar_suit_f_normal_fab",
+  "mask_collar_suit_f_normal_keep",
+  "mask_collar_suit_f_powerful_fab",
+  "mask_collar_suit_f_powerful_keep",
+  "mask_collar_suit_f_strong_fab",
+  "mask_collar_suit_f_strong_keep",
+  "mask_collar_suit_f_thin_fab",
+  "mask_collar_suit_f_thin_keep",
+  "mask_collar_suit_f_very_full_fab",
+  "mask_collar_suit_f_very_full_keep",
+  "mask_collar_suit_f_very_thin_fab",
+  "mask_collar_suit_f_very_thin_keep",
+  "mask_collar_suit_m_full_fab",
+  "mask_collar_suit_m_full_keep",
+  "mask_collar_suit_m_normal_fab",
+  "mask_collar_suit_m_normal_keep",
+  "mask_collar_suit_m_powerful_fab",
+  "mask_collar_suit_m_powerful_keep",
+  "mask_collar_suit_m_strong_fab",
+  "mask_collar_suit_m_strong_keep",
+  "mask_collar_suit_m_thin_fab",
+  "mask_collar_suit_m_thin_keep",
+  "mask_collar_suit_m_very_full_fab",
+  "mask_collar_suit_m_very_full_keep",
+  "mask_collar_suit_m_very_thin_fab",
+  "mask_collar_suit_m_very_thin_keep",
+  "mask_collar_sweater_f_full_fab",
+  "mask_collar_sweater_f_full_keep",
+  "mask_collar_sweater_f_normal_fab",
+  "mask_collar_sweater_f_normal_keep",
+  "mask_collar_sweater_f_powerful_fab",
+  "mask_collar_sweater_f_powerful_keep",
+  "mask_collar_sweater_f_strong_fab",
+  "mask_collar_sweater_f_strong_keep",
+  "mask_collar_sweater_f_thin_fab",
+  "mask_collar_sweater_f_thin_keep",
+  "mask_collar_sweater_f_very_full_fab",
+  "mask_collar_sweater_f_very_full_keep",
+  "mask_collar_sweater_f_very_thin_fab",
+  "mask_collar_sweater_f_very_thin_keep",
+  "mask_collar_sweater_m_full_fab",
+  "mask_collar_sweater_m_full_keep",
+  "mask_collar_sweater_m_normal_fab",
+  "mask_collar_sweater_m_normal_keep",
+  "mask_collar_sweater_m_powerful_fab",
+  "mask_collar_sweater_m_powerful_keep",
+  "mask_collar_sweater_m_strong_fab",
+  "mask_collar_sweater_m_strong_keep",
+  "mask_collar_sweater_m_thin_fab",
+  "mask_collar_sweater_m_thin_keep",
+  "mask_collar_sweater_m_very_full_fab",
+  "mask_collar_sweater_m_very_full_keep",
+  "mask_collar_sweater_m_very_thin_fab",
+  "mask_collar_sweater_m_very_thin_keep",
+  "mask_collar_vest_f_full_fab",
+  "mask_collar_vest_f_full_keep",
+  "mask_collar_vest_f_normal_fab",
+  "mask_collar_vest_f_normal_keep",
+  "mask_collar_vest_f_powerful_fab",
+  "mask_collar_vest_f_powerful_keep",
+  "mask_collar_vest_f_strong_fab",
+  "mask_collar_vest_f_strong_keep",
+  "mask_collar_vest_f_thin_fab",
+  "mask_collar_vest_f_thin_keep",
+  "mask_collar_vest_f_very_full_fab",
+  "mask_collar_vest_f_very_full_keep",
+  "mask_collar_vest_f_very_thin_fab",
+  "mask_collar_vest_f_very_thin_keep",
+  "mask_collar_vest_m_full_fab",
+  "mask_collar_vest_m_full_keep",
+  "mask_collar_vest_m_normal_fab",
+  "mask_collar_vest_m_normal_keep",
+  "mask_collar_vest_m_powerful_fab",
+  "mask_collar_vest_m_powerful_keep",
+  "mask_collar_vest_m_strong_fab",
+  "mask_collar_vest_m_strong_keep",
+  "mask_collar_vest_m_thin_fab",
+  "mask_collar_vest_m_thin_keep",
+  "mask_collar_vest_m_very_full_fab",
+  "mask_collar_vest_m_very_full_keep",
+  "mask_collar_vest_m_very_thin_fab",
+  "mask_collar_vest_m_very_thin_keep",
   "mask_hat_cap",
   "mask_hat_helmet",
   "mask_hat_ushanka",
@@ -968,5 +1985,5 @@
  ],
  "size": 512,
  "src": 1024,
- "version": 2
+ "version": 3
 }

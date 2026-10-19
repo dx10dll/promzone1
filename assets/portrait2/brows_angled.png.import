@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cn07vrxgloouu"
+uid="uid://uwb86m3l3buc"
 path="res://.godot/imported/brows_angled.png-fd5aae2f7d58d15fbf3710f22deecb56.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/brows_angled.png-fd5aae2f7d58d15fbf3710f22dee
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

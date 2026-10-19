@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://m7mehkrqrnhe"
+uid="uid://c8no1f4uyv26y"
 path="res://.godot/imported/mask_hat_welder_mask.png-397f2b4a884c6bc122467a25f7869e3e.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/mask_hat_welder_mask.png-397f2b4a884c6bc12246
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

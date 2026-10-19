@@ -511,11 +511,10 @@ func _fill_form() -> void:
 		g.add_child(_pick("Серьги", [[false, "Нет"], [true, "Есть"]], fo, "earrings"))
 	else:
 		g.add_child(_pick("Борода, усы", CustomWorkers.BEARDS.map(func(x: String) -> Array: return [x, str(CustomWorkers.BEARD_NAMES[x])]), lk, "beard"))
-	# 1.33: на новом портрете у мужчин и женщин свои формы лица — показываем только те, что видны
-	var heads: Array = PortraitKit.heads(fem) if PortraitKit.available() else People.HEADS
-	if fo.has("head") and not heads.has(str(fo["head"])):
-		fo["head"] = PortraitKit.head_for(fem, str(fo["head"]))
-	g.add_child(_pick("Лицо", _named(heads, CustomWorkers.HEAD_NAMES), fo, "head"))
+	# 1.36: на портрете v3 голова, шея и плечи — одна основа по телосложению; форма лица не выбирается
+	# (старое поле face_ovr.head в сохранениях остаётся и не мешает). Без набора — как раньше.
+	if not PortraitKit.available():
+		g.add_child(_pick("Лицо", _named(People.HEADS, CustomWorkers.HEAD_NAMES), fo, "head"))
 	g.add_child(_pick("Глаза", _named(People.EYE_KINDS, CustomWorkers.EYE_KIND_NAMES), fo, "eyes"))
 	g.add_child(_pick("Цвет глаз", _zip(People.EYE_COLS, CustomWorkers.EYE_NAMES), lk, "eye_col", People.EYE_COLS))
 	g.add_child(_pick("Брови", _named(People.BROW_KINDS, CustomWorkers.BROW_NAMES), fo, "brows"))

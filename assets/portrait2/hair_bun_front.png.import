@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b41ydlvrrjf4n"
+uid="uid://da1oix4o2itfh"
 path="res://.godot/imported/hair_bun_front.png-f0ba0ef5656d7c9532132254bc1ab16e.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/hair_bun_front.png-f0ba0ef5656d7c9532132254bc
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

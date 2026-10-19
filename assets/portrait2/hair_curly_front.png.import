@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bi2qfk7l3y0o2"
+uid="uid://13uuhs613m3x"
 path="res://.godot/imported/hair_curly_front.png-f74147390919566bef8ca817f8ab0d15.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/hair_curly_front.png-f74147390919566bef8ca817
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

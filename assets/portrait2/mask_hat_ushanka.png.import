@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dv8bedo0xu8bq"
+uid="uid://duehoef7f4ara"
 path="res://.godot/imported/mask_hat_ushanka.png-72493c49b85ea60af2f8c057e0059888.ctex"
 metadata={
 "vram_texture": false
@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/mask_hat_ushanka.png-72493c49b85ea60af2f8c057
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
