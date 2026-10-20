@@ -1,12 +1,12 @@
 class_name PortraitKit
 extends RefCounted
 ## Портреты людей — слоистый набор (рисунок владельца игры, собран по слоям; assets/portrait2,
-## импорт — tools/import_portraits_136.py). Все слои лежат на общем холсте 512×512 и накладываются от (0,0).
-## 1.36: набор v3 — цельная основа «голова + шея + плечи» по телосложению (7 посадок на пол) и одежда той же
-## посадки. Схема сборки — как в compose_example.py набора:
-##   изнанка одежды -> волосы сзади -> основа (альфа × маска body_keep одежды) -> веки, глаза, нос, рот, брови,
-##   морщины, борода -> перед одежды -> волосы спереди, очки, серьги, головной убор.
-## Кожа, волосы, брови, борода, нос, веки, морщины красятся умножением out = src × цвет / (200/255); губы, глаза,
+## импорт — tools/import_portraits_137.py). Все слои лежат на общем холсте 512×512 и накладываются от (0,0).
+## 1.37: набор v5 — 14 изолированных наборов (пол × 7 телосложений, папки assets/portrait2/<телосложение>_<m|f>/).
+## ВСЕ детали человека берутся из его набора, без подмен из других. Порядок — как в README/compose.py набора:
+##   волосы сзади -> изнанка одежды -> шея/плечи (своя у каждой одежды) -> голова -> перед одежды ->
+##   веки, глаза, брови, нос, рот -> веснушки, морщины, борода -> волосы спереди -> очки, серьги, головной убор.
+## Кожа, волосы, брови, борода, веки, морщины красятся умножением out = src × цвет / (200/255); губы, глаза,
 ## серьги, очки — своего цвета. Одежда — цветной рисунок, основная ткань (маска _fab) перекрашивается по его
 ## яркости (= серая версия набора) в цвет спецовки (как у человечка на карте); кепка, каска, косынка — в цвет убора.
 ## По облику (look) собирается «рецепт» — слои по группам с цветом и маской; его рисует Portrait (на видеокарте),
@@ -18,8 +18,15 @@ const REF := 200.0 / 255.0          ## опорный серый набора (#
 const GRAY_HAIR := Color("#b9b7b1")
 const CACHE_MAX := 128
 ## Группы слоёв в порядке рисования; у каждой своя маска: inner и cloth — основная ткань одежды (перекраска),
-## back и hair — волосы под головным убором, body — основа под одеждой (body_keep).
-const GROUPS := ["inner", "back", "body", "face", "cloth", "hair", "top"]
+## back и hair — волосы под головным убором; body — шея и голова, face — черты, top — очки, серьги, убор.
+const GROUPS := ["back", "inner", "body", "cloth", "face", "hair", "top"]
+const HEADS_M := ["oval", "square", "round", "long"]
+const HEADS_F := ["soft", "oval", "round"]
+## ближайшая замена, если в наборе нет такой детали (старые сохранения, смена пола) — только внутри набора
+const NEAR := {"soft": "oval", "square": "round", "long": "oval",
+	"bob": "side", "bun": "slick", "ponytail": "mullet", "long_h": "mullet", "pixie": "short", "curly_f": "curly", "braid": "mullet", "perm": "curly",
+	"short": "pixie", "crew": "pixie", "side": "bob", "slick": "bun", "receding": "bun", "bald": "pixie", "curly": "curly_f", "mullet": "long",
+	"kerchief": "shirt"}
 ## телосложение игры -> посадка основы и одежды набора (body_types.json)
 const FIT := {"vthin": "very_thin", "thin": "thin", "normal": "normal", "stout": "strong", "strong": "powerful",
 	"fat": "full", "vfat": "very_full"}
@@ -27,7 +34,8 @@ const FIT := {"vthin": "very_thin", "thin": "thin", "normal": "normal", "stout":
 static var _ok := -1
 static var _bbox: Dictionary = {}       ## слой -> Rect2 непустой части (холст 512)
 static var _masks: Dictionary = {}      ## имена масок
-static var _gain: Dictionary = {}       ## одежда -> во сколько поднять яркость ткани до опорного серого
+static var _sets: Dictionary = {}       ## набор -> {heads, hair, beard, outfits, gain, crown, chin}
+static var _alias: Dictionary = {}      ## слой -> файл, одинаковый с ним (лежит один раз)
 static var _tex: Dictionary = {}        ## слой -> Texture2D
 static var _rec: Dictionary = {}        ## ключ облика -> рецепт (LRU)
 static var _rec_order: Array[String] = []
@@ -46,7 +54,7 @@ static func available() -> bool:
 		var f := FileAccess.open(DIR + "layers.json", FileAccess.READ)
 		if f != null:
 			var d: Variant = JSON.parse_string(f.get_as_text())
-			if d is Dictionary and (d as Dictionary).has("layers") and int((d as Dictionary).get("version", 0)) >= 3:
+			if d is Dictionary and (d as Dictionary).has("layers") and int((d as Dictionary).get("version", 0)) >= 5:
 				var k := CANVAS / float((d as Dictionary).get("size", 512))
 				var lays: Dictionary = (d as Dictionary)["layers"]
 				for n: String in lays.keys():
@@ -54,10 +62,9 @@ static func available() -> bool:
 					_bbox[n] = Rect2(float(bb[0]) * k, float(bb[1]) * k, float(int(bb[2]) - int(bb[0])) * k, float(int(bb[3]) - int(bb[1])) * k)
 				for m: Variant in (d as Dictionary).get("masks", []):
 					_masks[str(m)] = true
-				var gd: Dictionary = (d as Dictionary).get("gain", {})
-				for c: String in gd.keys():
-					_gain[c] = float(gd[c])
-				if tex("base_normal_m") != null and tex("collar_overall_m_normal") != null:
+				_alias = (d as Dictionary).get("alias", {})
+				_sets = (d as Dictionary).get("sets", {})
+				if _sets.size() == 14 and tex("normal_m/head_m_oval") != null and tex("normal_f/neck_overall_f") != null:
 					_ok = 1
 	return _ok == 1
 
@@ -84,14 +91,24 @@ static func bbox(n: String) -> Rect2:
 	return _bbox.get(n, Rect2())
 
 
-static func gain(collar: String) -> float:
-	return float(_gain.get(collar, 1.0))
+## Во сколько поднять яркость основной ткани одежды набора, чтобы её медиана стала опорным серым.
+static func gain(sid: String, outfit: String) -> float:
+	return float((set_info(sid).get("gain", {}) as Dictionary).get(outfit, 1.0))
+
+
+static func set_info(sid: String) -> Dictionary:
+	return _sets.get(sid, {})
+
+
+static func set_ids() -> Array:
+	available()
+	return _sets.keys()
 
 
 static func tex(n: String) -> Texture2D:
 	if _tex.has(n):
 		return _tex[n]
-	var p := DIR + n + ".png"
+	var p := DIR + str(_alias.get(n, n)) + ".png"
 	var t: Texture2D = load(p) as Texture2D if ResourceLoader.exists(p) else null
 	_tex[n] = t
 	return t
@@ -134,14 +151,46 @@ static func material(mask_name: String) -> ShaderMaterial:
 		m.set_shader_parameter("mask", tex(mask_name))
 		if mask_name.ends_with("_fab"):
 			m.set_shader_parameter("fab", 1.0)
-			m.set_shader_parameter("gain", gain(mask_name.trim_prefix("mask_").trim_suffix("_fab")))
+			m.set_shader_parameter("gain", _mask_gain(mask_name))
 	_mats[mask_name] = m
 	return m
 
 
-## Посадка основы и одежды по телосложению игры.
+## gain по имени маски ткани "<набор>/mask_<одежда>_fab".
+static func _mask_gain(mask_name: String) -> float:
+	var sl := mask_name.split("/")
+	return gain(sl[0], sl[1].trim_prefix("mask_").trim_suffix("_fab")) if sl.size() == 2 else 1.0
+
+
+## Набор по телосложению и полу: "<посадка>_<m|f>".
 static func fit_of(lk: Dictionary) -> String:
 	return str(FIT.get(People.body_key(lk), "normal"))
+
+
+static func set_of(lk: Dictionary) -> String:
+	return "%s_%s" % [fit_of(lk), "f" if bool(lk.get("fem", false)) else "m"]
+
+
+## Формы лица (у всех наборов одного пола — одни и те же).
+static func heads(fem: bool) -> Array:
+	return HEADS_F if fem else HEADS_M
+
+
+## Вариант из списка набора: такой же, иначе ближайший (NEAR), иначе первый. Только внутри набора.
+static func pick_in(lst: Array, v: String) -> String:
+	if lst.is_empty():
+		return ""
+	if lst.has(v):
+		return v
+	var nv := str(NEAR.get("long_h" if v == "long" and not lst.has("soft") and not lst.has("oval") else v, ""))
+	if nv != "" and lst.has(nv):
+		return nv
+	return str(lst[0])
+
+
+## Форма лица для пола (старые сохранения и смена пола: ближайшая из своих).
+static func head_for(fem: bool, h: String) -> String:
+	return pick_in(heads(fem), h)
 
 
 static func _hash(lk: Dictionary) -> int:
@@ -235,7 +284,7 @@ static func _mood_band(m: float) -> int:
 
 
 ## Рецепт портрета: {<группа>: [[слой, цвет], ...] для каждой из GROUPS, "mask_<группа>": маска,
-## "collar", "base", "fit", "hat"}. Детерминирован: тот же облик — тот же рецепт.
+## "set", "collar", "head", "hairdo", "hat", "eye"/"chin" — линия глаз и подбородок (холст 512)}. Детерминирован: тот же облик — тот же рецепт.
 static func recipe(lk: Dictionary, info: Dictionary = {}) -> Dictionary:
 	var key := _key(lk, info)
 	if _rec.has(key):
@@ -249,15 +298,13 @@ static func recipe(lk: Dictionary, info: Dictionary = {}) -> Dictionary:
 
 
 static func _build(lk: Dictionary, info: Dictionary) -> Dictionary:
-	var inner: Array = []
-	var back: Array = []
-	var body: Array = []
-	var face: Array = []
-	var cloth_l: Array = []
-	var hair_l: Array = []
-	var top: Array = []
+	var gr := {}
+	for gname: String in GROUPS:
+		gr[gname] = []
 	var fem := bool(lk.get("fem", false))
 	var g := "f" if fem else "m"
+	var sid := set_of(lk)
+	var st := set_info(sid)
 	var age := int(info.get("age", lk.get("age", 35)))
 	var skin := Color(str(People.SKINS[clampi(int(lk.get("skin", 1)), 0, People.SKINS.size() - 1)]))
 	var hair_c := Color(str(lk.get("hair_col", "#4a3020")))
@@ -266,67 +313,73 @@ static func _build(lk: Dictionary, info: Dictionary) -> Dictionary:
 	if hair_c.s > 0.12 or hair_c.v < 0.45:
 		hair_c = hair_c.lerp(GRAY_HAIR, gray_k)
 	var brow_c := hair_c.darkened(0.12)
-	var fc := People.face(lk, age)   # форма головы (fc["head"]) на портрете v3 не видна: основа — по телосложению
-	var fit := fit_of(lk)
-	var hair := People.hair_style(lk)
+	var fc := People.face(lk, age)
+	var head := pick_in(st.get("heads", heads(fem)), str(fc["head"]))
+	var hair := pick_in(st.get("hair", []), People.hair_style(lk))
 	var hat := hat_of(lk, info)
-	var collar := collar_of(lk, info)
-	var cn := "collar_%s_%s_%s" % [collar, g, fit]
+	var outfits: Dictionary = st.get("outfits", {})
+	var collar := pick_in(outfits.keys(), collar_of(lk, info))
+	var o: Dictionary = outfits.get(collar, {})
 	var dressed := bool(info.get("dressed", true))
 	var cloth := Color(str(lk.get("outfit_col", "#3d5a7a") if dressed else lk.get("street_col", "#3b3f44")))
-	# 1. изнанка одежды (основная ткань — в цвет спецовки), 2. волосы сзади
-	if has(cn + "_inner"):
-		inner.append([cn + "_inner", _tinted(cloth)])
-	if has("hair_%s_back" % hair):
-		back.append(["hair_%s_back" % hair, _tinted(hair_c)])
-	# 3. цельная основа: голова, шея, плечи (альфа × маска body_keep одежды)
-	var base := "base_%s_%s" % [fit, g]
-	body.append([base, _tinted(skin)])
-	# 4. лицо: веки под глазами, глаза, радужка, нос, рот, брови, морщины, борода
+	var p := sid + "/"
+	# 1. волосы сзади, 2. изнанка одежды (за шеей), 3. шея/плечи этой одежды и голова, 4. перед одежды
+	if has(p + "hair_%s_back" % hair):
+		(gr["back"] as Array).append([p + "hair_%s_back" % hair, _tinted(hair_c)])
+	if o.get("inner", null) != null:
+		(gr["inner"] as Array).append([p + str(o["inner"]), _tinted(cloth)])
+	(gr["body"] as Array).append([p + str(o.get("neck", "")), _tinted(skin)])
+	(gr["body"] as Array).append([p + "head_%s_%s" % [g, head], _tinted(skin)])
+	(gr["cloth"] as Array).append([p + str(o.get("outer", "")), _tinted(cloth)])
+	# 5. веки, глаза, радужка, брови, нос, рот; веснушки, морщины, борода
+	var face: Array = gr["face"]
 	var ek := str(fc["eyes"])
-	face.append(["eyes_" + ek + "_lids", _tinted(skin)])
-	face.append(["eyes_" + ek, _plain()])
-	face.append(["eyes_" + ek + "_iris", _tinted(People.eye_color(lk).lightened(0.25))])
-	face.append(["nose_" + str(fc["nose"]), _tinted(skin)])
+	face.append([p + "eyes_" + ek + "_lids", _tinted(skin)])
+	face.append([p + "eyes_" + ek, _plain()])
+	face.append([p + "eyes_" + ek + "_iris", _tinted(People.eye_color(lk).lightened(0.25))])
+	face.append([p + "brows_" + str(fc["brows"]), _tinted(brow_c)])
+	face.append([p + "nose_" + str(fc["nose"]), _tinted(skin)])
 	var mouth := str(fc["mouth"])
 	match _mood_band(float(info.get("mood", 55.0))):
 		2:
 			mouth = "smile"
 		0:
 			mouth = "down"
-	face.append(["mouth_" + mouth, _plain()])
-	face.append(["brows_" + str(fc["brows"]), _tinted(brow_c)])
+	face.append([p + "mouth_" + mouth, _plain()])
 	if bool(fc["freckles"]):
-		face.append(["freckles", _plain(0.8)])
+		face.append([p + "freckles", _plain(0.8)])
 	var lines := str(fc["lines"])
 	if lines != "":
-		face.append(["lines_" + lines, _tinted(skin, 0.5 if lines == "mid" else 0.75)])
+		face.append([p + "lines_" + lines, _tinted(skin, 0.5 if lines == "mid" else 0.75)])
 	var beard := str(lk.get("beard", ""))
-	if beard != "" and not fem and has("beard_" + beard):
-		face.append(["beard_" + beard, _tinted(hair_c)])
-	# 5. перед одежды
-	cloth_l.append([cn, _tinted(cloth)])
-	# 6. волосы спереди, очки, серьги, головной убор
-	if has("hair_%s_front" % hair):
-		hair_l.append(["hair_%s_front" % hair, _tinted(skin if hair == "bald" else hair_c)])
+	if beard != "" and not fem:
+		beard = pick_in(st.get("beard", []), beard)
+		if has(p + "beard_" + beard):
+			face.append([p + "beard_" + beard, _tinted(hair_c)])
+	# 6. волосы спереди, 7. очки, серьги, головной убор
+	if has(p + "hair_%s_front" % hair):
+		(gr["hair"] as Array).append([p + "hair_%s_front" % hair, _tinted(skin if hair == "bald" else hair_c)])
+	var top: Array = gr["top"]
 	if bool(lk.get("glasses", false)):
-		top.append(["glasses", _plain()])
-	if bool(fc["earrings"]) and hat != "ushanka":
-		top.append(["earrings", _plain()])
+		top.append([p + "glasses", _plain()])
+	if bool(fc["earrings"]) and hat != "ushanka" and has(p + "earrings"):
+		top.append([p + "earrings", _plain()])
 	var hat_c := Color(str(lk.get("hat_col", "#8a3e3a")))
 	match hat:
 		"kerchief":
-			top.append(["kerchief_f", _tinted(hat_c.lightened(0.15))])
+			top.append([p + "kerchief_f", _tinted(hat_c.lightened(0.15))])
 		"cap", "helmet":
-			top.append([hat, _tinted(hat_c)])
+			top.append([p + hat, _tinted(hat_c)])
 		"welder_mask", "ushanka":
-			top.append([hat, _plain()])
-	var hat_mask := "mask_hat_" + hat if has_mask("mask_hat_" + hat) else ""
-	var fab := "mask_%s_fab" % cn if has_mask("mask_%s_fab" % cn) else ""
-	return {"inner": inner, "back": back, "body": body, "face": face, "cloth": cloth_l, "hair": hair_l, "top": top,
-		"collar": cn, "base": base, "fit": fit, "hat": hat,
-		"mask_inner": fab, "mask_back": hat_mask, "mask_body": "mask_%s_keep" % cn if has_mask("mask_%s_keep" % cn) else "",
-		"mask_face": "", "mask_cloth": fab, "mask_hair": hat_mask, "mask_top": ""}
+			top.append([p + hat, _plain()])
+	var hat_mask := p + "mask_hat_" + hat if has_mask(p + "mask_hat_" + hat) else ""
+	var fab := p + "mask_%s_fab" % collar if has_mask(p + "mask_%s_fab" % collar) else ""
+	var r := {"set": sid, "collar": collar, "head": head, "hairdo": hair, "hat": hat,
+		"eye": bbox(p + "eyes_almond").get_center().y, "chin": float(st.get("chin", 635.0)) * CANVAS / 1024.0,
+		"mask_back": hat_mask, "mask_inner": fab, "mask_body": "", "mask_cloth": fab, "mask_face": "", "mask_hair": hat_mask, "mask_top": ""}
+	for gname: String in GROUPS:
+		r[gname] = gr[gname]
+	return r
 
 
 ## Все слои рецепта по порядку (для проверок).
@@ -339,10 +392,13 @@ static func layer_names(rec: Dictionary) -> Array:
 
 
 ## Кадр на холсте 512 для окошка с пропорцией aspect (ширина/высота): обычный — голова и плечи,
-## мелкий (в списках) — крупнее лицо.
-static func frame(aspect: float, small: bool) -> Rect2:
-	var h := 300.0 if small else 486.0
-	var y0 := 40.0 if small else 26.0
+## мелкий (в списках) — крупнее лицо. 1.37: в наборах v5 лица разного размера и на разной высоте — кадр
+## ставится по глазам и подбородку набора (рецепт: "eye", "chin"), размер — наполовину по размеру лица.
+static func frame(aspect: float, small: bool, rec: Dictionary = {}) -> Rect2:
+	var eye := float(rec.get("eye", 200.0))
+	var d := maxf(40.0, float(rec.get("chin", 317.5)) - eye)
+	var h := (300.0 if small else 486.0) * sqrt(d / 117.5)
+	var y0 := eye - h * (0.533 if small else 0.358)
 	var w := h * aspect
 	return Rect2(256.0 - w * 0.5, y0, w, h)
 
@@ -367,7 +423,7 @@ static func _layer_img(n: String, px: int) -> Image:
 	if _img.has(key):
 		return _img[key]
 	var im: Image = null
-	var abs_p := ProjectSettings.globalize_path(DIR + n + ".png")
+	var abs_p := ProjectSettings.globalize_path(DIR + str(_alias.get(n, n)) + ".png")
 	if FileAccess.file_exists(abs_p):
 		im = Image.load_from_file(abs_p)
 	if im == null:
@@ -403,7 +459,7 @@ static func compose_recipe(rec: Dictionary, px: int, bg: Color = Color(0, 0, 0, 
 		var mname := str(rec.get("mask_" + gname, ""))
 		var mimg: Image = _layer_img(mname, px) if mname != "" else null
 		var fab := mname.ends_with("_fab")
-		var gn := gain(mname.trim_prefix("mask_").trim_suffix("_fab")) if fab else 1.0
+		var gn := _mask_gain(mname) if fab else 1.0
 		for l: Array in rec.get(gname, []):
 			var n := str(l[0])
 			var src := _layer_img(n, px)

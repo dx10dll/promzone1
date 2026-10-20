@@ -88,7 +88,7 @@ func _notification(what: int) -> void:
 
 ## 1.33: кадр нового портрета на холсте набора (мелкий портрет в списках — крупнее лицо).
 func frame_rect() -> Rect2:
-	return PortraitKit.frame(size.x / maxf(1.0, size.y), zoom < 0.75)
+	return PortraitKit.frame(size.x / maxf(1.0, size.y), zoom < 0.75, _rec)
 
 
 func draw_layers(ci: Control, group: String) -> void:
