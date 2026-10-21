@@ -34,6 +34,17 @@ var name_errs: Dictionary = {}    ## поле -> Label
 var fio_lbl: Label
 var sub_lbl: Label
 var char_box: VBoxContainer   ## описания выбранных черт — под человечком
+## 1.38.1: форма строится один раз (и заново — только при смене пола: другие причёски, борода/серьги, лица);
+## остальные кнопки обновляют свои строки на месте (_sync_form), список — тоже на месте (_fill_list).
+var _form_built := false
+var _syncs: Array[Callable] = []   ## обновить строку ◀ ▶ по текущей записи
+var _age_lbl: Label
+var _prof_ob: OptionButton
+var _trait_title: Label
+var _trait_hint: Label
+var _trait_flow: HFlowContainer
+var _gender_seg: HBoxContainer
+var _look_box: VBoxContainer      ## раздел «Внешность»: заголовок и сетка строк
 
 
 func _init(menu_sim: Sim = null) -> void:
@@ -155,6 +166,7 @@ func _build_preview() -> Control:
 	fio_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	fio_lbl.custom_minimum_size = Vector2(250, 0)
 	por = Portrait.new()
+	por.async_load = true
 	por.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(por)
 	v.add_child(fio_lbl)
@@ -199,62 +211,108 @@ func _build_bar() -> Control:
 
 # ---------------------------------------------------------------- список
 
+## 1.38.1: строки списка обновляются на месте — не пересобираются (с портретами) на каждое «Сохранить» и выбор.
 func _fill_list() -> void:
-	UITheme.clear(list_box)
 	var ws := workers()
 	list_cap.text = "СПИСОК · %d из %d" % [ws.size(), CustomWorkers.MAX]
-	if ws.is_empty() and sel >= 0:
-		list_box.add_child(UITheme.para("Пока никого. Нажмите «Новый рабочий».", 13))
-	for i in ws.size():
-		list_box.add_child(_row(ws[i], i))
-	if sel < 0:
-		list_box.add_child(_row(cur, -1))
+	var rows: Array[PanelContainer] = []
+	var plain := true
+	for c in list_box.get_children():
+		if c.is_queued_for_deletion():
+			continue
+		if c is PanelContainer and c.has_meta("l1"):
+			rows.append(c as PanelContainer)
+		else:
+			plain = false
+	var hint := ws.is_empty() and sel >= 0
+	if hint or not plain:
+		UITheme.clear(list_box)
+		rows.clear()
+		if hint:
+			list_box.add_child(UITheme.para("Пока никого. Нажмите «Новый рабочий».", 13))
+			return
+	var want := ws.size() + (1 if sel < 0 else 0)
+	while rows.size() > want:
+		var r: PanelContainer = rows.pop_back()
+		list_box.remove_child(r)
+		r.queue_free()
+	while rows.size() < want:
+		var r := _row()
+		list_box.add_child(r)
+		rows.append(r)
+	for i in want:
+		_sync_row(rows[i], ws[i] if i < ws.size() else cur, i if i < ws.size() else -1)
 
 
-func _row(e: Dictionary, i: int) -> Control:
-	var on := i == sel
+## Строка списка: портрет, имя, подпись, «включён». Что в ней — _sync_row (индекс — по месту строки в списке).
+func _row() -> PanelContainer:
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", UITheme.sb(Color(UITheme.ACCENT, 0.12) if on else UITheme.BG2, UITheme.ACCENT if on else UITheme.LINE, 1, 8, 8, 6))
 	p.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var h := UITheme.hbox(10)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(h)
-	var pw := CustomPeople.preview_worker(e)
 	var pr := Portrait.new()
-	pr.set_look(pw.look, 0.62, {"age": pw.age, "mood": 60.0})
+	pr.async_load = true
 	pr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_child(pr)
 	var v := UITheme.vbox(0)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var nm := ("%s %s" % [str(e.get("last", "")), str(e.get("first", ""))]).strip_edges()
-	var l1 := UITheme.label(nm if nm != "" else "Без имени", 14, UITheme.TEXT if bool(e.get("enabled", true)) else UITheme.MUTED, UITheme.f_semi)
+	var l1 := UITheme.label("", 14, UITheme.TEXT, UITheme.f_semi)
 	l1.clip_text = true
 	l1.custom_minimum_size = Vector2(150, 0)
 	v.add_child(l1)
-	var l2 := UITheme.label("новый — ещё не в списке" if i < 0 else CustomWorkers.subtitle(e), 12, UITheme.WARN if i < 0 else UITheme.MUTED)
+	var l2 := UITheme.label("", 12, UITheme.MUTED)
 	l2.clip_text = true
 	l2.custom_minimum_size = Vector2(150, 0)
 	v.add_child(l2)
 	h.add_child(v)
-	if i >= 0:
-		var cb := CheckBox.new()
-		cb.button_pressed = bool(e.get("enabled", true))
-		cb.focus_mode = Control.FOCUS_NONE
-		cb.tooltip_text = "Включён: может прийти в новой игре"
-		cb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		cb.toggled.connect(func(x: bool) -> void:
-			(workers()[i] as Dictionary)["enabled"] = x
-			if i == sel:
-				cur["enabled"] = x
-			CustomWorkers.save_data(data)
-			l1.add_theme_color_override("font_color", UITheme.TEXT if x else UITheme.MUTED))
-		h.add_child(cb)
+	var cb := CheckBox.new()
+	cb.focus_mode = Control.FOCUS_NONE
+	cb.tooltip_text = "Включён: может прийти в новой игре"
+	cb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	cb.toggled.connect(func(x: bool) -> void:
+		var i := p.get_index()
+		if i >= workers().size():
+			return
+		(workers()[i] as Dictionary)["enabled"] = x
+		if i == sel:
+			cur["enabled"] = x
+		CustomWorkers.save_data(data)
+		l1.add_theme_color_override("font_color", UITheme.TEXT if x else UITheme.MUTED))
+	h.add_child(cb)
+	p.set_meta("pr", pr)
+	p.set_meta("l1", l1)
+	p.set_meta("l2", l2)
+	p.set_meta("cb", cb)
 	p.gui_input.connect(func(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and (ev as InputEventMouseButton).pressed and (ev as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
-			if i >= 0 and i != sel:
+			var i := p.get_index()
+			if i < workers().size() and i != sel:
 				_open(i))
 	return p
+
+
+func _sync_row(p: PanelContainer, e: Dictionary, i: int) -> void:
+	var on := i == sel
+	if not p.has_meta("on") or bool(p.get_meta("on")) != on:
+		p.set_meta("on", on)
+		p.add_theme_stylebox_override("panel", UITheme.sb(Color(UITheme.ACCENT, 0.12) if on else UITheme.BG2, UITheme.ACCENT if on else UITheme.LINE, 1, 8, 8, 6))
+	var lh := e.hash()
+	if not p.has_meta("lh") or int(p.get_meta("lh")) != lh:
+		p.set_meta("lh", lh)
+		var pw := CustomPeople.preview_worker(e)
+		(p.get_meta("pr") as Portrait).set_look(pw.look, 0.62, {"age": pw.age, "mood": 60.0})
+	var nm := ("%s %s" % [str(e.get("last", "")), str(e.get("first", ""))]).strip_edges()
+	var l1 := p.get_meta("l1") as Label
+	l1.text = nm if nm != "" else "Без имени"
+	l1.add_theme_color_override("font_color", UITheme.TEXT if bool(e.get("enabled", true)) else UITheme.MUTED)
+	var l2 := p.get_meta("l2") as Label
+	l2.text = "новый — ещё не в списке" if i < 0 else CustomWorkers.subtitle(e)
+	l2.add_theme_color_override("font_color", UITheme.WARN if i < 0 else UITheme.MUTED)
+	var cb := p.get_meta("cb") as CheckBox
+	cb.visible = i >= 0
+	cb.set_pressed_no_signal(bool(e.get("enabled", true)))
 
 
 ## Уйти с записи: правильные правки сохраняем сами, черновик новой записи — отбрасываем.
@@ -302,7 +360,7 @@ func _save() -> void:
 	var added := sel < 0
 	_commit()
 	_refresh_all()
-	bar_status.text = ("Добавлен%s в список. В новой игре может прийти наниматься." if added else "Сохранено.") % ("а" if bool(cur.get("female", false)) else "")
+	bar_status.text = ("Добавлен%s в список. В новой игре может прийти наниматься." % ("а" if bool(cur.get("female", false)) else "")) if added else "Сохранено."
 	bar_status.add_theme_color_override("font_color", UITheme.GOOD)
 
 
@@ -334,16 +392,17 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 
 func _refresh_all() -> void:
 	_fill_list()
-	_fill_form()
+	_sync_form()
 	_preview()
 	_bar()
 
 
-## Что-то поменяли. full — пересобрать форму (стрелки, пол); при наборе текста — только подписи.
+## Что-то поменяли. full — обновить форму по записи (случайная внешность, ФИО, пол, возраст, черты);
+## при наборе текста и стрелках — только подписи.
 func _changed(full: bool) -> void:
 	dirty = true
 	if full:
-		_fill_form()
+		_sync_form()
 	_preview()
 	_bar()
 	_list_texts()
@@ -404,12 +463,67 @@ func _section(t: String) -> VBoxContainer:
 	return v
 
 
+## Форма — по текущей записи: пол тот же, что у построенной формы, — обновляем строки на месте, иначе строим заново.
+func _sync_form() -> void:
+	if not _form_built:
+		_fill_form()
+		return
+	var fem := bool(cur.get("female", false))
+	var gb := _gender_seg.get_children()
+	(gb[0] as Button).set_pressed_no_signal(not fem)
+	(gb[1] as Button).set_pressed_no_signal(fem)
+	_norm_look()
+	for k: String in name_edits.keys():
+		var le: LineEdit = name_edits[k]
+		var t := str(cur.get(k, ""))
+		if le.text != t:
+			le.text = t
+	_check_names()
+	var age := int(cur.get("age", 30))
+	_age_lbl.text = "%d %s" % [age, Defs.plural(age, "год", "года", "лет")]
+	_select_prof()
+	for f: Callable in _syncs:
+		f.call()
+	_fill_traits()
+
+
+## Внешность записи: есть face_ovr, форма лица — из своих для пола (старое значение — ближайшее).
+func _norm_look() -> void:
+	var lk: Dictionary = cur.get("look", {})
+	if not lk.has("face_ovr"):
+		lk["face_ovr"] = {}
+	cur["look"] = lk
+	var fo: Dictionary = lk["face_ovr"]
+	var fem := bool(cur.get("female", false))
+	var heads: Array = PortraitKit.heads(fem) if PortraitKit.available() else People.HEADS
+	if fo.has("head") and not heads.has(str(fo["head"])):
+		fo["head"] = PortraitKit.head_for(fem, str(fo["head"]))
+
+
+## Словарь, в котором лежит значение строки: "look" — внешность, "fo" — черты лица (face_ovr).
+func _tgt(t: String) -> Dictionary:
+	var lk: Dictionary = cur.get("look", {})
+	return lk if t == "look" else (lk.get("face_ovr", {}) as Dictionary)
+
+
+func _select_prof() -> void:
+	var cur_prof := str(cur.get("prof", ""))
+	var ix := 0
+	for i in _prof_ob.item_count:
+		if not _prof_ob.is_item_separator(i) and str(_prof_ob.get_item_metadata(i)) == cur_prof:
+			ix = i
+	if _prof_ob.selected != ix:
+		_prof_ob.select(ix)
+
+
 func _fill_form() -> void:
 	var keep := form_scroll.scroll_vertical
 	UITheme.clear(form)
 	name_edits.clear()
 	name_errs.clear()
+	_syncs.clear()
 	var fem := bool(cur.get("female", false))
+	_form_built = true
 	# --- ФИО
 	var s1 := _section("Фамилия, имя, отчество")
 	var nrow := UITheme.hbox(12)
@@ -450,25 +564,29 @@ func _fill_form() -> void:
 	var brow := UITheme.hbox(22)
 	var gv := UITheme.vbox(3)
 	gv.add_child(UITheme.label("Пол", 12, UITheme.MUTED))
-	gv.add_child(UITheme.segmented([["m", "Мужчина"], ["f", "Женщина"]], "f" if fem else "m", func(k: String) -> void:
+	_gender_seg = UITheme.segmented([["m", "Мужчина"], ["f", "Женщина"]], "f" if fem else "m", func(k: String) -> void:
 		if (k == "f") != bool(cur.get("female", false)):
 			cur["female"] = k == "f"
 			CustomWorkers.regender(cur)
 			_regender_face()
-			_changed(true)))
+			_changed(true))
+	gv.add_child(_gender_seg)
 	brow.add_child(gv)
 	var av := UITheme.vbox(3)
 	av.add_child(UITheme.label("Возраст", 12, UITheme.MUTED))
 	var age := int(cur.get("age", 30))
-	av.add_child(_stepper("%d %s" % [age, Defs.plural(age, "год", "года", "лет")], 90, func(d: int) -> void:
+	var stp := _stepper("%d %s" % [age, Defs.plural(age, "год", "года", "лет")], 90, func(d: int) -> void:
 		cur["age"] = clampi(int(cur.get("age", 30)) + d, CustomWorkers.AGE_MIN, CustomWorkers.AGE_MAX)
 		cur["traits"] = CustomPeople.clean_traits(cur.get("traits", []), int(cur["age"]))
-		_changed(true)))
+		_changed(true))
+	_age_lbl = stp.get_child(1) as Label
+	av.add_child(stp)
 	brow.add_child(av)
 	var pv := UITheme.vbox(3)
 	pv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pv.add_child(UITheme.label("Профессия", 12, UITheme.MUTED))
 	var ob := OptionButton.new()
+	_prof_ob = ob
 	ob.focus_mode = Control.FOCUS_NONE
 	ob.custom_minimum_size = Vector2(260, 34)
 	ob.add_item("Любая — по тому, кто нужен заводу")
@@ -490,60 +608,78 @@ func _fill_form() -> void:
 	brow.add_child(pv)
 	s2.add_child(brow)
 	# --- внешность
-	var s3 := _section("Внешность")
-	var lk: Dictionary = cur.get("look", {})
-	if not lk.has("face_ovr"):
-		lk["face_ovr"] = {}
-	cur["look"] = lk
-	var fo: Dictionary = lk["face_ovr"]
-	var g := UITheme.grid(2, 18, 4)
-	var bodies: Array = []
-	for bk: String in CustomWorkers.BODY_ORDER:
-		var bn := str((People.BODIES[bk]["name"] as Array)[1 if fem else 0])
-		bodies.append([bk, bn.left(1).to_upper() + bn.substr(1)])
-	g.add_child(_pick("Телосложение", bodies, lk, "body"))
-	g.add_child(_pick("Рост", _zip(CustomWorkers.HEIGHTS, ["Ниже среднего", "Средний", "Выше среднего"]), lk, "h"))
-	g.add_child(_pick("Кожа", _zip(range(People.SKINS.size()), CustomWorkers.SKIN_NAMES), lk, "skin", People.SKINS))
-	var hs: Array = People.HAIR_F if fem else People.HAIR_M
-	g.add_child(_pick("Причёска", hs.map(func(x: String) -> Array: return [x, str(CustomWorkers.HAIR_NAMES.get(x, x))]), lk, "hair"))
-	g.add_child(_pick("Цвет волос", _zip(CustomWorkers.HAIR_COLS, CustomWorkers.HAIR_COL_NAMES), lk, "hair_col", CustomWorkers.HAIR_COLS))
-	if fem:
-		g.add_child(_pick("Серьги", [[false, "Нет"], [true, "Есть"]], fo, "earrings"))
-	else:
-		g.add_child(_pick("Борода, усы", CustomWorkers.BEARDS.map(func(x: String) -> Array: return [x, str(CustomWorkers.BEARD_NAMES[x])]), lk, "beard"))
-	# 1.37: в наборе v5 у мужчин 4 формы лица, у женщин 3 — показываем только свои (старое значение — ближайшее)
-	var heads: Array = PortraitKit.heads(fem) if PortraitKit.available() else People.HEADS
-	if fo.has("head") and not heads.has(str(fo["head"])):
-		fo["head"] = PortraitKit.head_for(fem, str(fo["head"]))
-	g.add_child(_pick("Лицо", _named(heads, CustomWorkers.HEAD_NAMES), fo, "head"))
-	g.add_child(_pick("Глаза", _named(People.EYE_KINDS, CustomWorkers.EYE_KIND_NAMES), fo, "eyes"))
-	g.add_child(_pick("Цвет глаз", _zip(People.EYE_COLS, CustomWorkers.EYE_NAMES), lk, "eye_col", People.EYE_COLS))
-	g.add_child(_pick("Брови", _named(People.BROW_KINDS, CustomWorkers.BROW_NAMES), fo, "brows"))
-	g.add_child(_pick("Нос", _named(People.NOSE_KINDS, CustomWorkers.NOSE_NAMES), fo, "nose"))
-	g.add_child(_pick("Рот", _named(People.MOUTH_KINDS, CustomWorkers.MOUTH_NAMES), fo, "mouth"))
-	g.add_child(_pick("Очки", [[false, "Нет"], [true, "Есть"]], lk, "glasses"))
-	g.add_child(_pick("Веснушки", [[false, "Нет"], [true, "Есть"]], fo, "freckles"))
-	g.add_child(_pick("Своя одежда", [["jacket", "Куртка"], ["coat", "Пальто"]], lk, "street"))
-	g.add_child(_pick("Её цвет", _zip(People.STREET_COLS, CustomWorkers.STREET_NAMES), lk, "street_col", People.STREET_COLS))
-	s3.add_child(g)
+	_look_box = _section("Внешность")
+	_fill_looks()
 	# --- черты
+	var s4 := _section("Черты характера")
+	_trait_title = (s4.get_child(0) as HBoxContainer).get_child(0) as Label
+	_trait_hint = UITheme.label("чтобы выбрать другую — снимите одну", 12, UITheme.DIM)
+	(s4.get_child(0) as HBoxContainer).add_child(_trait_hint)
+	(s4.get_child(0) as HBoxContainer).move_child(_trait_hint, 1)
+	_trait_flow = HFlowContainer.new()
+	_trait_flow.add_theme_constant_override("h_separation", 6)
+	_trait_flow.add_theme_constant_override("v_separation", 5)
+	s4.add_child(_trait_flow)
+	_fill_traits()
+	(func() -> void: form_scroll.scroll_vertical = keep).call_deferred()
+
+
+## Строки внешности (◀ ▶): набор вариантов зависит от пола — при смене пола строятся заново только они.
+func _fill_looks() -> void:
+	for i in range(_look_box.get_child_count() - 1, 0, -1):   # заголовок раздела оставляем
+		var c := _look_box.get_child(i)
+		_look_box.remove_child(c)
+		c.queue_free()
+	_syncs.clear()
+	_norm_look()
+	var g := UITheme.grid(2, 18, 4)
+	var bodies := func() -> Array:
+		var fm := bool(cur.get("female", false))
+		var out: Array = []
+		for bk: String in CustomWorkers.BODY_ORDER:
+			var bn := str((People.BODIES[bk]["name"] as Array)[1 if fm else 0])
+			out.append([bk, bn.left(1).to_upper() + bn.substr(1)])
+		return out
+	g.add_child(_pick("Телосложение", bodies, "look", "body"))
+	g.add_child(_pick("Рост", _zip(CustomWorkers.HEIGHTS, ["Ниже среднего", "Средний", "Выше среднего"]), "look", "h"))
+	g.add_child(_pick("Кожа", _zip(range(People.SKINS.size()), CustomWorkers.SKIN_NAMES), "look", "skin", People.SKINS))
+	g.add_child(_pick("Причёска", func() -> Array:
+		var hs: Array = People.HAIR_F if bool(cur.get("female", false)) else People.HAIR_M
+		return hs.map(func(x: String) -> Array: return [x, str(CustomWorkers.HAIR_NAMES.get(x, x))]), "look", "hair"))
+	g.add_child(_pick("Цвет волос", _zip(CustomWorkers.HAIR_COLS, CustomWorkers.HAIR_COL_NAMES), "look", "hair_col", CustomWorkers.HAIR_COLS))
+	# у женщин — серьги, у мужчин — борода (на одном месте сетки: видна одна из двух строк)
+	g.add_child(_pick("Серьги", [[false, "Нет"], [true, "Есть"]], "fo", "earrings", [], 1))
+	g.add_child(_pick("Борода, усы", CustomWorkers.BEARDS.map(func(x: String) -> Array: return [x, str(CustomWorkers.BEARD_NAMES[x])]), "look", "beard", [], 0))
+	# 1.37: в наборе v5 у мужчин 4 формы лица, у женщин 3 — показываем только свои (старое значение — ближайшее)
+	g.add_child(_pick("Лицо", func() -> Array:
+		var heads: Array = PortraitKit.heads(bool(cur.get("female", false))) if PortraitKit.available() else People.HEADS
+		return _named(heads, CustomWorkers.HEAD_NAMES), "fo", "head"))
+	g.add_child(_pick("Глаза", _named(People.EYE_KINDS, CustomWorkers.EYE_KIND_NAMES), "fo", "eyes"))
+	g.add_child(_pick("Цвет глаз", _zip(People.EYE_COLS, CustomWorkers.EYE_NAMES), "look", "eye_col", People.EYE_COLS))
+	g.add_child(_pick("Брови", _named(People.BROW_KINDS, CustomWorkers.BROW_NAMES), "fo", "brows"))
+	g.add_child(_pick("Нос", _named(People.NOSE_KINDS, CustomWorkers.NOSE_NAMES), "fo", "nose"))
+	g.add_child(_pick("Рот", _named(People.MOUTH_KINDS, CustomWorkers.MOUTH_NAMES), "fo", "mouth"))
+	g.add_child(_pick("Очки", [[false, "Нет"], [true, "Есть"]], "look", "glasses"))
+	g.add_child(_pick("Веснушки", [[false, "Нет"], [true, "Есть"]], "fo", "freckles"))
+	g.add_child(_pick("Своя одежда", [["jacket", "Куртка"], ["coat", "Пальто"]], "look", "street"))
+	g.add_child(_pick("Её цвет", _zip(People.STREET_COLS, CustomWorkers.STREET_NAMES), "look", "street_col", People.STREET_COLS))
+	_look_box.add_child(g)
+
+
+## Черты характера: заголовок со счётчиком, кнопки (выбранные — янтарные) и описания под человечком.
+func _fill_traits() -> void:
 	var tr: Array = cur.get("traits", [])
-	var s4 := _section("Черты характера · %d из %d" % [tr.size(), CustomPeople.MAX_TRAITS])
-	if tr.size() >= CustomPeople.MAX_TRAITS:
-		var hl := UITheme.label("чтобы выбрать другую — снимите одну", 12, UITheme.DIM)
-		(s4.get_child(0) as HBoxContainer).add_child(hl)
-		(s4.get_child(0) as HBoxContainer).move_child(hl, 1)
-	var fl := HFlowContainer.new()
-	fl.add_theme_constant_override("h_separation", 6)
-	fl.add_theme_constant_override("v_separation", 5)
+	_trait_title.text = "Черты характера · %d из %d" % [tr.size(), CustomPeople.MAX_TRAITS]
+	_trait_hint.visible = tr.size() >= CustomPeople.MAX_TRAITS
+	for c in _trait_flow.get_children():
+		_trait_flow.remove_child(c)
+		c.queue_free()
 	for tk: String in Defs.traits.keys():
 		var td: Dictionary = Defs.traits[tk]
 		if not bool(td.get("gen", true)):
 			continue
-		fl.add_child(_trait_btn(tk, td, tr))
-	s4.add_child(fl)
+		_trait_flow.add_child(_trait_btn(tk, td, tr))
 	_fill_char(tr)
-	(func() -> void: form_scroll.scroll_vertical = keep).call_deferred()
 
 
 ## Под человечком — что значат выбранные черты.
@@ -604,32 +740,44 @@ static func _named(keys: Array, names: Dictionary) -> Array:
 
 
 ## Строка выбора: подпись, ◀ значение ▶ (по кругу). swatches — цвета образцов для значений.
-func _pick(title: String, opts: Array, target: Dictionary, key: String, swatches: Array = []) -> Control:
+## 1.38.1: src — варианты или функция, что их даёт (зависят от пола: телосложение, причёска, лицо);
+## only — строка только для мужчин (0) или женщин (1): при смене пола строка прячется, форма не пересобирается.
+func _pick(title: String, src: Variant, tgt: String, key: String, swatches: Array = [], only: int = -1) -> Control:
+	var opts: Array = (src as Callable).call() if src is Callable else src
 	var h := UITheme.hbox(6)
 	h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var tl := UITheme.label(title, 13, UITheme.MUTED)
 	tl.custom_minimum_size = Vector2(112, 0)
 	h.add_child(tl)
-	var ci := 0
-	var have: Variant = target.get(key, null)
-	for i in opts.size():
-		var ov: Variant = opts[i][0]
-		if have != null and (str(ov) == str(have) or (ov is float and (have is float or have is int) and absf(float(ov) - float(have)) < 0.02)):
-			ci = i
+	var ci := _opt_index(opts, _tgt(tgt).get(key, null))
 	# 1.35: стрелка меняет только свою строку — без пересборки всей формы (≈30 мс и сотни узлов на щелчок)
-	var st := {"ci": ci}
+	var st := {"ci": ci, "opts": opts}
 	var sw: ColorRect = ColorRect.new() if not swatches.is_empty() else null   # (лямбда захватывает значения — создаём заранее)
 	var vl := UITheme.label(str(opts[ci][1]), 14, UITheme.TEXT)
 	var pos := UITheme.label("%d/%d" % [ci + 1, opts.size()], 11, UITheme.DIM)
 	var step := func(d: int) -> void:
-		var ni := posmod(int(st["ci"]) + d, opts.size())
+		var op: Array = st["opts"]
+		var ni := posmod(int(st["ci"]) + d, op.size())
 		st["ci"] = ni
-		target[key] = opts[ni][0]
-		vl.text = str(opts[ni][1])
-		pos.text = "%d/%d" % [ni + 1, opts.size()]
+		_tgt(tgt)[key] = op[ni][0]
+		vl.text = str(op[ni][1])
+		pos.text = "%d/%d" % [ni + 1, op.size()]
 		if sw:
 			sw.color = Color(str(swatches[ni % swatches.size()]))
 		_changed(false)
+	# 1.38.1: та же строка — по записи (случайная внешность, выбор в списке)
+	_syncs.append(func() -> void:
+		var fem := bool(cur.get("female", false))
+		h.visible = only < 0 or (only == 1) == fem
+		var op: Array = (src as Callable).call() if src is Callable else st["opts"]
+		st["opts"] = op
+		var ni := _opt_index(op, _tgt(tgt).get(key, null))
+		st["ci"] = ni
+		vl.text = str(op[ni][1])
+		pos.text = "%d/%d" % [ni + 1, op.size()]
+		if sw:
+			sw.color = Color(str(swatches[ni % swatches.size()])))
+	h.visible = only < 0 or (only == 1) == bool(cur.get("female", false))
 	var lb := UITheme.small("◀", func() -> void: step.call(-1))
 	lb.custom_minimum_size = Vector2(30, 30)
 	h.add_child(lb)
@@ -653,6 +801,15 @@ func _pick(title: String, opts: Array, target: Dictionary, key: String, swatches
 	rb.custom_minimum_size = Vector2(30, 30)
 	h.add_child(rb)
 	return h
+
+
+static func _opt_index(opts: Array, have: Variant) -> int:
+	var ci := 0
+	for i in opts.size():
+		var ov: Variant = opts[i][0]
+		if have != null and (str(ov) == str(have) or (ov is float and (have is float or have is int) and absf(float(ov) - float(have)) < 0.02)):
+			ci = i
+	return ci
 
 
 func _stepper(text: String, w: float, cb: Callable) -> Control:

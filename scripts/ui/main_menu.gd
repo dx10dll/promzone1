@@ -3,8 +3,8 @@ extends Node2D
 ## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
 ## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.38"
-const WHATS_NEW := ["102 новые иконки: зоны, события, слои, меню", "Портреты v5: свои детали для каждого телосложения", "Снова можно выбрать форму лица"]
+const VERSION_TEXT := "Версия 1.38.1"
+const WHATS_NEW := ["„Создать рабочего“ снова без лагов", "102 новые иконки: зоны, события, слои, меню", "Портреты v5: свои детали для каждого телосложения"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -60,6 +60,31 @@ func _ready() -> void:
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(ui)
 	_build_ui()
+	if OS.get_cmdline_user_args().has("--bench-editor"):
+		_bench_editor.call_deferred()
+
+
+## 1.38.1: `Promzona -- --bench-editor [--bench-bg]`: открыть «Создать рабочего», 200 раз нажать его кнопки, напечатать
+## время на нажатие и выйти. Свой список — во временном файле (настоящий не трогаем). Без флага не работает.
+## --bench-bg — не останавливать фон меню (по умолчанию на время замера он стоит).
+func _bench_editor() -> void:
+	CustomWorkers.path = "user://bench_custom_workers.json"
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	for i in 30:
+		await get_tree().process_frame
+	_show_custom()
+	var b := EditorBench.new()
+	b.quiet_bg = not OS.get_cmdline_user_args().has("--bench-bg")
+	add_child(b)
+	await b.run(self, 200, 20)
+	var r: Array = b.rows
+	var first := float(r[1]["ms_click"]) if r.size() > 1 else 0.0
+	var last := float(r[r.size() - 1]["ms_click"]) if not r.is_empty() else 0.0
+	print("BENCH ИТОГ: версия %s, нажатий %d, кадр без нажатий %.2f мс, нажатие+2 кадра: пачка 2 %.2f мс → последняя %.2f мс (×%.2f)" % [
+		ProjectSettings.get_setting("application/config/version"), b.clicks, b.idle_ms, first, last, last / maxf(0.01, first)])
+	if FileAccess.file_exists(CustomWorkers.path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(CustomWorkers.path))
+	get_tree().quit(0)
 
 
 func _exit_tree() -> void:

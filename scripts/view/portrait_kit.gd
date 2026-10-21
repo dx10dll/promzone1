@@ -17,6 +17,11 @@ const CANVAS := 512.0
 const REF := 200.0 / 255.0          ## опорный серый набора (#C8C8C8)
 const GRAY_HAIR := Color("#b9b7b1")
 const CACHE_MAX := 128
+## 1.38.1: сколько слоёв держать в памяти без портрета на экране (≈1,2 МБ видеопамяти каждый). Раньше копились все:
+## перебор внешности в «Создать рабочего» доводил их до сотен (до 1,8 ГБ на все 14 наборов). Слои, что сейчас
+## на экране, держат сами портреты (Portrait._hold), так что вытеснение их не перечитывает.
+const TEX_KEEP := 160
+const MATS_KEEP := 64
 ## Группы слоёв в порядке рисования; у каждой своя маска: inner и cloth — основная ткань одежды (перекраска),
 ## back и hair — волосы под головным убором; body — шея и голова, face — черты, top — очки, серьги, убор.
 const GROUPS := ["back", "inner", "body", "cloth", "face", "hair", "top"]
@@ -36,13 +41,16 @@ static var _bbox: Dictionary = {}       ## слой -> Rect2 непустой ч
 static var _masks: Dictionary = {}      ## имена масок
 static var _sets: Dictionary = {}       ## набор -> {heads, hair, beard, outfits, gain, crown, chin}
 static var _alias: Dictionary = {}      ## слой -> файл, одинаковый с ним (лежит один раз)
-static var _tex: Dictionary = {}        ## слой -> Texture2D
+static var _tex: Dictionary = {}        ## слой -> Texture2D (не больше TEX_KEEP — вытесняются давние)
+static var _tex_t: Dictionary = {}      ## слой -> когда последний раз нужен (счётчик)
+static var _clock := 0
 static var _rec: Dictionary = {}        ## ключ облика -> рецепт (LRU)
 static var _rec_order: Array[String] = []
 static var _img: Dictionary = {}        ## "слой|px" -> Image (для compose_image)
 static var _comp: Dictionary = {}       ## ключ -> ImageTexture (LRU)
 static var _comp_order: Array[String] = []
 static var compose_count := 0           ## сколько раз реально собирали картинку (для теста кэша)
+static var load_count := 0              ## 1.38.1: сколько раз слой реально читали с диска (для замера редактора)
 static var _shader: Shader
 static var _mats: Dictionary = {}       ## маска -> ShaderMaterial
 
@@ -106,12 +114,110 @@ static func set_ids() -> Array:
 
 
 static func tex(n: String) -> Texture2D:
+	_clock += 1
 	if _tex.has(n):
+		_tex_t[n] = _clock
 		return _tex[n]
-	var p := DIR + str(_alias.get(n, n)) + ".png"
-	var t: Texture2D = load(p) as Texture2D if ResourceLoader.exists(p) else null
+	var p := path_of(n)
+	var t: Texture2D = null
+	if ResourceLoader.exists(p):
+		# ещё жив (его держит портрет на экране) — load() отдаст его же, без чтения с диска
+		if not ResourceLoader.has_cached(p):
+			load_count += 1
+		t = load(p) as Texture2D
 	_tex[n] = t
+	_tex_t[n] = _clock
+	if _tex.size() > TEX_KEEP:
+		_evict()
 	return t
+
+
+## Отпустить давние слои: оставляем 3/4 предела самых свежих.
+static func _evict() -> void:
+	var ks := _tex.keys()
+	ks.sort_custom(func(x: String, y: String) -> bool: return int(_tex_t[x]) < int(_tex_t[y]))
+	for i in ks.size() - TEX_KEEP * 3 / 4:
+		_tex.erase(ks[i])
+		_tex_t.erase(ks[i])
+
+
+static var _pending: Dictionary = {}    ## путь -> [слои], читаются в фоне (load_threaded_request)
+
+
+static func path_of(n: String) -> String:
+	return DIR + str(_alias.get(n, n)) + ".png"
+
+
+## 1.38.1: все слои и маски рецепта уже в памяти? Чего нет — заказываем фоновое чтение (poll() заберёт).
+## Слой, который ещё держит кто-то другой (кэш ResourceLoader), берём сразу — это без чтения с диска.
+static func is_ready(rec: Dictionary) -> bool:
+	var ok := true
+	for n: String in _rec_needs(rec):
+		if _tex.has(n):
+			continue
+		var p := path_of(n)
+		if not ResourceLoader.exists(p) or ResourceLoader.has_cached(p):
+			tex(n)
+			continue
+		ok = false
+		if _pending.has(p):
+			if not (_pending[p] as Array).has(n):
+				(_pending[p] as Array).append(n)
+			continue
+		if ResourceLoader.load_threaded_request(p, "Texture2D") == OK:
+			_pending[p] = [n]
+		else:
+			tex(n)
+	return ok
+
+
+## Забрать прочитанные в фоне слои.
+static func poll() -> void:
+	for p: String in _pending.keys():
+		var st := ResourceLoader.load_threaded_get_status(p)
+		if st == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			continue
+		var t: Texture2D = ResourceLoader.load_threaded_get(p) as Texture2D if st == ResourceLoader.THREAD_LOAD_LOADED else null
+		load_count += 1
+		_clock += 1
+		for n: String in _pending[p]:
+			_tex[n] = t
+			_tex_t[n] = _clock
+		_pending.erase(p)
+	if _tex.size() > TEX_KEEP:
+		_evict()
+
+
+static func _rec_needs(rec: Dictionary) -> Array[String]:
+	var out: Array[String] = []
+	for gname: String in GROUPS:
+		for l: Array in rec.get(gname, []):
+			out.append(str(l[0]))
+		var mn := str(rec.get("mask_" + gname, ""))
+		if mn != "":
+			out.append(mn)
+	return out
+
+
+## Все текстуры рецепта (слои и маски) — их держит портрет, пока показывает этот рецепт.
+static func textures(rec: Dictionary) -> Array[Texture2D]:
+	var out: Array[Texture2D] = []
+	for gname: String in GROUPS:
+		for l: Array in rec.get(gname, []):
+			var t := tex(str(l[0]))
+			if t != null:
+				out.append(t)
+		var mn := str(rec.get("mask_" + gname, ""))
+		if mn != "":
+			var mt := tex(mn)
+			if mt != null:
+				out.append(mt)
+	return out
+
+
+## Сколько слоёв сейчас держим в памяти.
+static func loaded_count() -> int:
+	return _tex.size()
 
 
 ## Шейдер слоёв: цвет вершины — целевой цвет (умножить и разделить на опорный серый), альфа — прозрачность.
@@ -145,6 +251,12 @@ void fragment() {
 static func material(mask_name: String) -> ShaderMaterial:
 	if _mats.has(mask_name):
 		return _mats[mask_name]
+	if _mats.size() >= MATS_KEEP:
+		# материалы держат маски; те, что на экране, держат сами портреты (c.material)
+		var keep: ShaderMaterial = _mats.get("", null)
+		_mats.clear()
+		if keep:
+			_mats[""] = keep
 	var m := ShaderMaterial.new()
 	m.shader = shader()
 	if mask_name != "":

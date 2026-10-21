@@ -27,6 +27,9 @@ var _tex_key := ""
 var _lay: Array[_Layers] = []   ## 1.33: слои нового портрета — по группе на узел (у каждой свой шейдер с маской)
 var _rec: Dictionary = {}
 var _info: Dictionary = {}
+var _hold: Array[Texture2D] = []   ## 1.38.1: слои текущего рецепта — пока портрет их показывает, они в памяти
+var async_load := false            ## 1.38.1: недостающие слои читать в фоне (редактор «Создать рабочего»), а не в щелчке
+var _want: Dictionary = {}         ## рецепт, слои которого ещё читаются
 
 
 ## 1.34: новый портрет рисуется дочерними узлами по группам слоёв (PortraitKit.GROUPS) — у каждого материал
@@ -53,7 +56,7 @@ func set_look(lk: Dictionary, z: float = 1.0, info: Dictionary = {}) -> void:
 	custom_minimum_size = (Vector2(64.0 * (WIDE_K if wide else 1.0), 74) * z).round()
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_tex_key = ""
-	_rec = {}
+	var nr := {}
 	if PortraitKit.available():
 		if _lay.is_empty():
 			for gname: String in PortraitKit.GROUPS + [""]:
@@ -71,12 +74,43 @@ func set_look(lk: Dictionary, z: float = 1.0, info: Dictionary = {}) -> void:
 			for k: String in ["dressed", "winter", "outside"]:
 				if info.has(k):
 					ri[k] = info[k]
-			_rec = PortraitKit.recipe(look, ri)
+			nr = PortraitKit.recipe(look, ri)
+		# 1.38.1: слои, которых ещё нет в памяти, — читаются в фоне; до тех пор виден прежний облик (редактор)
+		if async_load and not nr.is_empty() and not PortraitKit.is_ready(nr):
+			_want = nr
+			set_process(true)
+			queue_redraw()
+			return
+	_want = {}
+	_apply(nr)
+
+
+func _apply(nr: Dictionary) -> void:
+	_rec = nr
+	if PortraitKit.available():
+		_hold = PortraitKit.textures(_rec)
 		for c: _Layers in _lay:
 			if c.group != "":
 				c.material = PortraitKit.material(str(_rec.get("mask_" + c.group, "")))
 			c.queue_redraw()
 	queue_redraw()
+
+
+func _process(_d: float) -> void:
+	if _want.is_empty():
+		set_process(false)
+		return
+	PortraitKit.poll()
+	if PortraitKit.is_ready(_want):
+		var nr := _want
+		_want = {}
+		set_process(false)
+		_apply(nr)
+
+
+func _ready() -> void:
+	if _want.is_empty():
+		set_process(false)
 
 
 func _notification(what: int) -> void:
