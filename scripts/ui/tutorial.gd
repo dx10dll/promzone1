@@ -369,7 +369,7 @@ func _cycle() -> Control:
 		ic.custom_minimum_size = Vector2(38, 38)
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		ic.modulate = Color("#f0cf7a")
+		UITheme.tint_icon(ic, ic.texture, Color("#f0cf7a"))
 		v.add_child(ic)
 		var l := UITheme.label(str(items[k][1]), 12, UITheme.MUTED)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

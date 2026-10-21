@@ -30,7 +30,7 @@ const GROUPS := {
 		["machines", "Станки", "shop", "shop", ""], ["stall", "Простой", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
 		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
 	"people": {"title": "Люди", "icon": "people", "secs": [
-		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "orders", "staff", "hire"],
+		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "hire", "staff", "hire"],
 		["train", "Обучение", "idea", "staff", "train"], ["safety", "Охрана труда", "injury", "staff", "safety"],
 		["brig", "Бригады", "crew", "crew", "brig"], ["sched", "График смены", "clock", "crew", "sched"],
 		["sec", "Охрана", "thief", "crew", "sec"], ["union", "Профсоюз", "handshake", "crew", "union"],
@@ -191,6 +191,11 @@ func _rail_item(sdef: Array) -> Button:
 	b.add_theme_color_override("icon_normal_color", UITheme.MUTED)
 	b.add_theme_color_override("icon_pressed_color", UITheme.CREAM)
 	b.add_theme_color_override("icon_hover_pressed_color", UITheme.CREAM)
+	if Tex.is_color(b.icon):
+		# 1.38: цветной значок владельца — не перекрашиваем; невыбранный раздел чуть приглушён
+		UITheme.micon_colors(b)
+		b.add_theme_color_override("icon_normal_color", Color(1, 1, 1, 0.78))
+		b.add_theme_constant_override("icon_max_width", 28)
 	b.add_theme_font_size_override("font_size", 14)
 	b.pressed.connect(func() -> void:
 		_open_sec(key)
@@ -691,6 +696,8 @@ func _card_in(parent: Control, title: String = "", help: String = "") -> VBoxCon
 func _icon(tex: Texture2D, sz: float = 40.0) -> TextureRect:
 	var r := TextureRect.new()
 	r.texture = tex
+	if Tex.is_color(tex):
+		sz = roundf(sz * 1.2)   # 1.38: у цветных PNG владельца прозрачные поля ~12%
 	r.custom_minimum_size = Vector2(sz, sz)
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -1535,6 +1542,10 @@ func _hire() -> void:
 			if err != "":
 				hud.toast(err, Sim.LVL_WARN)
 			rebuild(true))
+		hb.icon = Tex.ui("hire")   # 1.38: значок владельца
+		hb.expand_icon = false
+		hb.add_theme_constant_override("icon_max_width", 24)
+		UITheme.icon_colors(hb)
 		hb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(hb)
 
@@ -1924,7 +1935,7 @@ func _stall() -> void:
 			continue
 		var hh := UITheme.hbox(8)
 		var ic := _icon(Tex.ui("warn" if int(g[0]) < Stall.INFO else "clock"), 18.0)
-		ic.modulate = g[2]
+		UITheme.tint_icon(ic, ic.texture, g[2])
 		hh.add_child(ic)
 		hh.add_child(_cl("%s · %d" % [str(g[1]), part.size()], 13, g[2], UITheme.f_semi))
 		content.add_child(hh)
@@ -2681,7 +2692,7 @@ func _events_hist() -> void:
 		content.add_child(UITheme.empty("Пока ничего не случилось. Это ненадолго."))
 	for e: Dictionary in ar:
 		var ic := _icon(Tex.ui(str(e.get("icon", "letter"))), 22)
-		ic.modulate = [UITheme.INFO, UITheme.GOOD, UITheme.WARN, UITheme.BAD][clampi(int(e.get("level", 0)), 0, 3)]
+		UITheme.tint_icon(ic, ic.texture, [UITheme.INFO, UITheme.GOOD, UITheme.WARN, UITheme.BAD][clampi(int(e.get("level", 0)), 0, 3)])
 		var txt := _cl(str(e["text"]).replace("\n", " "), 12, UITheme.MUTED)
 		txt.tooltip_text = str(e["text"])
 		_trow([[ic, 26], [_cl(str(e.get("date", "")), 12, UITheme.MUTED), 150], [_cl(str(e["title"]), 13, UITheme.TEXT, UITheme.f_semi), 300], [txt, -1]], Callable(), 32.0, str(e["text"]))

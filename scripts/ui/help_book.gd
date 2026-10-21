@@ -1012,7 +1012,8 @@ func _fill_list() -> void:
 		sb.text = "%s  (%d)" % [str(s["title"]), (s["arts"] as Array).size()]
 		sb.icon = Tex.ui(str(s["icon"]))
 		sb.expand_icon = false
-		sb.add_theme_constant_override("icon_max_width", 20)
+		sb.add_theme_constant_override("icon_max_width", 22 if Tex.is_color(sb.icon) else 20)
+		UITheme.icon_colors(sb)
 		sb.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		sb.focus_mode = Control.FOCUS_NONE
 		sb.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS

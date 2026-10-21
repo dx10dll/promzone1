@@ -796,6 +796,8 @@ func _ready() -> void:
 		gm.cam.zoom = Vector2(z, z)
 	if args.size() > 5:
 		gm.cam.position = Vector2(float(args[4]), float(args[5])) * World.T
+	if args.size() > 6 and args[6].begins_with("p138"):
+		_p138(gm, args[6])
 	if args.size() > 6 and args[6] == "planmode":
 		gm.hud.toggle_plan()
 		gm.tool.set_mode("object", "lathe_1a616")
@@ -1772,3 +1774,43 @@ static func shot132_people() -> Array:
 			"look": {"skin": 2, "hair": "receding", "hair_col": "#9a9a94", "beard": "full", "glasses": false, "body": "fat", "h": 0.94, "street": "jacket", "street_col": "#55504a", "eye_col": "#3a2a20",
 				"face_ovr": {"head": "round", "eyes": "heavy", "brows": "bushy", "nose": "wide", "mouth": "down", "freckles": false, "earrings": false}}},
 	]
+
+
+## 1.38: снимки новых значков владельца (p138log, p138zones, p138emo, p138ov, p138pause, p138letter).
+func _p138(gm: GameMain, what: String) -> void:
+	var sm := gm.sim
+	match what:
+		"p138log":
+			var evs := [["Пожар в раздевалке", "fire", 3], ["Забастовка", "strike", 3], ["Проверка пожнадзора", "inspect", 2], ["Травма у станка", "injury", 3],
+				["Кража металла", "thief", 2], ["Иск в суде", "court", 2], ["Письмо из главка", "letter", 0], ["Статья в газете", "press", 1],
+				["Радиосообщение", "radio", 0], ["Звонок заказчика", "phone", 0], ["Праздник в цеху", "party", 1], ["Грамота", "medal", 1],
+				["Мороз −32 °C", "snow", 2], ["Жара в цеху", "heat", 2], ["Кот на складе", "cat", 1], ["Ребёнок на работе", "kid", 0],
+				["Падение заказов", "chart_down", 3], ["Свет отключили", "bolt_off", 3], ["Культпоход", "culture", 1], ["Идея рационализатора", "idea", 1]]
+			for e: Array in evs:
+				sm.story._archive(str(e[0]), "Пример записи для снимка значков 1.38.", str(e[1]), int(e[2]))
+			gm.hud.open_window("events:hist")
+			gm.hud.toast("Станок без электричества: проверьте кабель", Sim.LVL_WARN)
+		"p138letter":
+			sm.story._ev_rational()
+			gm.hud.show_letter(sm.story.letters[-1])
+		"p138pause":
+			gm.hud.show_pause_menu()
+		"p138zones":
+			gm.hud.open_rooms()
+		"p138ov":
+			gm.hud.set_overlay("nets")
+			gm.hud.toggle_sub("power")
+		"p138emo":
+			var kinds := ["argue", "chat", "fight", "laugh", "idea", "wc", "food", "rest", "cold", "hot", "talk", "mood"]
+			var keep := func() -> void:
+				var i := 0
+				for wk: Worker in sm.workers:
+					wk.bubble = str(kinds[i % kinds.size()])
+					if i % 4 == 3:
+						wk.bubble = ""
+						wk.needs["bladder"] = 5.0
+						wk.needs["food"] = 8.0
+						wk.needs["rest"] = 6.0
+					i += 1
+			keep.call()
+			get_tree().process_frame.connect(keep)

@@ -239,7 +239,7 @@ func _draw_over() -> void:
 			over.draw_style_box(sb, Rect2(Vector2(bx, top - 10.0), Vector2(bw, 12.0)))
 			var ic := Tex.ui_world("supply") if wait else Tex.item("equip_crate")
 			if ic:
-				over.draw_texture_rect(ic, Rect2(Vector2(bx + 2.0, top - 9.0), Vector2(10, 10)), false, Color(0.85, 0.9, 1.0, 0.9))
+				over.draw_texture_rect(ic, Rect2(Vector2(bx + 2.0, top - 9.0), Vector2(10, 10)), false, Tex.tint(ic, Color(0.85, 0.9, 1.0, 0.9)))
 			if txt != "":
 				over.draw_string(f, Vector2(bx + 13.0, top - 1.0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.88, 0.9, 0.95, 0.9))
 		if thing.progress > 0.0:

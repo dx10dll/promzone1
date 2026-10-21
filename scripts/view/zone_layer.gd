@@ -101,7 +101,9 @@ func _title(rect: Rect2i, type: String, title: String, col: Color, f: Font, vali
 	var tex := Tex.ui_world("zone_" + type)
 	if tex:
 		var isz := size * icon_k
-		draw_texture_rect(tex, Rect2(Vector2(x, y - size * 0.36 - isz * 0.5), Vector2(isz, isz)), false, tc)
+		# 1.38: цветной значок владельца — без перекраски, только приглушён прозрачностью
+		var ic := Color(1, 1, 1, 0.5 if valid else 0.32) if Tex.is_color(tex) else tc
+		draw_texture_rect(tex, Rect2(Vector2(x, y - size * 0.36 - isz * 0.5), Vector2(isz, isz)), false, ic)
 	x += size * (icon_k + 0.3)
 	# буквы рисуем в экранном кегле и уменьшаем обратно — при приближении надпись остаётся чёткой
 	var z := maxf(0.25, _zoom)

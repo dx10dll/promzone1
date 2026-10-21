@@ -254,8 +254,20 @@ static func icon_button(icon: String, text: String, cb: Callable, tip: String = 
 	var b := button(text, cb, tip)
 	b.icon = Tex.ui(icon)
 	b.expand_icon = false
-	b.add_theme_constant_override("icon_max_width", 22)
+	b.add_theme_constant_override("icon_max_width", 26 if Tex.is_color(b.icon) else 22)
+	icon_colors(b)
 	return b
+
+
+## 1.38: у кнопки цветной значок владельца — не перекрашивать (как micon_colors).
+static func icon_colors(b: Button) -> void:
+	if Tex.is_color(b.icon):
+		micon_colors(b)
+
+
+## 1.38: значок-картинка с цветом: цветной PNG — белым (только прозрачность), векторный — цветом.
+static func tint_icon(r: CanvasItem, t: Texture2D, col: Color) -> void:
+	r.modulate = Tex.tint(t, col)
 
 
 static func hbox(sep: int = 8) -> HBoxContainer:

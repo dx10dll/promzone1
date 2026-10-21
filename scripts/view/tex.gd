@@ -119,7 +119,12 @@ static func _vec_icon(name: String, world: bool) -> Texture2D:
 	var ck := ("w:" if world else "u:") + name
 	if _ui_vec.has(ck):
 		return _ui_vec[ck]
-	var t: Texture2D = VecIcon.make("ui", name, world)
+	# 1.38: цветной значок владельца (assets/ui/icons/<name>.png) важнее прежнего векторного
+	var t: Texture2D = png(str(PNG_ALIAS.get(name, name)), 48)
+	if t != null:
+		_ui_vec[ck] = t
+		return t
+	t = VecIcon.make("ui", name, world)
 	if t == null:
 		t = get_tex("res://assets/ui/%s.svg" % name)
 	_ui_vec[ck] = t
@@ -131,9 +136,57 @@ static func emo(name: String) -> Texture2D:
 	var ck := "e:" + name
 	if _ui_vec.has(ck):
 		return _ui_vec[ck]
-	var t: Texture2D = VecIcon.make("emo", name, true)
+	var t: Texture2D = png("emo_" + name, 32)
+	if t == null:
+		t = VecIcon.make("emo", name, true)
 	_ui_vec[ck] = t
 	return t
+
+
+## 1.38: цветные значки владельца из assets/ui/icons (PNG 128×128 с прозрачными полями ~12%).
+## Логический размер — как у прежнего векторного значка (sz), пиксели — полные 128 с мип-картами:
+## места, где значок рисуется «в родном размере», не раздуваются, а при приближении он чёткий.
+## Такие текстуры помечены мета-флагом COLOR_META — их не перекрашивают (см. is_color).
+const COLOR_META := &"pz_color_icon"
+## Зоны, которым нового значка не досталось, — значки меню владельца из набора 1.30.
+const PNG_ALIAS := {"zone_accounting": "accounting", "zone_union_office": "union"}
+static var _png: Dictionary = {}
+
+
+static func png(id: String, sz: int = 48) -> Texture2D:
+	var ck := "%s@%d" % [id, sz]
+	if _png.has(ck):
+		return _png[ck]
+	var path := "res://assets/ui/icons/%s.png" % id
+	var t: Texture2D = null
+	if ResourceLoader.exists(path):
+		var src: Texture2D = load(path)
+		var img: Image = src.get_image() if src else null
+		if img != null:
+			if img.is_compressed():
+				img.decompress()
+			if not img.has_mipmaps():
+				img.generate_mipmaps()
+			var it := ImageTexture.create_from_image(img)
+			it.set_size_override(Vector2i(sz, sz))
+			it.set_meta(COLOR_META, true)
+			t = it
+		elif src != null:
+			# без видеокарты (headless) картинку не достать — отдаём импортированную как есть
+			src.set_meta(COLOR_META, true)
+			t = src
+	_png[ck] = t
+	return t
+
+
+## Цветной значок владельца — рисовать белым (без перекраски), меняя только прозрачность.
+static func is_color(t: Texture2D) -> bool:
+	return t != null and t.has_meta(COLOR_META)
+
+
+## Цвет модуляции для значка: цветной — белый с той же прозрачностью, векторный — как просили.
+static func tint(t: Texture2D, col: Color) -> Color:
+	return Color(1, 1, 1, col.a) if is_color(t) else col
 
 
 static func fx(name: String) -> Texture2D:

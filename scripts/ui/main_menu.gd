@@ -3,8 +3,8 @@ extends Node2D
 ## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
 ## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.37"
-const WHATS_NEW := ["Портреты v5: свои детали для каждого телосложения", "Снова можно выбрать форму лица", "Новые иконки меню снова в игре"]
+const VERSION_TEXT := "Версия 1.38"
+const WHATS_NEW := ["102 новые иконки: зоны, события, слои, меню", "Портреты v5: свои детали для каждого телосложения", "Снова можно выбрать форму лица"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -227,7 +227,23 @@ func _build_ui() -> void:
 	top.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	top.custom_minimum_size = Vector2(0, 60)
 	col.add_child(top)
-	col.add_child(Logo.new())
+	# 1.38: эмблема владельца слева от надписи «ПРОМЗОНА»
+	var lrow := UITheme.hbox(14)
+	lrow.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	var emb_t := Tex.ui("logo_promzona")
+	if Tex.is_color(emb_t):
+		var emb := TextureRect.new()
+		emb.texture = emb_t
+		emb.custom_minimum_size = Vector2(84, 84)
+		emb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		emb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		emb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		emb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lrow.add_child(emb)
+	var logo := Logo.new()
+	logo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	lrow.add_child(logo)
+	col.add_child(lrow)
 	var g1 := Control.new()
 	g1.custom_minimum_size = Vector2(0, 12)
 	col.add_child(g1)
@@ -328,6 +344,7 @@ func _big(text: String, cb: Callable, sub_text: String = "", icon: String = "") 
 	b.title = text
 	b.hint = sub_text
 	b.icon_tex = Tex.ui(icon) if icon != "" else null
+	b.icon_raw = Tex.is_color(b.icon_tex)   # 1.38: цветные значки владельца — без перекраски
 	b.pressed.connect(cb)
 	menu_box.add_child(b)
 	return b
@@ -342,7 +359,7 @@ func _fill_menu() -> void:
 			"%s%s · %s" % [(str(s["company"]) + " · ") if s.has("company") else "", Defs.money_str(float(s.get("money", 0))), Game.pc_time(str(s.get("saved_at", "")))], "play1")
 		b.primary = true
 	_big("Новая игра", _show_new_game, "Профиль, сценарий, сложность", "factory")
-	var lb := _big("Загрузить", _show_load, "", "log")
+	var lb := _big("Загрузить", _show_load, "", "load")
 	lb.disabled = saves.is_empty()
 	var cw := CustomWorkers.load_data()
 	var n_cw := (cw["workers"] as Array).filter(func(e: Dictionary) -> bool: return bool(e.get("enabled", true))).size()
@@ -350,8 +367,8 @@ func _fill_menu() -> void:
 	cb.icon_tex = UITheme.micon("people")
 	cb.icon_raw = true
 	_big("Достижения", _show_achievements, "", "medal")
-	_big("Настройки", _show_settings, "", "control")
-	_big("Выход", func() -> void: get_tree().quit(), "", "cancel")
+	_big("Настройки", _show_settings, "", "settings")
+	_big("Выход", func() -> void: get_tree().quit(), "", "exit")
 
 
 ## Полупрозрачная панель слева с мягким краем и тонкой янтарной линией.
@@ -592,7 +609,8 @@ func _fill_new_game() -> void:
 		b2.custom_minimum_size = Vector2(320, 62)
 		b2.icon = Tex.ui("scn_" + key2)
 		b2.expand_icon = false
-		b2.add_theme_constant_override("icon_max_width", 36)
+		b2.add_theme_constant_override("icon_max_width", 44 if Tex.is_color(b2.icon) else 36)
+		UITheme.icon_colors(b2)   # 1.38: картинки сценариев владельца — без перекраски
 		b2.text = "%s\n%s" % [str(sd["name"]), str(sd.get("tag", ""))]
 		b2.add_theme_font_size_override("font_size", 15)
 		b2.pressed.connect(func() -> void:

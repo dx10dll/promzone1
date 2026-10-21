@@ -1,0 +1,1022 @@
+[
+  {
+    "id": "zone_workshop",
+    "file": "png_128/zone_workshop.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Цех",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "d50a6a87b7159905c950cf67a69928ac87ece8b3dccf2356966bb6f2648545b3"
+  },
+  {
+    "id": "zone_storage",
+    "file": "png_128/zone_storage.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Склад",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "d6a848d447f46861124361203ef534df5028c42c24c8f4a22facbae062a5b143"
+  },
+  {
+    "id": "zone_unload",
+    "file": "png_128/zone_unload.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Разгрузка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "4e32ff2f92230bcec5576d9ea9a2ec7b9140dbb3fef56bf14ca1b669c5d10354"
+  },
+  {
+    "id": "zone_ship",
+    "file": "png_128/zone_ship.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Отгрузка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "a89ef0acd6809259e125c69120be5f3a238bd802ca73ec636d7ac35eb636bf0b"
+  },
+  {
+    "id": "zone_office",
+    "file": "png_128/zone_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Общий кабинет",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "751ce783076a28a20e7234eb054cc876d0e581502a4b6a5e10c333cc52a39041"
+  },
+  {
+    "id": "zone_director_office",
+    "file": "png_128/zone_director_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Кабинет директора",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "fe0f0409458846259a49d3e13ffaa9d33769dc65bc006b42ca6191252a0b1a95"
+  },
+  {
+    "id": "zone_chief_office",
+    "file": "png_128/zone_chief_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Главный инженер",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "513194d30da77fbcb310d17ff677b1562835dbabf63a45e69bf70bb387152952"
+  },
+  {
+    "id": "zone_hr_office",
+    "file": "png_128/zone_hr_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Отдел кадров",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "dbd365c24b36fa902d8a074c6aecaf619d7a9063e3b194ec46c36ed64076f0ec"
+  },
+  {
+    "id": "zone_foreman_office",
+    "file": "png_128/zone_foreman_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Кабинет мастера",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "e4fe97ac6956e149d2e1ef59f4e7c23046b64308d9f968b122c4cbb056b5bf17"
+  },
+  {
+    "id": "zone_supply_office",
+    "file": "png_128/zone_supply_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Снабжение",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "70152e243eba314c361bc92117e32ce2dbda3567e469de662dcde199faa8b592"
+  },
+  {
+    "id": "zone_sales_office",
+    "file": "png_128/zone_sales_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Сбыт",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "23d340acda5a20dc396cbd8262bffe0146ba1bac64385e99a52576f8321424fe"
+  },
+  {
+    "id": "zone_safety_office",
+    "file": "png_128/zone_safety_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Охрана труда",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "4f8a2d66739cc56fefff775916910171bd8ca822feb41df39623d824e1cbf0d7"
+  },
+  {
+    "id": "zone_pdo",
+    "file": "png_128/zone_pdo.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "ПДО",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "839f4477202b7c76e811ba803cafa032656992bf3a431269b0328759dc58dbd2"
+  },
+  {
+    "id": "zone_tech_office",
+    "file": "png_128/zone_tech_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Технический отдел",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "e052919ba0610cca638e201695976389c475b690a77b95b68aab36786896a517"
+  },
+  {
+    "id": "zone_engineer_office",
+    "file": "png_128/zone_engineer_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Кабинет инженера",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "dcb5c04d4960121743a33faa14db8de39d9c7cec949bdbbf8a446f34b0b67e96"
+  },
+  {
+    "id": "zone_legal_office",
+    "file": "png_128/zone_legal_office.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Юридический отдел",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "727b628cf4f28d66b3c8fbf7609ad562a93f181f76a8d68df44df2bca679e5c7"
+  },
+  {
+    "id": "zone_canteen",
+    "file": "png_128/zone_canteen.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Столовая",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "31dce0b76589be80468ee580369aca3ce1a8358845a06fc5c0178cbc34bc1c04"
+  },
+  {
+    "id": "zone_locker",
+    "file": "png_128/zone_locker.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Раздевалка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "32dbfb1ffab42bad7f2d9f6664c59441b953e3dd738eb5cce7cf1705b5b1cb24"
+  },
+  {
+    "id": "zone_shower",
+    "file": "png_128/zone_shower.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Душевая",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "1e7bb25675436a8c86f7cab4a44c4eda7bf9c643606d1b942f2cc96c9e6cb26e"
+  },
+  {
+    "id": "zone_wc",
+    "file": "png_128/zone_wc.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Туалет",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "19632b47ef1f0b2efb0a324d5fcf6b623d38c66d7307b1173c75d3fa5f842fdb"
+  },
+  {
+    "id": "zone_restroom",
+    "file": "png_128/zone_restroom.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Комната отдыха",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "52d4bf273112ca97b36d0f475c3d71681c2fd9f81d5e80bf04f975b5393000e7"
+  },
+  {
+    "id": "zone_medbay",
+    "file": "png_128/zone_medbay.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Медпункт",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "71a98865afff3699cc9e8bc3757b1109d763b3990cdbe5a8bb98bf8c7fd92bbb"
+  },
+  {
+    "id": "zone_classroom",
+    "file": "png_128/zone_classroom.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Учебный класс",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "79464ad71cf7c14637b3203ac4ad0268ab9af3cecd277432f71a02ca58294df9"
+  },
+  {
+    "id": "zone_dorm",
+    "file": "png_128/zone_dorm.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Общежитие",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "cec8a8571482afa5857ac83dfcc2a879e8b5585848eb7f1ac159c64d926e7ea6"
+  },
+  {
+    "id": "zone_boiler_room",
+    "file": "png_128/zone_boiler_room.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Котельная",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "d8cbf77076f461b49a8027d63f78116d147d5be7ee6f8b23c32d63ae9521cd5e"
+  },
+  {
+    "id": "zone_compressor_room",
+    "file": "png_128/zone_compressor_room.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Компрессорная",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "a4510a409b7ff8dcf5bca82ba14b0940083bad14e5fe47a2c0c5ca1526a4231b"
+  },
+  {
+    "id": "zone_tech_room",
+    "file": "png_128/zone_tech_room.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Электрощитовая",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "e6f416bdcda1f563af909a53522d180d017cf25efa3ac28adb91ae888f65e395"
+  },
+  {
+    "id": "zone_toolroom",
+    "file": "png_128/zone_toolroom.png",
+    "section": "Меню «Зоны» и обозначения на полу комнат",
+    "purpose": "Инструментальная",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "81193a889f126d1c63a698013902a0fc83a5b5af36cecf4ca326aa9050a70afc"
+  },
+  {
+    "id": "cable",
+    "file": "png_128/cable.png",
+    "section": "Инструменты строительства",
+    "purpose": "Прокладка кабеля",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "45f9ad6452e762557fcd292fcfc481da9660bf1ac95fdb40172a36f364afceb8"
+  },
+  {
+    "id": "uncable",
+    "file": "png_128/uncable.png",
+    "section": "Инструменты строительства",
+    "purpose": "Удаление кабеля",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "122fcac9bf2246a1d9ff71085680c9a5b33cd6cbb7ad756bf79b8feb4f7801c1"
+  },
+  {
+    "id": "template",
+    "file": "png_128/template.png",
+    "section": "Инструменты строительства",
+    "purpose": "Шаблон строительства",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "3e4cf3f09f2eacae3602906f700d543f6804e7f727a887620d54ca06a2682ca8"
+  },
+  {
+    "id": "cancel",
+    "file": "png_128/cancel.png",
+    "section": "Инструменты строительства",
+    "purpose": "Отмена",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "6a9bb0f19a73da1c314e9b6a908eb60fb6a356186d10724818a33a01fda6a758"
+  },
+  {
+    "id": "ov_water",
+    "file": "png_128/ov_water.png",
+    "section": "Слои обзора",
+    "purpose": "Слой воды",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "45111bdbfcbe09160aa01c2aa834d210902b91e0c8dd2424d45afc66e524a5f2"
+  },
+  {
+    "id": "ov_air",
+    "file": "png_128/ov_air.png",
+    "section": "Слои обзора",
+    "purpose": "Слой сжатого воздуха",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "b64f13cf4de7baa1c783ff21f1b37dca3bef2f2f0a6b9c0d6326b4a5709035ae"
+  },
+  {
+    "id": "ov_vent",
+    "file": "png_128/ov_vent.png",
+    "section": "Слои обзора",
+    "purpose": "Слой вентиляции",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "37c1a111b352174eae9db5ab308a5b880cb2c2aa89ff6bc7b132c21d706f2a93"
+  },
+  {
+    "id": "ov_noise",
+    "file": "png_128/ov_noise.png",
+    "section": "Слои обзора",
+    "purpose": "Слой шума",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "81578d48ef87ffe23181dafa57b3936ee3bf4dace63dc56de1a7debbe233edae"
+  },
+  {
+    "id": "ov_off",
+    "file": "png_128/ov_off.png",
+    "section": "Слои обзора",
+    "purpose": "Выключить слой обзора",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "11972089f5398fc5482e3061fad9020093255e39965beb44d43518c505b8c8a1"
+  },
+  {
+    "id": "fire",
+    "file": "png_128/fire.png",
+    "section": "События и сообщения",
+    "purpose": "Пожар",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "685966a78f6200a6fa92ea03e31aa5f5c4fe323699060b8ae5458ad22d118837"
+  },
+  {
+    "id": "strike",
+    "file": "png_128/strike.png",
+    "section": "События и сообщения",
+    "purpose": "Забастовка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "ac46c31cea2fbf7dcee42d0fd46823d06c6fd18bd1b74691af29e053a5fccb15"
+  },
+  {
+    "id": "inspect",
+    "file": "png_128/inspect.png",
+    "section": "События и сообщения",
+    "purpose": "Проверка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "8ca8074bbe2d0fb4ce9a1ae6dd697fd6be62fe12c5c146a0de337472c0825660"
+  },
+  {
+    "id": "injury",
+    "file": "png_128/injury.png",
+    "section": "События и сообщения",
+    "purpose": "Травма",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "629ed9a7dffcdad9a7fcc1ac8ec4956643e3f01aded7426d21d1d0ee34d7a437"
+  },
+  {
+    "id": "thief",
+    "file": "png_128/thief.png",
+    "section": "События и сообщения",
+    "purpose": "Кража",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "30852eaf549d88a2b5328b61be8e5d6f6c069dae87d88def9b2eace5cdc9013e"
+  },
+  {
+    "id": "court",
+    "file": "png_128/court.png",
+    "section": "События и сообщения",
+    "purpose": "Суд",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "b072d410d3f6ba054028dd6c34e8a868827c61c4bd62fc29cf97a6e02ea9a3e2"
+  },
+  {
+    "id": "letter",
+    "file": "png_128/letter.png",
+    "section": "События и сообщения",
+    "purpose": "Письмо",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "6a3d449da2f08de64817173ed99d060328bfa4ab69175854ef42a96692bf73ff"
+  },
+  {
+    "id": "press",
+    "file": "png_128/press.png",
+    "section": "События и сообщения",
+    "purpose": "Пресса",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "0967404b13e2820eda0b84a002b3f1a788cdfe21be969b0d88e9177f4a753b43"
+  },
+  {
+    "id": "radio",
+    "file": "png_128/radio.png",
+    "section": "События и сообщения",
+    "purpose": "Радиосообщение",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "3c5df25eb4bf627b15a859699e4628e16381d5078288a11d219a9efcb8dd3b84"
+  },
+  {
+    "id": "phone",
+    "file": "png_128/phone.png",
+    "section": "События и сообщения",
+    "purpose": "Телефонный звонок",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "08b6586c900c4a5700923df88bd56a1546c06fab859dfe0ca5f29c094b156531"
+  },
+  {
+    "id": "party",
+    "file": "png_128/party.png",
+    "section": "События и сообщения",
+    "purpose": "Праздник",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "d40b015de9f208c7b0d7f97662dd75288b42edb97a482a5f90bfa69953d3c9dc"
+  },
+  {
+    "id": "medal",
+    "file": "png_128/medal.png",
+    "section": "События и сообщения",
+    "purpose": "Награда",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "1902b1d9c394234241f0abffbf7ff03b158aa63523cf2b28db0ed98c24256cb7"
+  },
+  {
+    "id": "medal_off",
+    "file": "png_128/medal_off.png",
+    "section": "События и сообщения",
+    "purpose": "Неактивная награда",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "38d6363264666b18eaaad63b3910f7f8a095707802bee1cff35593e0037da86c"
+  },
+  {
+    "id": "star",
+    "file": "png_128/star.png",
+    "section": "События и сообщения",
+    "purpose": "Звезда",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "bda77795feb8d3aefbb728c9fb368b22b0cd0a4641b00dfff9a86e388f645fb3"
+  },
+  {
+    "id": "chart_down",
+    "file": "png_128/chart_down.png",
+    "section": "События и сообщения",
+    "purpose": "Падение показателей",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "6c58d9db6538a175a6bc05988a5c3d47c0050caf30b12f56f94b987e402b551a"
+  },
+  {
+    "id": "snow",
+    "file": "png_128/snow.png",
+    "section": "События и сообщения",
+    "purpose": "Мороз",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "cc78695184305f8334fa87fd20be1af69c6b36b05a5ae971a887bbb04118a7c4"
+  },
+  {
+    "id": "heat",
+    "file": "png_128/heat.png",
+    "section": "События и сообщения",
+    "purpose": "Жара",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "6c3932c4f82ca2d2636c04bd2202206049afaa0a2c494d66223a014a0180f17e"
+  },
+  {
+    "id": "cat",
+    "file": "png_128/cat.png",
+    "section": "События и сообщения",
+    "purpose": "Кот",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "bdeb574babaa707762c8abd5556d5598108c636b1f5cd150e0c2e0aaa75c090a"
+  },
+  {
+    "id": "kid",
+    "file": "png_128/kid.png",
+    "section": "События и сообщения",
+    "purpose": "Ребёнок",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "b30af3bb7d51f79b6cd6f805c23d2a120fcb600548f48b4001ba75e7d712e6fa"
+  },
+  {
+    "id": "culture",
+    "file": "png_128/culture.png",
+    "section": "События и сообщения",
+    "purpose": "Культура",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "0fd9456383f13a21620ef41416ce0f5082e90b7dd364634b1c3c43cb0145696f"
+  },
+  {
+    "id": "shield",
+    "file": "png_128/shield.png",
+    "section": "События и сообщения",
+    "purpose": "Защита",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "b6e68054956e8ab96fac860cce01e352c98fb5f168e2be5d86f2de432c7ddb19"
+  },
+  {
+    "id": "lock",
+    "file": "png_128/lock.png",
+    "section": "События и сообщения",
+    "purpose": "Заблокировано",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "a257455bee86f130f79970ee68dbd527ad95c4e6f91862e44503e186ef858d42"
+  },
+  {
+    "id": "bolt_off",
+    "file": "png_128/bolt_off.png",
+    "section": "События и сообщения",
+    "purpose": "Нет электричества",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "e68e8c6df9e8784cf2628c954d8988d772ee40263f11b538f83393850ce4bb6b"
+  },
+  {
+    "id": "power_off",
+    "file": "png_128/power_off.png",
+    "section": "События и сообщения",
+    "purpose": "Остановка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "624d6028fef1cc08c5d724c7ae0bd85644772650b5c6d8f95a929b24d94a9f2b"
+  },
+  {
+    "id": "research",
+    "file": "png_128/research.png",
+    "section": "Окна и разделы",
+    "purpose": "Исследования",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "f04d7202380715fc883de1d87e4e20228ced450df92a3c7771b74d3be453d815"
+  },
+  {
+    "id": "develop",
+    "file": "png_128/develop.png",
+    "section": "Окна и разделы",
+    "purpose": "Разработка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "2d913d640be44692386dd17b903737d2e822fd7c6d3b5c8e9a0929dbd095ed2c"
+  },
+  {
+    "id": "idea",
+    "file": "png_128/idea.png",
+    "section": "Окна и разделы",
+    "purpose": "Идея",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "741adbc20072a14834de7329344f15dc392810a709bed711d40b5e101ef6b666"
+  },
+  {
+    "id": "supply",
+    "file": "png_128/supply.png",
+    "section": "Окна и разделы",
+    "purpose": "Поставки",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "311d8ac19470447cfccb9f6cc3a7c471033a703bc85ecd121d3875bac64ce707"
+  },
+  {
+    "id": "shop",
+    "file": "png_128/shop.png",
+    "section": "Окна и разделы",
+    "purpose": "Магазин",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "76d861404e6fbbdb1931406f018f4a91fdb073694ad9146f32fa376947d1dd2d"
+  },
+  {
+    "id": "land",
+    "file": "png_128/land.png",
+    "section": "Окна и разделы",
+    "purpose": "Земля",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "34bd28e7143051aa7ca898ef99e427a828cb2eba99e571dae05ce163ed37494e"
+  },
+  {
+    "id": "engineer",
+    "file": "png_128/engineer.png",
+    "section": "Окна и разделы",
+    "purpose": "Инженер",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "869b6dc65e5c12af87719ccd5c16a12441163a099418789fd0219fb7dd0828c9"
+  },
+  {
+    "id": "control",
+    "file": "png_128/control.png",
+    "section": "Окна и разделы",
+    "purpose": "Контроль качества",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "65852497cccc45b0cc17d0a863439289bf23d4411bad97f3a44ab54f4ce4d04e"
+  },
+  {
+    "id": "iso",
+    "file": "png_128/iso.png",
+    "section": "Окна и разделы",
+    "purpose": "Сертификация",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "c72bffc799f67cba70186c6fcefd55c5ba33f6d736b28f5fcfd99a9212be01c1"
+  },
+  {
+    "id": "paper",
+    "file": "png_128/paper.png",
+    "section": "Окна и разделы",
+    "purpose": "Документ",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "7a773db213e6daa8acf31c79993264d3a08b7e5e0f1fffad32f6ea7a43a441c2"
+  },
+  {
+    "id": "log",
+    "file": "png_128/log.png",
+    "section": "Окна и разделы",
+    "purpose": "Журнал",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "13b978e191a1cb4067d4ba4852e3d25ff3b6b4454ce495c8c8d654fee92fc033"
+  },
+  {
+    "id": "clock",
+    "file": "png_128/clock.png",
+    "section": "Окна и разделы",
+    "purpose": "Время",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "8280aeb56faac1ceadbfe35285a35d2dc584c2ad21124a5e5fae62493fc36ebd"
+  },
+  {
+    "id": "handshake",
+    "file": "png_128/handshake.png",
+    "section": "Окна и разделы",
+    "purpose": "Договорённости",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "d98614a12aa1a9f4586c68b5d94e6a894ae55e101b85ad394348233bf8f2e115"
+  },
+  {
+    "id": "wrench",
+    "file": "png_128/wrench.png",
+    "section": "Окна и разделы",
+    "purpose": "Обслуживание",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "a44019e05b83a6bea21880cb66cfc8caa28dfe83fd14a1a47e31f3954dca6c80"
+  },
+  {
+    "id": "med",
+    "file": "png_128/med.png",
+    "section": "Окна и разделы",
+    "purpose": "Медицина",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "4375d2b880c81ffb20227d808f481828d4735dd995b03a9f6e6a9246a09e29d8"
+  },
+  {
+    "id": "bed",
+    "file": "png_128/bed.png",
+    "section": "Окна и разделы",
+    "purpose": "Проживание",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "5f47e0c4bd66d296c7291869ca9fb48c31c010a51e3e747b90babc5bbfe4f079"
+  },
+  {
+    "id": "law",
+    "file": "png_128/law.png",
+    "section": "Окна и разделы",
+    "purpose": "Закон",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "7b38a754efe31b02be4826463fd12cdfab894dd83279cec2f341c7833c9d3cea"
+  },
+  {
+    "id": "emo_argue",
+    "file": "png_128/emo_argue.png",
+    "section": "Значки над людьми",
+    "purpose": "Спор",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "8ec51d560f6ded76801b10bd99a9917eee40010d79c982bb1a01ded708939546"
+  },
+  {
+    "id": "emo_chat",
+    "file": "png_128/emo_chat.png",
+    "section": "Значки над людьми",
+    "purpose": "Разговор",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "2032649100aa8565aaff766f92d5b6e30daaa95b8f23ee3e00ae89340c489792"
+  },
+  {
+    "id": "emo_fight",
+    "file": "png_128/emo_fight.png",
+    "section": "Значки над людьми",
+    "purpose": "Драка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "23ef802fe4bf3b10aa702ffe49ba098f22662318aff869a09c6ef65e17b824c7"
+  },
+  {
+    "id": "emo_food",
+    "file": "png_128/emo_food.png",
+    "section": "Значки над людьми",
+    "purpose": "Голод",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "8f387eafd35e410eb13bca79fad5f542504aa09ae5a2afffa6a88b3f1c719287"
+  },
+  {
+    "id": "emo_cold",
+    "file": "png_128/emo_cold.png",
+    "section": "Значки над людьми",
+    "purpose": "Холод",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "f58a527e4392cabcf7dd3f3af8ac69a3759075a85376ea8e258e1510b91f088f"
+  },
+  {
+    "id": "emo_hot",
+    "file": "png_128/emo_hot.png",
+    "section": "Значки над людьми",
+    "purpose": "Жарко",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "d40beeb40966f5107f0fb83d7096c13b97108dd670faf535e5e9640db62813a9"
+  },
+  {
+    "id": "emo_laugh",
+    "file": "png_128/emo_laugh.png",
+    "section": "Значки над людьми",
+    "purpose": "Смех",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "9b55246269eaaf0be7857a8b3be9bf33cd8a39f70e73ada55a0f8c0930deeb52"
+  },
+  {
+    "id": "emo_rest",
+    "file": "png_128/emo_rest.png",
+    "section": "Значки над людьми",
+    "purpose": "Сон и отдых",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "0b5604b672a5974d458cdb07a5d06342e50480eae07a3a717e9ae4f0b7452ee7"
+  },
+  {
+    "id": "emo_wc",
+    "file": "png_128/emo_wc.png",
+    "section": "Значки над людьми",
+    "purpose": "Нужен туалет",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "90ec9740497998a1086f9d5dcbc5073af77fa5f39826211657dd31eeff5ef120"
+  },
+  {
+    "id": "emo_idea",
+    "file": "png_128/emo_idea.png",
+    "section": "Значки над людьми",
+    "purpose": "Идея над персонажем",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "a6c621d282d927113351cc17ae53bfd6b86e67b202cc8dead2789b6b41e356f0"
+  },
+  {
+    "id": "scn_garage",
+    "file": "png_128/scn_garage.png",
+    "section": "Меню «Новая игра»",
+    "purpose": "Сценарий гаража",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "4948422f321f462124d06fc65f010ef50e50a49e79ed6f9578b5d03344b9a4c1"
+  },
+  {
+    "id": "scn_field",
+    "file": "png_128/scn_field.png",
+    "section": "Меню «Новая игра»",
+    "purpose": "Сценарий чистого поля",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "b655cde4d12a28544dd05627ceffc89a58aede83888ae17b514bb2977be88cbb"
+  },
+  {
+    "id": "scn_mono",
+    "file": "png_128/scn_mono.png",
+    "section": "Меню «Новая игра»",
+    "purpose": "Моногород",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "fb2a5975d096619a2568b33857b44537a01d02c07319fad84266b7c212c9e477"
+  },
+  {
+    "id": "scn_ussr",
+    "file": "png_128/scn_ussr.png",
+    "section": "Меню «Новая игра»",
+    "purpose": "Советский завод",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "7893833130e8dd97f1082d77c3506ddc801d0ee353fb842fcf06be01b1d19dc8"
+  },
+  {
+    "id": "scn_sandbox",
+    "file": "png_128/scn_sandbox.png",
+    "section": "Меню «Новая игра»",
+    "purpose": "Песочница",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "349d751032f18a6d46456968d6a69e3121b53de56a83f7138520aa7787b3b2d7"
+  },
+  {
+    "id": "logo_promzona",
+    "file": "png_128/logo_promzona.png",
+    "section": "Главное меню, пауза и общие обозначения",
+    "purpose": "Эмблема Промзоны",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "9c2f5f563f311de0c310d4da05f1767acd39989b20d80a6d5980702cec611535"
+  },
+  {
+    "id": "save",
+    "file": "png_128/save.png",
+    "section": "Главное меню, пауза и общие обозначения",
+    "purpose": "Сохранить игру",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "3545d07e23ec6334beecbfabc51b1e4a21fb6229c04cfd43c6e92193938386da"
+  },
+  {
+    "id": "load",
+    "file": "png_128/load.png",
+    "section": "Главное меню, пауза и общие обозначения",
+    "purpose": "Загрузить игру",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "0167ed4c2d6ed78d13b42a10d64e018a3f3efc997c73e4b6d3abd0eca477727f"
+  },
+  {
+    "id": "settings",
+    "file": "png_128/settings.png",
+    "section": "Главное меню, пауза и общие обозначения",
+    "purpose": "Настройки",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "07df9208b2473c13414107e0b4b0822c13bbaf2335cc55b73ff8a5eba88e508f"
+  },
+  {
+    "id": "exit",
+    "file": "png_128/exit.png",
+    "section": "Главное меню, пауза и общие обозначения",
+    "purpose": "Выход",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "3053b2d32efc00999a666b7330e2ad88230e5802b9417a48d2391d749304b878"
+  },
+  {
+    "id": "hire",
+    "file": "png_128/hire.png",
+    "section": "Управление сотрудниками",
+    "purpose": "Нанять сотрудника",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "e2e54240ae123d0e14917ba3d75cea26024641affb04b01b0809d7db7cb5a99d"
+  },
+  {
+    "id": "fire_worker",
+    "file": "png_128/fire_worker.png",
+    "section": "Управление сотрудниками",
+    "purpose": "Уволить сотрудника",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "80e4041be3e16e530242bc45518eb3ba3ef6f4c3957a118ab86b2563c9992f55"
+  },
+  {
+    "id": "warn",
+    "file": "png_128/warn.png",
+    "section": "Главное меню, пауза и общие обозначения",
+    "purpose": "Предупреждение",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "6d8b63cefeb40742aca3a16e2dc2bb5b6ff131ed0499dcb8bdaae803a6a7158a"
+  },
+  {
+    "id": "music",
+    "file": "png_128/music.png",
+    "section": "Главное меню, пауза и общие обозначения",
+    "purpose": "Музыка",
+    "width": 128,
+    "height": 128,
+    "alpha": true,
+    "sha256": "0f62ad95a32291a33292f5e1343771f16ab69ba5e54a1ddc74be4ca9ceb133dd"
+  }
+]

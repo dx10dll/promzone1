@@ -33,7 +33,19 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable()) -> void:
 		v.add_child(cb)
 	v.add_child(_choice("Игровой час", [[1.5, "медленно (45 с)"], [1.0, "обычно (30 с)"], [0.66, "быстро (20 с)"], [0.4, "очень быстро (12 с)"]], "hour_len",
 		"Сколько реальных секунд длится игровой час на обычной скорости"))
-	v.add_child(UITheme.label("Звук", 16, UITheme.TEXT, UITheme.f_semi))
+	# 1.38: заголовок «Звук» — со значком владельца «музыка»
+	var sh := UITheme.hbox(8)
+	var mt := Tex.ui("music")
+	if Tex.is_color(mt):
+		var mi := TextureRect.new()
+		mi.texture = mt
+		mi.custom_minimum_size = Vector2(26, 26)
+		mi.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		mi.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		mi.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		sh.add_child(mi)
+	sh.add_child(UITheme.label("Звук", 16, UITheme.TEXT, UITheme.f_semi))
+	v.add_child(sh)
 	for vo in VOLUMES:
 		var key2 := str(vo[0])
 		var h := UITheme.hbox(10)

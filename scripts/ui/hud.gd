@@ -1123,6 +1123,18 @@ func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2
 	dot.custom_minimum_size = Vector2(8, 8)
 	dot.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if level >= Sim.LVL_WARN:
+		# 1.38: предупреждение — значок владельца «!» слева
+		var wt := Tex.ui("warn")
+		if Tex.is_color(wt):
+			var wi := TextureRect.new()
+			wi.texture = wt
+			wi.custom_minimum_size = Vector2(24, 24)
+			wi.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			wi.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			wi.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+			wi.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			th.add_child(wi)
 	var l := UITheme.label(text, 13)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size = Vector2(360, 0)
@@ -1261,10 +1273,10 @@ func show_letter(l: Dictionary) -> void:
 	ic.texture = Tex.ui(str(l.get("icon", "letter")))
 	if ic.texture == null:
 		ic.texture = Tex.ui("letter")
-	ic.custom_minimum_size = Vector2(32, 32)
+	ic.custom_minimum_size = Vector2(38, 38) if Tex.is_color(ic.texture) else Vector2(32, 32)
 	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	ic.modulate = col.lightened(0.25)
+	UITheme.tint_icon(ic, ic.texture, col.lightened(0.25))
 	icp.add_child(ic)
 	icp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(icp)
@@ -1414,10 +1426,17 @@ func show_drawing(o: Dictionary) -> void:
 	v.add_child(UITheme.label("Размеры у каждого заказа свои. Чертёж — для интереса: по нему ничего настраивать не нужно.", 12, UITheme.MUTED))
 
 
-func _menu_button(v: Control, text: String, cb: Callable) -> Button:
+func _menu_button(v: Control, text: String, cb: Callable, icon: String = "") -> Button:
 	var b := UITheme.button(text, cb)
 	b.custom_minimum_size = Vector2(0, 40)
 	b.add_theme_font_size_override("font_size", 16)
+	if icon != "":
+		# 1.38: значок владельца слева от надписи (save, load, settings, exit…)
+		b.icon = Tex.ui(icon)
+		b.expand_icon = false
+		b.add_theme_constant_override("icon_max_width", 28)
+		b.add_theme_constant_override("h_separation", 10)
+		UITheme.icon_colors(b)
 	v.add_child(b)
 	return b
 
@@ -1436,9 +1455,9 @@ func show_pause_menu() -> void:
 	cont.add_theme_color_override("font_color", UITheme.ACCENT_T)
 	cont.add_theme_color_override("font_hover_color", UITheme.ACCENT_T)
 	cont.add_theme_font_override("font", UITheme.f_semi)
-	_menu_button(v, "Сохранить игру", show_save_dialog)
-	_menu_button(v, "Загрузить игру", show_load_dialog)
-	_menu_button(v, "Настройки", show_settings)
+	_menu_button(v, "Сохранить игру", show_save_dialog, "save")
+	_menu_button(v, "Загрузить игру", show_load_dialog, "load")
+	_menu_button(v, "Настройки", show_settings, "settings")
 	_menu_button(v, "Справочник (F1)", func() -> void: show_help(false, "", true))
 	v.add_child(HSeparator.new())
 	_menu_button(v, "Выйти в главное меню", func() -> void:
@@ -1446,7 +1465,7 @@ func show_pause_menu() -> void:
 		Game.to_menu())
 	var q := _menu_button(v, "Выйти из игры", func() -> void:
 		Game.autosave(sim)
-		get_tree().quit())
+		get_tree().quit(), "exit")
 	q.add_theme_color_override("font_color", UITheme.BAD)
 	q.add_theme_color_override("font_hover_color", UITheme.BAD.lightened(0.2))
 	var note := UITheme.label("При выходе игра сохраняется автоматически.", 12, UITheme.DIM)
@@ -1724,7 +1743,7 @@ func show_game_over() -> void:
 	var days := sim.day() + 1
 	v.add_child(UITheme.para("%s проработал %d %s (до %s). Выполнено заказов: %d, репутация %d." % [Company.title(sim), days, Defs.plural(days, "день", "дня", "дней"), str(c.get("date", sim.date_str())), int(sim.stats.get("orders_done", 0)), int(sim.reputation)], 13, UITheme.MUTED))
 	v.add_child(UITheme.para("Чтобы такого не было: платите зарплату вовремя (в долг — не чаще раза в 3 месяца), не набирайте заказов больше, чем успеваете, и держите запас денег на две зарплаты.", 13, UITheme.WARN))
-	_menu_button(v, "Загрузить сохранение", show_load_dialog)
+	_menu_button(v, "Загрузить сохранение", show_load_dialog, "load")
 	_menu_button(v, "Начать заново", func() -> void: Game.start_new_game())
 	_menu_button(v, "В главное меню", func() -> void: Game.to_menu())
 

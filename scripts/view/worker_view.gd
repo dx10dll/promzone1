@@ -936,7 +936,7 @@ func _chip(c: Vector2, kinds: Array, urgs: Array) -> void:
 			bubble.draw_line(gc + Vector2(-2.2, CHIP_H * 0.5 - 1.3), gc + Vector2(2.2, CHIP_H * 0.5 - 1.3), Color(col, 0.55 + 0.35 * sin(_t * 6.0)), 0.9, true)
 		var gt := Tex.emo(kind)
 		if gt:
-			var gs := 11.0 * k
+			var gs := 11.0 * k * (1.25 if Tex.is_color(gt) else 1.0)   # 1.38: у PNG владельца поля ~12%
 			bubble.draw_texture_rect(gt, Rect2(gc - Vector2(gs, gs) * 0.5, Vector2(gs, gs)), false)
 		else:
 			_glyph(gc, kind, k, col, CHIP_BG)

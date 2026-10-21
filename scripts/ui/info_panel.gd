@@ -126,7 +126,17 @@ func _act(text: String, cb: Callable, tip: String = "", icon: String = "", col: 
 	if col != UITheme.TEXT:
 		b.add_theme_color_override("font_color", col)
 		b.add_theme_color_override("icon_normal_color", col)
+	_color_icon(b)
 	return b
+
+
+## 1.38: цветной значок владельца на кнопке — без перекраски и чуть крупнее (у PNG поля ~12%).
+static func _color_icon(b: Button) -> void:
+	if Tex.is_color(b.icon):
+		UITheme.micon_colors(b)
+		b.expand_icon = false
+		b.add_theme_constant_override("icon_max_width", 20)
+		b.add_theme_constant_override("h_separation", 5)
 
 
 ## Цветная плашка состояния в заголовке («Работает», «Сломан»…).
@@ -241,6 +251,7 @@ func show_worker(s: Sim, w: Worker) -> void:
 				"Человек бросит своё и будет ждать ваших команд: щёлкните по стройке, станку, грузу или месту — и выберите «Сделать сейчас»")
 		cb.icon = Tex.ui("control")
 		cb.add_theme_constant_override("icon_max_width", 20)
+		UITheme.icon_colors(cb)
 		cb.custom_minimum_size = Vector2(0, 34)
 		col.add_child(cb)
 		dyn["order_hint"] = cb
@@ -306,7 +317,7 @@ func show_worker(s: Sim, w: Worker) -> void:
 		ex.disabled = why != ""
 		actions.add_child(ex)
 	actions.add_child(_act("Показать", func() -> void: focus_request.emit(w.cell()), "Перевести камеру на человека", "inspect"))
-	actions.add_child(_act("Уволить", func() -> void: _confirm_fire(w), "Уволить с выплатой расчёта", "", UITheme.BAD))
+	actions.add_child(_act("Уволить", func() -> void: _confirm_fire(w), "Уволить с выплатой расчёта", "fire_worker", UITheme.BAD))
 	_worker_tab()
 	visible = true
 	refresh()
@@ -746,6 +757,7 @@ func show_thing(s: Sim, t: Thing) -> void:
 		var upd := func() -> void:
 			tg.text = "Выключить" if t.enabled else "Включить"
 			tg.icon = Tex.ui("power_off" if t.enabled else "power")
+			_color_icon(tg)
 		var on_toggle := func() -> void:
 			t.enabled = not t.enabled
 			sim.thing_rev += 1

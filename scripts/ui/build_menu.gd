@@ -97,6 +97,10 @@ static func _cat(cats: Control, tex: Texture2D, text: String, on: bool, cb: Call
 	b.add_theme_color_override("font_hover_pressed_color", UITheme.TEXT)
 	b.add_theme_color_override("icon_normal_color", Color("#c9c5ba"))
 	b.add_theme_color_override("icon_pressed_color", UITheme.ACCENT)
+	if Tex.is_color(tex):
+		# 1.38: цветной значок владельца — без перекраски и чуть крупнее (у PNG прозрачные поля)
+		UITheme.micon_colors(b)
+		b.add_theme_constant_override("icon_max_width", 18)
 	b.pressed.connect(cb)
 	cats.add_child(b)
 
@@ -134,11 +138,11 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 		v.add_child(sw)
 	var r := TextureRect.new()
 	r.texture = tex
-	r.custom_minimum_size = Vector2(0, 28)
+	r.custom_minimum_size = Vector2(0, 32 if Tex.is_color(tex) else 28)   # 1.38: PNG владельца с полями — крупнее
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	r.modulate = tint
+	r.modulate = Tex.tint(tex, tint)
 	v.add_child(r)
 	var fit := fit_title(title, TILE.x - 6.0)
 	var l := UITheme.label(str(fit[1]), int(fit[0]), UITheme.TEXT)
@@ -537,7 +541,7 @@ static func _zones(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 # ---------------------------------------------------------------- сети
 
 static func _power(h: Hud, cats: Control, head: Control, grid: Control) -> void:
-	var list := [["power", "cable", "Электричество"], ["light", "power", "Освещение"], ["water", "", "Водопровод и тепло"], ["vent", "", "Вентиляция"], ["air", "", "Сжатый воздух"]]
+	var list := [["power", "cable", "Электричество"], ["light", "power", "Освещение"], ["water", "ov_water", "Водопровод и тепло"], ["vent", "ov_vent", "Вентиляция"], ["air", "ov_air", "Сжатый воздух"]]   # 1.38: значки слоёв владельца
 	var tile_icons := {"water": "icon_pipe", "vent": "icon_duct", "air": "icon_air"}
 	for it: Array in list:
 		var k := str(it[0])
