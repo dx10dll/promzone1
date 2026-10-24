@@ -46,6 +46,26 @@ static func next_minute(now: float, tod: float) -> float:
 	return m
 
 
+## 1.38.2: снимок показательного завода в начале дня (утро первого вида). Фон меню больше не живёт сутками:
+## раньше завод за минуты меню проживал дни — копились грузы на полу (металл подвозят под всё новые заказы:
+## к 5-му дню 190 штук на земле), и каждый свободный рабочий перебирал их все в поиске работы (Brain._find_work):
+## кадр меню рос с 8 до 400 мс. Теперь мир, которому пора «в следующий день», заменяется свежим из снимка.
+static func snapshot(sim: Sim) -> PackedByteArray:
+	return var_to_bytes(sim.to_dict())
+
+
+## Свежий мир из снимка (каждый раз — свои копии всех массивов: bytes_to_var).
+static func restore(snap: PackedByteArray) -> Sim:
+	var d: Dictionary = bytes_to_var(snap)
+	var s := Sim.from_dict(d)
+	s.company = d.get("company", {})   # пустое — как у собранного завода (from_dict подставил бы эмблему по умолчанию)
+	s.story.enabled = false
+	s.progress.tutorial = -1
+	s.bmats.enabled = false
+	s.events.clear()
+	return s
+
+
 ## Промотать мир к минуте target, не больше steps шагов. true — дошли.
 static func advance_to(sim: Sim, target: float, steps: int) -> bool:
 	for i in steps:

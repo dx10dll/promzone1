@@ -1217,6 +1217,7 @@ func _find_work(w: Worker) -> Task:
 
 	# 7. грузы, брошенные на полу
 	var reloc := false
+	var no_store := {}   ## 1.38.2: «склада нет» не зависит от того, где лежит груз — для того же груза не искать снова
 	for gid in sim.ground_items:
 		var it5: Item = sim.items.get(gid)
 		if it5 == null or it5.reserved_by >= 0 or _coolf(w, "item%d", it5.id):
@@ -1228,7 +1229,10 @@ func _find_work(w: Worker) -> Task:
 			if not dst5.is_empty():
 				cands.append({"s": 62.0 + haul_bonus - _dist(wc, it5.cell) * 0.3, "k": "haul", "item": it5, "dest": dst5[0], "slot": dst5[1]})
 		else:
-			var dest2 := sim.find_storage(it5, it5.cell)
+			var nk := it5.cat() + "|" + it5.stack_key()
+			var dest2: Array = [] if no_store.has(nk) else sim.find_storage(it5, it5.cell)
+			if dest2.is_empty():
+				no_store[nk] = true
 			if not dest2.is_empty():
 				cands.append({"s": 60.0 + haul_bonus - _dist(wc, it5.cell) * 0.3, "k": "haul", "item": it5, "dest": dest2[0], "slot": dest2[1]})
 			elif not reloc and it5.kind != "crate" and sim.logi.has_zone() and not sim.logi.in_zone(it5.cell) and not sim.logi.in_ship(it5.cell):

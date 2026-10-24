@@ -3,8 +3,8 @@ extends Node2D
 ## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
 ## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.38.1"
-const WHATS_NEW := ["„Создать рабочего“ снова без лагов", "102 новые иконки: зоны, события, слои, меню", "Портреты v5: свои детали для каждого телосложения"]
+const VERSION_TEXT := "Версия 1.38.2"
+const WHATS_NEW := ["Меню и „Создать рабочего“ не тормозят со временем", "F3 в меню — строка диагностики (кадры, узлы, память)", "„Создать рабочего“ снова без лагов"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -30,13 +30,17 @@ var cap_time: Label
 var cap_bar: SceneBar
 var ng_dim: ColorRect           ## затемнение под окном «Новая игра»
 var _cards: Array[Control] = [] ## карточки «Сейчас на заводе» и «Что нового» — прячем под окнами
+var _snap := PackedByteArray()  ## 1.38.2: снимок завода утром первого вида — из него «новый день» (MenuScenes.restore)
+var _retired: Array = []        ## [мир, кадров до release()] — сменённые миры: отпускаем, когда их виды уже удалены
+var diag: DiagLine = null       ## 1.38.2: F3 — строка диагностики (кадры, узлы, объекты, память)
 
 
 func _ready() -> void:
-	for i in 2:
-		worlds.append(MenuScenes.build())
-	var w0 := worlds[0]
+	var w0 := MenuScenes.build()
 	MenuScenes.advance_to(w0, MenuScenes.next_minute(w0.minute, MenuScenes.tod_of(0)), 2000)
+	_snap = MenuScenes.snapshot(w0)
+	worlds.append(w0)
+	worlds.append(MenuScenes.restore(_snap))   # второй — копия того же утра (раньше строился заново: ещё ~0,3 с)
 	_next_target = MenuScenes.next_minute(w0.minute + 1.0, MenuScenes.tod_of(1))
 	add_child(cam)
 	cam.make_current()
@@ -62,6 +66,9 @@ func _ready() -> void:
 	_build_ui()
 	if OS.get_cmdline_user_args().has("--bench-editor"):
 		_bench_editor.call_deferred()
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("--soak-editor="):
+			_soak_editor.call_deferred(int(a.get_slice("=", 1)))
 
 
 ## 1.38.1: `Promzona -- --bench-editor [--bench-bg]`: открыть «Создать рабочего», 200 раз нажать его кнопки, напечатать
@@ -87,10 +94,64 @@ func _bench_editor() -> void:
 	get_tree().quit(0)
 
 
+## 1.38.2: `Promzona -- --soak-editor=<сек> [--soak-mode=click|idle|menu]` — долгий прогон с ЖИВЫМ фоном меню
+## (EditorBench.soak): каждую секунду строка SOAK, в конце — первая и последняя минута. Без флага не работает.
+func _soak_editor(secs: int) -> void:
+	var mode := "click"
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("--soak-mode="):
+			mode = a.get_slice("=", 1)
+	CustomWorkers.path = "user://soak_%s_custom_workers.json" % mode
+	if FileAccess.file_exists(CustomWorkers.path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(CustomWorkers.path))
+	for i in 30:
+		await get_tree().process_frame
+	if mode != "menu":
+		_show_custom()
+	var b := EditorBench.new()
+	add_child(b)
+	await b.soak(self, secs, mode)
+	if FileAccess.file_exists(CustomWorkers.path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(CustomWorkers.path))
+	get_tree().quit(0)
+
+
 func _exit_tree() -> void:
 	for s in worlds:
-		s.dispose()
+		s.release()
 	worlds.clear()
+	for r: Array in _retired:
+		(r[0] as Sim).release()
+	_retired.clear()
+
+
+## 1.38.2: к какой минуте проматывать второй (скрытый) завод, чтобы показать вид i. Если для этого ему пришлось бы
+## жить дальше — в следующие сутки (или назад) — он заменяется свежим заводом из утреннего снимка: фон меню всегда
+## живёт в пределах одного дня, ничего не копится (раньше за 10 минут меню мир проживал 10 суток).
+func _retarget(i: int) -> void:
+	var shown := worlds[cur]
+	var hid := worlds[1 - cur]
+	var t := MenuScenes.next_minute(shown.minute + 1.0, MenuScenes.tod_of(i))
+	if t < hid.minute or floorf(t / 1440.0) != floorf(hid.minute / 1440.0):
+		var fresh := MenuScenes.restore(_snap)
+		_retired.append([hid, 3])
+		worlds[1 - cur] = fresh
+		hid = fresh
+		t = MenuScenes.next_minute(fresh.minute, MenuScenes.tod_of(i))
+	_next_target = t
+
+
+## Сколько шагов промотки скрытого завода сделать в этом кадре: поровну на оставшиеся кадры вида (успеть к 80 %
+## его времени), а не по 6 шагов подряд, — без всплесков по 6 тиков симуляции в кадре.
+func _catch_steps(delta: float) -> int:
+	var hid := worlds[1 - cur]
+	var left := ceilf(maxf(0.0, _next_target - hid.minute) / 0.5)
+	if left <= 0.0:
+		return 1
+	var frames := (SCENE_TIME * 0.8 - scene_t) / maxf(delta, 1.0 / 240.0)
+	if frames < 1.0:
+		return 6
+	return clampi(int(ceilf(left / frames)), 1, 6)
 
 
 func _vignette() -> ColorRect:
@@ -113,6 +174,8 @@ void fragment() {
 ## Собрать картинку текущего вида на заводе worlds[cur].
 func _show_scene() -> void:
 	sim = worlds[cur]
+	if ng_root is CustomWorkersUI and is_instance_valid(ng_root):
+		(ng_root as CustomWorkersUI).set_menu_sim(sim)   # 1.38.2: человечек в редакторе — на заводе, что сейчас на экране
 	if scene_root:
 		scene_root.queue_free()
 	scene_root = Node2D.new()
@@ -176,7 +239,12 @@ func _process(delta: float) -> void:
 	_place_cam(clampf(scene_t / SCENE_TIME, 0.0, 1.0))
 	# второй завод тем временем проматывается к времени следующего вида
 	var other := worlds[1 - cur]
-	var ready := MenuScenes.advance_to(other, _next_target, 6)
+	var ready := MenuScenes.advance_to(other, _next_target, _catch_steps(delta))
+	for r: Array in _retired.duplicate():
+		r[1] = int(r[1]) - 1
+		if int(r[1]) <= 0:
+			_retired.erase(r)
+			(r[0] as Sim).release()
 	if cap_bar:
 		cap_bar.k = clampf(scene_t / SCENE_TIME, 0.0, 1.0)
 		cap_bar.queue_redraw()
@@ -197,11 +265,7 @@ func _process(delta: float) -> void:
 			_fade_t += delta
 			fade_rect.color.a = clampf(_fade_t / FADE, 0.0, 1.0)
 			if _fade_t >= FADE:
-				scene_i = (scene_i + 1) % MenuScenes.count()
-				cur = 1 - cur
-				_show_scene()
-				var shown := worlds[cur]
-				_next_target = MenuScenes.next_minute(shown.minute + 1.0, MenuScenes.tod_of(scene_i + 1))
+				next_scene()
 				_fading = 2
 				_fade_t = 0.0
 		2:
@@ -211,6 +275,31 @@ func _process(delta: float) -> void:
 				_fading = 0
 
 
+## 1.38.2: F3 — строка диагностики (и в окне «Создать рабочего»: оно — часть меню).
+func _input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k and k.pressed and not k.echo and k.keycode == KEY_F3:
+		toggle_diag()
+		get_viewport().set_input_as_handled()
+
+
+func toggle_diag() -> void:
+	if diag and is_instance_valid(diag):
+		diag.queue_free()
+		diag = null
+		return
+	diag = DiagLine.new()
+	add_child(diag)
+
+
+## Следующий вид: показать второй (уже промотанный) завод, а первый — готовить к виду через один.
+func next_scene() -> void:
+	scene_i = (scene_i + 1) % MenuScenes.count()
+	cur = 1 - cur
+	_show_scene()
+	_retarget(scene_i + 1)
+
+
 ## Для снимков и тестов: сразу показать вид i (завод проматывается к его времени).
 func jump(i: int) -> void:
 	scene_i = i % MenuScenes.count()
@@ -218,7 +307,7 @@ func jump(i: int) -> void:
 	MenuScenes.advance_to(w, MenuScenes.next_minute(w.minute, MenuScenes.tod_of(scene_i)), 4000)
 	_show_scene()
 	scene_t = 4.0
-	_next_target = MenuScenes.next_minute(w.minute + 1.0, MenuScenes.tod_of(scene_i + 1))
+	_retarget(scene_i + 1)
 
 
 func _time_text() -> String:

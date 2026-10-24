@@ -16,6 +16,10 @@ static var _cache: Dictionary = {}
 static var people_k := 1.0   ## 1.14.2: люди всегда из вектора (импортированные SVG людей в сборку не входят)
 static var people_rev := 0
 static var _people_hi: Dictionary = {}
+static var _people_t: Dictionary = {}      ## 1.38.2: ключ -> когда последний раз нужен (счётчик)
+static var _people_clock := 0
+const PEOPLE_KEEP := 1600
+static var _people_lv: Array[String] = []   ## 1.38.2: последние ступени масштаба людей ("@k"), не больше 4
 
 
 static func get_tex(path: String) -> Texture2D:
@@ -61,7 +65,9 @@ static func item(def_id: String) -> Texture2D:
 
 static func person(name: String) -> Texture2D:
 	var key := "%s@%.3f" % [name, people_k]
+	_people_clock += 1
 	if _people_hi.has(key):
+		_people_t[key] = _people_clock
 		return _people_hi[key]
 	var t: Texture2D = null
 	var it := Vec.raster_one("people", name, people_k)
@@ -69,7 +75,21 @@ static func person(name: String) -> Texture2D:
 		it.set_size_override(Vector2i(maxi(1, roundi(it.get_width() / people_k)), maxi(1, roundi(it.get_height() / people_k))))
 		t = it
 	_people_hi[key] = t
+	_people_t[key] = _people_clock
+	if _people_hi.size() > PEOPLE_KEEP:
+		_evict_people()
 	return t
+
+
+## 1.38.2: растры людей — не больше PEOPLE_KEEP: давние (дольше всех не нужные) вытесняются до 3/4 предела.
+## Раньше держались все (до 6000): каждая новая внешность в «Создать рабочего» (человечек крупно, ~3×) и каждая
+## новая одёжка/поза людей фона добавляли растры навсегда — память текстур росла с каждой минутой.
+static func _evict_people() -> void:
+	var ks := _people_hi.keys()
+	ks.sort_custom(func(x: String, y: String) -> bool: return int(_people_t.get(x, 0)) < int(_people_t.get(y, 0)))
+	for i in ks.size() - PEOPLE_KEEP * 3 / 4:
+		_people_hi.erase(ks[i])
+		_people_t.erase(ks[i])
 
 
 ## e — сколько пикселей экрана приходится на единицу SVG человека (зум камеры × масштаб окна × 0,5).
@@ -86,10 +106,21 @@ static func set_people_scale(e: float) -> void:
 	k = snappedf(k, 0.001)
 	if k == people_k:
 		return
+	if _people_lv.is_empty():
+		_people_lv.append("@%.3f" % people_k)
 	people_k = k
 	people_rev += 1
-	if _people_hi.size() > 6000:
-		_people_hi.clear()
+	# 1.38.2: растры людей держим только для 4 последних ступеней масштаба (зум туда-обратно — без перерисовки).
+	# Раньше копилось до 6000 растров всех ступеней всех видов меню — память текстур росла минутами.
+	var tag := "@%.3f" % k
+	_people_lv.erase(tag)
+	_people_lv.append(tag)
+	if _people_lv.size() > 4:
+		var drop: String = _people_lv.pop_front()
+		for key: String in _people_hi.keys():
+			if key.ends_with(drop):
+				_people_hi.erase(key)
+				_people_t.erase(key)
 
 
 ## Мелкий масштаб: лица попроще (глаза — тёмные овалы), чтобы не превращались в кашу.

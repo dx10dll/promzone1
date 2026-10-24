@@ -71,8 +71,10 @@ func _pigeon(p: Dictionary, i: int) -> void:
 	if st == "fly":
 		var flap := sin(_t * 22.0 + i) * 0.5 + 0.5
 		var tip_y := -9.0 + flap * 12.0
-		draw_colored_polygon(PackedVector2Array([Vector2(-2.6, -1.0), Vector2(2.4, -1.4), Vector2(-1.0, tip_y), Vector2(-5.0, tip_y + 2.0)]), WING)
-		draw_colored_polygon(PackedVector2Array([Vector2(-1.6, -0.6), Vector2(3.0, -1.0), Vector2(1.4, tip_y * 0.7 + 1.0), Vector2(-2.6, tip_y * 0.7 + 2.0)]), WING.darkened(0.15))
+		# 1.38.2: крыло — двумя треугольниками: четырёхугольник в середине взмаха выворачивался («бантиком»),
+		# и движок на каждом кадре писал в журнал «triangulation failed»
+		_quad(Vector2(-2.6, -1.0), Vector2(2.4, -1.4), Vector2(-1.0, tip_y), Vector2(-5.0, tip_y + 2.0), WING)
+		_quad(Vector2(-1.6, -0.6), Vector2(3.0, -1.0), Vector2(1.4, tip_y * 0.7 + 1.0), Vector2(-2.6, tip_y * 0.7 + 2.0), WING.darkened(0.15))
 	else:
 		_ellipse(Vector2(-0.8, -0.4), 3.6, 2.2, WING)
 		draw_line(Vector2(-3.2, 0.2), Vector2(1.4, -0.4), DARK, 0.9)
@@ -121,3 +123,9 @@ func _ellipse_line(c: Vector2, rx: float, ry: float, col: Color, wdt: float) -> 
 		var a := TAU * k / 16.0
 		pts.append(c + Vector2(cos(a) * rx, sin(a) * ry))
 	draw_polyline(pts, col, wdt)
+
+
+func _quad(a: Vector2, b: Vector2, c: Vector2, d: Vector2, col: Color) -> void:
+	var cols := PackedColorArray([col, col, col])
+	draw_primitive(PackedVector2Array([a, b, c]), cols, PackedVector2Array())
+	draw_primitive(PackedVector2Array([a, c, d]), cols, PackedVector2Array())

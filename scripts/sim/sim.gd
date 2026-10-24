@@ -780,7 +780,9 @@ func find_storage(it: Item, near: Vector2i, skip_def: String = "") -> Array:
 	var key := it.stack_key()
 	var best: Array = []
 	var best_d := INF
-	for t: Thing in things.values():
+	# 1.38.2: только склады (готовый список по виду, в том же порядке) — раньше перебор всех объектов завода на
+	# каждый груз на полу: при сотне грузов поиск работы у каждого свободного рабочего стоил десятки мс
+	for t: Thing in things_of("storage", false):
 		if not t.built or t.demolish or not t.is_storage() or t.def_id == skip_def:
 			continue
 		for s in t.slot_count():
@@ -1913,6 +1915,32 @@ func dispose() -> void:
 	orders.sim = null
 	planner.sim = null
 	brain.sim = null
+
+
+## 1.38.2: разорвать ВСЕ обратные ссылки подсистем на завод (season.sim, story.brigade.sim, town.cat.sim…), чтобы
+## RefCounted-завод освободился целиком. dispose() рвёт только три — остальные кольца держали бы весь мир в памяти.
+## После release() заводом пользоваться нельзя (фон меню сменяет миры каждые сутки — см. MenuScenes.restore).
+func release() -> void:
+	dispose()
+	var seen := {}
+	_unlink(self, seen, 0)
+
+
+func _unlink(o: Object, seen: Dictionary, depth: int) -> void:
+	for p: Dictionary in o.get_property_list():
+		if int(p["usage"]) & PROPERTY_USAGE_SCRIPT_VARIABLE == 0 or int(p["type"]) != TYPE_OBJECT:
+			continue
+		var v: Variant = o.get(str(p["name"]))
+		if not (v is RefCounted) or v is Sim or v is Resource:
+			continue
+		var id := (v as Object).get_instance_id()
+		if seen.has(id):
+			continue
+		seen[id] = true
+		if "sim" in v:
+			(v as Object).set("sim", null)
+		if depth < 2:
+			_unlink(v as Object, seen, depth + 1)
 
 
 func _on_park(v: Vehicle) -> void:

@@ -265,3 +265,228 @@ func run(m: Node, n: int, per: int, seed_v: int = 1381) -> void:
 		print("BENCH   %-20s %4d раз | %7.2f %7.2f | %7.2f %7.2f | %5.1f" % [k, kd["n"], float(kd["emit"]) / 1000.0 / nk, float(kd["emit_max"]) / 1000.0,
 			float(kd["us"]) / 1000.0 / nk, float(kd["max"]) / 1000.0, float(kd["loads"]) / nk])
 	finished.emit()
+
+
+# ---------------------------------------------------------------- 1.38.2: долгий прогон (soak)
+## `Promzona -- --soak-editor=<сек> [--soak-mode=click|idle|menu]`: фон меню ЖИВОЙ (как у игрока), каждую секунду —
+## строка SOAK с кадром (среднее/макс), process, объектами/узлами/сиротами/ресурсами, памятью, отрисовкой, узлами фона,
+## твинами, таймерами, кэшем портретов. click — щёлкать редактор в темпе человека (1–3 нажатия в секунду, с паузами),
+## idle — редактор открыт, без нажатий, menu — одно главное меню. В конце — сравнение первой и последней минуты и
+## какие коллекции (массивы/словари в полях скриптов, в т. ч. статических) выросли.
+
+var soak_rows: Array = []          ## по секунде: словарь показателей
+var soak_grew: Array = []          ## [имя коллекции, было, стало] — выросшие сильнее всего
+var _fr: Array[float] = []         ## длительности кадров за текущую секунду, мс
+var _last_us := 0
+
+
+func _process(_d: float) -> void:
+	var now := Time.get_ticks_usec()
+	if _last_us > 0:
+		_fr.append((now - _last_us) / 1000.0)
+	_last_us = now
+
+
+func _max_minute() -> float:
+	var m := 0.0
+	if menu:
+		for w: Sim in menu.get("worlds"):
+			m = maxf(m, w.minute)
+	return m
+
+
+static func count_nodes(n: Node) -> int:
+	if n == null or not is_instance_valid(n):
+		return 0
+	var c := 1
+	for ch in n.get_children():
+		c += count_nodes(ch)
+	return c
+
+
+func soak_sample(t: int) -> Dictionary:
+	var fr := _fr.duplicate()
+	_fr.clear()
+	var avg := 0.0
+	var mx := 0.0
+	for f in fr:
+		avg += f
+		mx = maxf(mx, f)
+	avg /= maxf(1.0, float(fr.size()))
+	var bg: Node = menu.get("scene_root") as Node if menu else null
+	var timers := get_tree().root.find_children("*", "Timer", true, false).size()
+	var st := {"t": t, "frames": fr.size(), "ms_avg": avg, "ms_max": mx,
+		"process_ms": Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+		"objects": int(Performance.get_monitor(Performance.OBJECT_COUNT)),
+		"nodes": int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
+		"orphans": int(Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT)),
+		"resources": int(Performance.get_monitor(Performance.OBJECT_RESOURCE_COUNT)),
+		"static_mb": Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
+		"tex_mb": Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0,
+		"vid_mb": Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
+		"draws": int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+		"robjs": int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)),
+		"bg_nodes": count_nodes(bg), "tweens": get_tree().get_processed_tweens().size(), "timers": timers,
+		"kit": PortraitKit.loaded_count(), "people": Tex._people_hi.size(), "clicks": clicks,
+		"scene": int(menu.get("scene_i")) if menu else 0, "minute": _max_minute()}
+	return st
+
+
+## Сумма размеров коллекций в полях скрипта obj (и на уровень глубже — в объектах-полях). out: имя -> размер.
+static func scan_obj(obj: Object, prefix: String, out: Dictionary, depth: int, seen: Dictionary) -> void:
+	if obj == null or not is_instance_valid(obj):
+		return
+	var oid := obj.get_instance_id()
+	if seen.has(oid):
+		return
+	seen[oid] = true
+	for p: Dictionary in obj.get_property_list():
+		if int(p["usage"]) & PROPERTY_USAGE_SCRIPT_VARIABLE == 0:
+			continue
+		var nm := str(p["name"])
+		var v: Variant = obj.get(nm)
+		var key := prefix + "." + nm
+		match typeof(v):
+			TYPE_ARRAY, TYPE_DICTIONARY, TYPE_PACKED_BYTE_ARRAY, TYPE_PACKED_INT32_ARRAY, TYPE_PACKED_INT64_ARRAY, \
+					TYPE_PACKED_FLOAT32_ARRAY, TYPE_PACKED_FLOAT64_ARRAY, TYPE_PACKED_STRING_ARRAY, TYPE_PACKED_VECTOR2_ARRAY, \
+					TYPE_PACKED_COLOR_ARRAY:
+				out[key] = int(out.get(key, 0)) + int(v.size())
+			TYPE_OBJECT:
+				if depth > 0 and v != null and is_instance_valid(v) and not (v is Node) and not (v is Resource and not (v is Script)):
+					scan_obj(v as Object, key, out, depth - 1, seen)
+
+
+## Снимок: коллекции во всех узлах дерева (по классу узла — сумма) и в статических полях глобальных классов.
+func scan_all() -> Dictionary:
+	var out := {}
+	var seen := {}
+	if menu:   # сначала заводы фона: их поля — под постоянными именами (иначе их «увидит» первый попавшийся вид)
+		var ws: Array = menu.get("worlds")
+		for i in ws.size():
+			scan_obj(ws[i] as Object, "menu_world%d" % i, out, 2, seen)
+	for n: Node in get_tree().root.find_children("*", "", true, false):
+		var s := n.get_script() as Script
+		if s == null:
+			continue
+		var cls := s.get_global_name()
+		if cls == &"":
+			cls = StringName(s.resource_path.get_file())
+		scan_obj(n, "node:" + str(cls), out, 2, seen)
+	for c: Dictionary in ProjectSettings.get_global_class_list():
+		var sc := load(str(c["path"])) as Script
+		if sc:
+			for p: Dictionary in sc.get_property_list():
+				var v: Variant = sc.get(str(p["name"]))
+				if v is Array or v is Dictionary:
+					var key := "static:" + str(c["class"]) + "." + str(p["name"])
+					out[key] = int(out.get(key, 0)) + int(v.size())
+	return out
+
+
+func _soak_line(st: Dictionary) -> String:
+	return "SOAK t=%4d кадров %3d кадр %.2f/%.1f мс process %.2f мс объектов %d узлов %d сирот %d ресурсов %d static %.1f МБ текстуры %.1f МБ видео %.1f МБ draw %d robj %d фон-узлов %d твинов %d таймеров %d кэш-портр %d растры-людей %d нажатий %d вид %d мин-завода %.0f" % [
+		st["t"], st["frames"], st["ms_avg"], st["ms_max"], st["process_ms"], st["objects"], st["nodes"], st["orphans"], st["resources"],
+		st["static_mb"], st["tex_mb"], st["vid_mb"], st["draws"], st["robjs"], st["bg_nodes"], st["tweens"], st["timers"], st["kit"], st["people"], st["clicks"], st["scene"], st["minute"]]
+
+
+## Средние показатели за секунды [a, b).
+func soak_avg(a: int, b: int) -> Dictionary:
+	var out := {}
+	var n := 0
+	for st: Dictionary in soak_rows:
+		if int(st["t"]) >= a and int(st["t"]) < b:
+			n += 1
+			for k: String in st.keys():
+				out[k] = float(out.get(k, 0.0)) + float(st[k])
+	for k: String in out.keys():
+		out[k] = float(out[k]) / maxf(1.0, float(n))
+	return out
+
+
+## Долгий прогон: secs секунд по-настоящему, mode — "click", "idle" или "menu". hold_scene — фон живой, но без смены
+## видов (для теста: кадр сравнивается на одном и том же виде). Перед замером — прогрев: все виды по разу
+## (их текстуры грузятся при первом показе — это не рост).
+var hold_scene := false
+
+
+func soak(m: Node, secs: int, mode: String, seed_v: int = 1382) -> void:
+	menu = m
+	rng.seed = seed_v
+	for i in MenuScenes.count():
+		menu.call("jump", i)
+		await _wait(4)
+	if mode != "menu":
+		ed = menu.get("ng_root") as CustomWorkersUI
+		if ed == null:
+			menu.call("_show_custom")
+			await _wait(5)
+			ed = menu.get("ng_root") as CustomWorkersUI
+		while ed.workers().size() < 6:
+			_press(ed.save_btn)
+			await _wait(1)
+			_press(_btns(ed, ["+  Новый рабочий"]).front())
+			await _wait(1)
+		_build_seq()
+	await _wait(10)
+	var scan0 := scan_all()
+	var t0 := Time.get_ticks_msec()
+	var next_click := t0 + 1000
+	var next_sec := t0 + 1000
+	var sec := 0
+	_fr.clear()
+	print("SOAK: режим %s, %d с, версия %s, окно %s" % [mode, secs, ProjectSettings.get_setting("application/config/version"),
+		str(get_viewport().get_visible_rect().size)])
+	while sec < secs:
+		await get_tree().process_frame
+		if hold_scene:
+			menu.set("scene_t", 4.0)
+		var now := Time.get_ticks_msec()
+		if mode == "click" and now >= next_click and is_instance_valid(ed):
+			var k: String = _seq[rng.randi_range(0, _seq.size() - 1)]
+			if _do(k):
+				clicks += 1
+			# человек: 1–3 нажатия в секунду, иногда пауза на пару секунд (посмотреть на портрет)
+			next_click = now + (rng.randi_range(2000, 5000) if rng.randf() < 0.12 else rng.randi_range(330, 1000))
+		if now >= next_sec:
+			next_sec += 1000
+			sec += 1
+			var st := soak_sample(sec)
+			soak_rows.append(st)
+			print(_soak_line(st))
+	var scan1 := scan_all()
+	var grew: Array = []
+	for k: String in scan1.keys():
+		var a := int(scan0.get(k, 0))
+		var b := int(scan1[k])
+		if b > a + 10 and b > a * 1.2:
+			grew.append([k, a, b])
+	grew.sort_custom(func(x: Array, y: Array) -> bool: return int(x[2]) - int(x[1]) > int(y[2]) - int(y[1]))
+	soak_grew = grew
+	print("SOAK: выросшие коллекции (было → стало): %d" % grew.size())
+	for g: Array in grew.slice(0, 40):
+		print("SOAK   %-70s %7d → %7d" % [g[0], g[1], g[2]])
+	var m1 := mini(60, maxi(1, secs / 5))
+	var a1 := soak_avg(m1 / 6, m1 + m1 / 6)       # первая «минута» (без первых секунд разгона)
+	var a2 := soak_avg(secs - m1, secs + 1)        # последняя
+	print("SOAK ИТОГ (%s): первые %d с → последние %d с" % [mode, m1, m1])
+	for k: String in ["ms_avg", "ms_max", "frames", "process_ms", "objects", "nodes", "orphans", "resources", "static_mb", "tex_mb", "vid_mb",
+			"draws", "robjs", "bg_nodes", "tweens", "timers", "kit", "people"]:
+		print("SOAK ИТОГ   %-11s %10.2f → %10.2f  (×%.2f)" % [k, float(a1.get(k, 0.0)), float(a2.get(k, 0.0)),
+			float(a2.get(k, 0.0)) / maxf(0.001, float(a1.get(k, 0.0)))])
+	# по видам фона: кадр в первой и последней трети прогона (виды рисуются по-разному — сравнивать один с одним)
+	for sc in MenuScenes.count():
+		var f1 := _scene_ms(sc, 0, secs / 3)
+		var f2 := _scene_ms(sc, secs - secs / 3, secs + 1)
+		if f1 > 0.0 and f2 > 0.0:
+			print("SOAK ИТОГ   вид %d %-22s кадр %8.2f → %8.2f мс (×%.2f)" % [sc, MenuScenes.caption(sc), f1, f2, f2 / f1])
+	finished.emit()
+
+
+func _scene_ms(sc: int, a: int, b: int) -> float:
+	var sum := 0.0
+	var n := 0
+	for st: Dictionary in soak_rows:
+		if int(st["scene"]) == sc and int(st["t"]) >= a and int(st["t"]) < b and int(st["frames"]) > 0:
+			sum += float(st["ms_avg"])
+			n += 1
+	return sum / n if n > 0 else 0.0

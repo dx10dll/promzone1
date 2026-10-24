@@ -70,6 +70,13 @@ func workers() -> Array:
 	return data["workers"]
 
 
+## 1.38.2: фон меню сменил завод (новый день из снимка) — прежний будет отпущен, человечек переходит на новый.
+func set_menu_sim(s: Sim) -> void:
+	sim = s
+	if doll_box and doll_box.doll and is_instance_valid(doll_box.doll):
+		doll_box.doll.sim = s
+
+
 # ---------------------------------------------------------------- каркас
 
 func _build() -> void:
