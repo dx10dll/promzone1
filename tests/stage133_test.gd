@@ -365,7 +365,7 @@ func _editor_options() -> void:
 				lk3["beard"] = bd
 				if str(bd) != "" and not _names(PortraitKit.recipe(lk3, {})).has(sp + "beard_" + str(bd)):
 					bad.append("beard " + str(bd))
-		var flags := {"glasses": "glasses", "freckles": "freckles", "earrings": "earrings"} if fem else {"glasses": "glasses", "freckles": "freckles"}
+		var flags := {"glasses": "glasses", "freckles": "freckles"}   # 1.40: серьги убраны
 		for f: String in flags:
 			var lk4: Dictionary = base.duplicate(true)
 			if f == "glasses":

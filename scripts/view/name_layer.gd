@@ -11,6 +11,7 @@ const FONT_PX := 12
 var sim: Sim
 var game: Node
 var _sb: StyleBoxFlat
+var _sb_fast: StyleBoxTexture   ## 1.40: та же плашка одной картинкой-«девятью заплатками» — дешевле StyleBoxFlat в каждом кадре
 var _sb_sel: StyleBoxFlat
 
 
@@ -21,10 +22,30 @@ func _ready() -> void:
 	_sb.set_corner_radius_all(6)
 	_sb.content_margin_left = 5
 	_sb.content_margin_right = 5
+	_sb_fast = _bake_box(Color(0.07, 0.08, 0.09, 0.66))
 	_sb_sel = _sb.duplicate()
 	_sb_sel.bg_color = Color(0.11, 0.09, 0.05, 0.85)
 	_sb_sel.border_color = UITheme.ACCENT
 	_sb_sel.set_border_width_all(1)
+
+
+var _tw: Dictionary = {}
+
+
+## Скруглённая плашка 16×16 (радиус 6) с мягкой кромкой; цвет — через modulate_color.
+static func _bake_box(col: Color) -> StyleBoxTexture:
+	var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	for y in 16:
+		for x in 16:
+			var px := absf(x + 0.5 - 8.0) - (8.0 - 6.0)
+			var py := absf(y + 0.5 - 8.0) - (8.0 - 6.0)
+			var d := Vector2(maxf(px, 0.0), maxf(py, 0.0)).length() + minf(maxf(px, py), 0.0) - 6.0
+			img.set_pixel(x, y, Color(1, 1, 1, clampf(0.5 - d, 0.0, 1.0)))
+	var sb := StyleBoxTexture.new()
+	sb.texture = ImageTexture.create_from_image(img)
+	sb.set_texture_margin_all(6.0)
+	sb.modulate_color = col
+	return sb
 
 
 func _process(_delta: float) -> void:
@@ -51,18 +72,23 @@ func _draw() -> void:
 			continue
 		var nm := L.name(w.last if w.last != "" else w.first)
 		var sel := w.id == sel_id
-		var tw := f.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX).x
+		var tl: TextLine = _tw.get(nm)
+		if tl == null:   # 1.40: текст раскладываем один раз на имя, а не каждый кадр на каждого человека
+			tl = TextLine.new()
+			tl.add_string(nm, f, FONT_PX)
+			_tw[nm] = tl
+		var tw := tl.get_size().x
 		var has_b := not w.visitor and w.brigade >= 0
 		var bw := tw + (8.0 if has_b else 0.0)
 		draw_set_transform(p, 0.0, Vector2(k, k))
 		var r := Rect2(Vector2(-bw * 0.5 - 5.0, 0.0), Vector2(bw + 10.0, FONT_PX + 4.0))
-		draw_style_box(_sb_sel if sel else _sb, r)
+		draw_style_box(_sb_sel if sel else _sb_fast, r)
 		var x := -bw * 0.5
 		if has_b:
 			draw_circle(Vector2(x + 2.5, FONT_PX * 0.5 + 2.0), 2.6, sim.crew.color(w.brigade))
 			x += 8.0
 		var col := UITheme.ACCENT if sel else (UITheme.INFO if w.visitor else (Color("#f0907f") if w.mood < 25.0 else Color("#ece8dc")))
-		draw_string(f, Vector2(x, FONT_PX + 0.5), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX, col)
+		tl.draw(get_canvas_item(), Vector2(x, FONT_PX + 0.5 - tl.get_line_ascent()), col)
 	# кот — тоже с именем, тёплым цветом
 	var ct: Cat = sim.town.cat if sim.town else null
 	if ct:
@@ -71,6 +97,6 @@ func _draw() -> void:
 			var cn := ct.shown_name()
 			var cw := f.get_string_size(cn, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX - 1).x
 			draw_set_transform(cp, 0.0, Vector2(k, k))
-			draw_style_box(_sb, Rect2(Vector2(-cw * 0.5 - 5.0, 0.0), Vector2(cw + 10.0, FONT_PX + 3.0)))
+			draw_style_box(_sb_fast, Rect2(Vector2(-cw * 0.5 - 5.0, 0.0), Vector2(cw + 10.0, FONT_PX + 3.0)))
 			draw_string(f, Vector2(-cw * 0.5, FONT_PX - 0.5), cn, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX - 1, Color("#f0c070"))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

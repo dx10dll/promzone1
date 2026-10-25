@@ -90,7 +90,7 @@ func _init() -> void:
 
 	print("— наладчик")
 	var st := S.hire(sim, "setter", "setup", 7)
-	check(st.prof_name() == "Наладчик" and st.skill("setup") == 7, "наладчик нанят")
+	check(st.prof_name() == "Наладчик ЧПУ" and st.skill("setup") == 7, "наладчик нанят")
 	st.present = true
 	var lsp2: Dictionary = lathe.spots()[0]
 	st.pos = Vector2(lsp2["cell"]) + Vector2(0.5, 0.5)

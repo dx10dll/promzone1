@@ -50,7 +50,7 @@ func _init() -> void:
 			if not sim.progress.products().has(str(o["product"])):
 				bad += 1
 		check(bad == 0, "%s/%s: заказы только по профилю" % [cb[0], cb[1]])
-		var builders := sim.workers.filter(func(x: Worker) -> bool: return x.prof == "builder").size()
+		var builders := sim.workers.filter(func(x: Worker) -> bool: return x.prof == "builder" or x.is_director()).size()   # 1.40: директор
 		match str(cb[0]):
 			"field":
 				check(sim.office.loans.is_empty() and sim.progress.ooo and not sim.grants.offers().is_empty(), "чистое поле: без кредита, ООО, доступны гранты")
@@ -60,6 +60,7 @@ func _init() -> void:
 				for i in sim.world.w * sim.world.h:
 					if WallKinds.is_room_wall(sim.world.wall[i]):
 						walls += 1
+				walls -= Director.office_counts(sim).x   # 1.40: контора директора
 				check(walls <= 20, "песочница: пустой участок, только техпомещение у ворот (стен %d)" % walls)   # 1.29
 				check(builders == sim.workers.size(), "песочница: бригада строителей")
 		var d := sim.to_dict()

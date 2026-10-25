@@ -957,9 +957,9 @@ insp.fix.no_ppe,Put up clothes lockers (at least one per two people): Objects �
 insp.fix.no_aid,Hang a first-aid kit: Objects → Safety → First aid kit.
 insp.fix.overwork,Cancel the rush and the overtime (People → Shift Schedule). Can't keep up? Hire more people.
 insp.fix.injuries,"Lots of injuries. Hold a briefing (People → Training), issue PPE (People → Workplace Safety), repair worn machines, don't push rushes."
-insp.fix.no_wc,"Build a toilet: Build → Rooms → Toilet (walls, door, stall and sink at once), then run water to it (Utilities → Water & heating)."
+insp.fix.no_wc,"Build a toilet: Build → Ready rooms → Toilet (walls, door, stall and sink at once), then run water to it (Utilities → Water & heating)."
 insp.fix.no_sink,Put a sink in the toilet (Objects → Amenities → Sink) and run a pipe to it (Utilities → Water & heating).
-insp.fix.no_canteen,With 8+ people you need a canteen: Build → Rooms → Canteen.
+insp.fix.no_canteen,With 8+ people you need a canteen: Build → Ready rooms → Canteen.
 insp.fix.few_wc,You need one stall per 12 people. Add another stall (Objects → Amenities → Toilet stall) to the toilet.
 insp.fix.garbage,Rubbish and scrap are lying around the grounds. Put reject bins by the machines (Objects → Storage → Reject bin); labourers will clean up. No one to do it? Hire a labourer.
 insp.fix.worn,"The machine's condition is below 25%. Click the machine and send it for repair, or turn on planned maintenance (Production → Machines → “PM”)."

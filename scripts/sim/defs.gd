@@ -35,6 +35,11 @@ static var wall_by_id: Dictionary = {}
 static var _loaded := false
 
 
+## 1.40: механика главного инженера временно убрана (владелец переделает). Включить обратно — true:
+## вернутся отдел, ступень «Развития», кабинет, вкладка «Главный инженер», советы, записка и ППР сам собой.
+const CHIEF_ENGINEER := false
+
+
 static func load_all() -> void:
 	if _loaded:
 		return
@@ -66,6 +71,8 @@ static func load_all() -> void:
 	stages = _load_dict("res://data/stages.json")
 	develop = _load_dict("res://data/develop.json")
 	build_mats = _load_dict("res://data/build_mats.json").get("list", {})
+	if not CHIEF_ENGINEER:
+		_strip_chief_engineer()
 	for k in floors.keys():
 		floors[k]["key"] = k
 		floor_by_id[int(floors[k]["id"])] = floors[k]
@@ -275,3 +282,17 @@ static func money_str(v: float) -> String:
 		if cnt % 3 == 0 and i > 0:
 			out = " " + out
 	return ("−" if neg else "") + out + " ₽"
+
+
+## 1.40: без главного инженера — нет отдела, ступени «Развития» и кабинета в каталоге. Кабинет в справочнике
+## остаётся (скрытым), чтобы старые сохранения с таким помещением загружались.
+static func _strip_chief_engineer() -> void:
+	departments.erase("engineer")
+	if rooms.has("engineer_office"):
+		rooms["engineer_office"]["hidden"] = true
+	for b: Dictionary in develop.get("branches", []):
+		var keep: Array = []
+		for sd: Dictionary in b.get("steps", []):
+			if str(sd.get("dept", "")) != "engineer":
+				keep.append(sd)
+		b["steps"] = keep

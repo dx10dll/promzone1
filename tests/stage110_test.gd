@@ -23,13 +23,13 @@ func _init() -> void:
 	sim.progress.tutorial = -1
 
 	print("— новые отделы и профессии")
-	for d in ["sales", "safety", "engineer", "legal"]:
+	for d in (["sales", "safety", "engineer", "legal"] if Defs.CHIEF_ENGINEER else ["sales", "safety", "legal"]):   # 1.40: главный инженер убран
 		var dd: Dictionary = Defs.departments.get(d, {})
 		check(not dd.is_empty() and Defs.rooms.has(str(dd["room"])) and Worker.PROF_NAMES.has(str(dd["prof"])), "отдел «%s»: кабинет «%s», специалист «%s»" % [str(dd.get("name", d)), str(Defs.rooms.get(str(dd.get("room", "")), {}).get("name", "?")), str(Worker.PROF_NAMES.get(str(dd.get("prof", "")), "?"))])
 		var room := str(dd["room"])
 		check(Rooms.TYPES.has(room) and Rooms.OFFICE_TYPES.has(room), "кабинет «%s» можно назначить и посадить туда ИТР" % room)
 		var w := People.make(sim.rng, str(dd["prof"]))
-		check(w.is_itr() and w.dept() == d and w.wage >= 3400 and str(w.look.get("outfit", "")) == "suit", "%s: ИТР, ставка %d ₽, в костюме" % [w.prof_name(), w.wage])
+		check(w.is_itr() and w.dept() == d and w.wage >= 1500 and str(w.look.get("outfit", "")) == "suit", "%s: ИТР, ставка %d ₽, в костюме" % [w.prof_name(), w.wage])
 	for oid in ["phone_stand", "safety_stand", "law_shelf"]:
 		check(Defs.objects.has(oid) and ResourceLoader.exists("res://assets/objects/%s.svg" % oid), "новый объект: %s" % str(Defs.objects.get(oid, {}).get("name", oid)))
 
@@ -86,7 +86,10 @@ func _init() -> void:
 	sim.ppr = false
 	var s0 := sim.service_at()
 	sim.office.all_depts = true
-	check(sim.service_at() > s0, "главный инженер ведёт ППР сам (обслуживание с %.0f%% вместо %.0f%%)" % [sim.service_at(), s0])
+	if Defs.CHIEF_ENGINEER:
+		check(sim.service_at() > s0, "главный инженер ведёт ППР сам (обслуживание с %.0f%% вместо %.0f%%)" % [sim.service_at(), s0])
+	else:
+		check(is_equal_approx(sim.service_at(), s0), "1.40: главного инженера нет — ППР сам собой не включается")
 	sim.office.all_depts = false
 	var w0: Worker = sim.workers[0]
 	sim.story.enabled = true

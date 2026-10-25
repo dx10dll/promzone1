@@ -219,6 +219,7 @@ func start(id: String) -> String:
 	cur = id
 	cur_start = sim.minute
 	cur_end = sim.minute + float(sd.get("days", 1)) * 1440.0
+	Director.on_develop(sim)   # 1.40: директор садится за стол и ведёт ступень
 	sim.notify(L.t("Директор взялся за «%s» (%s): %d %s.") % [sname(sd), L.dt("develop.branch.%s.name" % str(branch_of(id).get("id", "")), str(branch_of(id).get("name", ""))).to_lower(), int(sd.get("days", 1)), Defs.plural(int(sd.get("days", 1)), "день", "дня", "дней")], Sim.LVL_INFO)
 	return ""
 

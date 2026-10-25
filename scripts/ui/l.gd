@@ -121,7 +121,16 @@ static func translit(s: String) -> String:
 
 ## Имя человека на языке игры: в английском — латиницей.
 static func name(s: String) -> String:
-	return translit(s) if is_en() else s
+	if not is_en():
+		return s
+	var c: Variant = _name_cache.get(s)   # 1.40: имена на карте просят каждый кадр — транслит считаем один раз
+	if c == null:
+		c = translit(s)
+		_name_cache[s] = c
+	return c as String
+
+
+static var _name_cache: Dictionary = {}
 
 
 ## Дата из метки сохранения («Ср, 1-я нед. сентября») — на языке игры.

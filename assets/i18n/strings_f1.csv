@@ -1,0 +1,16 @@
+keys,en
+Ничего не найдено: «%s»,Nothing found: “%s”
+Ластик,Eraser
+Стереть нарисованное на плане: протяните рамку,Erase what is drawn on the plan: drag a frame
+Поиск…,Search…
+Поиск по названию во всех разделах меню,Search by name across all sections of this menu
+"В центре экрана «%s»: всё нужное есть, подсвечено то, что ему подходит.",“%s” in the centre of the screen has everything it needs; items that suit it are highlighted.
+"В центре экрана «%s»: подсвечено, что нужно. Не хватает: %s.",“%s” in the centre of the screen: what it needs is highlighted. Missing: %s.
+Есть: %d.,Placed: %d.
+Нужно помещению в центре экрана.,Needed by the room in the centre of the screen.
+Подходит помещению в центре экрана.,Suits the room in the centre of the screen.
+Готовые помещения,Ready rooms
+Поиск по всем разделам стройки.,Searching all Build sections.
+Поиск по всем разделам объектов. R — повернуть перед установкой.,Searching all Objects sections. R rotates before placing.
+"«Стройка» → «Готовые помещения» → «Склад 6×4», затем щёлкните по свободной земле рядом с гаражом.","“Build” → “Ready rooms” → “Storage 6×4”, then click free ground next to the garage."
+"Выберите стену, пол, зону или станок в меню снизу и рисуйте. Ластик стирает план.","Pick a wall, floor, zone or machine in the menu below and draw. The Eraser erases the plan."

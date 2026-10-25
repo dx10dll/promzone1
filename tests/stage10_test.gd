@@ -33,7 +33,8 @@ func _init() -> void:
 	var wsum := 0
 	for w in g.workers:
 		wsum += w.wage
-		check(w.wage >= int(Defs.inspections.get("min_wage_shift", 1900)), "ставка %s не ниже МРОТ-смены" % w.first)
+		if not w.is_director():   # 1.40: у директора (игрока) оклада нет
+			check(w.wage >= int(Defs.inspections.get("min_wage_shift", 1900)), "ставка %s не ниже МРОТ-смены" % w.first)
 	check(wsum < 9500, "фонд гаража за смену %d ₽" % wsum)
 
 	print("— гараж окупается (заказы берёт сбыт сам)")

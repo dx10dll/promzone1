@@ -14,6 +14,7 @@ var tex_key := ""
 var flip := false
 var _fshift := 0.0   ## сдвиг отражённого спрайта: тело объекта остаётся на своих клетках, а не уезжает на поле тени
 var _t := 0.0
+var _ov_t := 0.0                ## 1.40: до следующей перерисовки эффектов и подписей
 var _check := 0.0
 ## 1.30: проходная — внутренний слой будки (позади сидящего охранника) и планки турникетов
 var inner: Sprite2D = null
@@ -130,7 +131,10 @@ func _process(delta: float) -> void:
 		inner.modulate = sprite.modulate
 		_turnstiles(delta)
 	# 1.29: эффекты и подписи перерисовываем только у объектов на экране — за краем их всё равно не видно
-	if WorkerView.view.size.x <= 0.0 or WorkerView.view.has_point(position):
+	# 1.40: и не чаще 30 раз в секунду (на 100+ к/с лишнюю перерисовку анимаций глаз не видит)
+	_ov_t -= delta
+	if _ov_t <= 0.0 and (WorkerView.view.size.x <= 0.0 or WorkerView.view.has_point(position)):
+		_ov_t = 0.033
 		over.queue_redraw()
 
 

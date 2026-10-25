@@ -154,6 +154,8 @@ func setup(s: Sim, h: Node, k: String, first_sec: String = "", w: float = 1180.0
 	custom_minimum_size = Vector2(w, 0)
 	var gd: Dictionary = GROUPS.get(group, {"title": group, "icon": "log", "secs": [[group, group, "log", group, ""]]})
 	_secs = gd["secs"]
+	if not Defs.CHIEF_ENGINEER:   # 1.40: вкладки «Главный инженер» нет, пока механика убрана
+		_secs = _secs.filter(func(e: Array) -> bool: return str(e[0]) != "advisor")
 	var root := HBoxContainer.new()
 	root.add_theme_constant_override("separation", 0)
 	add_child(root)
@@ -1483,7 +1485,7 @@ func _hire() -> void:
 		UITheme.clear(chips)
 		var q := hire_q.strip_edges().to_lower()
 		var any := false
-		for grp: Array in HIRE_GROUPS:
+		for grp: Array in CustomWorkers.prof_groups():
 			var row := HBoxContainer.new()
 			row.add_theme_constant_override("separation", 6)
 			var gl := _cl(tr(str(grp[0])), 12, UITheme.MUTED)

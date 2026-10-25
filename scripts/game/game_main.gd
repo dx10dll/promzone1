@@ -456,6 +456,8 @@ func open_lot(k: int) -> void:
 		for st: Dictionary in b.get("steps", []):
 			if st.has("lot") and int(st["lot"]) == k:
 				DevTree.sel = str(st["id"])
+	if hud.win and hud.win.group == "office":
+		hud.close_window()   # 1.40: окно уже открыто — не закрыть его повторным щелчком, а показать участок
 	hud.open_window("develop")
 	Snd.play("n_info", -4.0)
 

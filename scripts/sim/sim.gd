@@ -56,6 +56,7 @@ var market: Market
 var town: Town
 var crisis: Crisis   ## 1.20: последствия — зарплата в долг, увольнения, конец игры
 var fauna: Fauna     ## 1.22: голуби, мыши
+var areas: Areas     ## 1.40: свои зоны у людей, логистика быта (какой цех к какой бытовке и т. д.)
 var visitors: Array[Worker] = []
 var honor_log: Array = []   ## лучшие работники недели (для «Доски почёта»): [{id, first, last, prof, look, age, day, score, board}]
 var traffic := PackedFloat32Array()  ## сколько раз проходили по клетке (оверлей потоков, затухает)  ## гости завода: инспекторы, губернатор, журналист
@@ -128,6 +129,7 @@ func _init() -> void:
 	town = Town.new(self)
 	crisis = Crisis.new(self)
 	fauna = Fauna.new(self)
+	areas = Areas.new(self)
 	for c in Defs.consumables.keys():
 		cons[c] = float(Defs.consumables[c].get("start", 0))
 	rng.randomize()
@@ -434,6 +436,8 @@ func hire(index: int) -> String:
 
 
 func fire(w: Worker, quit: bool = false, calm: bool = false) -> void:
+	if w.is_director():
+		return   # 1.40: директор — это игрок: его не увольняют, сам он не уходит
 	brain.abort(w)
 	office.on_quit(w)
 	training.on_leave(w)
@@ -459,6 +463,8 @@ func fire(w: Worker, quit: bool = false, calm: bool = false) -> void:
 
 ## Изменить ставку на долю (0.1 = +10%).
 func change_wage(w: Worker, pct: float) -> void:
+	if w.is_director():
+		return   # 1.40: у директора нет оклада
 	var nw := int(round(w.wage * (1.0 + pct) / 50.0) * 50.0)
 	nw = maxi(1000, nw)
 	if nw == w.wage:
@@ -2140,6 +2146,7 @@ func to_dict() -> Dictionary:
 		"progress": progress.to_dict(), "logi": logi.to_dict(), "grants": grants.to_dict(),
 		"sales": sales.to_dict(), "training": training.to_dict(), "career": career.to_dict(), "upkeep": upkeep.to_dict(), "eng": eng.to_dict(), "crew": crew.to_dict(), "market": market.to_dict(), "town": town.to_dict(), "crisis": crisis.to_dict(), "fauna": fauna.to_dict(), "dev": dev.to_dict(), "bmats": bmats.to_dict(), "legacy": {"zone": rooms.legacy.keys(), "water": water.bonus},
 		"company": company, "plan": plan.to_dict(), "faults": faults.to_dict(),
+		"areas": areas.to_dict(),
 	}
 
 
@@ -2186,6 +2193,7 @@ static func from_dict(d: Dictionary) -> Sim:
 	s.fauna.from_dict(d.get("fauna", {}))
 	s.dev.from_dict(d.get("dev", {}))
 	s.bmats.from_dict(d.get("bmats", {}))
+	s.areas.from_dict(d.get("areas", {}))
 	var lg: Dictionary = d.get("legacy", {})
 	for lid in lg.get("zone", []):
 		s.rooms.legacy[int(lid)] = true
@@ -2283,6 +2291,8 @@ static func from_dict(d: Dictionary) -> Sim:
 	if int(d.get("version", 1)) < 13:
 		Scenario.migrate_v13(s)   # 1.29: обязательные зоны разгрузки и отгрузки
 	s.faults.from_dict(d.get("faults", {}))
+	if not d.has("areas"):
+		Director.ensure(s)   # 1.40: в сохранениях до 1.40 директора не было — он появляется
 	# 1.18: сразу после загрузки — сеть, вода и помещения посчитаны (насосная качает до первого тика)
 	s.rooms.update()
 	s.power.tick(0.0)

@@ -23,8 +23,8 @@ func _init() -> void:
 	print("— сценарии")
 	var f := Scenario.new_game("field", "mech", "market", 31)
 	check(Defs.scenarios.keys() == ["garage", "field", "sandbox"], "остались только гараж, чистое поле, песочница: %s" % str(Defs.scenarios.keys()))
-	var all_builders := f.workers.all(func(w: Worker) -> bool: return w.prof == "builder")
-	check(all_builders and f.workers.size() == 3, "чистое поле: три строителя, станочников нет")
+	var all_builders := f.workers.all(func(w: Worker) -> bool: return w.prof == "builder" or w.is_director())   # 1.40: и директор
+	check(all_builders and f.workers.size() == 4, "чистое поле: три строителя, станочников нет")
 	# строители строят: стена и пол
 	f.money += 500000.0
 	for x in range(20, 28):
@@ -45,6 +45,8 @@ func _init() -> void:
 			walls += 1
 	# 1.29: у ворот — обязательные зоны с поддонами (заготовок и готовой продукции), остальное пусто
 	var objs := s.things.values().filter(func(t: Thing) -> bool: return t.def_id != "pallet" and t.def_id != "pallet_raw").size()
+	walls -= Director.office_counts(s).x   # 1.40: отдельная контора директора
+	objs -= Director.office_counts(s).y
 	# 1.29: и одно техпомещение 7×5 у ворот (подстанция, насосная, котёл, лампа, огнетушитель)
 	check(walls <= 20 and objs <= 5, "песочница пустая: стен %d, объектов %d (кроме поддонов и техпомещения у ворот)" % [walls, objs])
 

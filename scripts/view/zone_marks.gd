@@ -15,8 +15,14 @@ func _ready() -> void:
 	z_index = 4
 
 
-func _process(_d: float) -> void:
-	queue_redraw()
+var _rt := 0.0
+
+
+func _process(d: float) -> void:
+	_rt -= d   # 1.40: метки и подсветка комнаты под мышью — 30 раз в секунду
+	if _rt <= 0.0:
+		_rt = 0.033
+		queue_redraw()
 
 
 func _draw() -> void:

@@ -14,6 +14,8 @@ var doors: Array[WallPiece] = []
 var things: Dictionary = {}      ## id -> ThingView
 var workers: Dictionary = {}     ## id -> WorkerView
 var vans: Dictionary = {}        ## id -> Node2D
+var _van_ghosts: Array = []      ## 1.40: уехавшие из симуляции машины — доезжают до края города: [Node2D, шаг в секунду]
+var _van_t := -1
 var ground: Dictionary = {}      ## id -> Sprite2D
 var dogs: Array[Sprite2D] = []   ## бродячие (или заводские) собаки
 const DOG_COLS := [Color("#8a6a4a"), Color("#3a3530"), Color("#c98a4a"), Color("#a29a8e")]
@@ -234,6 +236,14 @@ func _sync_vans() -> void:
 			add_child(n)
 			vans[v.id] = n
 		var vx := v.x if v.px < -1e8 or absf(v.px - v.x) > 6.0 else lerpf(v.px, v.x, Worker.view_alpha)   # 1.29: плавно между шагами
+		# 1.40: в очереди машина ещё в пути (не стоит на дороге); подъезжает издалека, а не появляется у края карты
+		n.visible = v.state != "queued"
+		var lead := float(n.get_meta("lead", 40.0 if v.state in ["queued", "arriving"] else 0.0))
+		if v.state != "queued":
+			lead = maxf(0.0, lead - maxf(0.4, lead * 0.04))
+		n.set_meta("lead", lead)
+		n.set_meta("vdir", v.dir())
+		vx -= lead * v.dir()
 		# 1.30: встречная полоса — машина развёрнута (кабиной влево), x — по-прежнему задний край
 		n.position = Vector2(vx * T - 4.0, (sim.world.road_row + 0.7) * T) if v.lane == 0 else Vector2(vx * T + 4.0, (sim.world.road_row + 2.55) * T)
 		n.scale.x = 1.0 if v.lane == 0 else -1.0
@@ -250,8 +260,22 @@ func _sync_vans() -> void:
 			(cgn as Sprite2D).visible = full
 	for id in vans.keys():
 		if not seen.has(id):
-			vans[id].queue_free()
+			var gn: Node2D = vans[id]
 			vans.erase(id)
+			if gn.has_meta("vdir") and gn.visible:
+				_van_ghosts.append([gn, float(gn.get_meta("vdir"))])
+			else:
+				gn.queue_free()
+	var now := Time.get_ticks_msec()
+	var dts := clampf(float(now - _van_t) / 1000.0, 0.0, 0.1) if _van_t >= 0 else 0.0
+	_van_t = now
+	for i in range(_van_ghosts.size() - 1, -1, -1):
+		var gg: Array = _van_ghosts[i]
+		var nd: Node2D = gg[0]
+		nd.position.x += float(gg[1]) * 8.0 * T * dts
+		if nd.position.x < -CityBackdrop.M * T or nd.position.x > (sim.world.w + CityBackdrop.M) * T:
+			nd.queue_free()
+			_van_ghosts.remove_at(i)
 
 
 ## 1.30: какой груз видно в открытом кузове: прутки металла, ящики с оборудованием,

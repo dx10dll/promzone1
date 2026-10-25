@@ -41,7 +41,7 @@ func _init() -> void:
 		var made0 := 0
 		for m in sim.things_of("machine"):
 			made0 += m.parts_made
-		check(nw == (d["workers"] as Array).size(), "%s: люди на месте (%d)" % [v, nw])
+		check(nw == (d["workers"] as Array).size() + 1 and Director.of(sim) != null, "%s: люди на месте (%d) и пришёл директор (1.40)" % [v, nw])
 		check(nt > 10, "%s: объекты на месте (%d)" % [v, nt])
 		check(absf(m0 - float(d["money"])) < 1.0, "%s: деньги те же" % v)
 		var t0 := sim.minute

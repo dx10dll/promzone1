@@ -47,6 +47,8 @@ func set_mode(m: String, a: Variant = null) -> void:
 	if m == "object" and a != null and Thing.rotations(str(a)) < 4 and place_rot % 2 == 1:
 		place_rot = 0
 	dragging = false
+	if m != "logistics":
+		_logi_set_src(null)
 	mode_changed.emit()
 	queue_redraw()
 
@@ -75,7 +77,7 @@ func _process(delta: float) -> void:
 	if c != hover:
 		hover = c
 		queue_redraw()
-		if overlay and mode == "room":
+		if overlay and (mode == "room" or mode == "logistics"):
 			var rr := sim.rooms.room_at(c)
 			overlay.hover_room = rr.id if rr else -1
 			overlay.queue_redraw()
@@ -100,6 +102,8 @@ func _unhandled_input(e: InputEvent) -> void:
 		elif mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed:
 			if dragging:
 				dragging = false
+			elif mode == "logistics" and logi_remove_at(get_global_mouse_position()):
+				pass
 			elif mode != "select":
 				set_mode("select")
 			elif sim.brain.controlled_worker() != null:
@@ -136,6 +140,8 @@ func _on_press(c: Vector2i) -> void:
 				click_ms = Time.get_ticks_msec()
 				var r := sim.rooms.room_at(c)
 				room_clicked.emit(r.id if r else -1)
+		"logistics":
+			logi_press_at(get_global_mouse_position())
 		"object":
 			_place_object(c)
 		"template":
@@ -147,6 +153,9 @@ func _on_press(c: Vector2i) -> void:
 
 
 func _on_release(c: Vector2i) -> void:
+	if mode == "logistics":
+		logi_release_at(get_global_mouse_position())
+		return
 	if not dragging:
 		return
 	dragging = false
@@ -549,6 +558,9 @@ func _draw_template_ghost() -> void:
 
 func _select_at() -> void:
 	var mp := get_global_mouse_position()
+	if FxLayer.sign_at(sim, mp) >= 0:
+		cell_clicked.emit(_mouse_cell())   # 1.40: табличка «Продаётся» — game_main откроет «Развитие» на участке
+		return
 	var ctl_on := sim.brain.controlled_worker() != null
 	var best_id := -1
 	var bd := 22.0 * 22.0
@@ -593,10 +605,76 @@ func _select_at() -> void:
 
 # ---------------------------------------------------------------- рисование предпросмотра
 
+# ---------------------------------------------------------------- 1.40: оверлей «Логистика»
+var logi_src: Rooms.Room = null     ## откуда тянут линию (цех или контора)
+var logi_press: Rooms.Room = null   ## на чём нажали, если это не источник (столовая — переключатель «только ИТР»)
+
+
+func _logi_room(p: Vector2) -> Rooms.Room:
+	return sim.rooms.room_at(Vector2i(floori(p.x / T), floori(p.y / T)))
+
+
+func _logi_set_src(r: Rooms.Room) -> void:
+	logi_src = r
+	if overlay:
+		overlay.logi_src = r.id if r else -1
+		overlay.queue_redraw()
+	queue_redraw()
+
+
+## Убрать связь под точкой мира. true — что-то убрали.
+func logi_remove_at(p: Vector2) -> bool:
+	var l := OverlayLayer.logi_hit(sim, p, T * 0.5)
+	if l.is_empty():
+		return false
+	sim.areas.unlink(l["src"], str(l["kind"]), bool(l["itr"]))
+	message.emit(L.t("Связь убрана: %s — теперь ближайшее.") % L.t(str(OverlayLayer.LOGI_NAME[str(l["kind"])])).to_lower(), true)
+	if overlay:
+		overlay.queue_redraw()
+	return true
+
+
+func logi_press_at(p: Vector2) -> void:
+	logi_press = null
+	if logi_remove_at(p):
+		return
+	var r := _logi_room(p)
+	if r != null and (r.type == "workshop" or Areas.is_office_type(r.type)):
+		_logi_set_src(r)
+	else:
+		logi_press = r
+
+
+func logi_release_at(p: Vector2) -> void:
+	var dst := _logi_room(p)
+	if logi_src != null:
+		var src := logi_src
+		_logi_set_src(null)
+		if dst == null or dst.id == src.id:
+			return
+		var kind := sim.areas.drag_link(src, dst)
+		if kind == "":
+			message.emit(L.t("Сюда линию не провести: цех тянется к бытовке, душевой, туалету, столовой или комнате отдыха, контора (ИТР) — к туалету, столовой и комнате отдыха."), false)
+		else:
+			message.emit(L.t("Связь: %s — %s.") % [L.t(str(OverlayLayer.LOGI_NAME[kind])).to_lower(), dst.title()], true)
+	elif logi_press != null and dst != null and dst.id == logi_press.id and dst.type == "canteen":
+		var on := not sim.areas.is_itr_canteen(dst)
+		sim.areas.set_itr_canteen(dst, on)
+		message.emit(L.t("Столовая только для ИТР: рабочие туда не ходят.") if on else L.t("Столовая снова для всех."), true)
+	logi_press = null
+	if overlay:
+		overlay.queue_redraw()
+
+
 func _draw() -> void:
 	if sim == null:
 		return
 	var w := sim.world
+	if mode == "logistics" and logi_src != null:
+		var a := logi_src.center * T
+		var b := get_global_mouse_position()
+		draw_line(a, b, Color(1, 1, 1, 0.85), 3.0, true)
+		draw_circle(b, 5.0, Color(1, 1, 1, 0.9))
 	# чертежи стен
 	for i in sim.bp_cells.keys():
 		var bw := w.bp_wall[i]

@@ -14,6 +14,11 @@ const UI_ORDER := ["workshop", "storage", "locker", "shower", "canteen", "wc", "
 	"office", "director_office", "foreman_office", "chief_office", "accounting", "supply_office", "pdo", "hr_office", "tech_office",
 	"sales_office", "safety_office", "engineer_office", "legal_office",
 	"classroom", "compressor_room", "boiler_room", "tech_room", "union_office", "dorm", "medbay"]
+## 1.40: каталог без скрытых помещений (кабинет главного инженера, пока механика убрана).
+static func ui_order() -> Array:
+	return UI_ORDER.filter(func(t: String) -> bool: return not bool(Defs.rooms.get(t, {}).get("hidden", false)))
+
+
 const OFFICE_TYPES := ["office", "foreman_office", "chief_office", "accounting", "supply_office", "pdo", "hr_office", "tech_office",
 	"sales_office", "safety_office", "engineer_office", "legal_office"]
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
@@ -221,6 +226,7 @@ func rebuild() -> void:
 	for r in list:
 		_check(r)
 	rev += 1
+	w.zone_weights()   # 1.40: через кабинеты пути «дороже»
 
 
 ## Размеченные клетки вне помещения — показать предупреждение «нужны стены».

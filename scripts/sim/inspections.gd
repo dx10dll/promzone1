@@ -691,7 +691,7 @@ func violations(t: String) -> Array:
 			var low: Array[String] = []
 			var mw := float(Defs.inspections.get("min_wage_shift", 1900))
 			for w in sim.workers:
-				if float(w.wage) < mw:
+				if float(w.wage) < mw and not w.is_director():
 					low.append(w.full_name())
 			if not low.is_empty():
 				out.append(_v(t, "min_wage", none, -1, [", ".join(PackedStringArray(low.slice(0, 3)))], true, float(mini(low.size(), 3))))

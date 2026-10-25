@@ -599,7 +599,7 @@ func _fill_form() -> void:
 	ob.add_item("Любая — по тому, кто нужен заводу")
 	ob.set_item_metadata(0, "")
 	var cur_prof := str(cur.get("prof", ""))
-	for grp: Array in CustomWorkers.PROF_GROUPS:
+	for grp: Array in CustomWorkers.prof_groups():
 		ob.add_separator(str(grp[0]))
 		for pk: String in grp[1]:
 			ob.add_item(str(Worker.PROF_NAMES.get(pk, pk)))   # пункты OptionButton переводит сам Godot
@@ -656,7 +656,8 @@ func _fill_looks() -> void:
 		return hs.map(func(x: String) -> Array: return [x, str(CustomWorkers.HAIR_NAMES.get(x, x))]), "look", "hair"))
 	g.add_child(_pick("Цвет волос", _zip(CustomWorkers.HAIR_COLS, CustomWorkers.HAIR_COL_NAMES), "look", "hair_col", CustomWorkers.HAIR_COLS))
 	# у женщин — серьги, у мужчин — борода (на одном месте сетки: видна одна из двух строк)
-	g.add_child(_pick("Серьги", [[false, "Нет"], [true, "Есть"]], "fo", "earrings", [], 1))
+	if People.EARRINGS:   # 1.40: серьги убраны (флаг в People)
+		g.add_child(_pick("Серьги", [[false, "Нет"], [true, "Есть"]], "fo", "earrings", [], 1))
 	g.add_child(_pick("Борода, усы", CustomWorkers.BEARDS.map(func(x: String) -> Array: return [x, str(CustomWorkers.BEARD_NAMES[x])]), "look", "beard", [], 0))
 	# 1.37: в наборе v5 у мужчин 4 формы лица, у женщин 3 — показываем только свои (старое значение — ближайшее)
 	g.add_child(_pick("Лицо", func() -> Array:
@@ -705,7 +706,7 @@ func _fill_char(tr: Array) -> void:
 ## Женщине — женские черты лица по умолчанию не навязываем, но причёска и борода меняются в regender.
 func _regender_face() -> void:
 	var fo: Dictionary = (cur.get("look", {}) as Dictionary).get("face_ovr", {})
-	if not bool(cur.get("female", false)):
+	if not bool(cur.get("female", false)) or not People.EARRINGS:
 		fo["earrings"] = false
 
 

@@ -69,6 +69,8 @@ static func breakdown(sim: Sim, w: Worker) -> Array:
 		out.append([L.t("Очень хочет в туалет"), -4.0])
 	var market := float(market_wage(w))
 	var ratio := float(w.wage) / maxf(1.0, market)
+	if w.is_director():
+		ratio = 1.0   # 1.40: директор — хозяин завода, оклада у него нет
 	var wk := trait_val(w, "wage_k", 1.0)
 	if ratio < 0.9:
 		out.append([L.t("Платят меньше, чем везде"), -7.0 * wk])
@@ -119,6 +121,8 @@ static func life(sim: Sim, w: Worker) -> Dictionary:
 	if float(w.needs["rest"]) < 15.0:
 		add.call("byt", L.t("Вымотан"), -6.0)
 	var ratio := float(w.wage) / maxf(1.0, float(market_wage(w)))
+	if w.is_director():
+		ratio = 1.0
 	var wk := trait_val(w, "wage_k", 1.0)
 	if ratio < 0.9:
 		add.call("money", L.t("Платят меньше, чем везде"), -7.0 * wk)

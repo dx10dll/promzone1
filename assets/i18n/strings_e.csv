@@ -1247,7 +1247,7 @@ help.todo.text,"• [b]“What to do”[/b] (left): task cards. A [color=#e0675a
 • The [b]red banner[/b] under the top bar is the main trouble (wage arrears, negative cash, no tools). Clicking it opens the right window.
 • [b]Notifications[/b] at the bottom are clickable: the camera flies to the spot, or a window opens (Finance, Supply, Orders…). Everything is kept in the log (Events → Log).
 • Red banners over objects (“No power”, “Broken”, “Not heating”) tell you what to do.
-• The production bottleneck is shown by the chief engineer and the “Downtime” tab."
+• The production bottleneck is shown in the “Downtime” tab."
 help.tutorial.title,Tutorial
 help.tutorial.text,"In the Garage, the 14-step tutorial walks you through the basics: the screen dims, exactly what to press lights up, and a pulsing frame leads to the target. The camera moves to whatever is being discussed.
 • The yellow panel says why and what to do; explanations close with “Got it”.
@@ -1264,7 +1264,7 @@ help.walls.title,"Walls, floors, doors and windows"
 help.walls.text,"[b]Walls[/b]: brick, sand-lime brick, aerated concrete, concrete (cheaper), sandwich panel (builds twice as fast), partition (a cheap way to split a hall into offices).
 [b]Floors[/b]: concrete and epoxy (dirt builds up a third slower) for shops; ceramic and blue tile for amenities; linoleum and parquet for offices.
 [b]Openings[/b]: windows, wooden, steel and glass doors, gates. Drag them along a wall: several cells in a row become one window, a double door or a sectional gate.
-• [b]Room frame[/b] (Build): drag a rectangle and get the floor, walls and door at once."
+• [b]Ready rooms[/b] (Build): click where to place one and get the floor, walls, doors, furniture and zone at once."
 help.rooms.title,Rooms and zones
 help.rooms.text,"A room is a floor enclosed by walls with a door. Inside it you draw [b]zones[/b] (the “Zones” button, R): drag a rectangle, or click to fill the whole room. One hall can hold several zones.
 • The zone color is its group: orange production, yellow storage and shipping, green amenities, blue offices, purple training and union.
@@ -1410,11 +1410,11 @@ help.routes.text,"Complex products follow a route of several operations: turning
 help.wear.title,"Wear, maintenance and repair"
 help.wear.text,"• Machines wear out with use. A worn one is serviced by a turner, fitter or handy worker: about 40 minutes and 3,500 ₽ for cutters and spare parts.
 • Below 30% condition a machine may break down: repair takes about 3 hours and 22,000 ₽ (property insurance returns 80%).
-• [b]Preventive maintenance[/b] (Production → Machines): service earlier, from 75%. With a chief engineer it turns on by itself for new machines.
+• [b]Preventive maintenance[/b] (Production → Machines): service earlier, from 75%.
 • Fitters repair fastest of all; the “machine care” improvement proposal slows wear by 25%."
 help.saw_setup.title,"Blanks, setter, fitter"
 help.saw_setup.text,"• A [b]band saw[/b] (85,000 ₽) cuts bar stock into blanks in advance: the first operation on a ready blank is 20% faster.
-• A [b]setter[/b] sets machines up ahead of the next operation and services them, so machinists don't stand idle.
+• A [b]CNC setter[/b] sets machines up ahead of the next operation and services them, so machinists don't stand idle.
 • A [b]fitter[/b] at the fitter's bench reworks rejects, hacksaws blanks until you have a saw and repairs machines quickly."
 help.consumables.title,Consumables
 help.consumables.text,"Supply restocks consumables by itself:
@@ -1428,7 +1428,7 @@ help.stall.title,Machine downtime
 help.stall.text,"Production → [b]Downtime[/b]: every machine that isn't working right now and the reason in plain words: broken, no power or cable, sealed, worn, outside a workshop, no water, no task, no consumable, no one to run it, machinist off shift, output full, no metal, waiting for blanks.
 • Three groups: “Needs your attention”, “Will stop soon”, “Normal waiting”.
 • Clicking a line shows the machine and opens its card.
-• The [b]bottleneck[/b] is the process holding back output the most; the chief engineer points it out."
+• The [b]bottleneck[/b] is the process holding back output the most; it shows in the “Downtime” tab."
 help.sec.qc,QC and rejects
 help.qc_table.title,QC inspection
 help.qc_table.text,"A [b]QC table[/b] (26,000 ₽): the inspector checks every part. Good ones go on the pallet, rejects into the reject bin.
@@ -1631,7 +1631,6 @@ help.depts.text,"• [b]Section foreman[/b]: shift speed and discipline.
 • [b]Engineering office[/b]: research.
 • [b]Sales department[/b]: competitors, pricing policy, +10% requests.
 • [b]Workplace safety[/b]: −15% injuries, your own N-1 report.
-• [b]Chief engineer[/b]: advice, preventive maintenance, utilities summary.
 • [b]Legal department[/b]: appealing fines (60% instead of 40%), complaints, tenders."
 help.locks.title,"No person, no function"
 help.locks.text,"Window sections a department is responsible for are locked until you have it. Without an accountant, only money and recent transactions; without an HR officer, mood is shown in words; without a buyer, no metal price chart and no buying ahead; without a planning office, no plan and no “on time?”.
@@ -1644,7 +1643,7 @@ help.advisor.text,"Management → Chief engineer suggests what matters most righ
 • When wages eat more than 70% of revenue, he'll point out which machinists stand idle."
 help.sec.develop,Development and land
 help.stages.title,Growth stages
-help.stages.text,"Six stages: [b]Garage[/b] (2–5 people) → [b]Workshop[/b] (5–20) → [b]Small business[/b] (20–100) → [b]Medium[/b] (100–300) → [b]Large plant[/b] (300–1000) → [b]Town-forming[/b] (1000+).
+help.stages.text,"Six stages: [b]Garage[/b] (1–5 people) → [b]Workshop[/b] (5–15) → [b]Small business[/b] (15–30) → [b]Medium[/b] (30–50) → [b]Large plant[/b] (50–100) → [b]Town-forming[/b] (100+).
 • Each opens new machines, shops and departments; goals are in the Goals window (G).
 • From “Workshop”, the next stage needs two mandatory goals and any two of four roads: volume (turnover 2 → 5 → 12 → 30 million ₽), quality, people or town."
 help.rating.title,Star rating

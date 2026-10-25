@@ -147,7 +147,7 @@ func _appears() -> void:
 	check(People.eye_color(lk) == Color("#5d7a4a"), "цвет глаз")
 	var fc := People.face(lk, w.age)
 	check(str(fc["head"]) == "round" and str(fc["eyes"]) == "deep" and str(fc["brows"]) == "arched" and str(fc["nose"]) == "hooked" and str(fc["mouth"]) == "full", "черты лица: %s" % str(fc))
-	check(bool(fc["freckles"]) and bool(fc["earrings"]), "веснушки и серьги")
+	check(bool(fc["freckles"]) and not bool(fc["earrings"]), "веснушки есть, серёг нет (1.40: серьги убраны)")
 	check(bool(lk["fem"]) and str(lk.get("beard", "")) == "", "женщина без бороды")
 	check(w.skills.size() > 3 and w.wage > 0 and Worker.PROF_NAMES.has(w.prof), "навыки и ставка — как у обычного кандидата (%s, %s)" % [w.prof_name(), Defs.money_str(w.wage)])
 	check(s.events.any(func(ev: Variant) -> bool: return str(ev).contains("Зинаида Громова")), "в журнале — что пришла наниматься")

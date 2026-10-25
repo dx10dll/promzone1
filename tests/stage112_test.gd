@@ -25,7 +25,9 @@ func _types(sim: Sim, rect: Rect2i) -> Array[String]:
 
 func _init() -> void:
 	Defs.load_all()
+	Director.skip_office = true   # зал теста стоит на месте конторы директора
 	var sim := Scenario.new_game("garage", "mech", "calm", 112)
+	Director.skip_office = false
 	sim.story.enabled = false
 	sim.money = 5000000.0
 	sim.progress.all_open = true

@@ -42,7 +42,7 @@ func _init() -> void:
 	var ok_struct := true
 	for b: Dictionary in br:
 		var steps: Array = b["steps"]
-		if steps.size() != 3:
+		if steps.size() != (2 if str(b.get("id", "")) == "tech" and not Defs.CHIEF_ENGINEER else 3):   # 1.40: без главного инженера
 			ok_struct = false
 		for sd: Dictionary in steps:
 			if sd.has("dept"):
@@ -51,7 +51,7 @@ func _init() -> void:
 			elif (float(sd.get("cost", 0.0)) <= 0.0 and not sd.has("lot")) or int(sd.get("days", 0)) <= 0:
 				ok_struct = false
 	check(ok_struct, "в каждой ветке три ступени; у ступеней-отделов есть отдел, у остальных — цена и срок")
-	check(Develop.all_ids().size() == 27, "всего 27 ступеней")
+	check(Develop.all_ids().size() == (27 if Defs.CHIEF_ENGINEER else 26), "всего %d ступеней (1.40: без главного инженера — 26)" % Develop.all_ids().size())
 	check(Defs.rooms.has("director_office") and Defs.objects.has("director_desk") and Rooms.TYPES.has("director_office"), "кабинет директора и стол директора")
 
 	print("— ступени-отделы открывает найм")
@@ -65,6 +65,10 @@ func _init() -> void:
 	for i in 4:
 		S.hire(sim, "cleaner", "haul", 3)
 	check(sim.workers.size() >= 6, "в штате %d человек" % sim.workers.size())
+	var dk0 := Director.desk(sim)   # 1.40: кабинет директора есть с начала игры — убираем, чтобы проверить запрет
+	if dk0:
+		sim.remove_thing(dk0, 0.0)
+		sim.rooms.update()
 	check(sim.dev.block_reason("city1") == "Нужен кабинет директора", "без кабинета директора не исследовать: %s" % sim.dev.block_reason("city1"))
 	_director(sim)
 	check(sim.dev.root_ok(), "кабинет директора построен")

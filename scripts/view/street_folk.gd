@@ -368,11 +368,31 @@ func _pose_of(tr: Dictionary, m: float) -> Array:
 				return [end.lerp(bd, k), "up", "walk", clampf(1.0 - k * k, 0.0, 1.0)]
 		"edge":
 			if m < te + 4.0:
-				return [end, "right" if end.x < sim.world.w * T * 0.5 else "left", "idle", clampf((te + 4.0 - m) / 0.6, 0.0, 1.0)]
+				return [end, "right" if end.x < sim.world.w * T * 0.5 else "left", "idle", 1.0]
+			# 1.40: не дождался (смену отменили, заболел) — не тает у края, а идёт обратно домой или на автобус
+			_turn_back(tr, te + 4.0)
+			return _pose_of(tr, m)
 		"off":
 			pass
 	tr["done"] = true
 	return []
+
+
+## Поездка «к краю карты» не состоялась: тот же путь обратно — к подъезду или на остановку.
+func _turn_back(tr: Dictionary, t0: float) -> void:
+	var pts: PackedVector2Array = _rev(tr["pts"])
+	var back_bus := str(tr["pre"]) == "bus" or int(tr["da"]) < 0
+	tr["pts"] = pts
+	tr["len"] = _plen(pts)
+	tr["t0"] = t0
+	tr["te"] = t0 + float(tr["len"]) / maxf(float(tr["spd"]), 0.01)
+	tr["db"] = int(tr["da"])
+	tr["da"] = -1
+	tr["pre"] = ""
+	tr["post"] = "bus" if back_bus else "door"
+	tr.erase("hs")
+	tr.erase("hd")
+	tr["tb"] = maxf(float(tr["te"]), next_dwell(int(tr["side"]), float(tr["te"]))) if back_bus else -1.0
 
 
 # ---------------------------------------------------------------- кадр
@@ -622,7 +642,10 @@ func _folk_tick(np: Dictionary) -> void:
 		var f: Dictionary = _folk[k2]
 		var off := float(k2) * 37.3
 		var c := int(floorf((_vm + off) / cyc))
-		if int(f["c"]) != c:
+		var tr0: Dictionary = f["trip"]
+		# 1.40: новая прогулка — только когда прежняя закончилась (раньше её обрывало посреди тротуара)
+		var busy := not tr0.is_empty() and not tr0.has("done") and _vm >= float(tr0["t0"]) and _vm < maxf(float(tr0["te"]), float(tr0.get("tb", -1.0))) + 1.0
+		if int(f["c"]) != c and not busy:
 			f["c"] = c
 			f["trip"] = _folk_trip(f["w"], k2, c, float(c) * cyc - off, fr)
 		var tr: Dictionary = f["trip"]

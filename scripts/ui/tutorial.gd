@@ -58,7 +58,7 @@ const STEPS := [
 		"do": "Закройте меню: Esc или ещё раз кнопка «Объекты».", "target": "btn:objects", "done": "sub_closed"},
 	{"id": "build", "title": "Стройка",
 		"text": "Цеху тесно. Проще всего — готовое помещение: стены, пол, двери, мебель и зона разом. Строители всё сделают сами.",
-		"do": "«Стройка» → «Помещения» → «Склад 6×4», затем щёлкните по свободной земле рядом с гаражом.", "target": "dyn:build", "done": "template"},
+		"do": "«Стройка» → «Готовые помещения» → «Склад 6×4», затем щёлкните по свободной земле рядом с гаражом.", "target": "dyn:build", "done": "template"},
 	{"id": "build_close", "sub": true, "keep": true, "title": "Чертёж на месте",
 		"text": "Помещение начерчено — строители возьмутся за него сами, когда освободятся. Пока стройка идёт, можно заниматься другим.",
 		"do": "Закройте меню: Esc или ещё раз кнопка «Стройка».", "target": "btn:build", "done": "sub_closed"},
@@ -501,7 +501,7 @@ func _target_rect() -> Rect2:
 		"dyn:rack":
 			return _menu_target("objects", "Склад", "rack")
 		"dyn:build":
-			return _menu_target("build", "Помещения", "storage")
+			return _menu_target("build", "Готовые помещения", "storage")
 		"dyn:hire":
 			if hud.win == null or hud.win.group != "people":
 				return _rect_of(hud.bottom_btns.get("people"))

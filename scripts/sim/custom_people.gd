@@ -59,7 +59,7 @@ static func roll(sim: Sim, profs: Array, only_prof: String = "") -> Worker:
 		if sim.rng.randf() >= sim.custom_chance:
 			continue
 		var prof := str(e2.get("prof", ""))
-		if prof == "" or not Worker.PROF_NAMES.has(prof):
+		if prof == "" or not Worker.PROF_NAMES.has(prof) or (prof == "chief_engineer" and not Defs.CHIEF_ENGINEER):
 			prof = only_prof if only_prof != "" else (str(profs[sim.rng.randi_range(0, profs.size() - 1)]) if not profs.is_empty() else "laborer")
 		var w := make(sim.rng, e2, prof)
 		sim.candidates.append(w.to_dict())

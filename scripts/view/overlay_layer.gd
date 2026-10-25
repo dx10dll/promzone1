@@ -8,6 +8,7 @@ const T := World.T
 var sim: Sim
 var mode := ""            ## "" | "rooms" | "power" | "temp" | "water" | "light" | "noise" | "traffic" | "load"
 var hover_room := -1
+var logi_src := -1        ## 1.40: «Логистика» — откуда тянут линию (номер помещения)
 var legend: Array = []    ## [[текст, цвет]] — пояснение для карточки легенды в интерфейсе
 var _t := 0.0
 
@@ -119,6 +120,8 @@ func _draw() -> void:
 			_draw_nets()
 		"crew":
 			_draw_crew()
+		"logistics":
+			_draw_logistics()
 
 
 ## Пояснение к оверлею (1.12): строки уходят в карточку легенды справа, у панели оверлеев.
@@ -754,6 +757,103 @@ func _draw_crew() -> void:
 	_legend([[L.t("Бригады: участки и люди цветом бригады, бригадир — с ободком"), Color("#e7e4d8")],
 		[L.t("Охрана: камеры (зелёные — пишут), проходная, охранники — жёлтый ободок"), Color("#8fb3c8")],
 		[L.t("Шанс поймать несуна на выходе: %d%%") % int(round(cr.detect_k() * 100.0)), Color("#e0aa48")]])
+
+
+# ---------------------------------------------------------------- логистика быта (1.40)
+
+const LOGI_COL := {"locker": Color("#e0aa48"), "shower": Color("#5fb8e8"), "wc": Color("#b08ad8"),
+	"canteen": Color("#8fcf78"), "restroom": Color("#e87a8a")}
+const LOGI_NAME := {"locker": "Бытовка", "shower": "Душевая", "wc": "Туалет", "canteen": "Столовая", "restroom": "Комната отдыха"}
+
+
+## Кривая связи между центрами помещений: изгиб зависит от вида, чтобы линии одной пары не слипались.
+static func logi_curve(a: Vector2, b: Vector2, kind: String, n: int = 20) -> PackedVector2Array:
+	var d := b - a
+	var nrm := Vector2(-d.y, d.x).normalized()
+	var k := Areas.KINDS.find(kind)
+	var bulge := d.length() * (0.10 + 0.045 * k) * (1.0 if k % 2 == 0 else -1.0)
+	var ctrl := (a + b) * 0.5 + nrm * bulge
+	var out := PackedVector2Array()
+	for i in n + 1:
+		var t := float(i) / float(n)
+		out.append(a.lerp(ctrl, t).lerp(ctrl.lerp(b, t), t))
+	return out
+
+
+## Связь под точкой мира (в пределах radius) или {}.
+static func logi_hit(sim: Sim, p: Vector2, radius: float) -> Dictionary:
+	var best := {}
+	var bd := radius
+	for l: Dictionary in sim.areas.link_list():
+		var pts := logi_curve((l["src"] as Rooms.Room).center * T, (l["dst"] as Rooms.Room).center * T, str(l["kind"]))
+		for i in pts.size() - 1:
+			var q := Geometry2D.get_closest_point_to_segment(p, pts[i], pts[i + 1])
+			var dd := q.distance_to(p)
+			# у самих центров комнат линии сходятся — там нажатие начинает новую линию, а не стирает старую
+			if dd < bd and q.distance_to(pts[0]) > T * 1.3 and q.distance_to(pts[pts.size() - 1]) > T * 1.3:
+				bd = dd
+				best = l
+	return best
+
+
+func _draw_logistics() -> void:
+	var w := sim.world
+	draw_rect(Rect2(Vector2.ZERO, Vector2(w.w, w.h) * T), Color(0.05, 0.06, 0.08, 0.38))
+	var src: Rooms.Room = null
+	for r in sim.rooms.list:
+		if r.id == logi_src:
+			src = r
+	for r in sim.rooms.list:
+		var col := Color("#9aa3ab")
+		if r.type != "":
+			col = Color(str(Defs.rooms.get(r.type, {}).get("color", "#9aa3ab")))
+		var a := 0.22
+		if LOGI_COL.has(r.type):
+			col = LOGI_COL[r.type]
+			a = 0.3
+		if r.id == hover_room:
+			a += 0.14
+		if src != null and r.id == src.id:
+			a = 0.5
+		for c in r.cells:
+			draw_rect(Rect2(Vector2(c) * T, Vector2(T, T)), Color(col.r, col.g, col.b, a))
+		draw_rect(Rect2(Vector2(r.rect.position) * T, Vector2(r.rect.size) * T), Color(col.r, col.g, col.b, 0.85), false, 2.0)
+	var links := sim.areas.link_list()
+	for l: Dictionary in links:
+		var col2: Color = LOGI_COL[str(l["kind"])]
+		var pts := logi_curve((l["src"] as Rooms.Room).center * T, (l["dst"] as Rooms.Room).center * T, str(l["kind"]))
+		if bool(l["itr"]):
+			for i in range(0, pts.size() - 1, 2):
+				draw_line(pts[i], pts[i + 1], col2, 3.0, true)
+		else:
+			draw_polyline(pts, col2, 3.0, true)
+		draw_circle(pts[pts.size() - 1], 5.0, col2)
+		draw_circle(pts[0], 3.5, col2)
+	for r in sim.rooms.list:
+		var itr_only := sim.areas.is_itr_canteen(r)
+		var nm := r.title()
+		if itr_only:
+			nm += L.t(" · только ИТР")
+		_text(r.center * T + Vector2(0, -2), nm, 12.0, Color("#f0ece0"))
+		var sub := ""
+		if r.type == "workshop":
+			var cnt := 0
+			for l2: Dictionary in links:
+				if (l2["src"] as Rooms.Room).id == r.id:
+					cnt += 1
+			sub = L.t("связей: %d (иначе — ближайшее)") % cnt
+		elif Areas.is_office_type(r.type):
+			sub = L.t("группа ИТР")
+		elif LOGI_COL.has(r.type) and not r.valid:
+			sub = L.t("не оборудована")
+		if sub != "":
+			_text(r.center * T + Vector2(0, 12), sub, 9.5, Color("#c9c5b8"))
+	var lg: Array = [[L.t("Протяните линию от цеха (или конторы — для ИТР) к бытовке, душевой, туалету, столовой или комнате отдыха."), UITheme.TEXT],
+		[L.t("Щелчок или ПКМ по линии убирает связь. Щелчок по столовой — «только для ИТР». Нет линии — ходят в ближайшее."), UITheme.MUTED],
+		[L.t("Пунктир — связи ИТР."), UITheme.MUTED]]
+	for k: String in Areas.KINDS:
+		lg.append([L.t(str(LOGI_NAME[k])), LOGI_COL[k]])
+	_legend(lg)
 
 
 # ---------------------------------------------------------------- сжатый воздух

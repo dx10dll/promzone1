@@ -47,7 +47,7 @@ func reset() -> void:
 		var n := 2 if i < 4 else 1
 		for k in n:
 			_cars.append({"lane": i, "k": _rng.randf(), "v": _rng.randf_range(0.012, 0.03) * (1.0 if i < 4 else 2.5),
-				"col": cols[_rng.randi_range(0, cols.size() - 1)], "truck": _rng.randf() < 0.25})
+				"col": cols[_rng.randi_range(0, cols.size() - 1)], "truck": _rng.randf() < 0.25, "d": 1.0, "park": 0.0})
 
 
 func _process(delta: float) -> void:
@@ -74,12 +74,30 @@ func _process(delta: float) -> void:
 			_train_x = -99999.0
 			_train_wait = _rng.randf_range(25.0, 70.0)
 	# машины
+	# 1.40: у каждой машины маршрут. Конец проезда у края города — уезжает за край (и потом въезжает снова);
+	# конец внутри города (двор, проезд между кварталами) — паркуется у обочины, стоит и едет обратно.
 	for c: Dictionary in _cars:
+		if float(c["park"]) > 0.0:
+			c["park"] = float(c["park"]) - d
+			continue
 		var ln: Array = backdrop.lanes[int(c["lane"])]
 		var len := maxf(1.0, _lane_len(ln))
-		c["k"] = float(c["k"]) + float(c["v"]) * d * (1000.0 / len)
-		if float(c["k"]) > 1.0:
-			c["k"] = 0.0
+		var dirk := float(c["d"])
+		c["k"] = float(c["k"]) + dirk * float(c["v"]) * d * (1000.0 / len)
+		var k := float(c["k"])
+		if k > 1.0 or k < 0.0:
+			var end_p: Vector2 = ln[ln.size() - 1] if k > 1.0 else ln[0]
+			var other: Vector2 = ln[0] if k > 1.0 else ln[ln.size() - 1]
+			c["k"] = clampf(k, 0.0, 1.0)
+			if _edge(end_p, w):
+				if _edge(other, w):
+					c["k"] = 0.0 if dirk > 0.0 else 1.0   # за краем города — снова въезжает с начала маршрута
+				else:
+					c["d"] = -dirk                         # уехал за край — вернётся тем же путём к своему двору
+					c["park"] = _rng.randf_range(4.0, 14.0)
+			else:
+				c["d"] = -dirk                             # приехал во двор: стоит, потом уезжает
+				c["park"] = _rng.randf_range(12.0, 40.0)
 	# дым
 	_puff_t -= d
 	if _puff_t <= 0.0:
@@ -111,6 +129,15 @@ func _draw() -> void:
 		var a: Vector2 = seg[0]
 		var b: Vector2 = seg[1]
 		var p: Vector2 = seg[2]
+		if float(c["d"]) < 0.0:
+			var tmp := a
+			a = b
+			b = tmp
+		var side := (b - a).normalized().orthogonal() * (-0.35 * T)
+		if float(c["park"]) > 0.0 and not _edge(p, backdrop.sim.world):
+			p += side * 1.6   # стоит у обочины
+		elif float(c["d"]) < 0.0:
+			p += side * 1.4   # обратно — по встречной полосе
 		var horiz := absf(b.x - a.x) > absf(b.y - a.y)
 		var big := bool(c["truck"])
 		var sz := (Vector2(34, 13) if big else Vector2(20, 11)) if horiz else (Vector2(13, 34) if big else Vector2(11, 20))
@@ -139,6 +166,12 @@ func _draw() -> void:
 		for bp: Vector2 in backdrop.beacons:   # 1.30: заградительные огни телебашни
 			draw_circle(bp, 4.0, Color(1.0, 0.25, 0.2, 0.95))
 			draw_circle(bp, 9.0, Color(1.0, 0.3, 0.2, 0.25))
+
+
+## Точка у края города (дальше машину не видно).
+func _edge(p: Vector2, w: World) -> bool:
+	var m := (CityBackdrop.M - 2) * T
+	return p.x <= -m or p.y <= -m or p.x >= w.w * T + m or p.y >= w.h * T + m
 
 
 func _lane_len(ln: Array) -> float:

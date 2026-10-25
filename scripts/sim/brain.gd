@@ -117,6 +117,15 @@ func _tick_worker(w: Worker, dt: float) -> void:
 		if bt:
 			abort(w)
 			assign(w, bt)
+	elif w.mentor >= 0 and w.task.kind != "shadow" and w.carrying < 0 and w.carry_extra.is_empty() \
+			and (WORK_KINDS.has(w.task.kind) or SHADOW_KINDS.has(w.task.kind)) and str(w.task.current().get("t", "")) == "goto":
+		# 1.40: ученик идёт по своему делу, а наставник работает в стороне — бросает и идёт к нему
+		var mt := sim.training.mentor_of(w)
+		if mt and mt.present and not mt.hidden and mt.shift == w.shift and _shadowable(mt) and mt.pos.distance_to(w.pos) > 4.0:
+			var sht := _shadow_task(w)
+			if sht:
+				abort(w)
+				assign(w, sht)
 	if w.task:
 		_run(w, dt)
 
@@ -168,6 +177,8 @@ func _new_shift(w: Worker, win: Vector2) -> void:
 	if not sim.shift_is_workday(win):
 		return
 	Mood.refresh(sim, w)
+	if w.is_director():
+		return   # 1.40: директор не прогуливает и не увольняется
 	var weekday := int(win.x / 1440.0) % 7
 	var drink := trait_f(w, "absent_monday")
 	var abs_k := sim.office.absence_k(w)
@@ -301,7 +312,7 @@ func _free_shower(w: Worker) -> Thing:
 	for th in sim.usable_of("shower"):
 		if th.demolish or th.spot_users.has(0) or not sim.water.has_water(th):
 			continue
-		var d := _dist(th.cell, w.cell())
+		var d := _dist(th.cell, w.cell()) + sim.areas.pref(w, th, "shower")
 		if d < bd and sim.world.reachable(w.cell(), th.cell):
 			bd = d
 			best = th
@@ -366,7 +377,9 @@ func _despawn(w: Worker) -> void:
 ## Закреплённый шкафчик (или свободный — закрепляем). Предпочтение — шкафчики в бытовке.
 func _locker_for(w: Worker) -> Thing:
 	var cur: Thing = sim.things.get(w.locker_id)
-	if cur and cur.built and cur.kind() == "locker" and not cur.demolish and sim.rooms.zone_ok(cur):
+	var lr := sim.areas.linked(w, "locker")   # 1.40: бытовка, назначенная цеху
+	if cur and cur.built and cur.kind() == "locker" and not cur.demolish and sim.rooms.zone_ok(cur) \
+			and (lr == null or sim.rooms.room_of_thing(cur) == lr or _no_free_locker_in(lr, w)):
 		return cur
 	w.locker_id = -1
 	var taken := {}
@@ -378,13 +391,26 @@ func _locker_for(w: Worker) -> Thing:
 	for lk in sim.usable_of("locker"):
 		if lk.demolish or int(taken.get(lk.id, 0)) >= maxi(1, int(lk.def().get("seats", 1))):
 			continue
-		var sc := _dist(lk.cell, w.cell()) - (100.0 if sim.rooms.thing_in(lk, "locker") else 0.0)
+		var sc := _dist(lk.cell, w.cell()) - (100.0 if sim.rooms.thing_in(lk, "locker") else 0.0) + sim.areas.pref(w, lk, "locker")
 		if sc < bs:
 			bs = sc
 			best = lk
 	if best:
 		w.locker_id = best.id
 	return best
+
+
+## 1.40: в назначенной бытовке нет свободного шкафчика — остаётся свой прежний.
+func _no_free_locker_in(r: Rooms.Room, w: Worker) -> bool:
+	var used := {}
+	for o in sim.workers:
+		if o != w and o.locker_id >= 0:
+			used[o.locker_id] = int(used.get(o.locker_id, 0)) + 1
+	for tid in r.things:
+		var lk: Thing = sim.things.get(tid)
+		if lk and lk.built and not lk.demolish and lk.kind() == "locker" and int(used.get(lk.id, 0)) < maxi(1, int(lk.def().get("seats", 1))):
+			return false
+	return true
 
 
 func _locker_spot(lk: Thing, w: Worker) -> Vector2i:
@@ -503,7 +529,7 @@ func _choose(w: Worker) -> Task:
 			if bt:
 				return bt
 		"meet":
-			if not sim.crew.met(w):
+			if not sim.crew.met(w) and (not w.is_itr() or w.prof in ["foreman", "chief"]):
 				var mt := _meet_task(w)
 				if mt:
 					return mt
@@ -546,6 +572,9 @@ func _choose(w: Worker) -> Task:
 		hold.label = L.t("Ждёт вашей команды")
 		hold.add({"t": "work", "what": "order_wait", "dur": 3.0, "anim": "idle", "finish": false})
 		return hold
+	var sht := _shadow_task(w)
+	if sht:
+		return sht
 	if w.is_itr():
 		return _office_task(w)
 	if w.prof == "guard":
@@ -863,6 +892,8 @@ func _tb_task(w: Worker) -> Task:
 
 ## Работа ИТР: за своим столом; мастер ещё и обходит участок.
 func _office_task(w: Worker) -> Task:
+	if w.is_director():
+		return _director_task(w)
 	if w.prof == "foreman" and sim.rng.randf() < 0.35:
 		var pt := _patrol_task(w)
 		if pt:
@@ -884,6 +915,115 @@ func _office_task(w: Worker) -> Task:
 	t.data["desk"] = desk.id
 	t.add({"t": "goto", "cell": sp["cell"], "face": sp["face"]})
 	t.add({"t": "work", "what": "office", "dur": sim.rng.randf_range(40.0, 75.0), "anim": "desk"})
+	return t
+
+
+## 1.40: ученик ходит за наставником «хвостиком»: пока тот работает, стоит рядом и смотрит.
+## Пока наставник на смене, долгих дел вдали от него ученик не берёт (см. _tick_worker); без кубика.
+const SHADOW_KINDS := ["operate", "inspect", "haul", "build_bp", "build_thing", "repair", "fix", "rework", "reset", "lay_net", "load", "haul_cell", "clean", "sweep", "demolish"]
+
+
+func _shadow_task(w: Worker) -> Task:
+	if w.mentor < 0 or w.is_itr() or not sim.story.fires.is_empty():
+		return null
+	var m := sim.training.mentor_of(w)
+	if m == null or not m.present or m.hidden or m.shift != w.shift or not _shadowable(m):
+		return null
+	if _cool(w, "shadow"):
+		return null
+	var c := _beside(m.cell(), w)
+	if c.x < 0 or not sim.world.reachable(w.cell(), c):
+		_set_cool(w, "shadow", 20.0)
+		return null
+	var t := Task.new()
+	t.kind = "shadow"
+	t.label = L.t("Учится у наставника: %s") % m.full_name()
+	t.data["mentor"] = m.id
+	t.add({"t": "shadow", "mentor": m.id, "dur": 25.0, "want": c})
+	return t
+
+
+## Наставник на работе, между делами, на перекуре или в туалете — ученик рядом (ждёт у двери); на обед и отдых — нет.
+func _shadowable(m: Worker) -> bool:
+	return m.task == null or m.task.kind in ["wander", "smoke", "toilet", "patrol"] or SHADOW_KINDS.has(m.task.kind)
+
+
+## Свободная клетка рядом с человеком (ближайшая к ученику).
+func _beside(mc: Vector2i, w: Worker) -> Vector2i:
+	var best := Vector2i(-1, -1)
+	var bd := INF
+	for dy in range(-2, 3):
+		for dx in range(-2, 3):
+			var c := mc + Vector2i(dx, dy)
+			if (dx == 0 and dy == 0) or not sim.world.inb(c) or not sim.world.passable(c) or sim.world.occ[sim.world.idx(c)] >= 0:
+				continue
+			var dd := _dist(c, w.cell()) * 0.05 + float(maxi(absi(dx), absi(dy))) * 10.0
+			if dd < bd:
+				bd = dd
+				best = c
+	return best
+
+
+func _run_shadow(w: Worker, tl: Dictionary, dt: float) -> void:
+	var m := sim.get_worker(int(tl["mentor"]))
+	tl["done"] = float(tl.get("done", 0.0)) + dt
+	if m == null or not m.present or not _shadowable(m) or float(tl["done"]) >= float(tl["dur"]):
+		if m and float(tl["done"]) >= 10.0:
+			var sk := w.main_skill()
+			if w.skill(sk) < mini(10, m.skill(sk) - 1) and sim.rng.randf() < 0.03 * sim.training.growth_k(w, sk):
+				w.skills[sk] = w.skill(sk) + 1
+				w.add_history(sim.day(), L.t("Подучился у наставника: %s") % m.full_name())
+		w.task.next()
+		return
+	if m.task and m.task.kind in ["toilet", "smoke"] and float(w.needs["bladder"]) < 75.0:
+		var tt := _toilet_task(w)   # наставник отошёл — ученик заодно в туалет, чтобы потом не отлучаться
+		if tt:
+			abort(w)
+			assign(w, tt)
+			return
+	if w.pos.distance_to(m.pos) <= 1.6 or m.hidden:
+		w.anim = "idle"
+		_set_dir(w, m.pos - w.pos)
+		return
+	var want: Vector2i = tl.get("want", Vector2i(-1, -1))
+	if want.x < 0 or absi(want.x - m.cell().x) > 1 or absi(want.y - m.cell().y) > 1:
+		want = _beside(m.cell(), w)
+		tl["want"] = want
+	if want.x < 0:
+		w.anim = "idle"
+		return
+	if _move(w, want, dt) == -1:
+		tl["want"] = Vector2i(-1, -1)
+		w.task.next()
+
+
+## 1.40: директор — за своим столом (ведёт развитие, договоры, отчёты); раз в смену обходит цех.
+func _director_task(w: Worker) -> Task:
+	if int(w.get_meta("dir_walk", -1)) != int(w.shift_anchor) and sim.minute - w.shift_anchor > 120.0 and sim.dev.cur == "":
+		w.set_meta("dir_walk", int(w.shift_anchor))
+		var pt := _patrol_task(w)
+		if pt:
+			pt.label = L.t("Обходит цех: как идут дела")
+			pt.data["prop"] = "folder"
+			return pt
+	var desk := Director.desk(sim)
+	if desk == null:
+		sim.notify_once("nodesk_director", L.t("Директору негде работать: нужен кабинет директора со столом директора (Объекты → Офис). Без него не исследуются ступени «Развития»."), Sim.LVL_INFO, Vector2i(-1, -1), 2880.0)
+		return null
+	var sp := _free_spot(desk, w)
+	if sp.is_empty() or not sim.world.reachable(w.cell(), sp["cell"]):
+		return null
+	var t := Task.new()
+	t.kind = "office"
+	t.label = Director.desk_label(sim, int(sim.minute / 47.0))
+	desk.spot_users[int(sp["idx"])] = w.id
+	t.res_spots.append([desk.id, int(sp["idx"])])
+	t.data["desk"] = desk.id
+	if sim.dev.cur != "":
+		t.data["bubble"] = "idea"
+		t.data["prop"] = "folder"
+	t.add({"t": "goto", "cell": sp["cell"], "face": sp["face"]})
+	t.add({"t": "work", "what": "director", "dur": 60.0, "anim": "desk"})
 	return t
 
 
@@ -2358,7 +2498,7 @@ func _toilet_task(w: Worker) -> Task:
 		if not sim.water.has_water(th):
 			dry += 1
 			continue
-		var d := _dist(th.cell, w.cell()) - (20.0 if sim.rooms.thing_in(th, "wc") else 0.0)
+		var d := _dist(th.cell, w.cell()) - (20.0 if sim.rooms.thing_in(th, "wc") else 0.0) + sim.areas.pref(w, th, "wc")
 		if d < bd and sim.world.reachable(w.cell(), th.cell):
 			bd = d
 			best = th
@@ -2395,12 +2535,20 @@ func _chair_near_table(ch: Thing) -> bool:
 func _eat_task(w: Worker) -> Task:
 	var t := Task.new()
 	t.kind = "eat"
+	# 1.40: кто носит обед из дома — ест на своём месте (за столом, у станка или верстака)
+	if Areas.brings_lunch(w) and not sim.story.striking(w):
+		var own := _own_lunch(w, t)
+		if own:
+			return own
 	var best: Thing = null
 	var bd := INF
 	for ch in sim.things_of("chair"):
 		if ch.spot_users.has(0) or not _chair_near_table(ch):
 			continue
-		var d := _dist(ch.cell, w.cell()) - (40.0 if sim.rooms.thing_in(ch, "canteen") else 0.0)
+		var cr := sim.rooms.room_of_thing(ch)
+		if not sim.areas.canteen_ok(w, cr) or not sim.areas.own_area_ok(w, ch.cell):
+			continue   # 1.40: столовая для ИТР — не для рабочих; в чужих кабинетах и цехах не обедают
+		var d := _dist(ch.cell, w.cell()) - (40.0 if sim.rooms.thing_in(ch, "canteen") else 0.0) + sim.areas.canteen_pref(w, cr)
 		if d < bd and sim.world.reachable(w.cell(), ch.cell):
 			bd = d
 			best = ch
@@ -2430,17 +2578,55 @@ func _eat_task(w: Worker) -> Task:
 	return t
 
 
+## 1.40: обед из дома на рабочем месте. ИТР — за своим столом, рабочие — у своего станка или верстака.
+func _own_lunch(w: Worker, t: Task) -> Task:
+	var place: Thing = null
+	if w.is_director():
+		place = Director.desk(sim)
+	elif w.is_itr():
+		place = sim.office.desk_for(w)
+	else:
+		place = sim.things.get(w.workplace)
+	if place == null or not place.built or place.demolish:
+		return null
+	var cell := Vector2i(-1, -1)
+	var face := "down"
+	if w.is_itr():
+		var sp := _free_spot(place, w)
+		if sp.is_empty():
+			return null
+		cell = sp["cell"]
+		face = str(sp["face"])
+		place.spot_users[int(sp["idx"])] = w.id
+		t.res_spots.append([place.id, int(sp["idx"])])
+	else:
+		cell = best_access(place, w.cell())
+		if cell.x >= 0:
+			face = _face_to_rect(cell, place.rect())
+	if cell.x < 0 or not sim.world.reachable(w.cell(), cell):
+		t.res_spots.clear()
+		place.spot_users.erase(place.spot_users.find_key(w.id))
+		return null
+	t.data["eat"] = "own"
+	t.label = L.t("Обедает за своим столом: еда из дома") if w.is_itr() else L.t("Обедает на рабочем месте: еда из дома")
+	t.add({"t": "goto", "cell": cell, "face": face})
+	t.add({"t": "work", "what": "eat", "dur": Defs.b("eat_time"), "anim": "sit" if w.is_itr() else "idle"})
+	return t
+
+
 func _free_seat(w: Worker, kind: String) -> Dictionary:
 	var best: Dictionary = {}
 	var bd := INF
 	for th in sim.usable_of(kind):
 		if th.demolish:
 			continue
-		var bonus := (25.0 if sim.rooms.thing_in(th, "restroom") else 0.0) + float(th.def().get("comfort", 0)) * 3.0
+		var bonus := (25.0 if sim.rooms.thing_in(th, "restroom") else 0.0) + float(th.def().get("comfort", 0)) * 3.0 - sim.areas.pref(w, th, "restroom")
 		for sp: Dictionary in th.spots():
 			if th.spot_users.has(int(sp["idx"])):
 				continue
 			var c: Vector2i = sp["cell"]
+			if not sim.areas.own_area_ok(w, c) or not sim.areas.canteen_ok(w, sim.rooms.room_at(c)):
+				continue   # 1.40: отдыхают в своей зоне
 			var d := _dist(c, w.cell()) - bonus
 			if d < bd and sim.world.reachable(w.cell(), c):
 				bd = d
@@ -2483,6 +2669,8 @@ func _wander(w: Worker) -> void:
 			continue
 		if indoor and not sim.world.is_indoor(cand):
 			continue
+		if not sim.areas.own_area_ok(w, cand) and sim.areas.own_area_ok(w, c):
+			continue   # 1.40: без дела в чужие кабинеты (и конторским в цех) не заходят
 		if sim.world.reachable(c, cand):
 			target = cand
 			break
@@ -2518,6 +2706,8 @@ func _run(w: Worker, dt: float) -> void:
 				if e and e.reserved_by == w.id and e.loc != Item.Loc.WORKER:
 					sim.give_worker(e, w, true)
 			w.task.next()
+		"shadow":
+			_run_shadow(w, tl, dt)
 		"follow":
 			var v := sim.inspect.visitor()
 			if v == null:
@@ -2932,6 +3122,14 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 					else:
 						Mood.add(sim, w, "changed_shop")
 				w.task.next()
+		"director":
+			if not w.task.data.has("thought"):
+				w.task.data["thought"] = true
+				var dsk: Thing = sim.things.get(int(w.task.data.get("desk", -1)))
+				if dsk and sim.rooms.thing_in(dsk, "director_office"):
+					Mood.add(sim, w, "office_own")
+			if done >= dur:
+				w.task.next()
 		"office":
 			sim.office.add_work(w, dt * Mood.productivity(w))
 			if not w.task.data.has("thought"):
@@ -3097,6 +3295,8 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 						Mood.add(sim, w, "ate_table")
 					"bench":
 						Mood.add(sim, w, "ate_bench")
+					"own":
+						Mood.add(sim, w, "ate_own")
 					_:
 						Mood.add(sim, w, "ate_standing")
 				w.task.next()

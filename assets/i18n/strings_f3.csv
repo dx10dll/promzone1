@@ -1,0 +1,33 @@
+keys,en
+%s №%d (%d кл.%s),%s #%d (%d cells%s)
+", не оборудована",", not equipped"
+Ведёт развитие: «%s»,Leading development: “%s”
+Директор завода — это вы.,The factory director is you.
+"ИТР и контора (директор, бухгалтерия, отделы)","Engineers and office staff (director, accounting, departments)"
+"Какой цех к какой бытовке, туалету и столовой относится и куда ходят ИТР. «Ближайшее» — люди идут туда, что ближе. ИТР и конторе раздевалка не нужна: они работают в своём.","Which workshop uses which locker room, toilet and canteen, and where engineers go. “Nearest” means people go to whatever is closest. Engineers and office staff need no locker room: they work in their own clothes."
+Логистика быта,Amenities logistics
+Логистика быта…,Amenities logistics…
+"На заводе появился директор — это вы. Ему нужен кабинет: помещение с линолеумом или паркетом, стол директора (Объекты → Офис), зона «Кабинет директора».","The factory now has a director — that's you. He needs an office: a room with linoleum or parquet, a director's desk (Objects → Office) and a “Director's office” zone."
+Открыл своё дело. Директор завода — это вы.,Started his own business. The factory director is you.
+Столовая только для ИТР (рабочие туда не ходят):,Canteen for engineers only (workers don't go there):
+Таких зон пока нет,No such zones yet
+Цех №%d · %d кл.,Workshop #%d · %d cells
+Цехов пока нет: разметьте зону «Цех».,No workshops yet: mark a “Workshop” zone.
+— ближайшее —,— nearest —
+Руководит заводом,Running the factory
+Подписывает договоры,Signing contracts
+Звонит заказчикам,Calling clients
+Смотрит отчёты за неделю,Reading the weekly reports
+Обходит цех: как идут дела,Walking the shop floor: how are things going
+Директору негде работать: нужен кабинет директора со столом директора (Объекты → Офис). Без него не исследуются ступени «Развития».,"The director has nowhere to work: he needs a director's office with a director's desk (Objects → Office). Without it, “Development” steps can't be researched."
+Учится у наставника: %s,Learning from mentor: %s
+Подучился у наставника: %s,Picked up skills from mentor: %s
+Обедает за своим столом: еда из дома,Having lunch at the desk: food from home
+Обедает на рабочем месте: еда из дома,Having lunch at the workplace: food from home
+Директор завода — это вы. Оклада нет: вы хозяин. Развитие завода идёт через вас — за столом в кабинете директора.,The factory director is you. No salary: you're the owner. The factory develops through you — at the desk in the director's office.
+"Какой цех к какой бытовке, туалету и столовой относится, куда ходят ИТР","Which workshop uses which locker room, toilet and canteen; where engineers go"
+"Пообедал своим, из дома",Had his own lunch from home
+thought.ate_own.text,Had own lunch from home
+Учится у наставника,Learning from mentor
+Без оклада,No salary
+хозяин завода,owner of the factory

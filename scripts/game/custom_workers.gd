@@ -176,6 +176,16 @@ const PROF_GROUPS := [["У станков", ["turner", "miller", "cnc_operator",
 	["Быт и охрана", ["guard", "cook", "nurse"]],
 	["ИТР и офис", ["foreman", "chief", "technologist", "dispatcher", "accountant", "buyer", "hr", "sales_manager", "safety_engineer", "chief_engineer", "lawyer"]]]
 
+
+## 1.40: группы без главного инженера, пока его механика убрана (Defs.CHIEF_ENGINEER).
+static func prof_groups() -> Array:
+	if Defs.CHIEF_ENGINEER:
+		return PROF_GROUPS
+	var out: Array = []
+	for grp: Array in PROF_GROUPS:
+		out.append([grp[0], (grp[1] as Array).filter(func(p: String) -> bool: return p != "chief_engineer")])
+	return out
+
 const HAIR_NAMES := {"short": "Короткая", "crew": "Ёжик", "side": "На пробор", "slick": "Зачёс назад", "receding": "Залысины",
 	"bald": "Лысый", "curly": "Кудри", "mullet": "Длинная сзади", "bob": "Каре", "bun": "Пучок", "ponytail": "Хвост",
 	"long": "Длинные", "pixie": "Короткая", "curly_f": "Кудри", "braid": "Коса", "perm": "Химзавивка"}
@@ -218,7 +228,7 @@ static func random_look(e: Dictionary, r: RandomNumberGenerator) -> void:
 		"nose": str(People.pick(r, ["small", "straight", "wide"] if fem else People.NOSE_KINDS)),
 		"mouth": str(People.pick(r, People.MOUTH_KINDS)),
 		"freckles": int(lk["skin"]) <= 1 and r.randf() < 0.2,
-		"earrings": fem and r.randf() < 0.5,
+		"earrings": fem and r.randf() < 0.5 and People.EARRINGS,   # 1.40: серьги убраны (бросок сохранён)
 	}
 	e["look"] = lk
 

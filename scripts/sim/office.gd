@@ -53,6 +53,9 @@ func staff(d: String) -> Array[Worker]:
 
 ## Насколько хорошо специалист устроен: свой отдел — 1, общая контора — 0,7, нет стола — 0.
 func desk_k(w: Worker) -> float:
+	if w.is_director():
+		var dd := Director.desk(sim)   # 1.40: у директора свой стол в своём кабинете
+		return 1.0 if dd != null and sim.rooms.thing_in(dd, "director_office") else 0.0
 	var desk: Thing = sim.things.get(w.desk_id)
 	if desk == null or not desk.built or desk.demolish or desk.def_id != "office_desk":
 		return 0.0
@@ -82,6 +85,8 @@ func eff(d: String) -> float:
 
 
 func active(d: String) -> bool:
+	if not Defs.departments.has(d):
+		return false   # 1.40: отдела нет в справочнике (главный инженер убран) — не работает и в песочнице
 	return all_depts or eff(d) > 0.0
 
 

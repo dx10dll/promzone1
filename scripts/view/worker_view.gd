@@ -57,6 +57,7 @@ func setup(s: Sim, w: Worker) -> void:
 	add_to_group("wv")
 	_t = randf() * 10.0
 	var lk := w.look
+	Worker.sync_helmet(lk, w.prof)   # 1.40: цвет каски по должности
 	skin = Color(People.SKINS[int(lk.get("skin", 1)) % People.SKINS.size()])
 	hair_col = Color(str(lk.get("hair_col", "#4a3020")))
 	cloth = Color(str(lk.get("outfit_col", "#3d5a7a")))
@@ -325,6 +326,9 @@ func _update_pos() -> void:
 	position = Vector2(vp.x * T, vp.y * T + 6.0)
 
 
+var _bub_t := 0.0
+
+
 func _process(delta: float) -> void:
 	_t += delta
 	# 1.30: на улице за краем карты (ушёл домой, идёт на смену, горожанин) — поза от StreetFolk
@@ -365,7 +369,10 @@ func _process(delta: float) -> void:
 	_animate()
 	if _veh != "":
 		_place_vehicle()
-	bubble.queue_redraw()
+	_bub_t -= delta   # 1.40: значки потребностей меняются медленно — 15 раз в секунду хватает
+	if _bub_t <= 0.0:
+		_bub_t = 0.066
+		bubble.queue_redraw()
 	if selected or ring.get_meta("was", false):
 		ring.set_meta("was", selected)
 		ring.queue_redraw()

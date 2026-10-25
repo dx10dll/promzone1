@@ -20,6 +20,8 @@ const W_SILICATE := 11        ## 1.21: белый силикатный кирп�
 const W_GASBLOCK := 12        ## 1.21: газобетонные блоки
 const W_GLASS_DOOR := 13      ## 1.21: остеклённая дверь (контора, кабинеты)
 const W_GATE_WARM := 14       ## 1.21: утеплённые ворота (синие сэндвич-секции)
+const W_DOOR_BROWN := 15      ## 1.40: простая коричневая дверь (цеха, склады)
+const W_DOOR_GREEN := 16      ## 1.40: зелёная филёнчатая дверь (хорошие кабинеты)
 const BP_NONE := 255
 
 var w := 0
@@ -164,7 +166,7 @@ func inner_fence(c: Vector2i) -> bool:
 
 func is_door(c: Vector2i) -> bool:
 	var v := get_wall(c)
-	return v == W_DOOR or v == W_METAL_DOOR or v == W_GLASS_DOOR or v == W_GATE or v == W_GATE_WARM or v == W_FENCE_GATE
+	return v == W_DOOR or v == W_METAL_DOOR or v == W_GLASS_DOOR or v == W_DOOR_BROWN or v == W_DOOR_GREEN or v == W_GATE or v == W_GATE_WARM or v == W_FENCE_GATE
 
 
 func is_indoor(c: Vector2i) -> bool:
@@ -339,8 +341,35 @@ func refresh_cell(c: Vector2i) -> void:
 	if not inb(c):
 		return
 	astar.set_point_solid(c, not passable(c))
-	astar.set_point_weight_scale(c, 1.6 if is_door(c) else 1.0)
+	astar.set_point_weight_scale(c, _weight(c))
 	rev += 1
+
+
+## 1.40: дверь чуть «дороже» прохода; кабинеты и контора — заметно: через чужой кабинет не срезают, если есть коридор.
+const OFFICE_W := 3.0
+var _zw_rev := -1
+
+
+func _weight(c: Vector2i) -> float:
+	if is_door(c):
+		return 1.6
+	if zone.size() == w * h:
+		var z := int(zone[idx(c)])
+		var tb := Areas.office_table()
+		if z > 0 and z < tb.size() and tb[z] == 1:
+			return OFFICE_W
+	return 1.0
+
+
+## Пересчитать «цену» клеток после смены разметки зон (зовёт Rooms при пересчёте).
+func zone_weights() -> void:
+	if _zw_rev == zone_rev:
+		return
+	_zw_rev = zone_rev
+	for y in h:
+		for x in w:
+			var c := Vector2i(x, y)
+			astar.set_point_weight_scale(c, _weight(c))
 
 
 func refresh_all() -> void:

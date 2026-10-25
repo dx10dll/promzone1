@@ -2,53 +2,104 @@ class_name BuildMenu
 extends RefCounted
 ## Меню «Стройка», «Объекты», «Зоны» и «Сети» (1.12): слева — разделы списком, справа — плитка
 ## квадратных значков, внизу — описание того, на что навели (цена, размер, что нужно).
+## 1.40: поиск по названию, подсветка того, что нужно помещению в центре экрана, меню постоянной
+## высоты (плитка в прокрутке), цена и «есть N» всегда внутри плитки; в плане — стройка и объекты разом.
 
-const COLS := 9
-const TILE := Vector2(62, 66)       ## компактная плитка (1.21: меньше и шире ряд — меню ниже и уже)
+const COLS := 10
+const TILE := Vector2(64, 76)       ## 1.40: фиксированная раскладка — значок, подпись в две строки, цена внизу
 const CAT_W := 124.0
+const ICON_Y := 4.0
+const TITLE_Y := 33.0
+const TITLE_H := 27.0
+const PRICE_H := 13.0
+const HEAD_H := 26.0
+const FOCUS_ZOOM := 1.25            ## 1.40: «камера приближена» — с этого масштаба подсвечиваем нужное помещению
+const NEED_COL := Color("#5fd3c0")  ## подсветка «нужно помещению»
+const BUILD_CATS := ["wall", "floor", "open", "yard", "frame"]   ## 1.40: стены, полы, двери, улица, готовые помещения
 
-static var build_cat := "frame"
+static var build_cat := "wall"
 static var zone_cat := "prod"
 static var _info: Label
 static var _info_def := ""
+static var query := {"build": "", "objects": ""}   ## 1.40: строка поиска каждого меню
+static var _q := ""                   ## поиск раздела, который сейчас собираем
+static var _search_edit: LineEdit = null
+static var focus_type := ""           ## тип помещения в центре экрана (или "")
+static var focus_room_id := -1
+static var _need := {}                ## id объекта -> true: нужно помещению; false: уже есть
+static var _shown := 0                ## сколько плиток прошло фильтр поиска
 
 
 static func fill(h: Hud) -> void:
-	# 1.21: компактнее — разделы строкой-«чипами» сверху, под ними плитка в 9 столбцов, внизу описание
+	# 1.21: компактнее — разделы строкой-«чипами» сверху, под ними плитка, внизу описание
 	var root := h.sub_root
-	var right := UITheme.vbox(5)
-	var rw := float(COLS) * (TILE.x + 4.0) - 4.0
-	right.custom_minimum_size = Vector2(rw, 0)
-	root.add_child(right)
-	var head := UITheme.hbox(8)
-	right.add_child(head)
-	if h.g.tool.plan_mode and h.sub_kind in ["build", "objects", "rooms"]:
-		var pl := UITheme.label("ПЛАН: всё ставится на кальку — бесплатно, рабочие не строят, пока не утвердите", 12, Color(0.62, 0.8, 1.0), UITheme.f_semi)
-		head.add_child(pl)
-	var cats := HFlowContainer.new()
-	cats.add_theme_constant_override("h_separation", 3)
-	cats.add_theme_constant_override("v_separation", 3)
-	cats.custom_minimum_size = Vector2(rw, 0)
-	right.add_child(cats)
-	var sep := ColorRect.new()
-	sep.color = UITheme.LINE
-	sep.custom_minimum_size = Vector2(0, 1)
-	right.add_child(sep)
-	var grid := UITheme.grid(COLS, 4, 4)
-	grid.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	right.add_child(grid)
+	_info_def = ""
 	_info = UITheme.label("", 11, UITheme.MUTED)
 	_info.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_info.max_lines_visible = 2
 	_info.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	# под описание — всегда ровно две строки: меню не прыгает, когда наводишь на разные плитки
 	var inf_f: Font = UITheme.f_reg if UITheme.f_reg else ThemeDB.fallback_font
-	var inf_h := ceilf(inf_f.get_height(11)) * 2.0 + 4.0
-	_info.custom_minimum_size = Vector2(rw, inf_h)
+	_info.custom_minimum_size = Vector2(width(), ceilf(inf_f.get_height(11)) * 2.0 + 4.0)
 	_info.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	_info_def = ""
-	right.add_child(_info)
-	match h.sub_kind:
+	_update_focus(h)
+	if h.g.tool.plan_mode and h.sub_kind in ["build", "objects", "rooms"]:
+		# 1.40: план — своё меню стройки (или зон) и меню объектов одновременно
+		root.add_child(_plan_row(h))
+		_section(h, root, "rooms" if h.sub_kind == "rooms" else "build", 1)
+		var sp := ColorRect.new()
+		sp.color = Color(0.36, 0.62, 1.0, 0.45)
+		sp.custom_minimum_size = Vector2(0, 1)
+		root.add_child(sp)
+		_section(h, root, "objects", 2)
+	else:
+		_section(h, root, h.sub_kind, -1)
+	root.add_child(_info)
+	_info.text = _info_def
+
+
+## Ширина меню: плитка в COLS столбцов плюс место под полосу прокрутки.
+static func width() -> float:
+	return float(COLS) * (TILE.x + 4.0) - 4.0 + 12.0
+
+
+## Один раздел меню: шапка (одна строка, лишнее обрезается), чипы разделов, плитка постоянной высоты.
+static func _section(h: Hud, root: Control, kind: String, rows: int) -> void:
+	var w := width()
+	var right := UITheme.vbox(5)
+	right.custom_minimum_size = Vector2(w, 0)
+	root.add_child(right)
+	# шапка: фиксированная высота и обрезка — длинная строка не раздувает меню
+	var hold := Control.new()
+	hold.clip_contents = true
+	hold.custom_minimum_size = Vector2(w, HEAD_H)
+	right.add_child(hold)
+	var head := UITheme.hbox(8)
+	head.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	head.alignment = BoxContainer.ALIGNMENT_BEGIN
+	hold.add_child(head)
+	var cats := HFlowContainer.new()
+	cats.add_theme_constant_override("h_separation", 3)
+	cats.add_theme_constant_override("v_separation", 3)
+	cats.custom_minimum_size = Vector2(w, 0)
+	right.add_child(cats)
+	var sep := ColorRect.new()
+	sep.color = UITheme.LINE
+	sep.custom_minimum_size = Vector2(0, 1)
+	right.add_child(sep)
+	# плитка — в прокрутке постоянной высоты: разделы с одним и с тремя рядами одной высоты
+	var n_rows := rows if rows > 0 else clampi(max_rows(h, kind), 2, 3)
+	var sc := ScrollContainer.new()
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sc.custom_minimum_size = Vector2(w, float(n_rows) * (TILE.y + 4.0) - 4.0)
+	sc.set_meta("tile_rows", n_rows)
+	right.add_child(sc)
+	var grid := UITheme.grid(COLS, 4, 4)
+	grid.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	sc.add_child(grid)
+	_q = str(query.get(kind, "")).strip_edges()
+	_shown = 0
+	match kind:
 		"build":
 			_build(h, cats, head, grid)
 		"objects":
@@ -57,7 +108,187 @@ static func fill(h: Hud) -> void:
 			_zones(h, cats, head, grid)
 		"power":
 			_power(h, cats, head, grid)
-	_info.text = _info_def
+	if _q != "" and _shown == 0:
+		var nl := UITheme.label(L.t("Ничего не найдено: «%s»") % _q, 12, UITheme.MUTED)
+		grid.add_child(nl)
+	_q = ""
+
+
+## Строка плана над меню: что это за режим, переключатель «Стройка / Зоны», ластик.
+static func _plan_row(h: Hud) -> Control:
+	var hold := Control.new()
+	hold.clip_contents = true
+	hold.custom_minimum_size = Vector2(width(), HEAD_H)
+	var row := UITheme.hbox(6)
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	hold.add_child(row)
+	for it: Array in [["build", "construction", "Стройка"], ["rooms", "zones", "Зоны"]]:
+		var k := str(it[0])
+		var on := h.sub_kind == k or (k == "build" and h.sub_kind == "objects")
+		_cat(row, UITheme.micon(str(it[1])), str(it[2]), on, func() -> void:
+			h.sub_kind = k
+			h.g.tool.set_mode("room" if k == "rooms" else "select")
+			h._fill_sub())
+	_cat(row, UITheme.micon("demolition"), "Ластик", h.g.tool.mode == "demolish", func() -> void:
+		h.g.tool.set_mode("select" if h.g.tool.mode == "demolish" else "demolish")
+		h._fill_sub())
+	(row.get_child(row.get_child_count() - 1) as Button).tooltip_text = "Стереть нарисованное на плане: протяните рамку"
+	var pl := UITheme.label("ПЛАН: всё ставится на кальку — бесплатно, рабочие не строят, пока не утвердите", 12, Color(0.62, 0.8, 1.0), UITheme.f_semi)
+	pl.clip_text = true
+	pl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	pl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pl.tooltip_text = pl.text
+	row.add_child(pl)
+	return hold
+
+
+## Сколько рядов плитки в самом длинном разделе меню (без поиска) — под это и держим высоту.
+static func max_rows(h: Hud, kind: String) -> int:
+	var mx := 1
+	match kind:
+		"build":
+			var nw := 0
+			var no := 0
+			for k in Defs.walls.keys():
+				var wd: Dictionary = Defs.walls[k]
+				if bool(wd.get("buildable", false)):
+					if str(wd.get("kind", "")) == "wall":
+						nw += 1
+					else:
+						no += 1
+			mx = maxi(maxi(nw, no), maxi(Defs.floors.size(), Defs.templates.size()))
+		"objects":
+			var cnt := {}
+			for k2 in Defs.objects.keys():
+				var od: Dictionary = Defs.objects[k2]
+				if not bool(od.get("legacy", false)):
+					var c := str(od.get("cat", ""))
+					cnt[c] = int(cnt.get(c, 0)) + 1
+			for v: int in cnt.values():
+				mx = maxi(mx, v)
+		"rooms":
+			var cg := {}
+			for t in Rooms.ui_order():
+				var g := str(Defs.rooms.get(t, {}).get("group", ""))
+				cg[g] = int(cg.get(g, 0)) + 1
+			for g2: String in cg.keys():
+				mx = maxi(mx, int(cg[g2]) + 1 + (3 if g2 == "store" else 0))
+		"power":
+			mx = h.sim.world.w * 0 + 6   # кабель/труба, «снять» и приборы — один ряд
+	return int(ceil(float(mx) / float(COLS)))
+
+
+## Поле поиска в шапке: фильтр по названию (в английском — по английским названиям).
+static func _search(h: Hud, head: Control, kind: String) -> void:
+	var sp := Control.new()
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_child(sp)
+	var le := LineEdit.new()
+	le.placeholder_text = "Поиск…"
+	le.text = str(query.get(kind, ""))
+	le.clear_button_enabled = true
+	le.custom_minimum_size = Vector2(150, 0)
+	le.add_theme_font_size_override("font_size", 12)
+	le.tooltip_text = "Поиск по названию во всех разделах меню"
+	le.set_meta("search", kind)
+	le.text_changed.connect(func(t: String) -> void:
+		query[kind] = t
+		h._fill_sub()
+		refocus(kind))
+	head.add_child(le)
+
+
+## После пересборки меню вернуть фокус и курсор в поле поиска (пишем дальше, не теряя букв).
+static func refocus(kind: String) -> void:
+	_search_edit = null
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	for n: Node in tree.root.find_children("*", "LineEdit", true, false):
+		var le := n as LineEdit
+		if le.has_meta("search") and str(le.get_meta("search")) == kind and not _dying(le):
+			le.grab_focus()
+			le.caret_column = le.text.length()
+			_search_edit = le
+			return
+
+
+## Узел или его предок уже удаляется (старое меню до конца кадра ещё в дереве).
+static func _dying(n: Node) -> bool:
+	while n != null:
+		if n.is_queued_for_deletion():
+			return true
+		n = n.get_parent()
+	return false
+
+
+static func _norm(s: String) -> String:
+	return s.to_lower().replace("ё", "е").replace("\n", " ").replace("-", "")
+
+
+## Проходит ли название плитки фильтр поиска.
+static func matches(title_shown: String, q: String) -> bool:
+	if q == "":
+		return true
+	var t := _norm(title_shown)
+	for wd in _norm(q).split(" ", false):
+		if not t.contains(wd):
+			return false
+	return true
+
+
+# ---------------------------------------------------------------- 1.40: что нужно помещению
+
+## Помещение в центре экрана, если камера к нему приближена (иначе null).
+static func focus_room(h: Hud) -> Rooms.Room:
+	var cam: Camera2D = h.g.cam
+	if cam == null or cam.zoom.x < FOCUS_ZOOM:
+		return null
+	var p := cam.get_screen_center_position()
+	var r := h.sim.rooms.room_at(Vector2i(floori(p.x / World.T), floori(p.y / World.T)))
+	if r == null or r.type == "" or not Defs.rooms.has(r.type):
+		return null
+	return r
+
+
+## Подпись того, что сейчас в фокусе (меняется — меню пересобирается).
+static func focus_sig(h: Hud) -> String:
+	var r := focus_room(h)
+	return "" if r == null else "%d|%s|%s" % [r.id, r.type, str(r.missing)]
+
+
+static func _update_focus(h: Hud) -> void:
+	_need.clear()
+	var r := focus_room(h)
+	focus_type = r.type if r else ""
+	focus_room_id = r.id if r else -1
+	if r == null:
+		return
+	for need: Dictionary in Defs.rooms[r.type].get("needs", []):
+		var miss := r.missing.has(str(need.get("text", "")))
+		var ids: Array = need.get("ids", [])
+		var kinds: Array = need.get("kinds", [])
+		for k in Defs.objects.keys():
+			var od: Dictionary = Defs.objects[k]
+			if bool(od.get("legacy", false)):
+				continue
+			if ids.has(str(k)) or (not kinds.is_empty() and kinds.has(str(od.get("kind", "decor")))):
+				_need[str(k)] = bool(_need.get(str(k), false)) or miss
+
+
+## Строка про помещение в фокусе: что ему нужно и чего не хватает.
+static func focus_text(h: Hud) -> String:
+	if focus_type == "":
+		return ""
+	var r := focus_room(h)
+	var nm := L.dt("room.%s.name" % focus_type, str(Defs.rooms[focus_type].get("name", focus_type)))
+	if r == null or r.missing.is_empty():
+		return L.t("В центре экрана «%s»: всё нужное есть, подсвечено то, что ему подходит.") % nm
+	var ms: Array[String] = []
+	for m: String in r.missing:
+		ms.append(L.t(m))
+	return L.t("В центре экрана «%s»: подсвечено, что нужно. Не хватает: %s.") % [nm, ", ".join(ms)]
 
 
 # ---------------------------------------------------------------- общие кусочки
@@ -74,8 +305,6 @@ static func _cat(cats: Control, tex: Texture2D, text: String, on: bool, cb: Call
 	b.toggle_mode = true
 	b.button_pressed = on
 	b.focus_mode = Control.FOCUS_NONE
-	b.clip_text = true
-	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	b.tooltip_text = text
 	b.clip_text = false
 	b.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
@@ -105,64 +334,131 @@ static func _cat(cats: Control, tex: Texture2D, text: String, on: bool, cb: Call
 	cats.add_child(b)
 
 
-## Квадратная плитка: значок, название в две строки, цена. Наведение — описание внизу меню.
+## Текст в рамке шириной w: подбираем кегль (from…to), не влезает — обрезаем с многоточием.
+static func fit_line(text: String, w: float, from: int, to: int, f: Font) -> Array:
+	for px in range(from, to - 1, -1):
+		if f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x <= w:
+			return [px, text]
+	var t := text
+	while t.length() > 2 and f.get_string_size(t + "…", HORIZONTAL_ALIGNMENT_LEFT, -1, to).x > w:
+		t = t.substr(0, t.length() - 1)
+	return [to, t + "…"]
+
+
+## Короткая цена для плитки: «115 000 ₽» → «115 тыс. ₽», если полная не влезает.
+static func short_money(cost: String) -> String:
+	var digits := ""
+	for ch in cost:
+		if ch >= "0" and ch <= "9":
+			digits += ch
+	if digits.length() < 4:
+		return cost
+	var v := float(digits)
+	var tail := cost.substr(cost.rfind(digits.right(1)) + 1)   # «₽», «₽/кл.» и т. п.
+	var en := L.is_en()
+	var num := ("%.1f" % (v / 1000000.0)).trim_suffix(".0") + ("M" if en else " млн") if v >= 1000000.0 else str(int(round(v / 1000.0))) + ("k" if en else " тыс.")
+	var head := cost.substr(0, cost.find(digits.left(1)))   # «лизинг » и т. п.
+	return head + num + tail
+
+
+## Квадратная плитка: значок, название в две строки, цена внизу. Все надписи — в своих рамках,
+## за границы плитки ничего не выходит. Наведение — описание внизу меню.
 static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: String, cost_col: Color, desc: String,
-		mode: String, arg: Variant, lock: String = "", stripe: Color = Color(0, 0, 0, 0), tint: Color = Color.WHITE) -> Button:
+		mode: String, arg: Variant, lock: String = "", stripe: Color = Color(0, 0, 0, 0), tint: Color = Color.WHITE, count: int = 0) -> Button:
 	title = L.t(title)   # 1.40: названия, цены и описания из данных — ключ перевода сам русский текст
+	if not matches(title, _q):
+		return null
+	_shown += 1
 	cost = L.t(cost)
 	desc = L.t(desc)
+	var need := mode == "object" and _need.has(str(arg))
+	var miss := need and bool(_need[str(arg)])
 	var b := Button.new()
 	b.toggle_mode = true
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = TILE
+	b.clip_contents = true
 	b.set_meta("arg", arg)   # 1.17: обучение находит нужную плитку
+	if need:
+		b.set_meta("need", miss)
 	var chosen: bool = h.g.tool.mode == mode and h.g.tool.arg == arg
 	b.button_pressed = chosen
 	var n := UITheme.sb(Color(1, 1, 1, 0.035), UITheme.LINE, 1, 7, 2, 2)
 	var hv := UITheme.sb(Color(1, 1, 1, 0.08), UITheme.LINE2, 1, 7, 2, 2)
 	var pr := UITheme.sb(Color(UITheme.ACCENT.r, UITheme.ACCENT.g, UITheme.ACCENT.b, 0.18), UITheme.ACCENT, 2, 7, 2, 2)
+	if need:
+		# 1.40: нужно помещению в центре экрана — бирюзовая рамка (не хватает — ярче и толще)
+		n = UITheme.sb(Color(NEED_COL.r, NEED_COL.g, NEED_COL.b, 0.14 if miss else 0.06), Color(NEED_COL, 1.0 if miss else 0.55), 2 if miss else 1, 7, 2, 2)
+		hv = UITheme.sb(Color(NEED_COL.r, NEED_COL.g, NEED_COL.b, 0.22), NEED_COL, 2, 7, 2, 2)
 	b.add_theme_stylebox_override("normal", n)
 	b.add_theme_stylebox_override("hover", hv)
 	b.add_theme_stylebox_override("pressed", pr)
 	b.add_theme_stylebox_override("hover_pressed", pr)
 	b.add_theme_stylebox_override("disabled", n)
-	var v := UITheme.vbox(0)
-	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	v.offset_top = 3
-	v.offset_bottom = -2
-	v.offset_left = 2
-	v.offset_right = -2
+	var iw := TILE.x - 6.0
 	if stripe.a > 0.0:
 		var sw := ColorRect.new()
 		sw.color = stripe
-		sw.custom_minimum_size = Vector2(0, 2)
+		sw.set_meta("rect", Rect2(Vector2(6, 2), Vector2(TILE.x - 12.0, 2)))
 		sw.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		v.add_child(sw)
+		b.add_child(sw)
 	var r := TextureRect.new()
 	r.texture = tex
-	r.custom_minimum_size = Vector2(0, 32 if Tex.is_color(tex) else 28)   # 1.38: PNG владельца с полями — крупнее
+	var ih := 30.0 if Tex.is_color(tex) else 26.0   # 1.38: PNG владельца с полями — крупнее
+	r.set_meta("rect", Rect2(Vector2(3, ICON_Y + (28.0 - ih) * 0.5 + 1.0), Vector2(iw, ih)))
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	r.modulate = Tex.tint(tex, tint)
-	v.add_child(r)
-	var fit := fit_title(title, TILE.x - 6.0)
+	b.add_child(r)
+	var fit := fit_title(title, iw)
 	var l := UITheme.label(str(fit[1]), int(fit[0]), UITheme.TEXT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.add_theme_constant_override("line_spacing", -3)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	l.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.clip_text = true
-	v.add_child(l)
+	l.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # уже переведено и разложено по строкам
+	l.set_meta("rect", Rect2(Vector2(3, TITLE_Y), Vector2(iw, TITLE_H if cost != "" else TITLE_H + PRICE_H - 2.0)))
+	b.add_child(l)
 	if cost != "":
-		var c := UITheme.label(cost, 9, cost_col, UITheme.f_semi)
+		var pf: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
+		var ct := cost
+		if pf.get_string_size(ct, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x > iw:
+			ct = short_money(ct)
+		var pfit := fit_line(ct, iw, 9, 7, pf)
+		var c := UITheme.label(str(pfit[1]), int(pfit[0]), cost_col, UITheme.f_semi)
 		c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		c.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		v.add_child(c)
-	b.add_child(v)
+		c.clip_text = true
+		c.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		c.set_meta("rect", Rect2(Vector2(3, TILE.y - PRICE_H - 3.0), Vector2(iw, PRICE_H)))
+		c.set_meta("price", true)
+		c.add_theme_stylebox_override("normal", UITheme.sb(Color(0, 0, 0, 0.22), Color(0, 0, 0, 0), 0, 4, 0, 0))
+		b.add_child(c)
+	if count > 0:
+		# 1.40: «есть N» — значок в углу плитки, а не строкой под названием
+		var cb := UITheme.label("×%d" % count, 9, Color.WHITE, UITheme.f_semi)
+		cb.add_theme_stylebox_override("normal", UITheme.sb(Color(UITheme.GOOD, 0.85), Color(0, 0, 0, 0), 0, 6, 3, 0))
+		cb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cb.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		cb.set_meta("count", count)
+		var cw := ceilf((UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font).get_string_size(cb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x) + 6.0
+		cb.set_meta("rect", Rect2(Vector2(TILE.x - cw - 3.0, 3.0), Vector2(cw, 13)))
+		b.add_child(cb)
+	if need:
+		var dot := ColorRect.new()
+		dot.color = NEED_COL
+		dot.set_meta("rect", Rect2(Vector2(4, 4), Vector2(6, 6)))
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(dot)
 	var full := "%s — %s" % [title, desc] if desc != "" else title
+	if count > 0:
+		full = "%s %s" % [full, L.t("Есть: %d.") % count]
+	if need:
+		full = (L.t("Нужно помещению в центре экрана.") if miss else L.t("Подходит помещению в центре экрана.")) + " " + full
 	if lock != "":
 		b.disabled = true
 		b.modulate = Color(1, 1, 1, 0.42)
@@ -181,8 +477,13 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 	if chosen:
 		_info_def = full
 	grid.add_child(b)
+	# размеры — уже в дереве: до этого тема ещё не применена и надписи считали бы себя крупнее
+	for ch: Node in b.get_children():
+		if ch.has_meta("rect"):
+			var rc: Rect2 = ch.get_meta("rect")
+			(ch as Control).position = rc.position
+			(ch as Control).size = rc.size
 	return b
-
 
 ## Подпись плитки: подбираем кегль (10…8) и сами раскладываем слова по строкам (до двух,
 ## при 8 px — до трёх) как можно ровнее. Сначала — без переносов; длинное слово
@@ -374,7 +675,7 @@ static func _pick(h: Hud, cap: String, cur: int, items: Dictionary, cb: Callable
 	ob.add_theme_font_size_override("font_size", 11)
 	ob.fit_to_longest_item = false
 	ob.clip_text = true
-	ob.custom_minimum_size = Vector2(150, 0)
+	ob.custom_minimum_size = Vector2(120, 0)
 	ob.add_item("как задумано", -1)
 	var sel := 0
 	var n := 1
@@ -401,42 +702,54 @@ static func _head_text(_head: Control, text: String) -> void:
 # ---------------------------------------------------------------- стройка
 
 static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
-	var list := [["frame", "icon_room_concrete", "Помещения"], ["floor", "concrete_0", "Полы"], ["wall", "icon_wall", "Стены"],
-		["open", "icon_door", "Окна и двери"], ["yard", "icon_zone", "Зоны на улице"]]
-	for it: Array in list:
-		var k := str(it[0])
-		_cat(cats, Tex.tile(str(it[1])), str(it[2]), build_cat == k, func() -> void:
+	# 1.40: порядок владельца — стены, полы, двери, улица, потом готовые помещения (без «… рамкой»)
+	var names := {"wall": ["icon_wall", "Стены"], "floor": ["concrete_0", "Полы"], "open": ["icon_door", "Окна и двери"],
+		"yard": ["icon_zone", "Зоны на улице"], "frame": ["icon_room_concrete", "Готовые помещения"]}
+	if not BUILD_CATS.has(build_cat):
+		build_cat = str(BUILD_CATS[0])
+	for k: String in BUILD_CATS:
+		var it: Array = names[k]
+		_cat(cats, Tex.tile(str(it[0])), str(it[1]), build_cat == k and _q == "", func() -> void:
 			build_cat = k
+			query["build"] = ""
 			h._fill_sub())
-	head.add_child(_priority(h))
-	var ms := mats_status(h.sim)
-	if ms != "":
-		var ml := UITheme.label(ms, 11, UITheme.INFO)
-		ml.clip_text = true
-		ml.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		ml.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		ml.tooltip_text = ms
-		head.add_child(ml)
-	match build_cat:
+	if not h.g.tool.plan_mode:
+		head.add_child(_priority(h))
+		var ms := mats_status(h.sim)
+		if ms != "":
+			var ml := UITheme.label(ms, 11, UITheme.INFO)
+			ml.clip_text = true
+			ml.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			ml.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			ml.tooltip_text = ms
+			head.add_child(ml)
+	if build_cat == "frame" and _q == "":
+		# 1.21: свой пол и свои стены — цена в плитках пересчитывается
+		head.add_child(_pick(h, "Пол:", Templates.pick_floor, Defs.floors, func(v: int) -> void: Templates.pick_floor = v))
+		var wl := {}
+		for wk in Defs.walls.keys():
+			if str(Defs.walls[wk].get("kind", "")) == "wall" and bool(Defs.walls[wk].get("buildable", false)):
+				wl[wk] = Defs.walls[wk]
+		head.add_child(_pick(h, "Стены:", Templates.pick_wall, wl, func(v: int) -> void: Templates.pick_wall = v))
+	_search(h, head, "build")
+	if _q != "":
+		_head_text(head, "Поиск по всем разделам стройки.")
+		for c: String in BUILD_CATS:
+			_build_tiles(h, head, grid, c)
+	else:
+		_build_tiles(h, head, grid, build_cat)
+
+
+static func _build_tiles(h: Hud, head: Control, grid: Control, cat: String) -> void:
+	match cat:
 		"frame":
 			_head_text(head, "Готовые помещения — щёлкните, где поставить: пол, стены, двери, мебель и зона разом. Можно вплотную к готовой стене — она станет общей и не оплачивается.")
-			# 1.21: свой пол и свои стены — цена в плитках пересчитывается
-			head.add_child(_pick(h, "Пол:", Templates.pick_floor, Defs.floors, func(v: int) -> void: Templates.pick_floor = v))
-			var wl := {}
-			for wk in Defs.walls.keys():
-				if str(Defs.walls[wk].get("kind", "")) == "wall" and bool(Defs.walls[wk].get("buildable", false)):
-					wl[wk] = Defs.walls[wk]
-			head.add_child(_pick(h, "Стены:", Templates.pick_wall, wl, func(v: int) -> void: Templates.pick_wall = v))
 			for tk in Defs.templates.keys():
 				var td: Dictionary = Defs.templates[tk]
 				var tid := str(tk)
 				var inn := Templates.inner(tid)
 				var tdesc := L.t("%s Внутри %d×%d клеток, снаружи со стенами %d×%d.") % [L.t(str(td.get("desc", ""))), inn.x, inn.y, inn.x + 2, inn.y + 2]
 				_tile(h, grid, Tex.ui("zone_" + str(td.get("zone", "workshop"))), str(td["name"]), Defs.money_str(Templates.cost(h.sim, tid)), UITheme.ACCENT, tdesc, "template", tid, Templates.locked(h.sim, tid))
-			for k0 in [["concrete", "Цех рамкой"], ["tile", "Бытовка рамкой"], ["lino", "Кабинет рамкой"]]:
-				var fd0: Dictionary = Defs.floors[str(k0[0])]
-				_tile(h, grid, Tex.tile("icon_room_" + str(k0[0])), str(k0[1]), _per_cell(float(fd0["cost"])), UITheme.ACCENT,
-					L.t("пол «%s» по всей площади, стены по контуру (общие с соседями не дублируются) и дверь посередине нижней стены. Цена — за клетку пола, плюс стены и дверь.") % L.t(str(fd0["name"])).to_lower(), "roomframe", int(fd0["id"]))
 		"floor":
 			_head_text(head, "Протяните прямоугольник. Цех — бетон или наливной пол, быт — плитка, кабинеты — линолеум или паркет.")
 			for k in Defs.floors.keys():
@@ -444,7 +757,7 @@ static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 				var tk := str(fd.get("tex", k))
 				_tile(h, grid, Tex.tile("concrete_0" if tk == "concrete" else tk), str(fd["name"]), _per_cell(float(fd["cost"])), UITheme.ACCENT, str(fd.get("desc", "")), "floor", int(fd["id"]))
 		"wall", "open":
-			_head_text(head, "Стены — контуром прямоугольника. Перегородкой удобно делить большой зал на кабинеты." if build_cat == "wall" else "Окна, двери и ворота ставят в стену: протяните вдоль неё.")
+			_head_text(head, "Стены — контуром прямоугольника. Перегородкой удобно делить большой зал на кабинеты." if cat == "wall" else "Окна, двери и ворота ставят в стену: протяните вдоль неё.")
 			var icons := {"brick": "icon_wall", "concrete_wall": "icon_wall_concrete", "sandwich": "icon_wall_sandwich", "partition": "icon_wall_partition",
 				"window": "icon_window", "door": "icon_door", "metal_door": "icon_door_metal", "gate": "icon_gate",
 				"silicate": "icon_wall_silicate", "gasblock": "icon_wall_gasblock", "glass_door": "icon_door_glass", "gate_warm": "icon_gate_warm"}
@@ -453,10 +766,10 @@ static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 				var kind := str(wd.get("kind", ""))
 				if not bool(wd.get("buildable", false)):
 					continue
-				if (build_cat == "wall") != (kind == "wall"):
+				if (cat == "wall") != (kind == "wall"):
 					continue
 				var mode := "wall" if kind == "wall" else kind
-				_tile(h, grid, Tex.tile(str(icons.get(k2, "icon_wall"))), str(wd["name"]), _per_cell(float(wd["cost"])), UITheme.ACCENT, str(wd.get("desc", "")), mode, int(wd["id"]))
+				_tile(h, grid, Tex.tile(str(wd.get("icon", icons.get(k2, "icon_wall")))), str(wd["name"]), _per_cell(float(wd["cost"])), UITheme.ACCENT, str(wd.get("desc", "")), mode, int(wd["id"]))
 		"yard":
 			_head_text(head, "Зоны на улице рисуют прямоугольником у ворот. Разгрузка и отгрузка обязательны — их можно расширить или перенести, но не убрать. Внутренние зоны — в меню «Зоны».")
 			_yard_tiles(h, grid)
@@ -477,6 +790,10 @@ static func _yard_tiles(h: Hud, grid: Control) -> void:
 # ---------------------------------------------------------------- объекты
 
 static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> void:
+	# 1.40: разделы, где есть нужное помещению в центре экрана, — с бирюзовой рамкой
+	var need_cats := {}
+	for nk: String in _need.keys():
+		need_cats[str(Defs.objects[nk].get("cat", ""))] = true
 	for c in Hud.OBJ_CATS:
 		var first := ""
 		for k in Defs.objects.keys():
@@ -484,11 +801,13 @@ static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> voi
 				first = str(k)
 				break
 		var cc: String = c
-		_cat(cats, Tex.obj(first if first != "chair" else "chair_down") if first != "" else null, c, h.obj_cat == c, func() -> void:
+		_cat(cats, Tex.obj(first if first != "chair" else "chair_down") if first != "" else null, c, h.obj_cat == c and _q == "", func() -> void:
 			h.obj_cat = cc
-			h._fill_sub())
-	head.add_child(_priority(h))
-	if h.sim.progress.stage >= 2:
+			query["objects"] = ""
+			h._fill_sub(), NEED_COL if need_cats.has(c) else Color(0, 0, 0, 0))
+	if not h.g.tool.plan_mode:
+		head.add_child(_priority(h))
+	if h.sim.progress.stage >= 2 and not h.g.tool.plan_mode:
 		var lz := CheckButton.new()
 		lz.text = "Станки в лизинг"
 		lz.focus_mode = Control.FOCUS_NONE
@@ -503,10 +822,20 @@ static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> voi
 			h.sim.market.leasing_on = v
 			h._fill_sub())
 		head.add_child(lz)
-	_head_text(head, "R — повернуть перед установкой.")
+	_search(h, head, "objects")
+	if focus_type != "" and _info_def == "":
+		_info_def = focus_text(h)
+	_head_text(head, "Поиск по всем разделам объектов. R — повернуть перед установкой." if _q != "" else "R — повернуть перед установкой.")
+	var cnt := {}
+	for t0: Thing in h.sim.things.values():
+		cnt[t0.def_id] = int(cnt.get(t0.def_id, 0)) + 1
 	for k3 in Defs.objects.keys():
 		var od: Dictionary = Defs.objects[k3]
-		if str(od.get("cat", "")) != h.obj_cat or bool(od.get("legacy", false)):
+		if bool(od.get("legacy", false)):
+			continue
+		if _q == "" and str(od.get("cat", "")) != h.obj_cat:
+			continue
+		if _q != "" and not Hud.OBJ_CATS.has(str(od.get("cat", ""))):
 			continue
 		var sz: Array = od.get("size", [1, 1])
 		var desc := L.t("%s Размер %d×%d.") % [L.t(str(od.get("desc", ""))), int(sz[0]), int(sz[1])]
@@ -516,7 +845,7 @@ static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> voi
 			desc += L.t(" Мощность %s кВт.") % str(od["power"])
 		var price := h.sim.thing_cost(str(k3))
 		var m := _money(h, price, "object", k3)
-		_tile(h, grid, Tex.obj(k3 if k3 != "chair" else "chair_down"), str(od["name"]), str(m[0]), m[1], desc, "object", k3, h.sim.progress.locked_reason(str(k3)))
+		_tile(h, grid, Tex.obj(k3 if k3 != "chair" else "chair_down"), str(od["name"]), str(m[0]), m[1], desc, "object", k3, h.sim.progress.locked_reason(str(k3)), Color(0, 0, 0, 0), Color.WHITE, int(cnt.get(str(k3), 0)))
 
 
 # ---------------------------------------------------------------- зоны
@@ -526,7 +855,7 @@ static func _zones(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 	for gk in groups.keys():
 		var gd: Dictionary = groups[gk]
 		var first := ""
-		for t in Rooms.UI_ORDER:
+		for t in Rooms.ui_order():
 			if str(Defs.rooms.get(t, {}).get("group", "")) == gk:
 				first = t
 				break
@@ -536,7 +865,7 @@ static func _zones(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 			h._fill_sub(), Color(str(gd["color"])))
 	_head_text(head, "Протяните прямоугольник — разметить клетки; щёлкните по помещению — залить его целиком. Соседние клетки одной зоны сливаются.")
 	var gc := Color(str(groups.get(zone_cat, {}).get("color", "#888888")))
-	for t2 in Rooms.UI_ORDER:
+	for t2 in Rooms.ui_order():
 		var d: Dictionary = Defs.rooms.get(t2, {})
 		if str(d.get("group", "")) != zone_cat:
 			continue
@@ -545,7 +874,7 @@ static func _zones(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 			if str(Defs.departments[dk].get("room", "")) == t2 and not h.sim.progress.dept_open(str(dk)):
 				lock = h.sim.progress.dept_lock_text(str(dk))
 		var n := h.sim.rooms.of_type(t2, false).size()
-		_tile(h, grid, Tex.ui("zone_" + t2), str(d.get("name", t2)), (L.t("есть: %d") % n) if n > 0 else "", UITheme.GOOD, L.t("нужно: %s. %s") % [Rooms.req_text(t2), L.t(str(d.get("desc", "")))], "room", t2, lock, gc, gc.lightened(0.35))
+		_tile(h, grid, Tex.ui("zone_" + t2), str(d.get("name", t2)), "", UITheme.GOOD, L.t("нужно: %s. %s") % [Rooms.req_text(t2), L.t(str(d.get("desc", "")))], "room", t2, lock, gc, gc.lightened(0.35), n)
 	if zone_cat == "store":
 		_yard_tiles(h, grid)
 	_tile(h, grid, Tex.ui("zone_erase"), "Стереть разметку", "", UITheme.MUTED, "протяните или щёлкните — клетки станут неразмеченными.", "room", "_erase")

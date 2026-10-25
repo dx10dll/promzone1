@@ -52,7 +52,7 @@ func _init() -> void:
 	check(tr2 != null and absf(g.power.total_kw() - 60.0) < 0.01 and absf(g.power.net_of_thing(lathe).capacity - 60.0) < 0.01, "аккумулятор у подстанции — мощность выросла: %d кВт" % int(g.power.net_of_thing(lathe).capacity))
 	var sb := Scenario.new_game("sandbox", "mech", "calm", 152, {"money": 1000000, "all_open": true})
 	sb.power.update_topology()
-	var sb_objs := sb.things.values().filter(func(t: Thing) -> bool: return t.def_id != "pallet" and t.def_id != "pallet_raw").size()   # 1.29: поддоны у ворот
+	var sb_objs := sb.things.values().filter(func(t: Thing) -> bool: return t.def_id != "pallet" and t.def_id != "pallet_raw").size() - Director.office_counts(sb).y   # 1.29: поддоны у ворот; 1.40: контора директора
 	check(sb.power.total_kw() >= 40.0 and sb_objs <= 5, "песочница: подстанция, насосная и электрокотёл в техпомещении, %d кВт" % int(sb.power.total_kw()))
 
 	print("— быт на старте укомплектован")

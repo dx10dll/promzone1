@@ -123,7 +123,7 @@ func set_door_open(v: bool) -> void:
 
 
 func _process(delta: float) -> void:
-	if kind == World.W_WINDOW or kind == World.W_DOOR or kind == World.W_GLASS_DOOR:
+	if kind == World.W_WINDOW or kind == World.W_DOOR or kind == World.W_GLASS_DOOR or kind == World.W_DOOR_GREEN:
 		_glow_t -= delta
 		if _glow_t <= 0.0:
 			_glow_t = 1.5
@@ -177,8 +177,9 @@ static func paint(ci: CanvasItem, k: int, o: Vector2, d: Dictionary, open_t: flo
 				var vert := bool(d.get("vert", false))
 				_paint_brick(ci, o, {"up": vert, "dn": vert, "lf": not vert, "rt": not vert}, false, World.W_BRICK)
 			_paint_window(ci, o, d, ghost)
-		World.W_DOOR, World.W_METAL_DOOR, World.W_GLASS_DOOR:
-			_paint_door(ci, o, d, open_t, swing, ghost, k == World.W_METAL_DOOR, k == World.W_GLASS_DOOR)
+		World.W_DOOR, World.W_METAL_DOOR, World.W_GLASS_DOOR, World.W_DOOR_BROWN, World.W_DOOR_GREEN:
+			_paint_door(ci, o, d, open_t, swing, ghost, k == World.W_METAL_DOOR, k == World.W_GLASS_DOOR,
+				"brown" if k == World.W_DOOR_BROWN else ("green" if k == World.W_DOOR_GREEN else ""))
 		World.W_GATE, World.W_GATE_WARM:
 			_paint_gate(ci, o, d, ghost, open_t, k == World.W_GATE_WARM)
 
@@ -468,7 +469,14 @@ static func _paint_window(ci: CanvasItem, o: Vector2, d: Dictionary, ghost: bool
 
 ## Дверь: проём во всю клетку, полотно отъезжает в стену, когда кто-то проходит.
 ## Две двери подряд — одна двустворчатая: створки разъезжаются в разные стороны.
-static func _paint_door(ci: CanvasItem, o: Vector2, d: Dictionary, open_t: float, _swing: float, ghost: bool, metal: bool = false, glass: bool = false) -> void:
+## 1.40: style — «brown» (простая коричневая, глухая: цеха и склады) или «green» (зелёная филёнчатая со стеклом: кабинеты).
+const DOOR_STYLES := {
+	"brown": {"frame": "#6b4a30", "leaf": "#6e4a2e", "dark": "#3f2a1a", "up": "#5b3c24", "lo": "#5b3c24"},
+	"green": {"frame": "#e4e2d8", "leaf": "#3f7a52", "dark": "#22452f", "up": "#2f5f3f", "lo": "#356a46"},
+}
+
+
+static func _paint_door(ci: CanvasItem, o: Vector2, d: Dictionary, open_t: float, _swing: float, ghost: bool, metal: bool = false, glass: bool = false, style: String = "") -> void:
 	var vert := bool(d.get("vert", false))
 	var e := _ends(d)
 	var a_end: bool = e[0]
@@ -480,6 +488,11 @@ static func _paint_door(ci: CanvasItem, o: Vector2, d: Dictionary, open_t: float
 		frame = _col(Color("#c9ced2"), ghost, true)
 		leaf_c = _col(Color("#aab3b9"), ghost)
 	var leaf_d := _col(WOOD_DARK if not metal else Color("#4b5257"), ghost, true)
+	var sty: Dictionary = DOOR_STYLES.get(style, {})
+	if not sty.is_empty():
+		frame = _col(Color(str(sty["frame"])), ghost, true)
+		leaf_c = _col(Color(str(sty["leaf"])), ghost)
+		leaf_d = _col(Color(str(sty["dark"])), ghost, true)
 	var j := 3.0
 	# куда уезжает створка: одиночная — к началу проёма, в двустворчатой — от соседней створки
 	var to_a := a_end or not b_end
@@ -528,6 +541,22 @@ static func _paint_door(ci: CanvasItem, o: Vector2, d: Dictionary, open_t: float
 					ci.draw_rect(Rect2(px, ry, pw, 2.0), Color("#5d656a"))
 					ci.draw_line(Vector2(px, ry + 2.5), Vector2(px + pw, ry + 2.5), Color(1, 1, 1, 0.14), 1.0)
 				ci.draw_circle(Vector2(px + pw * 0.5, y0 + 4.0), 1.0, Color("#2a2e31"))
+			elif pw > 2.0 and style == "brown":
+				# простая дверь: две глухие филёнки, без стекла
+				var hh2 := (y1 - y0 - 9.0) * 0.5
+				for kk2 in 2:
+					var pr := Rect2(px, y0 + 3.0 + kk2 * (hh2 + 3.0), pw, hh2)
+					ci.draw_rect(pr, Color(str(sty["up"])))
+					ci.draw_line(pr.position + Vector2(0, pr.size.y), pr.end, Color(1, 1, 1, 0.10), 1.0)
+			elif pw > 2.0 and style == "green":
+				# зелёная филёнчатая: стекло сверху в светлой раскладке, внизу две филёнки
+				var up2 := Rect2(px, y0 + 3.0, pw, (y1 - y0) * 0.34)
+				ci.draw_rect(up2, Color(str(sty["up"])))
+				_glass(ci, up2.grow(-1.0), false, false, bool(d.get("glow", false)))
+				ci.draw_line(Vector2(up2.get_center().x, up2.position.y + 1.0), Vector2(up2.get_center().x, up2.end.y - 1.0), Color("#e4e2d8"), 1.0)
+				var lo2 := Rect2(px, up2.end.y + 3.0, pw, y1 - up2.end.y - 6.0)
+				ci.draw_rect(lo2, Color(str(sty["lo"])))
+				ci.draw_rect(lo2.grow(-1.5), Color(1, 1, 1, 0.08), false, 1.0)
 			elif pw > 2.0:
 				var up := Rect2(px, y0 + 3.0, pw, (y1 - y0) * 0.32)
 				ci.draw_rect(up, Color("#5e432c"))
@@ -535,9 +564,9 @@ static func _paint_door(ci: CanvasItem, o: Vector2, d: Dictionary, open_t: float
 				var lo := Rect2(px, up.end.y + 3.0, pw, y1 - up.end.y - 6.0)
 				ci.draw_rect(lo, Color("#7a5a3d"))
 				ci.draw_line(lo.position + Vector2(0, lo.size.y), lo.end, Color(1, 1, 1, 0.12), 1.0)
-			# ручка у свободного края створки
+			# ручка у свободного края створки (у зелёной — латунная)
 			var hx := lr.end.x - 3.5 if to_a else lr.position.x + 2.0
-			ci.draw_rect(Rect2(hx, y0 + (y1 - y0) * 0.52, 1.5, 4.0), Color("#d8dbde"))
+			ci.draw_rect(Rect2(hx, y0 + (y1 - y0) * 0.52, 1.5, 4.0), Color("#e2b73a") if style == "green" else Color("#d8dbde"))
 			ci.draw_line(Vector2(lr.position.x + 1.0, y0 + 1.0), Vector2(lr.position.x + 1.0, y1 - 1.0), Color(1, 1, 1, 0.14), 1.0)
 		ci.draw_rect(lr, leaf_d, false, 1.0)
 		# порожек
@@ -560,7 +589,10 @@ static func _paint_door(ci: CanvasItem, o: Vector2, d: Dictionary, open_t: float
 	var vr := Rect2(o.x + T * 0.5 - 4.5, ly, 9.0, lh)
 	ci.draw_rect(vr, leaf_c)
 	if not ghost and lh > 4.0:
-		ci.draw_rect(Rect2(vr.position.x + 2.0, vr.position.y + 2.0, vr.size.x - 4.0, vr.size.y - 4.0), Color("#7a5a3d") if not metal else Color("#687076"))
+		var inner_c := Color("#7a5a3d") if not metal else Color("#687076")
+		if not sty.is_empty():
+			inner_c = Color(str(sty["lo"]))
+		ci.draw_rect(Rect2(vr.position.x + 2.0, vr.position.y + 2.0, vr.size.x - 4.0, vr.size.y - 4.0), inner_c)
 		ci.draw_line(Vector2(vr.position.x + 1.0, vr.position.y + 1.0), Vector2(vr.position.x + 1.0, vr.end.y - 1.0), Color(1, 1, 1, 0.22), 1.0)
 		var hy := vr.end.y - 3.5 if to_a else vr.position.y + 2.0
 		ci.draw_rect(Rect2(vr.position.x - 1.5, hy, 2.0, 1.5), Color("#d8dbde"))

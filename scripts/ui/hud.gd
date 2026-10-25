@@ -51,12 +51,16 @@ const OVERLAYS := [["rooms", "Зоны", "Зоны и помещения: что
 	["temp", "Температура", "Тепло и холод по помещениям, батареи"],
 	["traffic", "Потоки людей", "Где чаще ходят — тропы и пробки"], ["load", "Загрузка станков", "Работает, простаивает, брак (нужен ПДО)"],
 	["dirt", "Чистота", "Стружка и грязь, уровень обустройства"],
-	["crew", "Бригады и охрана", "Участки бригад, камеры и посты"]]
+	["crew", "Бригады и охрана", "Участки бригад, камеры и посты"],
+	["logistics", "Логистика", "Кто в какую бытовку, душ, туалет, столовую ходит: протяните линию от цеха к помещению"]]
 var letter_box: Control = null     ## открытое письмо-событие
 var tutorial: TutorialPanel = null
 var letter_id := -1
 var sub_panel: PanelContainer
 var sub_root: VBoxContainer
+var top_left: Control      ## 1.40: левая часть верхней панели (обрезается, если не влезает)
+var top_right: Control     ## 1.40: правая часть — скорость, «?», журнал, ☰ — всегда видна
+var menu_btn: Button       ## 1.40: кнопка ☰
 var sub_kind := ""
 var obj_cat := "Станки"
 var net_kind := "power"   ## подменю «Сети»: "power" — электричество и свет, "water" — водопровод
@@ -173,8 +177,22 @@ func _build_top() -> void:
 	p.add_theme_stylebox_override("panel", st)
 	_anchor(p, 0, 0, 1, 0, 0, 0, 0, 50)
 	add_child(p)
+	# 1.40: справа — скорость, «?», журнал и ☰ отдельным блоком: он всегда на месте и не уезжает за край,
+	# сколько бы места ни заняли надписи слева (длинный английский текст, узкое окно); левая часть обрезается
+	var top_row := UITheme.hbox(4)
+	p.add_child(top_row)
+	var left := Control.new()
+	left.clip_contents = true
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.mouse_filter = Control.MOUSE_FILTER_PASS
+	top_row.add_child(left)
+	top_left = left
 	var h := UITheme.hbox(4)
-	p.add_child(h)
+	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	left.add_child(h)
+	var rh := UITheme.hbox(4)
+	top_row.add_child(rh)
+	top_right = rh
 	# 1.17: эмблема и название завода — щелчок открывает паспорт завода
 	var cc := _chip("goals", "company", show_passport)
 	company_l = UITheme.label("", 14, UITheme.TEXT, UITheme.f_semi)
@@ -285,11 +303,13 @@ func _build_top() -> void:
 		sp.add_child(b)
 		speed_btns.append(b)
 	sp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(sp)
+	rh.add_child(sp)
 	fast_l = UITheme.label("", 12, UITheme.INFO, UITheme.f_semi)
-	fast_l.custom_minimum_size = Vector2(70, 0)
+	fast_l.custom_minimum_size = Vector2(84, 0)   # 1.40: «fast-forward» шире 70 px — ☰ сдвигался
+	fast_l.clip_text = true
+	fast_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	fast_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	h.add_child(fast_l)
+	rh.add_child(fast_l)
 	# 1.29: кнопка справочника
 	var hlp := UITheme.button("?", func() -> void: show_help(false), "Справочник: все механики игры по разделам (F1)")
 	hlp.custom_minimum_size = Vector2(40, 34)
@@ -297,11 +317,11 @@ func _build_top() -> void:
 	hlp.add_theme_font_size_override("font_size", 17)
 	if UITheme.f_semi:
 		hlp.add_theme_font_override("font", UITheme.f_semi)
-	h.add_child(hlp)
+	rh.add_child(hlp)
 	var lb := UITheme.icon_button("log", "", func() -> void: open_window("log"), "Журнал событий")
 	lb.custom_minimum_size = Vector2(40, 34)
 	lb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(lb)
+	rh.add_child(lb)
 	var mbtn := UITheme.icon_button("menu", "", show_pause_menu, "Меню игры (Esc)")
 	mbtn.icon = _top_tex("menu")
 	mbtn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -314,7 +334,8 @@ func _build_top() -> void:
 	UITheme.micon_colors(mbtn)
 	mbtn.custom_minimum_size = Vector2(40, 34)
 	mbtn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(mbtn)
+	rh.add_child(mbtn)
+	menu_btn = mbtn
 
 
 ## Панель оверлеев (1.12): столбик значков у правого края — всегда на виду; легенда — карточкой слева внизу.
@@ -365,7 +386,7 @@ func _build_overlays() -> void:
 
 ## 1.30: значки слоёв — из набора владельца (зоны → «слои», сети → «коммуникации», …).
 const OV_ICONS := {"rooms": "layers", "nets": "utilities", "light": "lighting", "temp": "heating",
-	"traffic": "routes", "load": "statistics", "dirt": "cleaning", "crew": "team"}
+	"traffic": "routes", "load": "statistics", "dirt": "cleaning", "crew": "team", "logistics": "supply"}
 
 
 func _ov_tex(key: String) -> Texture2D:
@@ -375,11 +396,32 @@ func _ov_tex(key: String) -> Texture2D:
 
 ## Включить оверлей (тот же ещё раз — выключить).
 func set_overlay(key: String) -> void:
+	if key == "logistics":
+		toggle_logistics()
+		return
+	if g.tool.mode == "logistics":
+		g.tool.set_mode("select")
 	if key == "load" and not sim.office.active("pdo"):
 		toast("Загрузку станков считает диспетчер ПДО: наймите диспетчера (Управление → Отделы).", Sim.LVL_INFO)
 		key = ""
 	forced_overlay = "" if forced_overlay == key else key
 	_sync_overlays()
+
+
+## 1.40: оверлей «Логистика» — режим инструмента. Выходит из плана и окна, как любая кнопка нижней панели.
+func toggle_logistics() -> void:
+	if g.tool.mode == "logistics":
+		g.tool.set_mode("select")
+		return
+	if g.tool.plan_mode:
+		close_sub()
+	if win:
+		close_window()
+	if sub_kind != "":
+		close_sub()
+	forced_overlay = ""
+	g.tool.set_mode("logistics")
+	_sync_bottom()
 
 
 func _sync_overlays() -> void:
@@ -414,6 +456,11 @@ func _sync_overlays() -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(276, 0)
 		legend_box.add_child(l)
+	if cur == "logistics":
+		var db := UITheme.button(L.t("Подробно…"), func() -> void:
+			g.tool.set_mode("select")
+			LogisticsUI.open(self, sim), L.t("Старое окно: выпадающие списки по каждому цеху"))
+		legend_box.add_child(db)
 	if forced_overlay == cur:
 		legend_box.add_child(UITheme.label("Щёлкните по значку ещё раз, чтобы выключить", 11, UITheme.DIM))
 
@@ -830,6 +877,10 @@ func open_rooms_type(type: String) -> void:
 ## Каталог помещений: все типы с требованиями видны заранее, ещё до постройки.
 ## Выбрали тип — щелчок по помещению сразу назначает его; без выбора — открывается карточка.
 func open_rooms() -> void:
+	if g.tool.mode == "logistics":
+		g.tool.set_mode("select")
+	if g.tool.plan_mode:
+		close_sub()   # 1.40: другая кнопка нижней панели выводит из плана
 	if sub_kind == "rooms":
 		close_sub()
 		g.tool.set_mode("select")
@@ -844,6 +895,10 @@ func open_rooms() -> void:
 
 
 func toggle_sub(kind: String) -> void:
+	if g.tool.mode == "logistics":
+		g.tool.set_mode("select")
+	if g.tool.plan_mode:
+		close_sub()   # 1.40: другая кнопка нижней панели выводит из плана
 	if sub_kind == kind:
 		close_sub()
 		g.tool.set_mode("select")
@@ -862,7 +917,28 @@ func toggle_sub(kind: String) -> void:
 func close_sub() -> void:
 	sub_kind = ""
 	sub_panel.visible = false
+	BuildMenu.query = {"build": "", "objects": ""}
+	if g.tool.plan_mode:
+		_end_plan()   # 1.40: план живёт, только пока открыто его меню
 	_sync_bottom()
+
+
+## 1.40: подсветка нужного помещению — меню объектов пересобирается, когда в центре экрана другое помещение.
+var _focus_sig := ""
+
+
+func _check_focus_room() -> void:
+	if not sub_panel.visible or not (sub_kind == "objects" or g.tool.plan_mode):
+		_focus_sig = ""
+		return
+	var sig := BuildMenu.focus_sig(self)
+	if sig != _focus_sig:
+		_focus_sig = sig
+		var f := get_viewport().gui_get_focus_owner()
+		var kind := str(f.get_meta("search")) if f != null and f.has_meta("search") else ""
+		_fill_sub()
+		if kind != "":
+			BuildMenu.refocus(kind)
 
 
 func _fill_sub() -> void:
@@ -891,23 +967,38 @@ var plan_panel: PanelContainer = null
 var _plan_sig := ""
 
 
+## 1.40: план включается только своей кнопкой (или V) и выключается ею же, «Готово», Esc
+## или любой другой кнопкой нижней панели. В плане открыты сразу стройка (или зоны) и объекты.
 func toggle_plan() -> void:
 	var t := g.tool
-	t.plan_mode = not t.plan_mode
 	if t.plan_mode:
-		PlanLayer.faded = false
-		if sub_kind == "" or sub_kind == "power":
-			toggle_sub("build")
-		else:
-			_fill_sub()
-		toast(tr("Планировка: рисуйте стены, полы, зоны и станки — это калька, бесплатно. Готово — «Утвердить план»."), Sim.LVL_INFO, 5.0)
-	else:
-		if sub_kind != "":
-			_fill_sub()
+		close_sub()
+		return
+	if win:
+		close_window()
+	if t.mode in ["demolish", "cancel", "logistics"]:
+		t.set_mode("select")
+	t.plan_mode = true
+	PlanLayer.faded = false
+	if not sub_kind in ["build", "rooms"]:
+		sub_kind = "build"
+	_fill_sub()
+	sub_panel.visible = true
+	toast(tr("Планировка: рисуйте стены, полы, зоны и станки — это калька, бесплатно. Готово — «Утвердить план»."), Sim.LVL_INFO, 5.0)
 	t.queue_redraw()
 	_plan_sig = ""
 	_refresh_plan_panel()
 	_sync_bottom()
+
+
+func _end_plan() -> void:
+	var t := g.tool
+	t.plan_mode = false
+	if t.mode != "select":
+		t.set_mode("select")
+	t.queue_redraw()
+	_plan_sig = ""
+	_refresh_plan_panel()
 
 
 func _refresh_plan_panel() -> void:
@@ -948,7 +1039,7 @@ func _refresh_plan_panel() -> void:
 		parts.append(tr("зон %d") % int(cn["zones"]))
 	if int(cn["objs"]) > 0:
 		parts.append(tr("объектов %d") % int(cn["objs"]))
-	var txt := (tr("На плане: %s · по смете ≈ %s") % [", ".join(parts), Defs.money_str(cost)]) if not parts.is_empty() else tr("Выберите стену, пол, зону или станок в меню снизу и рисуйте. Снос стирает план.")
+	var txt := (tr("На плане: %s · по смете ≈ %s") % [", ".join(parts), Defs.money_str(cost)]) if not parts.is_empty() else tr("Выберите стену, пол, зону или станок в меню снизу и рисуйте. Ластик стирает план.")
 	v.add_child(UITheme.label(txt, 12, UITheme.MUTED))
 	h.add_child(v)
 	var ab := UITheme.primary("Утвердить план", func() -> void:
@@ -1022,6 +1113,8 @@ func _refresh_hint() -> void:
 			txt = tr("%s: щёлкните — помещение встанет центром под курсором (внутри %d×%d)") % [L.dt("template.%s.name" % str(t.arg), str(td.get("name", ""))), Templates.inner(str(t.arg)).x, Templates.inner(str(t.arg)).y]
 		"demolish":
 			txt = "Снос: выделите область. Объекты упакуют в ящики и унесут на склад оборудования"
+		"logistics":
+			txt = tr("Логистика: линия от цеха к помещению · щелчок по линии — убрать")
 		"cancel":
 			txt = "Отмена чертежей: выделите область. Деньги вернутся полностью"
 		"room":
@@ -1075,12 +1168,15 @@ func _process(delta: float) -> void:
 		_t = 0.2
 		_refresh_top()
 		_place_tutorial()
+		_check_focus_room()
 	_refresh_hint()
 	if plan_panel and plan_panel.visible:
 		_refresh_plan_panel()
 	# слой, выбранный игроком на панели справа, главнее подсказки от открытого меню
 	var om := ""
-	if forced_overlay != "":
+	if g.tool.mode == "logistics":
+		om = "logistics"
+	elif forced_overlay != "":
 		om = forced_overlay
 	elif g.tool.mode == "room":
 		om = "rooms"
@@ -1181,6 +1277,8 @@ func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2
 # ---------------------------------------------------------------- окна
 
 func open_window(kind: String) -> void:
+	if g.tool.mode == "logistics":
+		g.tool.set_mode("select")
 	var rs := GameWindow.resolve(kind)
 	if kind.contains(":"):
 		rs = Array(kind.split(":"))

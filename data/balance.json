@@ -68,7 +68,7 @@
  "ad_cost": 2500,
  "ad_prof_k": 1.4,
  "bonus_amount": 3000,
- "wage_k": 0.88,
+ "wage_k": 0.4,
  "breakdown_below": 30,
  "breakdown_chance": 0.05,
  "repair_time": 180,

@@ -1,0 +1,23 @@
+keys,en
+Логистика,Logistics
+"Кто в какую бытовку, душ, туалет, столовую ходит: протяните линию от цеха к помещению","Who uses which locker room, shower, toilet and canteen: drag a line from a workshop to a room"
+Подробно…,Details…
+Старое окно: выпадающие списки по каждому цеху,Old dialog: drop-down lists for each workshop
+"Логистика: линия от цеха к помещению · щелчок по линии — убрать","Logistics: drag a line from a workshop to a room · click a line to remove it"
+ · только ИТР, · ITR only
+связей: %d (иначе — ближайшее),links: %d (otherwise nearest)
+группа ИТР,ITR group
+не оборудована,not equipped
+"Протяните линию от цеха (или конторы — для ИТР) к бытовке, душевой, туалету, столовой или комнате отдыха.","Drag a line from a workshop (or an office, for ITR) to a locker room, shower, toilet, canteen or break room."
+Щелчок или ПКМ по линии убирает связь. Щелчок по столовой — «только для ИТР». Нет линии — ходят в ближайшее.,Click or right-click a line to remove the link. Click a canteen to make it ITR-only. No line: people use the nearest room.
+Пунктир — связи ИТР.,Dashed lines are ITR links.
+Бытовка,Locker room
+Душевая,Shower
+Туалет,Toilet
+Столовая,Canteen
+Комната отдыха,Break room
+Связь убрана: %s — теперь ближайшее.,Link removed: %s is now the nearest.
+"Сюда линию не провести: цех тянется к бытовке, душевой, туалету, столовой или комнате отдыха, контора (ИТР) — к туалету, столовой и комнате отдыха.","Can't link here: a workshop links to a locker room, shower, toilet, canteen or break room; an office (ITR) links to a toilet, canteen or break room."
+Связь: %s — %s.,Link: %s - %s.
+Столовая только для ИТР: рабочие туда не ходят.,ITR-only canteen: workers won't go there.
+Столовая снова для всех.,Canteen is open to everyone again.

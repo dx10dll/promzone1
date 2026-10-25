@@ -39,6 +39,7 @@ var pending_story := "market"   ## режим рассказчика для но
 var pending_scn := "garage"      ## сценарий
 var pending_profile := "mech"    ## профиль завода
 var pending_opts: Dictionary = {"tutorial": true}  ## обучение, параметры песочницы
+var pending_sim: Sim = null      ## 1.40: готовый завод для игровой сцены (замер --bench-game), берётся один раз
 
 
 func _ready() -> void:
@@ -87,6 +88,8 @@ func _handle_cmdline() -> void:
 			shot = a.substr(7)
 		elif a == "--newgame":
 			newgame = true
+		elif a.begins_with("--bench-game="):
+			add_child(GameBench.new())   # 1.40: замер кадров в игре на большом заводе
 	if newgame:
 		settings["tutorial_done"] = true
 		start_new_game.call_deferred(4242)
@@ -157,6 +160,10 @@ func to_menu() -> void:
 
 ## Создаёт симуляцию для игровой сцены согласно pending. Возвращает null при ошибке загрузки.
 func make_sim() -> Sim:
+	if pending_sim != null:
+		var ps := pending_sim
+		pending_sim = null
+		return ps
 	if pending == "load":
 		var s := load_sim(pending_slot)
 		if s:

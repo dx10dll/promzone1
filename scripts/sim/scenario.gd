@@ -34,6 +34,7 @@ static func new_game(scn: String, profile: String, story_mode: String, seed_valu
 		var crng := RandomNumberGenerator.new()
 		crng.seed = seed_value * 7 + 11
 		Company.set_data(sim, Company.random_name(crng), Company.random_emblem(crng, sim.progress.profile))
+	Director.setup(sim, seed_value)   # 1.40: директор (это игрок) и его кабинет — с первого дня
 	# 1.32: свои рабочие из главного меню — список едет в игре (и в сохранении); первый шанс — сразу
 	var cl: Variant = opts.get("customs", [])
 	if cl is Array and not (cl as Array).is_empty():
@@ -344,10 +345,18 @@ static func _build_annex(sim: Sim) -> void:
 
 
 ## 1.18: техпомещение 5×3 внутри: трансформаторная подстанция, насосная станция, лампа, огнетушитель.
+## 1.40: дверь в правой стене (песочница) — насосная на клетку дальше от двери, у двери свободный столбец.
 static func _build_tech(sim: Sim, r: Rect2i, door: Vector2i) -> void:
 	box(sim, r, 1, [door])
 	sim.world.wall[sim.world.idx(door)] = World.W_METAL_DOOR
 	var o := r.position
+	if door.x == r.end.x - 1:
+		put(sim, "substation", o + Vector2i(1, 1))
+		put(sim, "pump_house", o + Vector2i(3, 1))
+		put(sim, "water_heater", o + Vector2i(3, 3))   # вплотную к насосной, снизу
+		put(sim, "lamp_bulb", o + Vector2i(5, 1))
+		put(sim, "extinguisher", o + Vector2i(5, 3))
+		return
 	put(sim, "substation", o + Vector2i(1, 1))
 	put(sim, "pump_house", o + Vector2i(4, 1))
 	put(sim, "water_heater", o + Vector2i(4, 3))   # 1.20: электрокотёл отопления у насосной
@@ -415,7 +424,7 @@ static func _hire_crew(sim: Sim) -> void:
 	b.last = "Савина"
 	b.female = true
 	b.age = 44
-	b.skills = {"turning": 1, "qc": 6, "build": 1, "haul": 3, "electric": 0}
+	b.skills = {"turning": 0, "qc": 6, "build": 2, "haul": 3, "electric": 0}   # 1.40: у контролёра станочных навыков нет
 	b.traits = ["neat"]
 	b.look = {"skin": 0, "hair": "bun", "hair_col": "#3a2418", "beard": "", "glasses": true,
 		"phones": false, "bulk": 1.0, "body": "normal", "fem": true, "h": 0.96, "hat": "", "hat_col": "#ffffff", "outfit": "coat", "outfit_col": "#e9ecec",
@@ -429,7 +438,7 @@ static func _hire_crew(sim: Sim) -> void:
 	c.last = "Королёв"
 	c.female = false
 	c.age = 23
-	c.skills = {"turning": 1, "qc": 1, "build": 6, "haul": 7, "electric": 1}
+	c.skills = {"turning": 0, "qc": 1, "build": 6, "haul": 7, "electric": 1, "clean": 2, "paint": 2}   # 1.40: общие навыки
 	c.traits = ["handy", "night_owl"]
 	c.look = {"skin": 1, "hair": "short", "hair_col": "#6b4428", "beard": "", "glasses": false,
 		"phones": true, "bulk": 1.0, "body": "thin", "h": 1.04, "hat": "cap", "hat_col": "#26324a", "outfit": "shirt", "outfit_col": "#8a3e3a",
@@ -859,6 +868,17 @@ static func put(sim: Sim, def_id: String, c: Vector2i) -> Thing:
 	return sim.place_thing(def_id, c, true, false)
 
 
+## 1.40: то же, что put, но с поворотом.
+static func put_rot(sim: Sim, def_id: String, c: Vector2i, rot: int) -> Thing:
+	var old := sim.progress.all_open
+	sim.progress.all_open = true
+	var err := sim.can_place(def_id, c, rot)
+	sim.progress.all_open = old
+	if err != "":
+		return put(sim, def_id, c)
+	return sim.place_thing(def_id, c, true, false, rot)
+
+
 ## Ряд объектов слева направо с промежутком; возвращает следующий x.
 static func row(sim: Sim, ids: Array, x0: int, y: int, x_max: int, gap: int = 1) -> int:
 	var x := x0
@@ -958,13 +978,14 @@ static func _new_field(seed_value: int, story_mode: String, profile: String) -> 
 	var sim := _base(seed_value, "field", profile, story_mode, 64, 44)
 	var w := sim.world
 	sim.gate_x = 30
-	_lay_ground(sim, Rect2i(4, 26, 20, 7), Rect2i(28, 30, 8, 7), 38)
+	_lay_ground(sim, Rect2i(4, 26, 22, 7), Rect2i(28, 30, 8, 7), 38)
 	sim.progress.ooo = true
 	# 1.15: три блок-контейнера бок о бок — раздевалка, туалет и бытовка-столовая, у каждого своя дверь
 	box(sim, Rect2i(4, 26, 6, 7), 3, [Vector2i(7, 32)], [Vector2i(4, 29)])
 	box(sim, Rect2i(9, 26, 4, 7), 2, [Vector2i(10, 32)])
 	box(sim, Rect2i(12, 26, 5, 7), 3, [Vector2i(15, 32)], [Vector2i(16, 29), Vector2i(14, 26)])
-	_build_tech(sim, Rect2i(17, 27, 7, 5), Vector2i(20, 31))   # 1.18: подстанция и насосная
+	# 1.18: подстанция и насосная; 1.40 — отдельным домиком, через проход от бытовок (раньше стена к стене)
+	_build_tech(sim, Rect2i(19, 27, 7, 5), Vector2i(22, 31))
 	w.refresh_all()
 	# раздевалка: шкафчики на двоих, скамейки
 	for c in [Vector2i(5, 27), Vector2i(6, 27), Vector2i(7, 27)]:
@@ -975,7 +996,7 @@ static func _new_field(seed_value: int, story_mode: String, profile: String) -> 
 	# туалет: две кабинки входом вниз и раковина
 	put(sim, "toilet", Vector2i(10, 27))
 	put(sim, "toilet", Vector2i(11, 27))
-	put(sim, "sink", Vector2i(11, 29))
+	put_rot(sim, "sink", Vector2i(11, 29), 1)   # 1.40: спиной к правой стене, к раковине подходят слева
 	put(sim, "lamp_bulb", Vector2i(10, 30))
 	# бытовка-столовая: холодильник, чайник, стол, стулья
 	put(sim, "fridge", Vector2i(15, 27))
@@ -989,7 +1010,7 @@ static func _new_field(seed_value: int, story_mode: String, profile: String) -> 
 	assign_at(sim, Vector2i(6, 29), "locker")
 	assign_at(sim, Vector2i(10, 29), "wc")
 	assign_at(sim, Vector2i(15, 30), "canteen")
-	assign_at(sim, Vector2i(20, 30), "tech_room")
+	assign_at(sim, Vector2i(22, 30), "tech_room")
 	autowire(sim)
 	autopipe(sim)
 	# 1.17: на участке только бытовка — склад, цех и всё остальное игрок строит сам

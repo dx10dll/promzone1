@@ -25,7 +25,7 @@ const PROF_NAMES := {
 	"hr": "Кадровик",
 	"technologist": "Технолог",
 	"cleaner": "Уборщик",
-	"setter": "Наладчик",
+	"setter": "Наладчик ЧПУ",
 	"cnc_operator": "Оператор станков с ЧПУ",
 	"guard": "Охранник",
 	"cook": "Повар",
@@ -34,10 +34,11 @@ const PROF_NAMES := {
 	"safety_engineer": "Инженер по ОТ",
 	"chief_engineer": "Главный инженер",
 	"lawyer": "Юрист",
+	"director": "Директор",   ## 1.40: директор — это игрок; на заводе с первого дня
 }
 ## Инженерно-технические работники: сидят в кабинетах, на станках не работают.
 const ITR := ["foreman", "chief", "accountant", "buyer", "dispatcher", "hr", "technologist",
-	"sales_manager", "safety_engineer", "chief_engineer", "lawyer"]
+	"sales_manager", "safety_engineer", "chief_engineer", "lawyer", "director"]
 ## Отдел, в котором работает специалист.
 const PROF_DEPT := {"foreman": "foreman", "chief": "chief", "accountant": "accounting", "buyer": "supply",
 	"dispatcher": "pdo", "hr": "hr", "technologist": "tech",
@@ -50,6 +51,7 @@ const PROF_SKILL := {
 	"hr": "office", "technologist": "engineering", "cleaner": "clean", "setter": "setup", "cnc_operator": "cnc", "guard": "security",
 	"cook": "cook", "nurse": "medicine",
 	"sales_manager": "office", "safety_engineer": "engineering", "chief_engineer": "engineering", "lawyer": "office",
+	"director": "manage",
 }
 const SKILL_NAMES := {
 	"turning": "Токарное дело",
@@ -231,6 +233,37 @@ func is_itr() -> bool:
 	return ITR.has(prof)
 
 
+## 1.40: директор завода — аватар игрока (не увольняется, без оклада).
+func is_director() -> bool:
+	return prof == "director"
+
+
+## 1.40: цвет каски по должности — рабочие оранжевая, ИТР красная, начальство (мастер, начальник цеха,
+## главный инженер, директор) белая. Для гостей и проверяющих (не наши профессии) — пусто, цвет свой.
+const HELMET_WORKER := "#e2752c"
+const HELMET_ITR := "#c23a2e"
+const HELMET_BOSS := "#efefe9"
+const BOSSES := ["foreman", "chief", "chief_engineer", "director"]
+
+
+static func helmet_hex(p: String) -> String:
+	if BOSSES.has(p):
+		return HELMET_BOSS
+	if ITR.has(p):
+		return HELMET_ITR
+	if PROF_NAMES.has(p):
+		return HELMET_WORKER
+	return ""
+
+
+## Каска в облике — того цвета, что положен по должности (и в старых сохранениях).
+static func sync_helmet(lk: Dictionary, p: String) -> void:
+	if str(lk.get("hat", "")) == "helmet":
+		var hx := helmet_hex(p)
+		if hx != "":
+			lk["hat_col"] = hx
+
+
 func dept() -> String:
 	return str(PROF_DEPT.get(prof, ""))
 
@@ -245,7 +278,7 @@ func skill(s: String) -> int:
 
 ## 1.15: разряд есть только у квалифицированных рабочих, у ИТР — категория, у руководителей — должность.
 const NO_GRADE := ["laborer", "cleaner", "guard"]
-const MANAGERS := ["foreman", "chief", "chief_engineer"]
+const MANAGERS := ["foreman", "chief", "chief_engineer", "director"]
 const CAT_ROMAN := ["", "II", "I", ""]
 
 
@@ -376,6 +409,7 @@ static func from_dict(d: Dictionary) -> Worker:
 		w.skills[k] = int(w.skills[k])
 	w.wage = int(d["wage"])
 	w.look = d["look"]
+	sync_helmet(w.look, w.prof)
 	if not w.look.has("fem"):
 		w.look["fem"] = bool(d["female"])
 	if not w.look.has("fs"):

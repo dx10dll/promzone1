@@ -1152,7 +1152,7 @@ func _res_rumor(choice: int) -> void:
 func _retiree() -> Worker:
 	var best: Worker = null
 	for w in sim.workers:
-		if sim.career.pensioner(w) and not departures.any(func(x: Dictionary) -> bool: return int(x["wid"]) == w.id):
+		if sim.career.pensioner(w) and not w.is_director() and not departures.any(func(x: Dictionary) -> bool: return int(x["wid"]) == w.id):
 			if best == null or w.age > best.age:
 				best = w
 	return best
@@ -1237,7 +1237,7 @@ func _res_poach(d: Dictionary, choice: int) -> void:
 func _young() -> Worker:
 	var c: Array[Worker] = []
 	for w in sim.workers:
-		if w.age >= 22 and w.age <= 40:
+		if w.age >= 22 and w.age <= 40 and not w.is_director():
 			c.append(w)
 	return c[sim.rng.randi_range(0, c.size() - 1)] if not c.is_empty() else null
 
@@ -1270,7 +1270,7 @@ func _rational_author() -> Worker:
 		return rat[sim.rng.randi_range(0, rat.size() - 1)]
 	var c: Array[Worker] = []
 	for w in sim.workers:
-		if w.skill(w.main_skill()) >= 4 or w.prof == "technologist":
+		if (w.skill(w.main_skill()) >= 4 or w.prof == "technologist") and not w.is_director():
 			c.append(w)
 	return c[sim.rng.randi_range(0, c.size() - 1)] if not c.is_empty() else null
 

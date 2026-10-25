@@ -26,6 +26,12 @@
     "comfort": true,
     "grp": "byt"
   },
+  "ate_own": {
+    "text": "Пообедал своим, из дома",
+    "mood": 2,
+    "dur": 600,
+    "grp": "byt"
+  },
   "toilet_open": {
     "text": "Туалет прямо в цеху, без стен",
     "mood": -3,

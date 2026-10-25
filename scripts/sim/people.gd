@@ -96,6 +96,41 @@ static func patronymic(father: String, female: bool) -> String:
 	return father + ("овна" if female else "ович")
 
 
+## 1.40: станочные навыки — только у тех, кто работает на станках (и у мастеров/технологов, что их ведут).
+## Уборщица, строитель, разнорабочий, охранник, повар, конторские и т. п. за фрезерным станком не стоят:
+## у них станочных навыков нет, зато погрузка, стройка и прочие общие — получше.
+const MACHINE_SKILLS := ["turning", "milling", "cnc", "casting", "stamping", "heat", "welding", "setup"]
+const NON_MACHINE := ["laborer", "builder", "cleaner", "guard", "cook", "nurse", "electrician", "painter", "assembler", "qc",
+	"accountant", "buyer", "dispatcher", "hr", "sales_manager", "safety_engineer", "lawyer", "director"]
+
+
+## Убирает станочные навыки у нестаночных профессий и подтягивает общие. Кубик игры не трогает (свой — от имени),
+## чтобы облик, черты и всё, что бросается после, остались прежними.
+static func general_skills(w: Worker) -> void:
+	if not NON_MACHINE.has(w.prof):
+		return
+	var main := str(Worker.PROF_SKILL.get(w.prof, ""))
+	for sk: String in MACHINE_SKILLS:
+		if sk != main:
+			w.skills[sk] = 0
+	if Worker.ITR.has(w.prof):
+		return
+	var lr := RandomNumberGenerator.new()
+	lr.seed = absi((w.first + w.last).hash() + w.age * 977)
+	w.skills["haul"] = maxi(int(w.skills.get("haul", 0)), lr.randi_range(3, 6))
+	w.skills["build"] = maxi(int(w.skills.get("build", 0)), lr.randi_range(2, 4))
+	match w.prof:
+		"laborer":
+			w.skills["clean"] = maxi(int(w.skills.get("clean", 0)), lr.randi_range(1, 3))
+			w.skills["paint"] = maxi(int(w.skills.get("paint", 0)), lr.randi_range(1, 2))
+		"builder":
+			w.skills["paint"] = maxi(int(w.skills.get("paint", 0)), 2)   # < 3: в покрасочную без маляра не встанет
+		"cleaner", "cook", "nurse":
+			w.skills["clean"] = maxi(int(w.skills.get("clean", 0)), lr.randi_range(2, 4))
+		"guard":
+			w.skills["haul"] = maxi(int(w.skills["haul"]), lr.randi_range(3, 5))
+
+
 ## fix (1.32, свои рабочие): {"female", "first", "last", "age"} — поверх брошенного кубика (броски те же).
 static func make(rng: RandomNumberGenerator, prof: String, female_chance: float = 0.25, fix: Dictionary = {}) -> Worker:
 	var w := Worker.new()
@@ -218,6 +253,7 @@ static func make(rng: RandomNumberGenerator, prof: String, female_chance: float 
 		if prof == "technologist":
 			w.skills["turning"] = rng.randi_range(2, 4)
 			w.skills["milling"] = rng.randi_range(1, 4)
+	general_skills(w)
 	w.wage = wage_for(w)
 	w.look = random_look(rng, w)
 	# дети дошкольного возраста: по имени и возрасту, без лишних бросков кубика
@@ -356,11 +392,17 @@ static func eye_color(lk: Dictionary) -> Color:
 	return Color(EYE_COLS[absi(int(lk.get("skin", 0)) * 7 + str(lk.get("hair_col", "")).hash()) % EYE_COLS.size()])
 
 
+## 1.40: серьги отключены по просьбе владельца (слои остались — вернуть можно этим флагом).
+const EARRINGS := false
+
 ## Черты лица: форма головы, разрез глаз, брови, нос, рот, веснушки, серьги, морщины.
 ## Хранятся только зерно и происхождение — черты выводятся из них одинаково везде (кукла, портрет).
 static func face(lk: Dictionary, age: int = -1) -> Dictionary:
 	if lk.has("_face") and age < 0:
-		return lk["_face"]
+		var cf: Dictionary = lk["_face"]
+		if bool(cf.get("earrings", false)):
+			cf["earrings"] = false   # 1.40: серёг больше нет (старые сохранения)
+		return cf
 	var r := RandomNumberGenerator.new()
 	r.seed = int(lk.get("fs", absi(str(lk.get("hair_col", "")).hash() + int(lk.get("skin", 0)) * 7919 + str(lk.get("outfit_col", "")).hash())))
 	var fem := bool(lk.get("fem", false))
@@ -392,7 +434,8 @@ static func face(lk: Dictionary, age: int = -1) -> Dictionary:
 		f["mouth"] = _wpick(r, [["neutral", 55], ["thin", 22], ["smile", 12], ["down", 4 + (18 if a >= 45 else 0)]])
 	var hc := Color(str(lk.get("hair_col", "#4a3020")))
 	f["freckles"] = not asia and int(lk.get("skin", 0)) <= 1 and (hc.r > hc.b * 1.6 or hc.v > 0.6) and r.randf() < 0.4
-	f["earrings"] = fem and r.randf() < 0.55
+	# 1.40: серьги убраны у всех; бросок оставлен, чтобы остальные черты (и детерминизм) не сдвинулись
+	f["earrings"] = fem and r.randf() < 0.55 and EARRINGS
 	f["lines"] = "old" if a >= 52 else ("mid" if a >= 38 else "")
 	# 1.32: свой рабочий — черты лица выбраны в редакторе (броски выше те же, просто заменяем)
 	var ov: Variant = lk.get("face_ovr", null)
@@ -400,7 +443,7 @@ static func face(lk: Dictionary, age: int = -1) -> Dictionary:
 		for k: String in ["head", "eyes", "brows", "nose", "mouth"]:
 			if (ov as Dictionary).has(k):
 				f[k] = str(ov[k])
-		for k2: String in ["freckles", "earrings"]:
+		for k2: String in (["freckles", "earrings"] if EARRINGS else ["freckles"]):
 			if (ov as Dictionary).has(k2):
 				f[k2] = bool(ov[k2])
 	return f
@@ -531,6 +574,7 @@ static func random_look(rng: RandomNumberGenerator, w: Worker) -> Dictionary:
 			lk["hat_col"] = pick(rng, CAP_COLS)
 		"helmet":
 			lk["hat_col"] = "#efefe9" if w.prof == "foreman" else pick(rng, HELMET_COLS)
+			Worker.sync_helmet(lk, w.prof)   # 1.40: цвет по должности (бросок выше оставлен ради детерминизма)
 		"weldmask":
 			lk["hat_col"] = pick(rng, ["#3a3f43", "#2a2e31", "#4a4f55"])
 		"kerchief":

@@ -9,7 +9,7 @@ static func is_plain(v: int) -> bool:
 
 
 static func is_door(v: int) -> bool:
-	return v == World.W_DOOR or v == World.W_METAL_DOOR or v == World.W_GLASS_DOOR
+	return v == World.W_DOOR or v == World.W_METAL_DOOR or v == World.W_GLASS_DOOR or v == World.W_DOOR_BROWN or v == World.W_DOOR_GREEN
 
 
 ## Стена помещения (глухая, окно, дверь, ворота) — не забор.

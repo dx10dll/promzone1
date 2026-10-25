@@ -295,9 +295,13 @@ func show_worker(s: Sim, w: Worker) -> void:
 		if err != "":
 			sim.notify(err, Sim.LVL_WARN)
 		refresh()
-	actions.add_child(_act("−10%", on_down, L.t("Урезать ставку: сэкономите, но человек обидится")))
-	actions.add_child(_act("+10%", on_upw, L.t("Поднять ставку: настроение вверх")))
-	actions.add_child(_act(L.t("Премия %s") % Defs.money_str(Defs.b("bonus_amount")), on_bonus, L.t("Разовая премия: хорошее настроение на три дня"), "money"))
+	if w.is_director():
+		# 1.40: директор — это игрок: без оклада, не увольняется
+		head.add_child(_wrap(L.t("Директор завода — это вы. Оклада нет: вы хозяин. Развитие завода идёт через вас — за столом в кабинете директора."), 12, UITheme.MUTED))
+	else:
+		actions.add_child(_act("−10%", on_down, L.t("Урезать ставку: сэкономите, но человек обидится")))
+		actions.add_child(_act("+10%", on_upw, L.t("Поднять ставку: настроение вверх")))
+		actions.add_child(_act(L.t("Премия %s") % Defs.money_str(Defs.b("bonus_amount")), on_bonus, L.t("Разовая премия: хорошее настроение на три дня"), "money"))
 	if not w.is_itr():
 		actions.add_child(_act(L.t("Учить…"), _open_training, L.t("Курсы, наставник, инструктаж (Люди → Обучение)"), "research"))
 	actions.add_child(UITheme.spacer())
@@ -317,7 +321,8 @@ func show_worker(s: Sim, w: Worker) -> void:
 		ex.disabled = why != ""
 		actions.add_child(ex)
 	actions.add_child(_act(L.t("Показать"), func() -> void: focus_request.emit(w.cell()), L.t("Перевести камеру на человека"), "inspect"))
-	actions.add_child(_act(L.t("Уволить"), func() -> void: _confirm_fire(w), L.t("Уволить с выплатой расчёта"), "fire_worker", UITheme.BAD))
+	if not w.is_director():
+		actions.add_child(_act(L.t("Уволить"), func() -> void: _confirm_fire(w), L.t("Уволить с выплатой расчёта"), "fire_worker", UITheme.BAD))
 	_worker_tab()
 	visible = true
 	refresh()
@@ -1091,6 +1096,8 @@ func show_room(s: Sim, room_id: int) -> void:
 	var sel := 0
 	for type in Rooms.UI_ORDER:
 		var d: Dictionary = Defs.rooms[type]
+		if bool(d.get("hidden", false)) and r.type != type:
+			continue   # 1.40: скрытое помещение — только если оно уже такое
 		ob.add_icon_item(_swatch(Color(str(d.get("color", "#888")))), L.dt("room.%s.name" % type, str(d["name"])))
 		var i := ob.item_count - 1
 		ob.set_item_metadata(i, type)
@@ -1109,6 +1116,12 @@ func show_room(s: Sim, room_id: int) -> void:
 			show_room(sim, rr.id)
 	ob.item_selected.connect(on_pick)
 	actions.add_child(ob)
+	if r.type in ["workshop", "locker", "shower", "wc", "canteen", "restroom"] or Areas.is_office_type(r.type):
+		actions.add_child(_act(L.t("Логистика быта…"), func() -> void:
+			var hud := get_parent() as Hud
+			if hud:
+				if hud.g.tool.mode != "logistics":
+					hud.toggle_logistics(), L.t("Какой цех к какой бытовке, туалету и столовой относится, куда ходят ИТР"), "inspect"))
 	var st := _wrap("", 13, UITheme.TEXT)
 	box.add_child(st)
 	dyn["state"] = st
@@ -1360,8 +1373,11 @@ func _refresh_worker() -> void:
 		var parts2: Array[String] = []
 		if w.is_itr():
 			var dk2 := sim.office.desk_k(w)
-			parts2.append(L.t("Отдел: %s") % L.dt("department.%s.name" % w.dept(), str(Defs.departments.get(w.dept(), {}).get("name", ""))))
-			if dk2 <= 0.0:
+			if w.is_director():
+				parts2.append(L.t("Кабинет директора") if dk2 > 0.0 else L.t("Директору негде работать: нужен кабинет директора со столом директора (Объекты → Офис). Без него не исследуются ступени «Развития»."))
+			else:
+				parts2.append(L.t("Отдел: %s") % L.dt("department.%s.name" % w.dept(), str(Defs.departments.get(w.dept(), {}).get("name", ""))))
+			if dk2 <= 0.0 and not w.is_director():
 				parts2.append(L.t("НЕТ РАБОЧЕГО МЕСТА — поставьте стол ИТР в кабинет"))
 			elif dk2 < 1.0:
 				parts2.append(L.t("работает в общей конторе (−30%)"))
@@ -1386,6 +1402,10 @@ func _refresh_worker() -> void:
 			sub += L.t(" · переходит в %s") % (L.t("1-ю смену") if w.pending_shift == 0 else L.t("2-ю смену"))
 		(dyn["t_wage_s"] as Label).text = sub
 		(dyn["t_wage_s"] as Label).add_theme_color_override("font_color", UITheme.WARN if w.wage < int(market * 0.97) else UITheme.MUTED)
+		if w.is_director():
+			(dyn["t_wage"] as Label).text = L.t("Без оклада")
+			(dyn["t_wage_s"] as Label).text = L.t("хозяин завода")
+			(dyn["t_wage_s"] as Label).add_theme_color_override("font_color", UITheme.MUTED)
 
 
 ## Курсы, наставник, ученики, друзья и недруги — одной-двумя строками.
