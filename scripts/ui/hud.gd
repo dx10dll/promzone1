@@ -987,7 +987,7 @@ func _cap_sub() -> void:
 	if not is_inside_tree():
 		return
 	var need := sub_root.get_combined_minimum_size()
-	var cap := get_viewport_rect().size.y * 0.45
+	var cap := get_viewport_rect().size.y * 0.34   # 1.47.1: «План», «Стройка», «Объекты» — ещё ниже, дальше прокрутка
 	sub_scroll.custom_minimum_size = Vector2(need.x, minf(need.y, cap))
 
 
@@ -1384,11 +1384,13 @@ func _place_tutorial() -> void:
 
 
 ## 1.47: высота окна — по содержимому (не меньше WIN_MIN_H), не выше свободного места; после смены вкладки — только растёт.
+## 1.47.1: владелец хочет большие окна справа, как в 1.46 — подгонку по содержимому выключили
+const FIT_WINDOWS := false
 const WIN_MIN_H := 420.0
 
 
 func fit_window(w: GameWindow, grow_only: bool) -> void:
-	if w == null:
+	if w == null or not FIT_WINDOWS:
 		return
 	await get_tree().process_frame
 	await get_tree().process_frame
