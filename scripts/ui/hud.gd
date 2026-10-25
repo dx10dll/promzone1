@@ -16,6 +16,7 @@ var date_l: Label
 var shift_l: Label
 var power_l: Label
 var fast_l: Label
+var skip_btn: Button = null              ## 1.44: «Пропустить до утра / смены»
 var speed_btns: Array[Button] = []
 var bottom_btns: Dictionary = {}
 var order_badge: Label
@@ -314,6 +315,18 @@ func _build_top() -> void:
 	fast_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	fast_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	rh.add_child(fast_l)
+	skip_btn = UITheme.button("Пропустить до утра", func() -> void:
+		if g.is_skipping():
+			g.stop_skip()
+		else:
+			g.start_skip(), "На заводе никого: прокрутить время до начала смены. Остановится сам, если случится что-то важное")
+	skip_btn.visible = false
+	skip_btn.z_index = 5
+	skip_btn.add_theme_font_size_override("font_size", 14)
+	if UITheme.f_semi:
+		skip_btn.add_theme_font_override("font", UITheme.f_semi)
+	_anchor(skip_btn, 0.5, 0, 0.5, 0, -110, 58, 110, 92)
+	add_child(skip_btn)
 	# 1.29: кнопка справочника
 	var hlp := UITheme.button("?", func() -> void: show_help(false), "Справочник: все механики игры по разделам (F1)")
 	hlp.custom_minimum_size = Vector2(40, 34)
@@ -617,6 +630,13 @@ func _refresh_top() -> void:
 		s = "смена окончена"
 	time_l.text = "%s · %s" % [sim.time_str(), tr(s)]
 	time_l.add_theme_color_override("font_color", scol)
+	if skip_btn:
+		var skipping := g.is_skipping()
+		skip_btn.visible = skipping or (sim.can_skip_idle() and not g.menu_paused)
+		if skipping:
+			skip_btn.text = tr("Остановить пропуск")
+		else:
+			skip_btn.text = tr("Пропустить до утра") if g.sim.next_shift_start() - sim.minute <= 1440.0 else tr("Пропустить до смены")
 	if g.menu_paused or g.speed == 0:
 		fast_l.text = tr("ПАУЗА")
 		fast_l.add_theme_color_override("font_color", UITheme.ACCENT)
@@ -1727,9 +1747,18 @@ func _save_list(saves: Array, overwrite: bool) -> Control:
 
 
 func show_settings() -> void:
-	var v := _open_modal(560)
+	var v := _open_modal(600)
 	v.add_child(UITheme.title("Настройки", 22))
-	SettingsUI.build(v, func(key: String, val: bool) -> void:
+	# 1.44: настройки длиннее экрана листаются внутри окна: высота — не больше экрана минус поля
+	var sc := ScrollContainer.new()
+	sc.name = "SettingsScroll"
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sc.custom_minimum_size = Vector2(0, clampf(get_viewport_rect().size.y - 230.0, 160.0, 760.0))
+	v.add_child(sc)
+	var sv := UITheme.vbox(10)
+	sv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(sv)
+	SettingsUI.build(sv, func(key: String, val: bool) -> void:
 		if key == "edge_scroll":
 			g.cam.edge_scroll = val, show_settings)   # 1.39: сменили язык — пересобрать окно
 	_menu_button(v, "Назад", show_pause_menu)

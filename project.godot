@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Промзона"
 config/description="Симулятор строительства и управления российским заводом"
-config/version="1.43.0"
+config/version="1.44.0"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.png"
@@ -33,7 +33,9 @@ window/vsync/vsync_mode=0
 [gui]
 
 theme/custom_font="res://assets/fonts/IBMPlexSans-Regular.ttf"
-theme/default_font_multichannel_signed_distance_field=true
+theme/default_font_multichannel_signed_distance_field=false
+theme/default_font_hinting=1
+theme/default_font_subpixel_positioning=1
 
 [importer_defaults]
 
@@ -44,7 +46,7 @@ texture={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://assets/i18n/strings.en.translation", "res://assets/i18n/strings_a.en.translation", "res://assets/i18n/strings_b.en.translation", "res://assets/i18n/strings_c.en.translation", "res://assets/i18n/strings_d1.en.translation", "res://assets/i18n/strings_d2.en.translation", "res://assets/i18n/strings_e.en.translation", "res://assets/i18n/strings_f1.en.translation", "res://assets/i18n/strings_f2.en.translation", "res://assets/i18n/strings_f3.en.translation", "res://assets/i18n/strings_f5.en.translation", "res://assets/i18n/strings_141.en.translation")
+locale/translations=PackedStringArray("res://assets/i18n/strings.en.translation", "res://assets/i18n/strings_a.en.translation", "res://assets/i18n/strings_b.en.translation", "res://assets/i18n/strings_c.en.translation", "res://assets/i18n/strings_d1.en.translation", "res://assets/i18n/strings_d2.en.translation", "res://assets/i18n/strings_e.en.translation", "res://assets/i18n/strings_f1.en.translation", "res://assets/i18n/strings_f2.en.translation", "res://assets/i18n/strings_f3.en.translation", "res://assets/i18n/strings_f5.en.translation", "res://assets/i18n/strings_141.en.translation", "res://assets/i18n/strings_144.en.translation")
 locale/fallback="ru"
 
 [rendering]
@@ -52,4 +54,5 @@ locale/fallback="ru"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/canvas_textures/default_texture_filter=3
+2d/snap/snap_2d_transforms_to_pixel=true
 environment/defaults/default_clear_color=Color(0.16, 0.17, 0.18, 1)

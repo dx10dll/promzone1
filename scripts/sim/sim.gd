@@ -152,6 +152,46 @@ func day() -> int:
 	return int(minute / 1440.0) + 1
 
 
+## 1.44: счётчик тревожных уведомлений (не сохраняется) — по нему «пропуск до смены» понимает, что пора остановиться.
+var bad_seq := 0
+
+
+## 1.44: абсолютная минута начала ближайшей дневной смены (рабочий день), строго после текущей минуты.
+func next_shift_start() -> float:
+	var d := day()
+	for i in 30:
+		var dd := d + i
+		if is_workday(dd):
+			var m := float(dd - 1) * 1440.0 + Defs.b("shift_start")
+			if m > minute:
+				return m
+	return minute + 1440.0
+
+
+## 1.44: на заводе пусто и смены нет — можно пропустить время.
+func can_skip_idle() -> bool:
+	if is_work_time() or crisis.is_over():
+		return false
+	for w in workers:
+		if w.present:
+			return false
+	return true
+
+
+## 1.44: что прерывает пропуск: пусто — продолжаем. call0/bad0 — значения calls.seq и bad_seq на старте.
+func skip_stop_reason(call0: int, bad0: int) -> String:
+	if calls.seq != call0:
+		return "Звонок"
+	if bad_seq != bad0:
+		return "Тревога"
+	if inspect.busy():
+		return "Проверка"
+	for w in workers:
+		if w.present:
+			return "Пришли люди"
+	return ""
+
+
 func tod() -> float:
 	return fmod(minute, 1440.0)
 
@@ -242,6 +282,8 @@ func new_id() -> int:
 # ---------------------------------------------------------------- уведомления и деньги
 
 func notify(text: String, level: int = LVL_INFO, cell: Vector2i = Vector2i(-1, -1)) -> void:
+	if level >= LVL_BAD:
+		bad_seq += 1
 	events.push_front({"day": day(), "time": time_str(), "text": text, "level": level})
 	if events.size() > 120:
 		events.resize(120)
@@ -2057,8 +2099,6 @@ func _timed(prev: float, now: float) -> void:
 		if weekday() == 0:
 			paper.publish()
 		morning.emit(day())
-	if is_workday() and _crossed(prev, now, Defs.b("shift_end") + 60.0) and office.overtime_on():
-		calls.on_overtime()
 	if is_workday() and _crossed(prev, now, Defs.b("shift_end") + 30.0) and weekday() == 4:
 		_pay_wages()
 	# заводской гудок: начало и конец первой смены

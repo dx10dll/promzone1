@@ -103,7 +103,6 @@ func schedule(t: String, at: float, announced: bool, why: String = "", repeat: A
 		var txt := L.t("%s: %s, в %s") % [type_name(t), sim.season.date_str(dd), "%02d:%02d" % [int(fmod(at2, 1440.0) / 60.0), int(fmod(at2, 60.0))]]
 		if why != "":
 			txt += " (%s)" % why
-		sim.calls.on_notice(t, dd)
 		sim.notify(L.t("Объявлена проверка. %s. Подготовьтесь — список требований в окне «События».") % txt, Sim.LVL_WARN)
 
 
@@ -572,7 +571,6 @@ func order_score() -> Dictionary:
 func _visit_result(kind: String) -> void:
 	var r := order_score()
 	var sc := float(r["score"])
-	sim.calls.on_visit_result(kind, sc)
 	var notes: Array = r["notes"]
 	var bad := ", ".join(PackedStringArray(notes))
 	if kind == "governor":

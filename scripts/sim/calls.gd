@@ -24,10 +24,10 @@ const INSPECTORS := {"fire": "fire", "sanitary": "sanitary", "ecology": "ecology
 
 const MAX_QUEUE := 4
 const EXPIRE_MIN := 600.0        ## звонок, на который не ответили, тихо гаснет через 10 игровых часов
-const ENG_PER_DAY := 2           ## советник: не больше двух звонков в сутки…
-const ENG_URGENT_DAY := 3        ## …и три со срочным
+const ENG_PER_DAY := 1           ## 1.44: советник: не больше одного звонка в сутки…
+const ENG_URGENT_DAY := 2        ## …и ещё один — только срочный (пожар, несчастный случай)
 const ENG_GAP := 150.0           ## минут между его звонками
-const TAG_DAYS := 3.0            ## один и тот же совет — не чаще, чем раз в 3 суток
+const TAG_DAYS := 5.0            ## 1.44: одна и та же тема — не чаще, чем раз в 5 суток
 
 var sim: Sim
 var queue: Array = []            ## [{id, caller, emotion, key, args, action, label, born, tag}]
@@ -40,12 +40,6 @@ var tag_at: Dictionary = {}
 var debt_n := 0
 var tips_done: Array = []
 
-const IRONY := [
-	"Знаете, что главное на заводе? Чтобы станки работали, а отчёты были красивее станков.",
-	"Говорят, лучший ремонт — тот, что не понадобился. Проверим это в следующий вторник.",
-	"Если всё идёт по плану, значит, план составлен где-то не здесь.",
-	"Я тут подумал: кофе в цехе кончается быстрее, чем металл. Это тоже показатель.",
-]
 
 
 func _init(s: Sim) -> void:
@@ -147,18 +141,12 @@ func has_call() -> bool:
 
 # ---------------------------------------------------------------- проверки и визиты
 
-func on_notice(t: String, day_n: int) -> void:
-	if INSPECTORS.has(t):
-		push(str(INSPECTORS[t]), "neutral", "Здравствуйте. %s: проверка назначена на %s. Подготовьтесь заранее: список требований — в окне «События».",
-			["insp.%s.name" % t, "date:%d" % day_n], "notice_" + t, "events:insp", "Открыть проверки", false, 1.0)
-
-
 func on_inspection(t: String, n: int, fine: float, due_day: int) -> void:
 	if not INSPECTORS.has(t):
 		return
 	var who: String = str(INSPECTORS[t])
 	if n <= 0:
-		push(who, "pleased", "Проверка закончена: замечаний нет. Порядок образцовый, так держать.", [], "res_" + t, "", "", false, 0.0)
+		return   # 1.44: «всё чисто» — не повод для звонка
 	elif fine <= 0.0:
 		push(who, "strict", "Нарушений: %d. На первый раз ограничусь предупреждением. Устраните до %s — иначе будет штраф.", [n, "date:%d" % due_day], "res_" + t, "events:insp", "Открыть проверки", false, 0.0)
 	else:
@@ -169,17 +157,6 @@ func on_inspection(t: String, n: int, fine: float, due_day: int) -> void:
 func on_visit_notice(kind: String) -> void:
 	if kind == "governor":
 		push("deputy", "neutral", "Добрый день. Через два дня завод посетит губернатор области. Наведите порядок: от этого зависит поддержка.", [], "visit_gov", "events:insp", "Открыть календарь", false, 1.0)
-
-
-func on_visit_result(kind: String, score: float) -> void:
-	if kind != "governor":
-		return
-	if score >= 60.0:
-		push("deputy", "pleased", "Хорошие новости: губернатор остался доволен заводом. Субсидия уже в пути.", [], "visit_gov_res", "", "", false, 0.0)
-	elif score < 42.0:
-		push("deputy", "strict", "Губернатор уехал недовольным. Беспорядок на заводе заметили — делайте выводы.", [], "visit_gov_res", "", "", false, 0.0)
-	else:
-		push("deputy", "neutral", "Губернатор уехал без восторгов, но и без претензий. Работайте, развивайтесь.", [], "visit_gov_res", "", "", false, 0.0)
 
 
 # ---------------------------------------------------------------- заказчики
@@ -198,13 +175,6 @@ func on_tender() -> void:
 	push("technologist", "neutral", "Объявлен тендер. Требования строгие, зато и оплата достойная. Решение — во вкладке «Контракты».", [], "tender", "orders", "Открыть заказы", false, 1.0)
 
 
-func on_delivered(product: String, big: bool) -> void:
-	if big:
-		push("technologist", "pleased", "Партию «%s» приняли без замечаний. Качество на уровне — с вами приятно работать.", [product], "ok_tech", "", "", false, 2.0)
-	else:
-		push("procurement", "pleased", "Заказ «%s» получили вовремя. Спасибо, будем обращаться снова.", [product], "ok_proc", "", "", false, 2.0)
-
-
 # ---------------------------------------------------------------- главный инженер (советник)
 
 func on_breakdown(title: String) -> void:
@@ -217,10 +187,6 @@ func on_metal_low(need: int, mat: String) -> void:
 		[mat, need], "metal", "prod:supply", "Открыть снабжение")
 
 
-func on_stage(title: String) -> void:
-	push("engineer", "pleased", "Новый этап — «%s»! Завод растёт. Теперь можно браться за более серьёзные заказы.", [title], "stage", "goals:stage", "Открыть цели", false, 1.0)
-
-
 func on_fire() -> void:
 	push("engineer", "surprised", "Пожар! Людей от огня, огнетушители в руки. Потом ждите пожарных — проверка будет.", [], "fire", "", "", true)
 
@@ -229,35 +195,23 @@ func on_injury() -> void:
 	push("engineer", "surprised", "В цеху несчастный случай. Проверьте охрану труда и аптечки, пока не пришла трудовая инспекция.", [], "injury", "people:safety", "Охрана труда", true)
 
 
-func on_overtime() -> void:
-	push("engineer", "tired", "Смена затянулась, люди валятся с ног. Сверхурочные хороши раз-два в месяц, не чаще.", [], "overtime", "people:sched", "График смены")
-
-
 func morning() -> void:
-	var d := sim.day()
 	# проверка уже завтра
 	for q: Dictionary in sim.inspect.queue:
 		var dt := float(q["at"]) - sim.minute
 		if bool(q.get("announced", false)) and dt > 0.0 and dt < 1440.0 and INSPECTORS.has(str(q["type"])):
 			push("engineer", "explaining", "Завтра проверка: %s. Загляните в «События → Проверки» — там список требований. Лучше исправить всё заранее.",
-				["insp.%s.name" % str(q["type"])], "soon_" + str(q["type"]), "events:insp", "Открыть проверки", true)
+				["insp.%s.name" % str(q["type"])], "soon_" + str(q["type"]), "events:insp", "Открыть проверки", false)
 			break
 	# касса
 	if sim.money < 0.0:
 		debt_n += 1
 		if debt_n >= 3:
-			push("engineer", "angry", "Опять кассовый разрыв! Так нельзя: сократите расходы или берите заказы с предоплатой.", [], "debt", "finance:summary", "Открыть финансы", true, 2.0)
+			push("engineer", "angry", "Опять кассовый разрыв! Так нельзя: сократите расходы или берите заказы с предоплатой.", [], "debt", "finance:summary", "Открыть финансы", false)
 		else:
-			push("engineer", "worried", "В кассе минус. Пока не вернёте деньги, закупки и зарплата под угрозой. Выполняйте заказы и не берите лишнего.", [], "debt", "finance:summary", "Открыть финансы", true, 2.0)
+			push("engineer", "worried", "В кассе минус. Пока не вернёте деньги, закупки и зарплата под угрозой. Выполняйте заказы и не берите лишнего.", [], "debt", "finance:summary", "Открыть финансы", false)
 	else:
 		debt_n = 0
-	# подсказки о возможностях, по одной
-	if d >= 3 and not tips_done.has("logi") and push("engineer", "explaining", "Совет: слой «Логистика» показывает, кто в какую бытовку, столовую и душ ходит. Протяните линии от цеха — люди не будут бегать через весь завод.", [], "tip_logi", "logistics", "Открыть логистику"):
-		tips_done.append("logi")
-	elif d >= 6 and not tips_done.has("plan") and push("engineer", "explaining", "Совет: режим «План» — это калька. Нарисуйте будущий завод бесплатно, рабочие его не тронут, а потом нажмите «Утвердить план».", [], "tip_plan", "plan", "Открыть план"):
-		tips_done.append("plan")
-	elif d >= 8 and d % 9 == 8:
-		push("engineer", "ironic", IRONY[(d / 9) % IRONY.size()], [], "irony", "", "", false, 6.0)
 
 
 func to_dict() -> Dictionary:

@@ -66,6 +66,12 @@ func publish(force: bool = false) -> void:
 	var fillers: Array = Defs.paper.get("fillers", [])
 	if not fillers.is_empty():
 		var fi := (number * 7 + sim.day()) % fillers.size()
+		# 1.44: заметка про должность выходит, только если такой человек есть; иначе — следующая подходящая
+		for _k in fillers.size():
+			var need := str((fillers[fi] as Array)[2]) if (fillers[fi] as Array).size() > 2 else ""
+			if need == "" or has_prof(need):
+				break
+			fi = (fi + 1) % fillers.size()
 		var f: Array = fillers[fi]
 		items.append({"rubric": L.dt("paper.filler.%d.rubric" % fi, str(f[0])), "title": "", "text": L.dt("paper.filler.%d.text" % fi, str(f[1]))})
 	issues.push_front({"no": number, "day": sim.day(), "date": sim.season.long_date(), "items": items})
@@ -84,11 +90,22 @@ static func subtitle_str() -> String:
 	return L.dt("paper.subtitle", str(Defs.paper.get("subtitle", "")))
 
 
+## 1.44: есть ли на заводе работник такой профессии (газета не пишет про тех, кого нет).
+func has_prof(p: String) -> bool:
+	for w in sim.workers:
+		if w.prof == p:
+			return true
+	return false
+
+
 func _life_item() -> Dictionary:
 	if sim.rooms.of_type("canteen").is_empty():
 		return {"rubric": L.t("Письма читателей"), "title": L.t("Когда будет столовая?"), "text": L.t("«Обедаем на скамейке, бутерброды в промасленной газете. Нельзя ли по-человечески?» — пишет группа рабочих.")}
-	var lines := [L.t("В столовой снова закончился компот. Буфетчица обещает разобраться."), L.t("Новое блюдо в столовой — котлета по-заводски. Отзывы сдержанно положительные."),
-		L.t("Столовая просит не уносить ложки. Ложек осталось одиннадцать.")]
+	var lines := [L.t("Столовая просит не уносить ложки. Ложек осталось одиннадцать.")]
+	if has_prof("cook"):
+		lines = [L.t("В столовой снова закончился компот. Буфетчица обещает разобраться."), L.t("Новое блюдо в столовой — котлета по-заводски. Отзывы сдержанно положительные."), lines[0]]
+	else:
+		lines.append(L.t("В столовой снова закончился компот. Администрация обещает разобраться."))
 	return {"rubric": L.t("Столовая"), "title": "", "text": lines[number % lines.size()]}
 
 

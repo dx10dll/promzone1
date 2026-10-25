@@ -4,7 +4,7 @@ extends Node2D
 ## Время течёт кусками не больше полминуты игрового времени за шаг симуляции.
 
 const SPEEDS := [0.0, 1.0, 2.0, 4.0]     ## множители скорости: пауза, ×1, ×2, ×4
-const NIGHT_RATE := 75.0                  ## игровых минут в секунду, когда на заводе пусто
+const NIGHT_RATE := 240.0                 ## игровых минут в секунду, когда на заводе пусто
 const MAX_STEP := 0.5
 const MIN_STEP := 0.05
 const SIM_HZ := 10.0                     ## 1.26: шагов симуляции в секунду на обычной скорости
@@ -33,6 +33,9 @@ var hud: Hud
 var speed := 1
 var _speed_before_pause := 1
 var menu_paused := false      ## пауза из-за открытого меню
+var skip_target := -1.0       ## 1.44: «пропустить до смены» — до какой минуты крутим
+var _skip_call0 := 0
+var _skip_bad0 := 0
 var fast := false             ## ночь/выходные ускорены
 var _want_autosave := false
 var _over_shown := false
@@ -186,6 +189,8 @@ func _exit_tree() -> void:
 
 func set_speed(s: int) -> void:
 	speed = clampi(s, 0, SPEEDS.size() - 1)
+	if speed == 0:
+		skip_target = -1.0
 	if speed > 0:
 		_speed_before_pause = speed
 	hud.on_speed_changed()
@@ -200,6 +205,48 @@ func toggle_pause() -> void:
 
 func is_running() -> bool:
 	return speed > 0 and not menu_paused
+
+
+func is_skipping() -> bool:
+	return skip_target >= 0.0
+
+
+func start_skip() -> bool:
+	if sim == null or not sim.can_skip_idle():
+		return false
+	skip_target = sim.next_shift_start()
+	_skip_call0 = sim.calls.seq
+	_skip_bad0 = sim.bad_seq
+	if speed == 0:
+		set_speed(1)
+	return true
+
+
+func stop_skip(reason: String = "") -> void:
+	if skip_target < 0.0:
+		return
+	skip_target = -1.0
+	if reason != "" and hud != null:
+		hud.toast(tr("Пропуск времени остановлен: %s") % tr(reason), Sim.LVL_WARN)
+
+
+## Пропуск: те же шаги симуляции (MAX_STEP), только их много за кадр, пока не выйдет бюджет времени кадра.
+func _skip_frame() -> void:
+	var t0 := Time.get_ticks_usec()
+	fast = true
+	while sim.minute < skip_target:
+		var why := sim.skip_stop_reason(_skip_call0, _skip_bad0)
+		if why != "":
+			stop_skip(why)
+			return
+		for w in sim.workers:
+			w.vprev = w.pos
+		sim.tick(MAX_STEP)
+		if (Time.get_ticks_usec() - t0) > 14000:
+			break
+	Worker.view_alpha = 1.0
+	if sim.minute >= skip_target:
+		stop_skip()
 
 
 func _factory_empty() -> bool:
@@ -235,6 +282,9 @@ func _process(delta: float) -> void:
 		Snd.duck(hud != null and hud.modal_open())   # 1.31: под меню паузы музыка тише
 	sim_ms = 0.0
 	if not is_running():
+		return
+	if skip_target >= 0.0:
+		_skip_frame()
 		return
 	var rate: float = float(SPEEDS[speed]) / maxf(0.05, Defs.b("minute_real_seconds") * float(Game.settings.get("hour_len", 1.0)))
 	if bool(Game.settings.get("fast_night", true)) and _factory_empty() and not sim.is_work_time():

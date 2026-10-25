@@ -493,8 +493,6 @@ func on_pickup_done(v: Vehicle) -> void:
 	sim.stats["shipped"] = int(sim.stats["shipped"]) + v.loaded
 	if late_days == 0:
 		sim.reputation = minf(100.0, sim.reputation + 3.0)
-		if int(o.get("defects", 0)) == 0:
-			sim.calls.on_delivered(Defs.product_name(str(o["product"])), ["contract", "export", "state"].has(okind))
 		sim.notify(L.t("Заказ отгружен вовремя: %s. Получено %s.") % [short(o), Defs.money_str(amount)], Sim.LVL_GOOD)
 	else:
 		sim.reputation = maxf(0.0, sim.reputation - 2.0)
