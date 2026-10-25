@@ -185,9 +185,43 @@ static var _png: Dictionary = {}
 
 
 static func png(id: String, sz: int = 48) -> Texture2D:
-	var ck := "%s@%d" % [id, sz]
-	if _png.has(ck):
-		return _png[ck]
+	return crisp(id, sz)
+
+
+## 1.46: чёткий значок. Причина «мыла»: 128-px PNG показывался в 24-40 px (×0,2-0,3) через мип-карты GPU
+## (трилинейное смешение двух уровней) да ещё в окне 1920×1080 (экран 1600×900 ×1,2). Теперь значок заранее
+## уменьшается Lanczos-ом до точного числа физических пикселей (логический размер × масштаб окна), без мип-карт:
+## на экране он рисуется 1:1. Логический размер текстуры — sz.
+const MAX_PX := 128
+static var _crisp: Dictionary = {}
+
+
+## Сколько физических пикселей в одном логическом пикселе интерфейса (stretch canvas_items + масштаб интерфейса).
+static func px_scale() -> float:
+	var ml := Engine.get_main_loop()
+	var tree := ml as SceneTree
+	if tree == null or tree.root == null:
+		return 1.0
+	var w: Window = tree.root
+	var base := Vector2(
+		float(ProjectSettings.get_setting("display/window/size/viewport_width", 1600)),
+		float(ProjectSettings.get_setting("display/window/size/viewport_height", 900)))
+	var sc := minf(float(w.size.x) / base.x, float(w.size.y) / base.y)
+	return clampf(sc * w.content_scale_factor, 0.5, 4.0)
+
+
+## Сбросить запечённые значки (сменился размер окна / масштаб интерфейса): новые окна получат точный размер.
+static func invalidate_crisp() -> void:
+	_crisp.clear()
+	_png.clear()
+	_ui_vec.clear()
+
+
+static func crisp(id: String, sz: int = 48) -> Texture2D:
+	var phys := clampi(roundi(float(sz) * px_scale()), 8, MAX_PX)
+	var ck := "%s@%d@%d" % [id, sz, phys]
+	if _crisp.has(ck):
+		return _crisp[ck]
 	var path := "res://assets/ui/icons/%s.png" % id
 	var t: Texture2D = null
 	if ResourceLoader.exists(path):
@@ -196,17 +230,27 @@ static func png(id: String, sz: int = 48) -> Texture2D:
 		if img != null:
 			if img.is_compressed():
 				img.decompress()
-			if not img.has_mipmaps():
-				img.generate_mipmaps()
+			if img.has_mipmaps():
+				img.clear_mipmaps()
+			if img.get_width() != phys:
+				img.resize(phys, phys, Image.INTERPOLATE_LANCZOS)
 			var it := ImageTexture.create_from_image(img)
 			it.set_size_override(Vector2i(sz, sz))
 			it.set_meta(COLOR_META, true)
+			it.set_meta(&"pz_icon_id", id)
 			t = it
 		elif src != null:
 			# без видеокарты (headless) картинку не достать — отдаём импортированную как есть
 			src.set_meta(COLOR_META, true)
 			t = src
-	_png[ck] = t
+	_crisp[ck] = t
+	return t
+
+
+## Тот же значок владельца, но запечённый под другой логический размер показа (если это значок из assets/ui/icons).
+static func at(t: Texture2D, sz: float) -> Texture2D:
+	if t != null and t.has_meta(&"pz_icon_id"):
+		return crisp(str(t.get_meta(&"pz_icon_id")), roundi(sz))
 	return t
 
 

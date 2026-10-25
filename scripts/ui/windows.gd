@@ -734,6 +734,29 @@ func _cards(cols: int = 2) -> GridContainer:
 
 
 ## Карточка в сетке: заголовок (+ значок «?»), внутри — вертикальный список.
+## 1.46: значки заголовков карточек: русский заголовок -> значок (ищется по переведённому тексту).
+const CARD_ICONS := {"Стратегия сбыта": "orders", "За 7 дней": "date", "Узкое место": "wrench", "Ценовая политика": "money",
+	"Учебный класс": "research", "Статистика": "statistics", "Спецоценка (СОУТ)": "inspect", "СИЗ": "shield", "Рассказчик": "paper",
+	"Рабочие места": "objects", "Путь завода": "goals", "Практиканты ПТУ": "hire", "Поставщик металла": "supply",
+	"Погода и отопление": "temperature", "План месяца": "date", "Наша доля рынка": "chart_up", "Молоко за вредность": "med",
+	"Люди и репутация": "people", "Конкурентоспособность": "medal", "История": "log", "Инструктаж по ОТ": "shield",
+	"Индекс цены металла": "chart_up", "Ждут решения": "letter", "Доля рынка": "chart_up", "Деньги на счёте": "finances",
+	"Действует сейчас": "events", "Выручка и расходы по дням": "finances", "В пути": "supply", "Ближайшие проверки": "inspect",
+	"Шаблоны": "template", "Профком": "union", "Проект колдоговора": "law", "Охранники": "shield", "Колдоговор": "law",
+	"Журнал охраны": "log", "Все графики": "statistics", "Доля рынка по дням": "chart_up"}
+static var _card_icon_map: Dictionary = {}
+static var _card_icon_lang := ""
+
+
+static func _card_icon(title: String) -> String:
+	if _card_icon_lang != L.lang():
+		_card_icon_lang = L.lang()
+		_card_icon_map.clear()
+		for k: String in CARD_ICONS:
+			_card_icon_map[L.t(k)] = CARD_ICONS[k]
+	return str(_card_icon_map.get(title, ""))
+
+
 func _card_in(parent: Control, title: String = "", help: String = "") -> VBoxContainer:
 	var c := UITheme.card(12)
 	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -741,7 +764,10 @@ func _card_in(parent: Control, title: String = "", help: String = "") -> VBoxCon
 	var v := UITheme.vbox(6)
 	c.add_child(v)
 	if title != "":
-		var h := UITheme.hbox(6)
+		var h := UITheme.hbox(8)
+		var cic := _card_icon(title)
+		if cic != "":
+			h.add_child(UITheme.icon_plate(cic, 18, UITheme.ACCENT))   # 1.46: значок в заголовке карточки
 		h.add_child(UITheme.label(title, 15, UITheme.TEXT, UITheme.f_semi))
 		if help != "":
 			h.add_child(UITheme.help(help))
@@ -754,6 +780,7 @@ func _icon(tex: Texture2D, sz: float = 40.0) -> TextureRect:
 	r.texture = tex
 	if Tex.is_color(tex):
 		sz = roundf(sz * 1.2)   # 1.38: у цветных PNG владельца прозрачные поля ~12%
+		r.texture = Tex.at(tex, sz)   # 1.46: запечь точно под размер показа (чётко)
 	r.custom_minimum_size = Vector2(sz, sz)
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -859,10 +886,10 @@ func _sales_head() -> void:
 	if sim.money < 0.0:
 		a.add_child(UITheme.para(tr("Завод в долгах — сбыт новых заказов не берёт, пока касса в минусе."), 12, UITheme.BAD))
 	var b := _card_in(g, tr("За 7 дней"))
-	b.add_child(_cl(tr("взято %d %s на %s") % [int(s["taken"]), Defs.plural(int(s["taken"]), "заказ", "заказа", "заказов"), Defs.money_str(float(s["taken_sum"]))], 13, UITheme.GOOD))
-	b.add_child(_cl(tr("отказано %d на %s") % [int(s["lost"]), Defs.money_str(float(s["lost_sum"]))], 13, UITheme.WARN if float(s["lost_sum"]) > 0.0 else UITheme.MUTED))
+	b.add_child(UITheme.kv("orders", tr("взято %d %s") % [int(s["taken"]), Defs.plural(int(s["taken"]), "заказ", "заказа", "заказов")], Defs.money_str(float(s["taken_sum"])), UITheme.GOOD))
+	b.add_child(UITheme.kv("cancel", tr("отказано %d") % int(s["lost"]), Defs.money_str(float(s["lost_sum"])), UITheme.WARN if float(s["lost_sum"]) > 0.0 else UITheme.MUTED))
 	if not sl.queue.is_empty():
-		b.add_child(_cl(tr("в рассмотрении %d на %s") % [sl.queue.size(), Defs.money_str(sl.queue_sum())], 13, UITheme.INFO))
+		b.add_child(UITheme.kv("clock", tr("в рассмотрении %d") % sl.queue.size(), Defs.money_str(sl.queue_sum()), UITheme.INFO))
 	var c := _card_in(g, tr("Узкое место"))
 	if float(li[0]) >= 98.0:
 		var an := sl.absent_note(str(li[1]))

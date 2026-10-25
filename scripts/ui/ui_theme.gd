@@ -234,13 +234,9 @@ static func button(text: String, cb: Callable, tip: String = "") -> Button:
 static var _micons: Dictionary = {}
 
 
-static func micon(id: String) -> Texture2D:
-	if _micons.has(id):
-		return _micons[id]
-	var path := "res://assets/ui/icons/%s.png" % id
-	var t: Texture2D = load(path) if ResourceLoader.exists(path) else null
-	_micons[id] = t
-	return t
+static func micon(id: String, sz: int = 40) -> Texture2D:
+	# 1.46: заранее уменьшенный Lanczos-ом под точный размер показа (см. Tex.crisp) — вместо мип-карт 128-px исходника
+	return Tex.crisp(id, sz)
 
 
 ## Кнопка-значок с цветной иконкой меню: значок не перекрашивается, неактивная — полупрозрачная.
@@ -325,6 +321,24 @@ static func caption(text: String, col: Color = MUTED) -> Label:
 	return l
 
 
+const STAT_ICONS := {"Деньги": "money", "Через 2 недели": "clock", "Сегодня": "date", "Репутация": "reputation", "Заработано": "chart_up",
+	"Потрачено": "chart_down", "Сделано деталей": "production", "Отгружено": "supply", "Заказы": "orders", "Долг": "law",
+	"Электросеть": "energy", "Сжатый воздух": "ov_air", "Вода": "ov_water", "Проходная": "exit", "Плата в день": "money",
+	"Охранники": "shield", "Отношения с городом": "city", "Общежитие": "bed", "Комнат": "zone_dorm", "Коек": "bed", "Камеры": "inspect",
+	"Задержано": "thief", "Детсад": "kid", "Горячих обедов": "emo_food"}
+static var _stat_map: Dictionary = {}
+static var _stat_lang := ""
+
+
+static func stat_icon(cap: String) -> String:
+	if _stat_lang != L.lang():
+		_stat_lang = L.lang()
+		_stat_map.clear()
+		for k: String in STAT_ICONS:
+			_stat_map[L.t(k)] = STAT_ICONS[k]
+	return str(_stat_map.get(cap, ""))
+
+
 ## Плитка показателя: подпись, крупное значение, необязательная строка ниже.
 static func stat(cap: String, value: String, col: Color = TEXT, sub: String = "", sub_col: Color = MUTED, tip: String = "") -> PanelContainer:
 	var p := card(12)
@@ -334,7 +348,16 @@ static func stat(cap: String, value: String, col: Color = TEXT, sub: String = ""
 	var v := vbox(1)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(v)
-	v.add_child(caption(cap))
+	var cic := stat_icon(cap)
+	if cic != "":
+		# 1.46: значок рядом с подписью показателя
+		var ch := hbox(6)
+		ch.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		ch.add_child(icon_plate(cic, 16, MUTED, false))
+		ch.add_child(caption(cap))
+		v.add_child(ch)
+	else:
+		v.add_child(caption(cap))
 	var vl := label(value, 20, col, f_semi)
 	v.add_child(vl)
 	if sub != "":
@@ -501,3 +524,75 @@ static func ramp(v: float) -> Color:
 	if v < 0.65:
 		return WARN
 	return GOOD
+
+
+## 1.46: значок в круглой плашке (цвет — акцент плашки). Цветной PNG владельца — без перекраски, чётко под размер.
+static func icon_plate(icon: String, sz: int = 22, col: Color = ACCENT, plate: bool = true) -> Control:
+	var tr_ := TextureRect.new()
+	var t: Texture2D = Tex.crisp(icon, sz)
+	if t == null:
+		t = Tex.ui(icon)
+	tr_.texture = t
+	tr_.custom_minimum_size = Vector2(sz, sz)
+	tr_.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr_.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tr_.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not Tex.is_color(t):
+		tr_.modulate = col
+	if not plate:
+		tr_.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		return tr_
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", sb(Color(col.r, col.g, col.b, 0.16), Color(col.r, col.g, col.b, 0.35), 1, (sz + 6) / 2, 2, 2))
+	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(tr_)
+	return p
+
+
+## Заголовок раздела: значок в плашке, название и тонкая линия до края.
+static func section(icon: String, text: String, col: Color = ACCENT) -> HBoxContainer:
+	var h := hbox(8)
+	h.add_child(icon_plate(icon, 20, col))
+	h.add_child(label(L.t(text), 15, TEXT, f_semi))
+	var ln := ColorRect.new()
+	ln.color = Color(LINE2.r, LINE2.g, LINE2.b, 0.7)
+	ln.custom_minimum_size = Vector2(0, 1)
+	ln.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ln.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ln.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.add_child(ln)
+	return h
+
+
+## Строка «значок + подпись … значение» вместо сплошного текста.
+static func kv(icon: String, cap: String, value: String, col: Color = TEXT, tip: String = "") -> HBoxContainer:
+	var h := hbox(8)
+	h.add_child(icon_plate(icon, 18, col, false))
+	var c := label(L.t(cap), 13, MUTED)
+	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	h.add_child(c)
+	var v := label(value, 14, col, f_semi)
+	v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	h.add_child(v)
+	if tip != "":
+		h.tooltip_text = tip
+		h.mouse_filter = Control.MOUSE_FILTER_PASS
+	return h
+
+
+## Чип со значком: «● текст» — статус, метка зоны, тег.
+static func icon_chip(icon: String, text: String, col: Color = MUTED, tip: String = "") -> PanelContainer:
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", sb(Color(col.r, col.g, col.b, 0.13), Color(col.r, col.g, col.b, 0.35), 1, 10, 6, 1))
+	var h := hbox(4)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(h)
+	h.add_child(icon_plate(icon, 16, col, false))
+	var l := label(text, 12, col, f_semi)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.add_child(l)
+	p.tooltip_text = tip
+	p.mouse_filter = Control.MOUSE_FILTER_STOP if tip != "" else Control.MOUSE_FILTER_IGNORE
+	p.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	return p

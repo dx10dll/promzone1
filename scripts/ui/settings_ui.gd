@@ -23,9 +23,10 @@ const VOLUMES := [["vol_master", "Общая громкость"], ["vol_music",
 static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: Callable = Callable()) -> void:
 	# 1.39: язык — первым пунктом, двуязычной подписью (её прочтёт и тот, кто случайно переключил)
 	var lh := UITheme.hbox(10)
+	lh.add_child(UITheme.icon_plate("letter", 18, UITheme.INFO, false))
 	var ll := UITheme.label("Язык / Language", 14)
 	ll.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	ll.custom_minimum_size = Vector2(150, 0)
+	ll.custom_minimum_size = Vector2(132, 0)
 	lh.add_child(ll)
 	var lob := OptionButton.new()
 	lob.name = "LangSelect"
@@ -41,7 +42,7 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 			on_lang.call())
 	lh.add_child(lob)
 	v.add_child(lh)
-	v.add_child(UITheme.label("Игра", 16, UITheme.TEXT, UITheme.f_semi))
+	v.add_child(UITheme.section("settings", "Игра"))
 	for o in TOGGLES:
 		var key := str(o[0])
 		var cb := CheckBox.new()
@@ -58,24 +59,13 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 		v.add_child(cb)
 	v.add_child(_choice("Игровой час", [[1.5, "медленно (45 с)"], [1.0, "обычно (30 с)"], [0.66, "быстро (20 с)"], [0.4, "очень быстро (12 с)"]], "hour_len",
 		"Сколько реальных секунд длится игровой час на обычной скорости"))
-	# 1.38: заголовок «Звук» — со значком владельца «музыка»
-	var sh := UITheme.hbox(8)
-	var mt := Tex.ui("music")
-	if Tex.is_color(mt):
-		var mi := TextureRect.new()
-		mi.texture = mt
-		mi.custom_minimum_size = Vector2(26, 26)
-		mi.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		mi.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		mi.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		sh.add_child(mi)
-	sh.add_child(UITheme.label("Звук", 16, UITheme.TEXT, UITheme.f_semi))
-	v.add_child(sh)
+	v.add_child(UITheme.section("music", "Звук"))
 	for vo in VOLUMES:
 		var key2 := str(vo[0])
 		var h := UITheme.hbox(10)
+		h.add_child(UITheme.icon_plate("music", 18, UITheme.INFO, false))
 		var l := UITheme.label(str(vo[1]), 14)
-		l.custom_minimum_size = Vector2(200, 0)
+		l.custom_minimum_size = Vector2(182, 0)
 		h.add_child(l)
 		var sl := HSlider.new()
 		sl.min_value = 0.0
@@ -97,7 +87,7 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 		v.add_child(h)
 	v.add_child(_choice("Подбор музыки", [[0.0, "по времени суток"], [1.0, "всё подряд"], [2.0, "только вальсы"]], "music_mode",
 		"По времени суток: утром — бодрее, днём — рабочий ритм, в аврал — марш, ночью — тихо"))
-	v.add_child(UITheme.label("Экран", 16, UITheme.TEXT, UITheme.f_semi))
+	v.add_child(UITheme.section("layers", "Экран"))
 	v.add_child(_choice("Качество эффектов", [[0.0, "низкое — без искр и дыма"], [1.0, "среднее"], [2.0, "высокое"]], "quality",
 		"Искры, стружка, пар, дым, листья и облака. На слабых компьютерах поставьте пониже"))
 	v.add_child(_choice("Предел кадров", [[0.0, "без предела"], [30.0, "30"], [60.0, "60"], [120.0, "120"], [144.0, "144"], [240.0, "240"]], "fps_cap",
@@ -107,10 +97,14 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 	v.add_child(_choice("Масштаб интерфейса", [[0.85, "85%"], [1.0, "100%"], [1.15, "115%"], [1.3, "130%"]], "ui_scale", "Размер кнопок и текста", func() -> void: Game.apply_ui_scale()))
 
 
+const ROW_ICONS := {"hour_len": "clock", "music_mode": "music", "quality": "star", "fps_cap": "speed_3", "vsync": "statistics", "ui_scale": "layers"}
+
+
 static func _choice(title: String, items: Array, key: String, tip: String, after: Callable = Callable()) -> HBoxContainer:
 	var h := UITheme.hbox(10)
+	h.add_child(UITheme.icon_plate(str(ROW_ICONS.get(key, "settings")), 18, UITheme.INFO, false))
 	var l := UITheme.label(title, 14)
-	l.custom_minimum_size = Vector2(150, 0)
+	l.custom_minimum_size = Vector2(132, 0)
 	l.tooltip_text = tip
 	l.mouse_filter = Control.MOUSE_FILTER_STOP
 	h.add_child(l)

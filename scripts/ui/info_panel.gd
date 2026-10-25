@@ -216,30 +216,30 @@ func show_worker(s: Sim, w: Worker) -> void:
 	chips.add_theme_constant_override("h_separation", 5)
 	chips.add_theme_constant_override("v_separation", 4)
 	chips.add_child(UITheme.chip(w.prof_name() + (" · " + w.rank_text() if w.rank_text() != "" else ""), UITheme.ACCENT, _rank_tip(w), true))
-	chips.add_child(UITheme.chip(L.t(["1-я смена", "2-я смена"][clampi(w.shift, 0, 1)]) if L.is_en() else str(Worker.SHIFT_NAMES[w.shift]).split(" ")[0] + " смена", UITheme.INFO if w.shift == 0 else Color("#a58ad8")))
+	chips.add_child(UITheme.icon_chip("clock", L.t(["1-я смена", "2-я смена"][clampi(w.shift, 0, 1)]) if L.is_en() else str(Worker.SHIFT_NAMES[w.shift]).split(" ")[0] + " смена", UITheme.INFO if w.shift == 0 else Color("#a58ad8")))
 	if w.custom_id != "":
 		chips.add_child(UITheme.chip(L.t("★ свой"), UITheme.ACCENT, L.t("Свой рабочий: собран в главном меню («Создать рабочего»)")))
 	if w.brigade >= 0 and not sim.crew.brigade(w.brigade).is_empty():
 		var lead := sim.crew.lead_of(w.brigade) == w
-		chips.add_child(UITheme.chip((L.t("★ бригадир · ") if lead else "") + str(sim.crew.brigade(w.brigade)["name"]), sim.crew.color(w.brigade).lightened(0.25)))
+		chips.add_child(UITheme.icon_chip("team", (L.t("★ бригадир · ") if lead else "") + str(sim.crew.brigade(w.brigade)["name"]), sim.crew.color(w.brigade).lightened(0.25)))
 	if w.is_itr():
-		chips.add_child(UITheme.chip(L.dt("department.%s.name" % w.dept(), str(Defs.departments.get(w.dept(), {}).get("name", "ИТР"))), UITheme.INFO))
+		chips.add_child(UITheme.icon_chip("management", L.dt("department.%s.name" % w.dept(), str(Defs.departments.get(w.dept(), {}).get("name", "ИТР"))), UITheme.INFO))
 	if w.practice_until >= 0:
-		chips.add_child(UITheme.chip(L.t("практикант"), UITheme.GOOD, L.t("Практика до дня %d") % w.practice_until))
+		chips.add_child(UITheme.icon_chip("hire", L.t("практикант"), UITheme.GOOD, L.t("Практика до дня %d") % w.practice_until))
 	if sim.crew.union_on() and int(sim.crew.union.get("lead", -1)) == w.id:
-		chips.add_child(UITheme.chip(L.t("председатель профкома"), UITheme.BAD))
+		chips.add_child(UITheme.icon_chip("union", L.t("председатель профкома"), UITheme.BAD))
 	if sim.town.is_resident(w):
-		chips.add_child(UITheme.chip(L.t("живёт в общежитии"), UITheme.INFO, (L.t("Не опаздывает. Иногородняя") if w.female else L.t("Не опаздывает. Иногородний")) if w.from_away else L.t("Не опаздывает")))
+		chips.add_child(UITheme.icon_chip("bed", L.t("живёт в общежитии"), UITheme.INFO, (L.t("Не опаздывает. Иногородняя") if w.female else L.t("Не опаздывает. Иногородний")) if w.from_away else L.t("Не опаздывает")))
 	elif w.from_away:
-		chips.add_child(UITheme.chip(L.t("негде жить"), UITheme.BAD, (L.t("Иногородняя без койки в общежитии — снимает угол, недовольна") if w.female else L.t("Иногородний без койки в общежитии — снимает угол, недоволен"))))
+		chips.add_child(UITheme.icon_chip("bed", L.t("негде жить"), UITheme.BAD, (L.t("Иногородняя без койки в общежитии — снимает угол, недовольна") if w.female else L.t("Иногородний без койки в общежитии — снимает угол, недоволен"))))
 	var places := Workplace.places_of(sim, w)
 	if not places.is_empty():
 		var pn: Array[String] = []
 		for pl in places:
 			pn.append(pl.title())
-		chips.add_child(UITheme.chip(L.t("рабочее место: ") + ", ".join(pn), Color("#b8c48a"), L.t("Закреплено за человеком: работает здесь первым. Если не может — на больничном, занят другим делом, не на смене — встаёт любой, кто умеет. Сменить — в карточке станка.")))
+		chips.add_child(UITheme.icon_chip("wrench", L.t("рабочее место: ") + ", ".join(pn), Color("#b8c48a"), L.t("Закреплено за человеком: работает здесь первым. Если не может — на больничном, занят другим делом, не на смене — встаёт любой, кто умеет. Сменить — в карточке станка.")))
 	if w.kids > 0:
-		chips.add_child(UITheme.chip(L.t("дети: %d%s") % [w.kids, L.t(" · в садике") if sim.town.has_kg_place(w) else ""], UITheme.GOOD if sim.town.has_kg_place(w) else UITheme.MUTED))
+		chips.add_child(UITheme.icon_chip("kid", L.t("дети: %d%s") % [w.kids, L.t(" · в садике") if sim.town.has_kg_place(w) else ""], UITheme.GOOD if sim.town.has_kg_place(w) else UITheme.MUTED))
 	col.add_child(chips)
 	col.add_child(UITheme.label(L.t("%d %s · %s · на заводе с дня %d") % [w.age, Defs.plural(w.age, "год", "года", "лет"), People.body_name(w).to_lower(), w.hired_day], 12, UITheme.MUTED))
 	var act := UITheme.label("", 13, UITheme.INFO)
@@ -262,6 +262,7 @@ func show_worker(s: Sim, w: Worker) -> void:
 		col.add_child(cb)
 		dyn["order_hint"] = cb
 	var mrow := UITheme.hbox(8)
+	mrow.add_child(UITheme.icon_plate("mood", 18, UITheme.GOOD, false))
 	mrow.add_child(UITheme.label(L.t("Настроение"), 12, UITheme.MUTED))
 	var mb := UITheme.bar(50, UITheme.GOOD, 170, 8)
 	mb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -410,11 +411,12 @@ func _wt_main(w: Worker) -> void:
 	var cols := UITheme.hbox(18)
 	var left := UITheme.vbox(4)
 	left.custom_minimum_size = Vector2(236, 0)
-	left.add_child(UITheme.caption(L.t("Потребности")))
+	left.add_child(UITheme.section("mood", "Потребности"))
 	for pair in [["food", L.t("Сытость")], ["bladder", L.t("Туалет")], ["rest", L.t("Бодрость")]]:
 		var row := UITheme.hbox(6)
+		row.add_child(UITheme.icon_plate({"food": "emo_food", "bladder": "emo_wc", "rest": "emo_rest"}[pair[0]], 18, UITheme.INFO, false))
 		var l := UITheme.label(pair[1], 12)
-		l.custom_minimum_size = Vector2(70, 0)
+		l.custom_minimum_size = Vector2(58, 0)
 		row.add_child(l)
 		var b := UITheme.bar(100, UITheme.GOOD, 120, 7)
 		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -424,14 +426,17 @@ func _wt_main(w: Worker) -> void:
 		left.add_child(row)
 		dyn["t_need_" + pair[0]] = b
 		dyn["t_needl_" + pair[0]] = vl
-	left.add_child(UITheme.caption(L.t("Работа")))
+	left.add_child(UITheme.section("wrench", "Работа"))
 	var g := UITheme.grid(2, 6, 6)
 	for k in ["days", "ops", "speed", "ppe"]:
 		var tile := UITheme.card(8)
 		var tv := UITheme.vbox(0)
 		tile.add_child(tv)
 		var cap := UITheme.label({"days": L.t("смен"), "ops": L.t("операций"), "speed": L.t("скорость"), "ppe": L.t("СИЗ") if not w.is_itr() else L.t("рабочее место")}[k], 11, UITheme.MUTED)
-		tv.add_child(cap)
+		var capr := UITheme.hbox(5)
+		capr.add_child(UITheme.icon_plate({"days": "date", "ops": "production", "speed": "speed_3", "ppe": "shield"}[k], 16, UITheme.MUTED, false))
+		capr.add_child(cap)
+		tv.add_child(capr)
 		var val := UITheme.label("", 16, UITheme.TEXT, UITheme.f_semi)
 		tv.add_child(val)
 		dyn["t_st_" + k] = val
@@ -443,11 +448,12 @@ func _wt_main(w: Worker) -> void:
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if not w.visitor:
 		# 1.15 (РП-8): пять жизненных потребностей
-		right.add_child(UITheme.caption(L.t("Что важно")))
-		var lg := UITheme.grid(3, 6, 2)
+		right.add_child(UITheme.section("star", "Что важно"))
+		var lg := UITheme.grid(4, 6, 2)
 		for lfg in Mood.LIFE:
+			lg.add_child(UITheme.icon_plate({"byt": "zone_shower", "money": "money", "work": "wrench", "team": "team", "home": "bed"}[str(lfg[0])], 16, UITheme.INFO, false))
 			var gl := UITheme.label(L.t(str(lfg[1])), 12)
-			gl.custom_minimum_size = Vector2(74, 0)
+			gl.custom_minimum_size = Vector2(70, 0)
 			gl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lg.add_child(gl)
 			var gb := UITheme.bar(50, UITheme.GOOD, 110, 7)
@@ -463,7 +469,7 @@ func _wt_main(w: Worker) -> void:
 		var hint := _wrap("", 12, UITheme.WARN, 300.0)
 		right.add_child(hint)
 		dyn["t_life_hint"] = hint
-	right.add_child(UITheme.caption(L.t("О чём думает")))
+	right.add_child(UITheme.section("idea", "О чём думает"))
 	var thoughts := UITheme.vbox(1)
 	right.add_child(thoughts)
 	dyn["t_thoughts"] = thoughts
@@ -483,6 +489,7 @@ func _wt_main(w: Worker) -> void:
 	var wage_s := UITheme.label("", 12, UITheme.MUTED)
 	wl.add_child(wage_v)
 	wl.add_child(wage_s)
+	wr.add_child(UITheme.icon_plate("money", 24, UITheme.GOOD))
 	wr.add_child(wl)
 	dyn["t_wage"] = wage_v
 	dyn["t_wage_s"] = wage_s

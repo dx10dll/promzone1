@@ -110,6 +110,9 @@ func _take_shot(path: String) -> void:
 
 func apply_ui_scale() -> void:
 	get_tree().root.content_scale_factor = clampf(float(settings.get("ui_scale", 1.0)), 0.75, 1.5)
+	if not get_tree().root.size_changed.is_connected(Tex.invalidate_crisp):
+		get_tree().root.size_changed.connect(Tex.invalidate_crisp)   # 1.46: значки запекаются под масштаб окна
+	Tex.invalidate_crisp()
 	apply_cursor()
 
 

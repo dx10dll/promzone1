@@ -279,7 +279,7 @@ func _build_top() -> void:
 	var tips := ["Пауза (Пробел)", "Обычная скорость ×1 (клавиша 1)", "Быстро ×2 (клавиша 2)", "Очень быстро ×4 (клавиша 3)"]
 	for i in 4:
 		var b := Button.new()
-		b.icon = _top_tex(["pause", "play", "speed_2", "speed_3"][i])
+		b.icon = _top_tex(["pause", "play", "speed_2", "speed_3"][i], 26)
 		b.toggle_mode = true
 		b.button_group = g2
 		b.focus_mode = Control.FOCUS_NONE
@@ -340,7 +340,7 @@ func _build_top() -> void:
 	lb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	rh.add_child(lb)
 	var mbtn := UITheme.icon_button("menu", "", show_pause_menu, "Меню игры (Esc)")
-	mbtn.icon = _top_tex("menu")
+	mbtn.icon = _top_tex("menu", 26)
 	mbtn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	mbtn.add_theme_constant_override("icon_max_width", 26)
 	for stn in ["normal", "hover", "pressed", "hover_pressed"]:
@@ -407,7 +407,7 @@ const OV_ICONS := {"rooms": "layers", "nets": "utilities", "light": "lighting", 
 
 
 func _ov_tex(key: String) -> Texture2D:
-	var t := UITheme.micon(str(OV_ICONS.get(key, "")))
+	var t := UITheme.micon(str(OV_ICONS.get(key, "")), 34)
 	return t if t != null else Tex.ui("ov_" + key)
 
 
@@ -499,7 +499,7 @@ func _chip(icon: String, key: String, cb: Callable) -> VBoxContainer:
 	var h := UITheme.hbox(8)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(h)
-	var ic := _ticon(icon)
+	var ic := _ticon(icon, 32)
 	ic.custom_minimum_size = Vector2(32, 32)
 	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -521,15 +521,15 @@ func _short_money(v: float) -> String:
 
 
 ## 1.30: значок верхней панели — цветной из набора владельца, если он есть, иначе прежний векторный.
-func _top_tex(n: String) -> Texture2D:
-	var t := UITheme.micon(n)
+func _top_tex(n: String, sz: int = 28) -> Texture2D:
+	var t := UITheme.micon(n, sz)
 	return t if t != null else Tex.ui(n)
 
 
-func _ticon(n: String) -> TextureRect:
+func _ticon(n: String, sz: int = 28) -> TextureRect:
 	var r := TextureRect.new()
-	r.texture = _top_tex(n)
-	r.custom_minimum_size = Vector2(28, 28)
+	r.texture = _top_tex(n, sz)
+	r.custom_minimum_size = Vector2(sz, sz)
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	return r
@@ -669,7 +669,7 @@ func _refresh_top() -> void:
 	weather_l.text = "%+d °C" % tt
 	weather_l.add_theme_color_override("font_color", Color("#9cd0f0") if tt <= -10 else (UITheme.WARN if tt >= 28 else UITheme.TEXT))
 	# снег и мороз — прежний голубой значок, иначе термометр из новых значков
-	weather_i.texture = Tex.ui("snow") if se.is_snowing() or tt < 0 else _top_tex("temperature")
+	weather_i.texture = Tex.at(Tex.ui("snow"), 32) if se.is_snowing() or tt < 0 else _top_tex("temperature", 32)
 	var wtip := tr("%s, %s. На улице %+d °C.") % [se.season_name(), se.long_date(), tt]
 	if se.is_snowing():
 		wtip += " " + tr("Идёт снег.")
@@ -802,7 +802,7 @@ func _bbtn(parent: Control, key: String, icon: String, text: String, tip: String
 	var b := Button.new()
 	b.text = text
 	# 1.30: цветной значок владельца (assets/ui/icons), крупнее; «открыто» — кирпичная планка снизу
-	var mt := UITheme.micon(icon)
+	var mt := UITheme.micon(icon, 40)
 	b.icon = mt if mt != null else Tex.ui(icon)
 	b.tooltip_text = tip
 	b.focus_mode = Control.FOCUS_NONE
@@ -1048,8 +1048,7 @@ func _refresh_plan_panel() -> void:
 	plan_panel.offset_right = 0
 	var h := UITheme.hbox(12)
 	plan_panel.add_child(h)
-	var ic := _ticon("blueprint")
-	ic.custom_minimum_size = Vector2(26, 26)
+	var ic := _ticon("blueprint", 26)
 	ic.modulate = Color(0.62, 0.8, 1.0)
 	h.add_child(ic)
 	var v := UITheme.vbox(0)
@@ -1241,6 +1240,31 @@ func on_notified(text: String, level: int, cell: Vector2i) -> void:
 	Snd.play(["n_info", "n_good", "n_warn", "n_bad"][clampi(level, 0, 3)], -4.0 if level == 0 else -1.0, 0.0, 0.7)
 
 
+## 1.46: значок уведомления по разделу, куда оно ведёт, и важности.
+static func toast_icon(target: String, level: int) -> String:
+	var grp := target.get_slice(":", 0)
+	var sec := target.get_slice(":", 1) if target.contains(":") else ""
+	var by_grp := {"finance": "finances", "orders": "orders", "people": "people", "goals": "goals", "office": "develop",
+		"town": "city", "events": "events", "prod": "production"}
+	if sec == "supply":
+		return "supply"
+	if sec == "machines":
+		return "wrench"
+	if sec == "safety":
+		return "shield"
+	if sec == "insp":
+		return "inspect"
+	if sec == "cat":
+		return "cat"
+	if sec == "paper":
+		return "paper"
+	if sec == "grants":
+		return "money"
+	if by_grp.has(grp):
+		return str(by_grp[grp])
+	return ["letter", "star", "warn", "warn"][clampi(level, 0, 3)]
+
+
 func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2i(-1, -1), link: bool = false) -> void:
 	var col: Color = LEVEL_COLORS[clampi(level, 0, 3)]
 	var p := PanelContainer.new()
@@ -1251,32 +1275,23 @@ func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2
 	var th := UITheme.hbox(10)
 	th.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(th)
-	var dot := ColorRect.new()
-	dot.color = col
-	dot.custom_minimum_size = Vector2(8, 8)
-	dot.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if level >= Sim.LVL_WARN:
-		# 1.38: предупреждение — значок владельца «!» слева
-		var wt := Tex.ui("warn")
-		if Tex.is_color(wt):
-			var wi := TextureRect.new()
-			wi.texture = wt
-			wi.custom_minimum_size = Vector2(24, 24)
-			wi.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			wi.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			wi.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-			wi.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			th.add_child(wi)
+	var target := Links.target(text, "events:log" if link else "") if cell.x < 0 else ""
+	# 1.46: значок по типу сообщения в круглой плашке цвета важности (вместо точки / голого текста)
+	var kind_icon := toast_icon(Links.target(text, ""), level)
+	var badge_p := PanelContainer.new()
+	badge_p.add_theme_stylebox_override("panel", UITheme.sb(Color(col.r, col.g, col.b, 0.16), Color(col.r, col.g, col.b, 0.45), 1, 14, 2, 2))
+	badge_p.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	badge_p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge_p.add_child(_ticon(kind_icon, 24))
+	th.add_child(badge_p)
 	var l := UITheme.label(text, 13)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(360, 0)
+	l.custom_minimum_size = Vector2(326, 0)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	th.add_child(l)
 	if cell.x >= 0:
 		p.tooltip_text = "Нажмите, чтобы показать место"
 		p.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	var target := Links.target(text, "events:log" if link else "") if cell.x < 0 else ""
 	if target != "":
 		p.tooltip_text = "Нажмите, чтобы открыть окно"
 		p.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND

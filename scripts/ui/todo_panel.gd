@@ -9,6 +9,7 @@ var hud: Hud
 var sim: Sim
 var _body: VBoxContainer
 var _head: Button
+var _hr: Control
 var _sig := ""
 var _t := 0.0
 
@@ -30,7 +31,7 @@ func setup(h: Hud) -> void:
 	_head.add_theme_color_override("font_color", UITheme.MUTED)
 	_head.add_theme_color_override("font_hover_color", UITheme.TEXT)
 	# 1.30: значок «Задачи» из набора владельца
-	_head.icon = UITheme.micon("tasks")
+	_head.icon = UITheme.micon("tasks", 20)
 	_head.expand_icon = false
 	_head.add_theme_constant_override("icon_max_width", 20)
 	UITheme.micon_colors(_head)
@@ -42,6 +43,13 @@ func setup(h: Hud) -> void:
 		_sig = ""
 		_refresh())
 	v.add_child(_head)
+	# 1.46: тонкий разделитель под заголовком
+	var hr := ColorRect.new()
+	hr.color = Color(UITheme.LINE2.r, UITheme.LINE2.g, UITheme.LINE2.b, 0.6)
+	hr.custom_minimum_size = Vector2(0, 1)
+	hr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(hr)
+	_hr = hr
 	_body = UITheme.vbox(4)
 	v.add_child(_body)
 	_refresh()
@@ -211,6 +219,7 @@ func _refresh() -> void:
 	_head.add_theme_color_override("font_color", UITheme.ACCENT if urgent > 0 else UITheme.TEXT)
 	UITheme.clear(_body)
 	_body.visible = not collapsed
+	_hr.visible = not collapsed
 	if collapsed:
 		return
 	for it2: Array in items:
@@ -232,7 +241,7 @@ func _line(it: Array) -> Button:
 	b.flat = true
 	b.focus_mode = Control.FOCUS_NONE
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.custom_minimum_size = Vector2(0, 22 if sub else 34)
+	b.custom_minimum_size = Vector2(0, 22 if sub else 36)
 	var accent := col
 	if col == UITheme.TEXT:
 		accent = UITheme.LINE2
@@ -260,16 +269,22 @@ func _line(it: Array) -> Button:
 	b.add_child(h)
 	if not sub:
 		var ic := TextureRect.new()
-		var mt := UITheme.micon(str(TODO_ICONS.get(str(it[0]), "")))
-		ic.texture = mt if mt != null else Tex.ui(str(it[0]))
-		ic.custom_minimum_size = Vector2(22, 22) if mt != null else Vector2(20, 20)
+		var mt := UITheme.micon(str(TODO_ICONS.get(str(it[0]), "")), 26)
+		ic.texture = mt if mt != null else Tex.at(Tex.ui(str(it[0])), 20)
+		ic.custom_minimum_size = Vector2(26, 26) if mt != null else Vector2(20, 20)
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		# цветной значок не перекрашиваем: срочность видна по цветной планке слева и тексту
 		ic.modulate = Color.WHITE if mt != null else col
 		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		h.add_child(ic)
+		# 1.46: значок в круглой плашке цвета срочности — строки читаются по значкам, а не только по тексту
+		var plate := PanelContainer.new()
+		plate.add_theme_stylebox_override("panel", UITheme.sb(Color(accent.r, accent.g, accent.b, 0.2), Color(0, 0, 0, 0), 0, 12, 1, 1))
+		plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		plate.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		plate.add_child(ic)
+		h.add_child(plate)
 	var txt := str(it[1])
 	if sub and txt.begins_with("· "):
 		txt = "○  " + txt.substr(2)
