@@ -98,12 +98,14 @@ func _build_panel() -> void:
 	bg_rect = TextureRect.new()
 	bg_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	bg_rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS   # 1.43: исходное качество без «мыла» при уменьшении
 	bg_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_img.add_child(bg_rect)
 	portrait = TextureRect.new()
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_img.add_child(portrait)
 	v.add_child(_img)

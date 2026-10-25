@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/office.jpg-5498e5289b0953cb6cfb4a73b6bb18a3.c
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.9
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
