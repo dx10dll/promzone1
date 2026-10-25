@@ -110,6 +110,27 @@ func _take_shot(path: String) -> void:
 
 func apply_ui_scale() -> void:
 	get_tree().root.content_scale_factor = clampf(float(settings.get("ui_scale", 1.0)), 0.75, 1.5)
+	apply_cursor()
+
+
+var _cursor_set := false
+
+## 1.42: свой курсор — оранжевая стрелка с тёмным кантом, над кнопками — светлая.
+## На крупном интерфейсе (масштаб от 1,25) — версия 48 px.
+func apply_cursor() -> void:
+	var big := float(settings.get("ui_scale", 1.0)) >= 1.25 or DisplayServer.screen_get_scale() >= 1.5
+	var suf := "_48" if big else ""
+	var arrow := load("res://assets/ui/cursor/arrow%s.png" % suf) as Texture2D
+	var hand := load("res://assets/ui/cursor/pointer%s.png" % suf) as Texture2D
+	if arrow == null or hand == null:
+		return
+	Input.set_custom_mouse_cursor(arrow, Input.CURSOR_ARROW, Vector2(1, 1))
+	Input.set_custom_mouse_cursor(hand, Input.CURSOR_POINTING_HAND, Vector2(1, 1))
+	_cursor_set = true
+
+
+func cursor_ok() -> bool:
+	return _cursor_set
 
 
 func apply_window() -> void:

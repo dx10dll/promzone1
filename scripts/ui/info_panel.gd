@@ -62,9 +62,10 @@ func _fit() -> void:
 		return
 	var hh := head.get_combined_minimum_size().y + (actions.get_combined_minimum_size().y + 6.0 if actions.visible else 0.0) + 6.0
 	var h := box.get_combined_minimum_size().y
+	var max_h := get_viewport_rect().size.y - 64.0 - 90.0 - 24.0 - hh
 	if kind == "worker":
 		h = maxf(h, 236.0)   # вкладки одной высоты — карточка не прыгает
-	var max_h := get_viewport_rect().size.y - 64.0 - 90.0 - 24.0 - hh
+		max_h = minf(max_h, 300.0)   # 1.42: длинные вкладки (история, отношения) — прокруткой, а не на весь экран
 	scroll.custom_minimum_size = Vector2(card_w, clampf(h, 0.0, maxf(max_h, 120.0)))
 	scroll.visible = h > 1.0
 	_pin_right()
@@ -170,6 +171,8 @@ func _bar_row(caption: String, col: Color, key: String) -> void:
 ## табельный номер, печать; ниже вкладки «Обзор», «Навыки», «Отношения», «История».
 func show_worker(s: Sim, w: Worker) -> void:
 	sim = s
+	if not visible or kind != "worker":
+		w_tab = "main"   # 1.42: новая карточка открывается на «Обзоре», а не на последней длинной вкладке
 	_begin("worker", w.id, 470.0)
 	root.move_child(actions, 2)
 	# бланк
