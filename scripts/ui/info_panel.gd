@@ -72,12 +72,18 @@ func _fit() -> void:
 	scroll.visible = h > 1.0
 	reset_size()   # 1.43: контейнер сам не сжимается после большой карточки — сбрасываем размер
 	_pin_right()
+	size = Vector2(offset_right - offset_left, offset_bottom - offset_top)   # 1.47: размер строго по рассчитанным границам
 
 
 ## Карточка объекта, стены, пола или зоны — рядом с тем местом, куда щёлкнули (1.12); карточка человека
 ## и выбранное из окон — прижаты к правому краю под верхней панелью.
 func _pin_right() -> void:
 	var ms := get_combined_minimum_size()
+	# 1.47: карточка никогда не шире своей колонки и не выше экрана, лишнее режется — какой бы путь её ни раздул
+	var vp0 := get_viewport_rect().size
+	ms.x = minf(ms.x, card_w + 48.0)
+	ms.y = minf(ms.y, maxf(160.0, vp0.y - 170.0))
+	clip_contents = true
 	if near_screen.x >= 0.0 and kind != "worker" and kind != "visitor":
 		var vp := get_viewport_rect().size
 		var x := near_screen.x + 22.0

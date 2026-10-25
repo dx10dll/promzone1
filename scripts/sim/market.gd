@@ -110,7 +110,7 @@ func ontime() -> float:
 	# 1.20: просроченные заказы в работе — тоже «не вовремя», а не только отгруженные
 	var overdue := 0
 	for od: Dictionary in sim.orders.by_status(["active", "ready", "shipping"]):
-		if sim.minute > float(od["deadline"]):
+		if sim.orders.is_overdue(od):
 			overdue += 1
 	if outcomes.is_empty() and overdue == 0:
 		return 0.8
@@ -661,7 +661,7 @@ func advice(limit: int = 6) -> Array:
 	var s := sim.sales.summary(7)
 	if float(s["lost_sum"]) >= 30000.0 and str(s["top"]) != "":
 		var pr := str(s["top"])
-		out.append({"prio": 90, "title": L.t("Узкое место — %s") % Defs.process_name(pr).to_lower(),
+		out.append({"prio": 90, "title": L.t("Проблемное место — %s") % Defs.process_name(pr).to_lower(),
 			"text": L.t("За неделю отказали заказчикам на %s, больше всего — из-за этого передела (%s). %s") % [Defs.money_str(float(s["lost_sum"])), Defs.money_str(float(s["top_sum"])), sim.sales.advice(pr)],
 			"open": "orders", "sec": "market"})
 	var broken := 0
@@ -676,7 +676,7 @@ func advice(limit: int = 6) -> Array:
 	if worn >= 2 and not sim.ppr:
 		out.append({"prio": 70, "title": L.t("Включите ППР"), "text": L.t("%d станка сильно изношены. Планово-предупредительный ремонт обслуживает их раньше — поломки реже.") % worn, "open": "prod", "sec": "machines"})
 	var late := 0
-	for o: Dictionary in sim.orders.by_status(["active", "ready"]):
+	for o: Dictionary in sim.orders.by_status(["active"]):
 		if sim.minute > float(o["deadline"]) - 1440.0:
 			late += 1
 	if late > 0:

@@ -54,6 +54,7 @@ func demand(p: String) -> int:
 ## 1.22: один проход по предметам на весь пересчёт — сколько деталей каждого изделия в работе
 ## и сколько свободного НЗП на каждом шаге (раньше — проход по всем предметам на каждое изделие).
 var _scan_ok := false
+var _urg := {}   ## 1.47: изделие -> срок самого раннего срочного активного заказа, которому оно нужно (в т.ч. узел-компонент)
 var _pipe_c := {}
 var _wip_c := {}
 
@@ -64,6 +65,10 @@ func _scan() -> void:
 	_scan_ok = true
 	_pipe_c.clear()
 	_wip_c.clear()
+	_urg.clear()
+	for o: Dictionary in sim.orders.by_status(["active"]):
+		if int(o.get("prio", 0)) > 0 and sim.orders.remaining(o) > 0:
+			_mark_urgent(str(o["product"]), float(o["deadline"]), 0)
 	for it: Item in sim.items.values():
 		if it.kind != "part":
 			continue
@@ -80,6 +85,20 @@ func _scan() -> void:
 			if ok:
 				var k := "%s:%d" % [it.def_id, it.step]
 				_wip_c[k] = int(_wip_c.get(k, 0)) + 1
+
+
+func _mark_urgent(p: String, dl: float, depth: int) -> void:
+	_urg[p] = minf(float(_urg.get(p, INF)), dl)
+	if depth >= 4:
+		return
+	for c in Defs.components(p).keys():
+		_mark_urgent(str(c), dl, depth + 1)
+
+
+## 1.47: срок ближайшего СРОЧНОГО заказа, которому нужно изделие (INF — срочных заказов на него нет).
+func urgent_deadline(p: String) -> float:
+	_scan()
+	return float(_urg.get(p, INF))
 
 
 ## Сколько изделий уже «в работе»: все детали этого изделия (кроме брака и отгруженных)
@@ -359,12 +378,70 @@ func _assign(m: Thing) -> void:
 	if m.demolish:
 		return
 	if m.product != "" and _busy(m):
+		# 1.47: срочный заказ прерывает несрочную работу (деталь, которую почти доделали, — доделывают)
+		_preempt(m)
 		return  # доделываем то, что уже заложено или несут
 	if not staffed(m):
 		m.product = ""
 		return
-	if m.product != "" and _job_useful(m.product, m.job_step):
+	var pk: Array = _urgent_pick(m)
+	if pk.is_empty():
+		if m.product != "" and _job_useful(m.product, m.job_step):
+			return
+		pk = _pick(m)
+	if debug and (str(pk[0]) != m.product or int(pk[1]) != m.job_step):
+		print("[planner] %s %s: станок %d (%s) '%s'/%d -> '%s'/%d" % [sim.date_str(), sim.time_str(), m.id, m.process(), m.product, m.job_step, str(pk[0]), int(pk[1])])
+	m.product = str(pk[0])
+	m.job_step = int(pk[1])
+
+
+## Срочное задание для станка, если оно строго раньше по сроку, чем то, что станок делает сейчас (иначе []).
+func _urgent_pick(m: Thing) -> Array:
+	_scan()
+	if _urg.is_empty():
+		return []
+	var pk := _pick(m)
+	if str(pk[0]) == "" or (str(pk[0]) == m.product and int(pk[1]) == m.job_step):
+		return []
+	var nd := urgent_deadline(str(pk[0]))
+	if nd < INF and nd < urgent_deadline(m.product):
+		return pk
+	return []
+
+
+## 1.47: станок занят несрочной (или более поздней по сроку) работой, а для его процесса есть срочная — переключить.
+## Деталь в работе доделывается, если осталось меньше 10% (или меньше 2 игровых минут); иначе операцию прерывают:
+## прогресс запоминается («paused»), заготовка возвращается на склад (см. Brain: «лишнее со станка»), ничего не теряется.
+func _preempt(m: Thing) -> void:
+	if not staffed(m):
 		return
+	if m.is_batch() and m.working:
+		return   # партию в печи не прерываем
+	var pk: Array = _urgent_pick(m)
+	if pk.is_empty():
+		return
+	var w: Worker = null
+	if m.user >= 0:
+		w = sim.get_worker(m.user)
+		if w == null or w.task == null or w.task.kind != "operate":
+			return
+		var base := float(Defs.op(m.product, m.job_step).get("time", 30))
+		if m.progress >= 0.9 or (1.0 - m.progress) * base < 2.0:
+			return   # почти готово — пусть доделает
+		if m.progress > 0.0:
+			m.set_meta("paused", {"key": "%s:%d" % [m.product, m.job_step], "frac": m.progress})
+		sim.brain.abort(w)
+	if debug:
+		print("[planner] %s %s: станок %d ПРЕРВАН срочным '%s'/%d -> '%s'/%d" % [sim.date_str(), sim.time_str(), m.id, m.product, m.job_step, str(pk[0]), int(pk[1])])
+	m.working = false
+	m.progress = 0.0
+	m.product = str(pk[0])
+	m.job_step = int(pk[1])
+
+
+## Лучшее задание для станка: [изделие, шаг маршрута] ("" — нечего делать).
+## Срочные заказы выше всего (раньше срок — выше), затем НЗП, затем новые запуски по сроку.
+func _pick(m: Thing) -> Array:
 	var pr := m.process()
 	var best_p := ""
 	var best_step := 0
@@ -372,6 +449,7 @@ func _assign(m: Thing) -> void:
 	for p in Defs.products.keys():
 		var ps := str(p)
 		var rt := Defs.route(ps)
+		var ud := urgent_deadline(ps)
 		for i in rt.size():
 			if str(rt[i]["op"]) != pr:
 				continue
@@ -391,7 +469,10 @@ func _assign(m: Thing) -> void:
 				if not Production.size_ok(ps, pr, sim.prod.processes_available()):
 					sim.notify_once("size_%s_%d" % [ps, i], L.t("«%s» — %s деталь: для операции «%s» нужен станок под %s детали. Такие есть в меню «Объекты».") % [Defs.product_name(ps), L.t(Defs.SIZE_ONE[Defs.product_rank(ps)]), Defs.process_name(pr), L.t(Defs.SIZE_PL[Defs.product_rank(ps)])], Sim.LVL_WARN, m.cell, 1440.0)
 				continue
-			s -= 40.0 * float(m.part_rank() - Defs.product_rank(ps))   # 1.16: крупный станок — сначала под крупные детали
+			if ud < INF:
+				# 1.47: срочный заказ — абсолютный приоритет; раньше срок — выше; НЗП раньше нового запуска
+				s = 1.0e8 - ud + (0.5 if i > 0 else 0.0)
+			s -= (0.01 if ud < INF else 1.0) * 40.0 * float(m.part_rank() - Defs.product_rank(ps))   # 1.16: крупный станок — сначала под крупные детали
 			var sk := int(rt[i].get("skill", 1))
 			if not _someone_can(pr, sk):
 				sim.notify_once("skill_%s_%d" % [ps, i], L.t("Некому выполнить операцию «%s» для «%s»: нужен работник с навыком от %d.") % [Defs.process_name(pr), Defs.product_name(ps), sk], Sim.LVL_WARN, m.cell, 720.0)
@@ -400,7 +481,4 @@ func _assign(m: Thing) -> void:
 				best_s = s
 				best_p = ps
 				best_step = i
-	if debug and (best_p != m.product or best_step != m.job_step):
-		print("[planner] %s %s: станок %d (%s) '%s'/%d -> '%s'/%d" % [sim.date_str(), sim.time_str(), m.id, pr, m.product, m.job_step, best_p, best_step])
-	m.product = best_p
-	m.job_step = best_step
+	return [best_p, best_step]

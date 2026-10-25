@@ -101,7 +101,7 @@ func _ready() -> void:
 	print("— чёткость: шрифт и привязка к пикселям")
 	var f: FontFile = load("res://assets/fonts/IBMPlexSans-Regular.ttf")
 	check(not f.multichannel_signed_distance_field, "основной шрифт — не MSDF (на мелком тексте даёт мыло)")
-	check(bool(ProjectSettings.get_setting("rendering/2d/snap/snap_2d_transforms_to_pixel", false)), "привязка 2D-преобразований к пикселю включена")
+	check(not bool(ProjectSettings.get_setting("rendering/2d/snap/snap_2d_transforms_to_pixel", false)), "1.47: привязка 2D к пикселю выключена (ровные промежутки, гладкий текст)")
 
 	print("— меню настроек в экране (игра)")
 	Game.pending = "new"

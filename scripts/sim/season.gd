@@ -515,7 +515,7 @@ func _cooler_near(c: Vector2i) -> bool:
 		return false
 	for tid in sim.rooms.spaces[si].things:
 		var th: Thing = sim.things.get(tid)
-		if th and th.built and th.def_id == "cooler":
+		if th and th.built and th.def_id in ["cooler", "water_cooler"]:
 			return true
 	return false
 

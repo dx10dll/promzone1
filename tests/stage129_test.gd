@@ -140,7 +140,12 @@ func _init() -> void:
 				loaded_from_store = true
 	check(staged_max >= 1, "детали носили в зону отгрузки (до %d одновременно)" % staged_max)
 	check(str(o["status"]) == "done", "машина забрала заказ (за %.0f мин)" % guard)
-	check(_parts_on(h, pallets, "pin") == 4 and not loaded_from_store, "грузили только из зоны отгрузки: на поддонах осталось %d" % _parts_on(h, pallets, "pin"))
+	# 1.47: к концу погрузки грузчик может уже нести оставшиеся детали (поддоны теперь «низкие» — ходят быстрее): считаем и руки
+	var in_hands := 0
+	for it9: Item in h.items.values():
+		if it9.def_id == "pin" and it9.loc == Item.Loc.WORKER:
+			in_hands += 1
+	check(_parts_on(h, pallets, "pin") + in_hands == 4 and not loaded_from_store, "грузили только из зоны отгрузки: на поддонах осталось %d, в руках %d" % [_parts_on(h, pallets, "pin"), in_hands])
 
 	print("— запасной путь: зона отгрузки недоступна — заказ не застревает")
 	var k := _game("garage", 1294)

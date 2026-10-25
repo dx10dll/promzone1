@@ -305,7 +305,12 @@ func embed(ox: int, oy: int, nw: int, nh: int) -> void:
 		"pipe": pipe.duplicate(), "duct": duct.duplicate(), "air": air.duplicate(), "flora": flora.duplicate()}
 	var oblock := block.duplicate()
 	var oocc := occ.duplicate()
+	var oclimb := climb.duplicate()
 	setup(nw, nh)
+	climb.clear()
+	for ci in oclimb.keys():
+		var cc0 := Vector2i(int(ci) % ow, int(ci) / ow)
+		climb[(cc0.y + oy) * nw + cc0.x + ox] = oclimb[ci]
 	for k: String in old.keys():
 		var src: PackedByteArray = old[k]
 		var dst := PackedByteArray()
@@ -347,10 +352,15 @@ func refresh_cell(c: Vector2i) -> void:
 
 ## 1.40: дверь чуть «дороже» прохода; кабинеты и контора — заметно: через чужой кабинет не срезают, если есть коридор.
 const OFFICE_W := 3.0
+const CLIMB_W := 6.0          ## 1.47: цена клетки с низким объектом (поддон) в поиске пути: перелезают, только если иначе не пройти
+const CLIMB_SPEED := 0.45     ## 1.47: скорость шага по такой клетке
+var climb := {}               ## 1.47: индекс клетки -> id низкого объекта на ней (не сохраняется: собирается при загрузке)
 var _zw_rev := -1
 
 
 func _weight(c: Vector2i) -> float:
+	if climb.has(idx(c)):
+		return CLIMB_W
 	if is_door(c):
 		return 1.6
 	if zone.size() == w * h:

@@ -135,6 +135,11 @@ func kind() -> String:
 	return str(def().get("kind", "decor"))
 
 
+## 1.47: низкий объект (поддон, тара): через него можно перелезть — клетка проходима, но дорого и медленно.
+func is_low() -> bool:
+	return bool(def().get("low", false))
+
+
 func blocks() -> bool:
 	return bool(def().get("blocks", true))
 

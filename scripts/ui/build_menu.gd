@@ -6,13 +6,13 @@ extends RefCounted
 ## высоты (плитка в прокрутке), цена и «есть N» всегда внутри плитки; в плане — стройка и объекты разом.
 
 const COLS := 10
-const TILE := Vector2(64, 76)       ## 1.40: фиксированная раскладка — значок, подпись в две строки, цена внизу
+const TILE := Vector2(64, 68)       ## 1.40: фиксированная раскладка — значок, подпись в две строки, цена внизу
 const CAT_W := 124.0
-const ICON_Y := 4.0
-const TITLE_Y := 33.0
-const TITLE_H := 27.0
+const ICON_Y := 3.0
+const TITLE_Y := 29.0
+const TITLE_H := 23.0
 const PRICE_H := 13.0
-const HEAD_H := 26.0
+const HEAD_H := 24.0
 const FOCUS_ZOOM := 1.25            ## 1.40: «камера приближена» — с этого масштаба подсвечиваем нужное помещению
 const NEED_COL := Color("#5fd3c0")  ## подсветка «нужно помещению»
 const BUILD_CATS := ["wall", "floor", "open", "yard", "frame"]   ## 1.40: стены, полы, двери, улица, готовые помещения
@@ -108,6 +108,22 @@ static func _section(h: Hud, root: Control, kind: String, rows: int) -> void:
 			_zones(h, cats, head, grid)
 		"power":
 			_power(h, cats, head, grid)
+	# 1.47: если в шапке только поиск — он уходит в строку чипов, а пустая шапка схлопывается
+	if head.get_child_count() == 2 and head.get_child(1) is LineEdit:
+		var le := head.get_child(1) as LineEdit
+		head.remove_child(le)
+		hold.visible = false
+		var hb := HBoxContainer.new()
+		hb.add_theme_constant_override("separation", 6)
+		right.remove_child(cats)
+		cats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		cats.custom_minimum_size = Vector2(w - 156.0, 0)
+		hb.add_child(cats)
+		le.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		le.custom_minimum_size = Vector2(150, 24)
+		hb.add_child(le)
+		right.add_child(hb)
+		right.move_child(hb, 0)
 	if _q != "" and _shown == 0:
 		var nl := UITheme.label(L.t("Ничего не найдено: «%s»") % _q, 12, UITheme.MUTED)
 		grid.add_child(nl)
@@ -287,7 +303,7 @@ static func focus_text(h: Hud) -> String:
 		return L.t("В центре экрана «%s»: всё нужное есть, подсвечено то, что ему подходит.") % nm
 	var ms: Array[String] = []
 	for m: String in r.missing:
-		ms.append(L.t(m))
+		ms.append(L.tx(m))
 	return L.t("В центре экрана «%s»: подсвечено, что нужно. Не хватает: %s.") % [nm, ", ".join(ms)]
 
 
@@ -404,8 +420,8 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 		b.add_child(sw)
 	var r := TextureRect.new()
 	r.texture = tex
-	var ih := 30.0 if Tex.is_color(tex) else 26.0   # 1.38: PNG владельца с полями — крупнее
-	r.set_meta("rect", Rect2(Vector2(3, ICON_Y + (28.0 - ih) * 0.5 + 1.0), Vector2(iw, ih)))
+	var ih := 26.0 if Tex.is_color(tex) else 22.0   # 1.38: PNG владельца с полями — крупнее
+	r.set_meta("rect", Rect2(Vector2(3, ICON_Y + (26.0 - ih) * 0.5 + 1.0), Vector2(iw, ih)))
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE

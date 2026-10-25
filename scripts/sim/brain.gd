@@ -4,6 +4,10 @@ extends RefCounted
 
 const SERVICE_AT := 50.0  ## ниже этого состояния станок отправляют на обслуживание
 
+const PROF_FIRST := 300.0     ## 1.47: надбавка к профильной работе профессии (станочник — станок, строитель — стройка и т.д.)
+const INSPECT_BONUS := 250.0  ## 1.47: устранение замечаний инспекции (треугольники на карте) — в первую очередь, ниже срочных заказов у станочников
+const URGENT_BONUS := 200.0   ## 1.47: надбавка к работе по срочному заказу
+const BUILD_KINDS := ["build_bp", "build_thing", "demolish", "lay_net"]
 const WORK_KINDS := ["haul", "build", "operate", "inspect", "office", "study"]
 
 var sim: Sim
@@ -1251,6 +1255,38 @@ func _rework_item(w: Worker) -> Item:
 	return best
 
 
+## 1.47: есть ли на заводе рабочий этой профессии (на смене и не ИТР).
+func _has_prof_free(prof: String) -> bool:
+	for x in sim.workers:
+		if x.prof == prof and x.present:
+			return true
+	return false
+
+
+## 1.47: рабочий — станочник (профиль процесса) и у его станков есть задание от заказов.
+func _machinist_has_work(w: Worker) -> bool:
+	if w.is_itr():
+		return false
+	var cnc := w.prof == "cnc_operator"
+	var is_m := cnc
+	if not is_m:
+		for pr in Defs.processes.values():
+			if str((pr as Dictionary).get("prof", "")) == w.prof:
+				is_m = true
+				break
+	if not is_m:
+		return false
+	for m in sim.things_of("machine"):
+		if m.demolish or not m.built or m.product == "" or m.broken or not m.enabled:
+			continue
+		if m.user >= 0 and m.user != w.id:
+			continue
+		var pdef: Dictionary = Defs.processes.get(m.process(), {})
+		if w.prof == str(pdef.get("prof", "")) or (cnc and m.is_cnc()):
+			return true
+	return false
+
+
 ## Подобрать работу: собираем кандидатов, сортируем по выгоде, пробуем по очереди.
 func _find_work(w: Worker) -> Task:
 	var cands: Array = []
@@ -1279,7 +1315,8 @@ func _find_work(w: Worker) -> Task:
 			continue   # 1.15: станок закреплён за другим, и тот может работать
 		var pdef: Dictionary = Defs.processes.get(m.process(), {})
 		var own := w.prof == str(pdef.get("prof", "")) or (w.prof == "cnc_operator" and m.is_cnc())
-		var sc := 100.0 + (60.0 if own else 0.0) + w.skill(Production.op_skill(w, m)) * 2.0 - _dist(wc, sp["cell"]) * 0.5 + sim.crew.zone_bonus(w, m) + Workplace.bonus(w, m)
+		# 1.47: свой процесс — сильно выше чужого; срочный заказ — выше несрочного
+		var sc := 100.0 + (PROF_FIRST if own else 0.0) + (URGENT_BONUS if sim.planner.urgent_deadline(m.product) < INF else 0.0) + w.skill(Production.op_skill(w, m)) * 2.0 - _dist(wc, sp["cell"]) * 0.5 + sim.crew.zone_bonus(w, m) + Workplace.bonus(w, m)
 		cands.append({"s": sc, "k": "operate", "t": m, "spot": sp})
 
 	# 2. контроль ОТК
@@ -1288,10 +1325,10 @@ func _find_work(w: Worker) -> Task:
 			var sp2 := _free_spot(q, w)
 			if sp2.is_empty() or _coolf(w, "qc%d", q.id) or not Workplace.may_use(sim, w, q):
 				continue
-			var sc2 := 95.0 + (60.0 if w.prof == "qc" else 0.0) + w.skill("qc") - _dist(wc, sp2["cell"]) * 0.5 + Workplace.bonus(w, q)
+			var sc2 := 95.0 + (PROF_FIRST if w.prof == "qc" else 0.0) + w.skill("qc") - _dist(wc, sp2["cell"]) * 0.5 + Workplace.bonus(w, q)
 			cands.append({"s": sc2, "k": "inspect", "t": q, "spot": sp2})
 
-	var haul_bonus := 40.0 if laborer else (15.0 if builder else 0.0)
+	var haul_bonus := 90.0 if laborer else (15.0 if builder else 0.0)
 
 	# 3. подвезти к станку металл, детали НЗП или комплектующие для сборки
 	for m in _hungry_machines(machines):
@@ -1300,7 +1337,7 @@ func _find_work(w: Worker) -> Task:
 			continue
 		if sim.free_space(m, 0, it.stack_key()) <= 0:
 			continue
-		var sc3 := 85.0 + haul_bonus + (6.0 if it.q == "wip" else 0.0) - _dist(wc, sim.item_cell(it)) * 0.3 + sim.crew.zone_bonus(w, m) * 0.4
+		var sc3 := 85.0 + haul_bonus + (URGENT_BONUS * 0.75 if sim.planner.urgent_deadline(m.product) < INF else 0.0) + (6.0 if it.q == "wip" else 0.0) - _dist(wc, sim.item_cell(it)) * 0.3 + sim.crew.zone_bonus(w, m) * 0.4
 		cands.append({"s": sc3, "k": "haul", "item": it, "dest": m, "slot": 0})
 
 	# 4. забрать детали со станка: готовые — на ОТК, НЗП — на следующий станок или стеллаж НЗП
@@ -1326,16 +1363,19 @@ func _find_work(w: Worker) -> Task:
 		if m.user >= 0 or m.working:
 			continue
 		var surplus := m.job_step == 0 and m.product != "" and Defs.is_assembly(m.product) and sim.planner.need(m.product) <= 0
-		if m.enabled and not surplus:
+		var foreign := m.enabled and not surplus and m.product != "" and not m.is_batch()   # 1.47: станок переключили на другое изделие
+		if m.enabled and not surplus and not foreign:
 			continue
 		for iid in sim.slot_ids(m, 0):
 			var itx: Item = sim.items.get(iid)
 			if itx == null or itx.reserved_by >= 0 or _coolf(w, "item%d", itx.id):
 				continue
+			if foreign and not surplus and sim.prod.input_ok(itx, m):
+				continue
 			var destx := sim.find_storage(itx, m.cell)
 			if destx.is_empty():
 				break
-			cands.append({"s": 66.0 + haul_bonus - _dist(wc, m.cell) * 0.3, "k": "haul", "item": itx, "dest": destx[0], "slot": destx[1]})
+			cands.append({"s": (92.0 if foreign and not surplus else 66.0) + haul_bonus - _dist(wc, m.cell) * 0.3, "k": "haul", "item": itx, "dest": destx[0], "slot": destx[1]})
 			break
 
 	# 5. разгрузка фургона (металл и ящики с оборудованием), доставка ящиков к местам установки
@@ -1364,6 +1404,15 @@ func _find_work(w: Worker) -> Task:
 		cands.append({"s": sc6, "k": "load", "item": it4, "veh": v})
 
 	# 7. грузы, брошенные на полу
+	# 1.47: «захламлено» в замечаниях — убирают в первую очередь: уборщица и грузчик (+ полный бонус), прочие — меньше, станочники — только если некому
+	var clutter_bonus := 0.0
+	if sim.ground_items.size() >= 12 and sim.inspect.open_keys().has("clutter"):
+		if laborer or w.prof == "cleaner":
+			clutter_bonus = INSPECT_BONUS
+		elif not _machinist_has_work(w):
+			clutter_bonus = INSPECT_BONUS * 0.5
+		elif not _has_prof_free("laborer") and not _has_prof_free("cleaner"):
+			clutter_bonus = INSPECT_BONUS * 0.4
 	var reloc := false
 	var no_store := {}   ## 1.38.2: «склада нет» не зависит от того, где лежит груз — для того же груза не искать снова
 	for gid in sim.ground_items:
@@ -1375,14 +1424,14 @@ func _find_work(w: Worker) -> Task:
 		if it5.cat() == "machined" or it5.cat() == "wip":
 			var dst5 := _route_dest(it5, it5.cell)
 			if not dst5.is_empty():
-				cands.append({"s": 62.0 + haul_bonus - _dist(wc, it5.cell) * 0.3, "k": "haul", "item": it5, "dest": dst5[0], "slot": dst5[1]})
+				cands.append({"s": 62.0 + clutter_bonus + haul_bonus - _dist(wc, it5.cell) * 0.3, "k": "haul", "item": it5, "dest": dst5[0], "slot": dst5[1]})
 		else:
 			var nk := it5.cat() + "|" + it5.stack_key()
 			var dest2: Array = [] if no_store.has(nk) else sim.find_storage(it5, it5.cell)
 			if dest2.is_empty():
 				no_store[nk] = true
 			if not dest2.is_empty():
-				cands.append({"s": 60.0 + haul_bonus - _dist(wc, it5.cell) * 0.3, "k": "haul", "item": it5, "dest": dest2[0], "slot": dest2[1]})
+				cands.append({"s": 60.0 + clutter_bonus + haul_bonus - _dist(wc, it5.cell) * 0.3, "k": "haul", "item": it5, "dest": dest2[0], "slot": dest2[1]})
 			elif not reloc and it5.kind != "crate" and sim.logi.has_zone() and not sim.logi.in_zone(it5.cell) and not sim.logi.in_ship(it5.cell):
 				reloc = true
 				# 1.20: зону разгрузки убрали или перенесли — груз несут в новую зону
@@ -1391,7 +1440,7 @@ func _find_work(w: Worker) -> Task:
 					cands.append({"s": 46.0 + haul_bonus - _dist(wc, it5.cell) * 0.3, "k": "haul_cell", "item": it5, "cell": zc5})
 
 	# 8. стройка и снос
-	var build_bonus := (55.0 if laborer else (95.0 if builder else 0.0)) + (60.0 if sim.build_priority else 0.0)
+	var build_bonus := (55.0 if laborer else (PROF_FIRST + 40.0 if builder else 0.0)) + (60.0 if sim.build_priority else 0.0)
 	var best_bp := -1
 	var best_bp_s := -INF
 	for i in sim.bp_cells.keys():
@@ -1423,20 +1472,20 @@ func _find_work(w: Worker) -> Task:
 			if sim.net_res.has("%s:%d" % [lay, ii]) or _coolf(w, "net%d", ii):
 				continue
 			var cc := sim.world.cell_of(ii)
-			var bonus := (45.0 if w.prof == "electrician" and lay == "cable" else 0.0) + (urgent if lay == "cable" else 0.0) + (80.0 if fault else 0.0)
+			var bonus := (PROF_FIRST if w.prof == "electrician" and lay == "cable" else 0.0) + (urgent if lay == "cable" else 0.0) + (80.0 if fault else 0.0)
 			var scn := 48.0 + build_bonus + bonus - _dist(wc, cc) * 0.3
 			if scn > best_ns:
 				best_ns = scn
 				best_n = pr
 		if not best_n.is_empty():
-			cands.append({"s": best_ns, "k": "lay_net", "layer": str(best_n[0]), "idx": int(best_n[1])})
+			cands.append({"s": best_ns, "k": "lay_net", "layer": str(best_n[0]), "idx": int(best_n[1]), "fault": any_fault and sim.faults.list.has(Faults.key(str(best_n[0]), int(best_n[1])))})
 	# 9. сбросить выбитый автомат
 	if w.prof == "electrician" or w.skill("electric") >= 2:
 		for pair in sim.power.tripped_list():
 			var src: Thing = sim.things.get(int(pair[0]))
 			if src == null or src.user >= 0 or _coolf(w, "th%d", src.id):
 				continue
-			var base := 230.0 if w.prof == "electrician" else 150.0
+			var base := 230.0 + PROF_FIRST if w.prof == "electrician" else 150.0
 			cands.append({"s": base - _dist(wc, src.cell) * 0.3, "k": "reset", "t": src})
 	# 10. ремонт сломанных и обслуживание изношенных станков (наладка, смена резцов, смазка)
 	var mechanic := w.prof in ["turner", "miller", "electrician", "assembler", "setter", "fitter"] or w.skill("build") >= 3
@@ -1446,10 +1495,10 @@ func _find_work(w: Worker) -> Task:
 			if m2.demolish or m2.user >= 0 or m2.working or _coolf(w, "th%d", m2.id):
 				continue
 			if m2.broken:
-				cands.append({"s": 120.0 + (20.0 if w.prof == "electrician" else 0.0) + (40.0 if w.prof in ["setter", "fitter"] else 0.0) - _dist(wc, m2.cell) * 0.3, "k": "fix", "t": m2})
+				cands.append({"s": 120.0 + (20.0 if w.prof == "electrician" else 0.0) + (PROF_FIRST if w.prof in ["setter", "fitter"] else 0.0) - _dist(wc, m2.cell) * 0.3, "k": "fix", "t": m2})
 			elif m2.condition < svc:
 				var urgent2 := 30.0 if m2.condition < 25.0 else 0.0
-				cands.append({"s": 78.0 + urgent2 + (15.0 if w.prof in ["turner", "miller"] else 0.0) + (60.0 if w.prof == "setter" else (45.0 if w.prof == "fitter" else 0.0)) - _dist(wc, m2.cell) * 0.3, "k": "repair", "t": m2})
+				cands.append({"s": 78.0 + urgent2 + (15.0 if w.prof in ["turner", "miller"] else 0.0) + (PROF_FIRST if w.prof in ["setter", "fitter"] else 0.0) - _dist(wc, m2.cell) * 0.3, "k": "repair", "t": m2})
 	for t: Thing in _pending_things():
 		if (t.built and not t.demolish) or t.user >= 0 or _coolf(w, "th%d", t.id):
 			continue
@@ -1472,7 +1521,7 @@ func _find_work(w: Worker) -> Task:
 	if (cleaner or (laborer and (sim.upkeep.has_hotspot() or sim.upkeep.avg_room_dirt() > 45.0))) and not _cool(w, "clean"):
 		var dc := sim.upkeep.dirty_cells(55 if cleaner else 110, 30)
 		if not dc.is_empty():
-			cands.append({"s": (210.0 if cleaner else 58.0) + w.skill("clean"), "k": "clean", "cells": dc})
+			cands.append({"s": (210.0 + PROF_FIRST * 0.3 if cleaner else 58.0) + w.skill("clean"), "k": "clean", "cells": dc})
 	# 13. ленточная пила: нарезать заготовки впрок
 	if laborer or w.prof in ["turner", "miller", "setter", "fitter"] or w.skill("haul") >= 4:
 		for saw in sim.upkeep.saws():
@@ -1512,7 +1561,7 @@ func _find_work(w: Worker) -> Task:
 			var sp3 := _free_spot(m3, w)
 			if sp3.is_empty():
 				continue
-			cands.append({"s": 240.0 - _dist(wc, sp3["cell"]) * 0.3, "k": "presetup", "t": m3, "spot": sp3, "key": key3})
+			cands.append({"s": 240.0 + PROF_FIRST * 0.5 - _dist(wc, sp3["cell"]) * 0.3, "k": "presetup", "t": m3, "spot": sp3, "key": key3})
 
 	if w.has_meta("order_only") or w.has_meta("order_bp"):
 		# 1.15: по приказу — только работа на указанном месте
@@ -1525,6 +1574,10 @@ func _find_work(w: Worker) -> Task:
 				if cd.has(key) and cd[key] is Thing and (cd[key] as Thing).id == oid:
 					return true
 			return false)
+
+	# 1.47: станочник не идёт на стройку, пока у его станков есть работа по заказам
+	if not sim.build_priority and not (w.has_meta("order_only") or w.has_meta("order_bp")) and cands.any(func(cd: Dictionary) -> bool: return BUILD_KINDS.has(str(cd["k"]))) and _machinist_has_work(w):
+		cands = cands.filter(func(cd: Dictionary) -> bool: return not BUILD_KINDS.has(str(cd["k"])) or bool(cd.get("fault", false)))
 
 	cands.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["s"]) > float(b["s"]))
 	var tries := 0
@@ -3513,6 +3566,8 @@ func _move(w: Worker, target: Vector2i, dt: float) -> int:
 			spd *= Defs.b("heavy_drag_k") if Defs.b("heavy_drag_k") > 0.0 else 0.6   # без крана — волоком
 	if w.task and str(w.task.data.get("veh", "")) == "forklift":
 		spd = Defs.b("walk_speed") * Defs.b("forklift_speed")
+	if not sim.world.climb.is_empty() and sim.world.climb.has(sim.world.idx(w.cell())):
+		spd *= World.CLIMB_SPEED   # перелезает через поддон
 	var step := spd * dt
 	var guard := 0
 	while step > 0.0 and guard < 16:

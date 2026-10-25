@@ -546,6 +546,7 @@
 			1
 		],
 		"blocks": true,
+		"low": true,
 		"kind": "storage",
 		"needs_floor": false,
 		"storage": {
@@ -567,6 +568,7 @@
 			1
 		],
 		"blocks": true,
+		"low": true,
 		"kind": "storage",
 		"needs_floor": false,
 		"storage": {
@@ -588,6 +590,7 @@
 			1
 		],
 		"blocks": true,
+		"low": true,
 		"kind": "storage",
 		"needs_floor": false,
 		"storage": {
@@ -764,6 +767,7 @@
 			1
 		],
 		"blocks": true,
+		"low": true,
 		"kind": "decor",
 		"needs_floor": false,
 		"desc": "Место, где решаются все важные вопросы завода.",
@@ -2425,6 +2429,7 @@
 			1
 		],
 		"blocks": true,
+		"low": true,
 		"kind": "chip_bin",
 		"needs_floor": false,
 		"no_rotate": true,

@@ -1,7 +1,7 @@
 class_name Sales
 extends RefCounted
 ## Отдел сбыта. Заказчики каждое утро шлют заявки — сбыт сам берёт те, что завод успеет
-## сделать с выгодой (по узкому месту, с учётом уже принятых). Игрок управляет стратегией:
+## сделать с выгодой (по проблемному месту, с учётом уже принятых). Игрок управляет стратегией:
 ## ассортимент, риск, минимальная маржа и долгие контракты с крупными клиентами.
 ## Отказы копятся в «упущенной выгоде»: видно, какого оборудования и каких людей не хватает.
 
@@ -101,6 +101,9 @@ func verdict(o: Dictionary) -> Array:
 		return ["маржа %d%% ниже порога %d%%" % [int(round(mg * 100.0)), int(round(min_margin() * 100.0))], []]
 	var li := sim.office.load_info(p, int(o["qty"]))
 	if float(li[0]) > float(int(o.get("lead", 3))) * risk_k():
+		if sim.office.ops_for(str(li[1])) <= 0.0:
+			# 1.47: на переделе никто не работает — так и сказать, а не «не успеваем»
+			return ["не успеваем: некому работать — %s" % Defs.process_name(str(li[1])).to_lower(), [str(li[1])]]
 		return ["не успеваем: проблемный участок — %s" % Defs.process_name(str(li[1])).to_lower(), [str(li[1])]]
 	var mat := sim.planner.material_of(p)
 	if mat != "":
@@ -499,7 +502,7 @@ func assess(c: Dictionary) -> String:
 		if v < wv:
 			wv = v
 			worst = str(pr2)
-	return L.t("Мощности не хватает: сейчас ~%d шт. в неделю из %d. Узкое место — %s. %s") % [int(cap), int(need), Defs.process_name(worst).to_lower(), advice(worst)]
+	return L.t("Мощности не хватает: сейчас ~%d шт. в неделю из %d. Проблемное место — %s. %s") % [int(cap), int(need), Defs.process_name(worst).to_lower(), advice(worst)]
 
 
 func sign(id: int) -> String:

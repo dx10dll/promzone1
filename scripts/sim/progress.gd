@@ -362,7 +362,7 @@ func _rate() -> void:
 				failed += 1
 			"active", "ready", "shipping":
 				# 1.20: просроченный заказ в работе — уже срыв срока
-				if sim.minute > float(o["deadline"]):
+				if sim.orders.is_overdue(o):
 					late += 1
 	var tot := on_time + late + failed
 	var output := 0.6 if tot == 0 else clampf((on_time + late * 0.5) / float(tot), 0.0, 1.0)

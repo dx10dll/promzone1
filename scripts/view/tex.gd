@@ -218,7 +218,9 @@ static func invalidate_crisp() -> void:
 
 
 static func crisp(id: String, sz: int = 48) -> Texture2D:
-	var phys := clampi(roundi(float(sz) * px_scale()), 8, MAX_PX)
+	# 1.47: запекаем в 2× физического размера (потолок — исходник) с мип-картами: дальше GPU уменьшает билинейно-трилинейно,
+	# края гладкие, но не «пиксельные» и не мыльные
+	var phys := clampi(roundi(float(sz) * px_scale() * 2.0), 16, MAX_PX)
 	var ck := "%s@%d@%d" % [id, sz, phys]
 	if _crisp.has(ck):
 		return _crisp[ck]
@@ -232,8 +234,12 @@ static func crisp(id: String, sz: int = 48) -> Texture2D:
 				img.decompress()
 			if img.has_mipmaps():
 				img.clear_mipmaps()
-			if img.get_width() != phys:
-				img.resize(phys, phys, Image.INTERPOLATE_LANCZOS)
+			if img.get_width() > phys:
+				while img.get_width() / 2 >= phys:   # пошагово вдвое (билинейно), финал — кубически
+					img.resize(img.get_width() / 2, img.get_height() / 2, Image.INTERPOLATE_BILINEAR)
+				if img.get_width() != phys:
+					img.resize(phys, phys, Image.INTERPOLATE_CUBIC)
+			img.generate_mipmaps()
 			var it := ImageTexture.create_from_image(img)
 			it.set_size_override(Vector2i(sz, sz))
 			it.set_meta(COLOR_META, true)

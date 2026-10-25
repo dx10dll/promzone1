@@ -1,0 +1,12 @@
+keys,en
+"Перекроет единственный проход: оставьте людям обход вокруг","This would block the only passage: leave people a way around"
+"доложите пол на %d клетках","lay floor on %d more cells"
+"Срочные заказы всегда первыми: станок бросает обычную деталь, из срочных — раньше срок","Urgent orders always come first: a machine drops a regular part; among urgent ones, the earliest deadline wins"
+"Каждый занят своим делом: станочники у станков, строители на стройке","Everyone does their own job: machinists at machines, builders on construction"
+"Люди обходят мебель, через поддоны перелезают медленно","People walk around furniture and climb over pallets slowly"
+"Помещение считается замкнутым и без пола","A room counts as enclosed even without a floor"
+"Заказ, готовый к сроку, не просрочен, даже если машина опоздала","An order finished on time is not overdue even if the truck is late"
+"Метки инспектора снимаются после уборки, предписания устраняют первыми","Inspector marks clear after cleanup; violations are fixed first"
+"Гладкие шрифты и иконки, меню ниже, карточки не растягиваются","Smooth fonts and icons, shorter menus, cards no longer stretch"
+"Оба кулера подходят для комнаты отдыха; предметы в руке на месте","Both water coolers count for the rest room; held items sit in the hand"
+"не успеваем: некому работать — %s","too slow: nobody works at — %s"

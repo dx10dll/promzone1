@@ -99,7 +99,7 @@ keys,en
 Страховое возмещение: ,Insurance payout: 
 Без работы: ,Idle: 
 "Их передела нет ни в одном заказе в работе. Возьмите заказы на эти изделия, переобучите людей (Люди → Обучение) или не нанимайте новых, пока работы нет.","None of the orders in progress need their operation. Take orders for those products, retrain people (People → Training) or stop hiring until there's work."
-Узкое место — %s,Bottleneck — %s
+Проблемное место — %s,Problem spot — %s
 "За неделю отказали заказчикам на %s, больше всего — из-за этого передела (%s). %s","This week we turned down customers worth %s, mostly because of this operation (%s). %s"
 Станков сломано: %d,Machines broken: %d
 "Сломанный станок стоит, а заказы горят. Ремонт делает токарь или рукастый рабочий — проверьте, что у них есть время.",A broken machine stands idle while orders burn. Repairs are done by a turner or a handy worker — make sure they have time.
@@ -146,7 +146,7 @@ keys,en
 нет оборудования: ,no equipment: 
 слишком много заказов в работе (%d),too many orders in progress (%d)
 маржа %d%% ниже порога %d%%,margin %d%% below the %d%% threshold
-не успеваем: проблемный участок — %s,too slow: bottleneck — %s
+не успеваем: проблемный участок — %s,too slow: problem spot — %s
 не хватает денег на металл,not enough money for metal
 слишком много,too many
 не хватает денег,not enough money
@@ -184,7 +184,7 @@ keys,en
 Сейчас мощность нулевая: %s. Если людей больше нет — наймите.,Capacity is zero right now: %s. If there's nobody else — hire.
 Мощности хватает с запасом: можете делать ~%d шт. в неделю.,Plenty of capacity: you can make ~%d pcs per week.
 Мощности хватает впритык (~%d шт. в неделю): на другие заказы времени останется мало.,Capacity is just enough (~%d pcs per week): little time left for other orders.
-Мощности не хватает: сейчас ~%d шт. в неделю из %d. Узкое место — %s. %s,Not enough capacity: ~%d pcs per week now out of %d. Bottleneck — %s. %s
+Мощности не хватает: сейчас ~%d шт. в неделю из %d. Проблемное место — %s. %s,Not enough capacity: ~%d pcs per week now out of %d. Problem spot — %s. %s
 Предложение уже недоступно,The offer is no longer available
 "Оплата: аванс по договору на год, ","Payment: advance on annual agreement, "
 "Контракт подписан: %s, %d шт. «%s» в неделю. Первая партия — в неделю со дня %d.","Contract signed: %s, %d pcs of “%s” per week. The first batch is due in the week from day %d."

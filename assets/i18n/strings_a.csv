@@ -103,7 +103,7 @@ keys,en
 взято %d %s на %s,taken %d %s for %s
 отказано %d на %s,declined %d for %s
 в рассмотрении %d на %s,under review %d for %s
-Узкое место,Bottleneck
+Проблемное место,Problem spot
 некому работать на переделе «%s»,nobody to work at “%s”
 "«%s» — %s, упущено %s","“%s”: %s, lost %s"
 нет оборудования,no equipment
@@ -162,7 +162,7 @@ keys,en
 себестоимость ~%s/шт · маржа ~%d%%%s · %s,cost ~%s/pc · margin ~%d%%%s · %s
  — убыточный!, — loss-making!
 %s · маржа — ступень «Себестоимость»,%s · margin needs the “Unit Cost” step
-загрузка ~%.1f раб. дн. (проблемный участок — %s): %s,load ~%.1f work days (bottleneck: %s): %s
+загрузка ~%.1f раб. дн. (проблемный участок — %s): %s,load ~%.1f work days (problem spot: %s): %s
 не успеем без найма,won't make it without hiring
 "Нет оборудования: %s — принять можно, но сделать не получится","No equipment: %s. You can accept, but you won't be able to make it"
 Принять,Accept
@@ -504,7 +504,7 @@ Click to open where to deal with it"
 Текущие кредиты,Current Loans
 %d%% годовых,%d%% a year
 "План производства ведёт ПДО. Постройте помещение «ПДО» (стол ИТР, доска планирования, линолеум) или общую контору и наймите диспетчера: появятся план с прогнозом сроков, приоритеты заказов и автоприём.","The production plan is kept by the planning office. Build a “Planning Office” room (office desk, planning board, linoleum) or a shared office and hire a dispatcher: you get a plan with lead-time forecast, order priorities and auto-accept."
- · проблемный участок — %s, · bottleneck: %s
+ · проблемный участок — %s, · problem spot: %s
 загрузка ~%.1f раб. дн.%s,load ~%.1f work days%s
 "Зелёное — сделано, тёмно-зелёное — прогноз до готовности, жёлтая черта — срок. Шкала — две недели от сегодняшнего дня.",Green: done; dark green: forecast to completion; yellow line: deadline. The scale is two weeks from today.
 Заказов в работе нет.,No active orders.

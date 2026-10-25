@@ -59,6 +59,7 @@ var tutorial: TutorialPanel = null
 var letter_id := -1
 var sub_panel: PanelContainer
 var sub_root: VBoxContainer
+var sub_scroll: ScrollContainer
 var top_left: Control      ## 1.40: левая часть верхней панели (обрезается, если не влезает)
 var top_right: Control     ## 1.40: правая часть — скорость, «?», журнал, ☰ — всегда видна
 var menu_btn: Button       ## 1.40: кнопка ☰
@@ -884,8 +885,13 @@ func _build_sub() -> void:
 	sub_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	sub_panel.visible = false
 	add_child(sub_panel)
+	# 1.47: меню не выше ~45 % экрана — дальше прокрутка (высоту ставит _cap_sub)
+	sub_scroll = ScrollContainer.new()
+	sub_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sub_panel.add_child(sub_scroll)
 	sub_root = UITheme.vbox(4)
-	sub_panel.add_child(sub_root)
+	sub_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sub_scroll.add_child(sub_root)
 
 
 ## Открыть каталог помещений сразу с выбранным типом (из закрытого раздела окна).
@@ -972,6 +978,17 @@ func _fill_sub() -> void:
 	sub_panel.offset_left = 0
 	sub_panel.offset_right = 0
 	BuildMenu.fill(self)
+	_cap_sub()
+
+
+func _cap_sub() -> void:
+	sub_scroll.custom_minimum_size = Vector2(0, 0)
+	await get_tree().process_frame
+	if not is_inside_tree():
+		return
+	var need := sub_root.get_combined_minimum_size()
+	var cap := get_viewport_rect().size.y * 0.45
+	sub_scroll.custom_minimum_size = Vector2(need.x, minf(need.y, cap))
 
 
 ## Подпись карточки: длинное слово («Ленточнопильный») — кеглем помельче, чтобы не рвалось посередине.
@@ -1351,6 +1368,7 @@ func open_window(kind: String) -> void:
 	win.size = Vector2(win.custom_minimum_size.x, win.custom_minimum_size.y)
 	win.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	win.position = Vector2((get_viewport_rect().size.x - win.size.x) * 0.5, 50.0 + 10.0 + (avail - win.size.y) * 0.5)
+	fit_window(win, false)
 	if grp == "events":
 		sim.paper.unread = false if win.sec == "paper" else sim.paper.unread
 	win.closed.connect(close_window)
@@ -1363,6 +1381,28 @@ func open_window(kind: String) -> void:
 ## Обучение — слева посередине, но всегда ниже списка задач (они не должны налезать друг на друга).
 func _place_tutorial() -> void:
 	pass   # 1.17: обучение ставит себя само (TutorialPanel._place)
+
+
+## 1.47: высота окна — по содержимому (не меньше WIN_MIN_H), не выше свободного места; после смены вкладки — только растёт.
+const WIN_MIN_H := 420.0
+
+
+func fit_window(w: GameWindow, grow_only: bool) -> void:
+	if w == null:
+		return
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not is_instance_valid(w) or w != win:
+		return
+	var vh := get_viewport_rect().size.y
+	var avail := vh - 50.0 - 92.0 - 20.0
+	var over := w.size.y - w.scroll.size.y   # шапка и поля вокруг прокрутки
+	var want := clampf(over + w.content.get_combined_minimum_size().y + 6.0, WIN_MIN_H, maxf(WIN_MIN_H, minf(avail, 780.0)))
+	if grow_only:
+		want = maxf(want, w.size.y)
+	w.custom_minimum_size.y = want
+	w.size = Vector2(w.custom_minimum_size.x, want)
+	w.position = Vector2((get_viewport_rect().size.x - w.size.x) * 0.5, 50.0 + 10.0 + (avail - want) * 0.8)
 
 
 func close_window() -> void:

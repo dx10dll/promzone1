@@ -21,6 +21,7 @@ static func ui_order() -> Array:
 
 const OFFICE_TYPES := ["office", "foreman_office", "chief_office", "accounting", "supply_office", "pdo", "hr_office", "tech_office",
 	"sales_office", "safety_office", "engineer_office", "legal_office"]
+const BARE_MAX := 40   ## 1.47: сколько клеток без пола допускается внутри замкнутого контура
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
 
@@ -129,6 +130,7 @@ func rebuild() -> void:
 		var cells: Array[Vector2i] = []
 		var openings := {}
 		var enclosed := true
+		var bare := {}   ## 1.47: клетки без пола внутри контура — замкнутость от пола не зависит
 		var queue: Array[Vector2i] = [c0]
 		seen[i] = 1
 		while not queue.is_empty():
@@ -145,12 +147,19 @@ func rebuild() -> void:
 						seen[ni] = 1
 						queue.append(nb)
 				elif w.wall[ni] == World.W_NONE:
-					enclosed = false   # выход на улицу без стены
+					# земля без пола: если её немного и она ограничена стенами — это часть помещения, иначе улица
+					if w.flr[ni] <= 0 and not bare.has(ni) and bare.size() < BARE_MAX:
+						bare[ni] = true
+						queue.append(nb)
+					elif not bare.has(ni):
+						enclosed = false   # выход на улицу без стены
 				else:
 					openings[ni] = w.wall[ni]
 		if not enclosed:
 			_open_zones(cells)
 			continue
+		for bi in bare.keys():
+			seen[int(bi)] = 1
 		var sp := Space.new()
 		sp.id = spaces.size()
 		sp.cells = cells
@@ -271,6 +280,12 @@ func _check(r: Room) -> void:
 			var names: Array[String] = []
 			for f in floors:
 				names.append(str(Defs.floor_by_id.get(int(f), {}).get("name", "пол")).to_lower())
+			var bare_n := 0
+			for c3 in r.cells:
+				if sim.world.flr[sim.world.idx(c3)] <= 0:
+					bare_n += 1
+			if bare_n > 0:
+				r.missing.append("доложите пол на %d клетках" % bare_n)
 			r.missing.append(" или ".join(names))
 	var dry := false
 	for need: Dictionary in def.get("needs", []):

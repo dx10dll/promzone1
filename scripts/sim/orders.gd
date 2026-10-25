@@ -33,6 +33,14 @@ const EXPORT_CLIENTS := ["ТОО «Степьмаш» (Казахстан)", "Ч
 const STATE_CLIENTS := ["ФКП «Госзаказ-7»", "АО «Спецкомплект»", "ФГУП «Северный арсенал»", "АО «НПО Восход»"]
 
 
+## 1.47: просрочен ли заказ. Готовый (ждёт машину / грузится) — по времени готовности, а не по приезду машины.
+func is_overdue(o: Dictionary) -> bool:
+	var st := str(o["status"])
+	if st == "ready" or st == "shipping":
+		return float(o.get("ready_at", sim.minute)) > float(o["deadline"])
+	return sim.minute > float(o["deadline"])
+
+
 func remaining(o: Dictionary) -> int:
 	return int(o["qty"]) - int(o["shipped"])
 
@@ -356,6 +364,7 @@ func tick(dt: float) -> void:
 		if free_ok >= remaining(o):
 			o["status"] = "ready"
 			o["allocated"] = remaining(o)
+			o["ready_at"] = sim.minute   # 1.47: срок выполнен, когда всё готово и сдано на отгрузку — машина клиента не в счёт
 			var delay := sim.rng.randf_range(Defs.b("pickup_delay_min"), Defs.b("pickup_delay_max"))
 			o["pickup_eta"] = sim.to_work_time(sim.minute + delay)
 			sim.notify(L.t("Заказ готов: %s. Клиент выслал машину.") % short(o), Sim.LVL_GOOD)
@@ -467,8 +476,9 @@ func on_pickup_done(v: Vehicle) -> void:
 	var qty := int(o["qty"])
 	var amount := float(o["price"]) * qty - float(o.get("paid_part", 0.0))
 	var late_days := 0
-	if sim.minute > float(o["deadline"]):
-		late_days = int(ceil((sim.minute - float(o["deadline"])) / 1440.0))
+	var done_at := float(o.get("ready_at", sim.minute))   # старые сейвы без поля — по приезду машины, как раньше
+	if done_at > float(o["deadline"]):
+		late_days = int(ceil((done_at - float(o["deadline"])) / 1440.0))
 	var k := maxf(1.0 - MAX_LATE_CUT, 1.0 - float(o["penalty"]) * late_days)
 	var full := amount
 	amount *= k

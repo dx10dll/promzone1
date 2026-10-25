@@ -168,7 +168,41 @@ func _applicable(t: String) -> bool:
 
 # ================================================================ ход визита
 
+var _mk_t := 0.0
+
+
+## 1.47: какие замечания инспекции сейчас висят (метки на карте и предписания): ключ нарушения -> true.
+func open_keys() -> Dictionary:
+	var out := {}
+	for m: Dictionary in marks:
+		if str(m.get("key", "")) != "":
+			out[str(m["key"])] = true
+	for p: Dictionary in prescriptions:
+		for k in p.get("keys", []):
+			out[str(k)] = true
+	return out
+
+
+## 1.47: метка нарушения снимается, как только причина устранена (проверка раз в игровую минуту).
+## Метки из старых сейвов (без ключа) опознаются по тексту.
+func prune_marks() -> void:
+	if marks.is_empty():
+		return
+	var clutter_txt := str(_v("fire", "clutter", Vector2i.ZERO, -1)["text"])
+	for m: Dictionary in marks.duplicate():
+		var key := str(m.get("key", ""))
+		if key == "" and str(m.get("text", "")) == clutter_txt:
+			key = "clutter"
+			m["key"] = key
+		if key == "clutter" and sim.ground_items.size() < 12:
+			marks.erase(m)
+
+
 func tick(dt: float) -> void:
+	_mk_t -= dt
+	if _mk_t <= 0.0:
+		_mk_t = 1.0
+		prune_marks()
 	if visit.is_empty():
 		if queue.is_empty():
 			return
@@ -359,7 +393,7 @@ func _check_stop(room_id: int) -> void:
 		var c: Array = vi.get("cell", [-1, -1])
 		var cell := Vector2i(int(c[0]), int(c[1]))
 		if cell.x >= 0:
-			marks.append({"cell": [cell.x, cell.y], "text": str(vi["text"]), "until": sim.minute + 6.0 * 1440.0, "type": t})
+			marks.append({"cell": [cell.x, cell.y], "text": str(vi["text"]), "until": sim.minute + 6.0 * 1440.0, "type": t, "key": str(vi["key"])})
 		sim.notify(L.t("Инспектор записал нарушение: %s.") % str(vi["text"]), Sim.LVL_WARN, cell)
 
 
@@ -369,6 +403,12 @@ func _finish() -> void:
 		sim.visitors.erase(v)
 	var t := str(visit["type"])
 	var found: Array = visit["found"]
+	# 1.47: проверка прошла — метки этого вида, по которым замечания больше нет, снимаем
+	if not VISIT_KINDS.has(t):
+		var fkeys := {}
+		for f: Dictionary in found:
+			fkeys[str(f["key"])] = true
+		marks = marks.filter(func(m: Dictionary) -> bool: return str(m.get("type", "")) != t or fkeys.has(str(m.get("key", ""))))
 	var rep: Array = visit.get("repeat", [])
 	var why := str(visit.get("why", ""))
 	var e0 := escort()
@@ -894,6 +934,7 @@ func _str_keys(d: Dictionary) -> Dictionary:
 func from_dict(d: Dictionary) -> void:
 	queue = d.get("queue", [])
 	marks = d.get("marks", [])
+	_mk_t = 0.0   # 1.47: старые метки без причины сразу проверим
 	prescriptions = d.get("presc", [])
 	history = d.get("hist", [])
 	next_due = d.get("due", {})

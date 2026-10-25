@@ -294,6 +294,8 @@ func _open_sec(key: String) -> void:
 	rebuild(true)
 	if hud and hud.has_method("_sync_bottom"):
 		hud._sync_bottom()
+	if hud and hud.has_method("fit_window"):
+		hud.fit_window(self, true)
 
 
 ## Подсказка к разделу: объяснение прячется под значок «?» рядом с заголовком.
@@ -735,7 +737,7 @@ func _cards(cols: int = 2) -> GridContainer:
 
 ## Карточка в сетке: заголовок (+ значок «?»), внутри — вертикальный список.
 ## 1.46: значки заголовков карточек: русский заголовок -> значок (ищется по переведённому тексту).
-const CARD_ICONS := {"Стратегия сбыта": "orders", "За 7 дней": "date", "Узкое место": "wrench", "Ценовая политика": "money",
+const CARD_ICONS := {"Стратегия сбыта": "orders", "За 7 дней": "date", "Проблемное место": "wrench", "Ценовая политика": "money",
 	"Учебный класс": "research", "Статистика": "statistics", "Спецоценка (СОУТ)": "inspect", "СИЗ": "shield", "Рассказчик": "paper",
 	"Рабочие места": "objects", "Путь завода": "goals", "Практиканты ПТУ": "hire", "Поставщик металла": "supply",
 	"Погода и отопление": "temperature", "План месяца": "date", "Наша доля рынка": "chart_up", "Молоко за вредность": "med",
@@ -890,7 +892,7 @@ func _sales_head() -> void:
 	b.add_child(UITheme.kv("cancel", tr("отказано %d") % int(s["lost"]), Defs.money_str(float(s["lost_sum"])), UITheme.WARN if float(s["lost_sum"]) > 0.0 else UITheme.MUTED))
 	if not sl.queue.is_empty():
 		b.add_child(UITheme.kv("clock", tr("в рассмотрении %d") % sl.queue.size(), Defs.money_str(sl.queue_sum()), UITheme.INFO))
-	var c := _card_in(g, tr("Узкое место"))
+	var c := _card_in(g, tr("Проблемное место"))
 	if float(li[0]) >= 98.0:
 		var an := sl.absent_note(str(li[1]))
 		c.add_child(UITheme.para(an if an != "" else tr("некому работать на переделе «%s»") % Defs.process_name(str(li[1])), 13, UITheme.BAD))

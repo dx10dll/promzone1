@@ -1095,6 +1095,87 @@ var _uo_rev := -1
 
 
 func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -> String:
+	var err := _can_place_base(def_id, c, rot, ignore_id)
+	if err == "" and ignore_id < 0 and _seals_passage(def_id, c, rot):
+		return L.t("Перекроет единственный проход: оставьте людям обход вокруг")
+	return err
+
+
+## 1.47: высокий объект не должен отрезать людям путь: клетки вокруг, которые были связаны, остаются связаны.
+func _seals_passage(def_id: String, c: Vector2i, rot: int) -> bool:
+	var d: Dictionary = Defs.objects.get(def_id, {})
+	if not bool(d.get("blocks", true)) or bool(d.get("low", false)) or bool(d.get("ceiling", false)) or str(d.get("kind", "")) == "checkpoint":
+		return false
+	var bs: Array = d.get("size", [1, 1])
+	var sz := Thing.rot_size(Vector2i(int(bs[0]), int(bs[1])), rot)
+	var foot := {}
+	for y in sz.y:
+		for x in sz.x:
+			foot[c + Vector2i(x, y)] = true
+	var ring: Array[Vector2i] = []
+	for fc: Vector2i in foot.keys():
+		for dd: Vector2i in Rooms.DIRS:
+			var nb := fc + dd
+			if not foot.has(nb) and world.passable(nb) and not ring.has(nb):
+				ring.append(nb)
+	if ring.size() < 2:
+		return false
+	var with := _flood(ring[0], foot, ring)
+	if with.size() == ring.size():
+		return false
+	var without := _flood(ring[0], {}, ring)
+	if without.size() <= with.size():
+		return false
+	# тупичок в пару клеток — не беда; перекрывать проход между большими частями нельзя
+	if _comp_size(ring[0], foot, 6) < 6:
+		return false
+	for r in ring:
+		if not with.has(r) and _comp_size(r, foot, 6) >= 6:
+			return true
+	return false
+
+
+func _comp_size(start: Vector2i, banned: Dictionary, cap: int) -> int:
+	var seen := {start: true}
+	var queue: Array[Vector2i] = [start]
+	var head := 0
+	while head < queue.size() and seen.size() < cap:
+		var cur: Vector2i = queue[head]
+		head += 1
+		for dd: Vector2i in Rooms.DIRS:
+			var nb := cur + dd
+			if seen.has(nb) or banned.has(nb) or not world.passable(nb):
+				continue
+			seen[nb] = true
+			queue.append(nb)
+	return seen.size()
+
+
+## Какие клетки из targets достижимы от start (обход по проходимым, без клеток из banned); поиск ограничен.
+func _flood(start: Vector2i, banned: Dictionary, targets: Array[Vector2i]) -> Array[Vector2i]:
+	var seen := {start: true}
+	var queue: Array[Vector2i] = [start]
+	var found: Array[Vector2i] = [start]
+	var head := 0
+	while head < queue.size() and seen.size() < 6000:
+		var cur: Vector2i = queue[head]
+		head += 1
+		for dd: Vector2i in Rooms.DIRS:
+			var nb := cur + dd
+			if seen.has(nb) or banned.has(nb) or not world.passable(nb):
+				continue
+			seen[nb] = true
+			queue.append(nb)
+			if targets.has(nb):
+				found.append(nb)
+				if found.size() == targets.size():
+					return found
+	if seen.size() >= 6000:
+		return targets.duplicate()   # огромное открытое место — не перекроем
+	return found
+
+
+func _can_place_base(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -> String:
 	var d: Dictionary = Defs.objects.get(def_id, {})
 	if d.is_empty():
 		return L.t("Неизвестный объект")
@@ -1298,6 +1379,21 @@ func thing_cost(def_id: String) -> float:
 	return round(float(Defs.objects.get(def_id, {}).get("cost", 0)) * k)
 
 
+## 1.47: объект встал на клетку: высокий — непроходим, низкий (поддон) — «перелезть» дорого.
+func _occupy(t: Thing, cc: Vector2i) -> void:
+	if t.is_low():
+		world.climb[world.idx(cc)] = t.id
+	else:
+		world.block[world.idx(cc)] = t.id
+
+
+func _vacate(t: Thing, i: int) -> void:
+	if world.block[i] == t.id:
+		world.block[i] = -1
+	if int(world.climb.get(i, -1)) == t.id:
+		world.climb.erase(i)
+
+
 func finish_thing(t: Thing) -> void:
 	t.built = true
 	t.build_work = 0.0
@@ -1308,7 +1404,7 @@ func finish_thing(t: Thing) -> void:
 	if t.blocks():
 		for cc in t.cells():
 			if t.blocks_at(cc):
-				world.block[world.idx(cc)] = t.id
+				_occupy(t, cc)
 			world.refresh_cell(cc)
 			nudge_from(cc)
 	thing_rev += 1
@@ -1369,15 +1465,14 @@ func rotate_thing(t: Thing) -> String:
 	for cc in t.cells():
 		var i := world.idx(cc)
 		world.occ[i] = -1
-		if world.block[i] == t.id:
-			world.block[i] = -1
+		_vacate(t, i)
 		world.refresh_cell(cc)
 	t.rot = nr
 	for cc2 in t.cells():
 		var i2 := world.idx(cc2)
 		world.occ[i2] = t.id
 		if t.built and t.blocks_at(cc2):
-			world.block[i2] = t.id
+			_occupy(t, cc2)
 			world.refresh_cell(cc2)
 			nudge_from(cc2)
 	thing_rev += 1
@@ -1413,8 +1508,7 @@ func remove_thing(t: Thing, refund_rate: float) -> void:
 		for cc in t.cells():
 			var i := world.idx(cc)
 			world.occ[i] = -1
-			if world.block[i] == t.id:
-				world.block[i] = -1
+			_vacate(t, i)
 			world.refresh_cell(cc)
 		_close_fence(t)
 	things.erase(t.id)
@@ -2269,7 +2363,7 @@ static func from_dict(d: Dictionary) -> Sim:
 		for cc in t.cells():
 			s.world.occ[s.world.idx(cc)] = t.id
 			if t.built and t.blocks_at(cc):
-				s.world.block[s.world.idx(cc)] = t.id
+				s._occupy(t, cc)
 	for t: Thing in late_cp:
 		s._fit_old_checkpoint(t)
 		if not s.things.has(t.id):
@@ -2277,7 +2371,7 @@ static func from_dict(d: Dictionary) -> Sim:
 		for cc in t.cells():
 			s.world.occ[s.world.idx(cc)] = t.id
 			if t.built and t.blocks_at(cc):
-				s.world.block[s.world.idx(cc)] = t.id
+				s._occupy(t, cc)
 	for wd: Dictionary in d["workers"]:
 		var w := Worker.from_dict(wd)
 		w.set_meta("wage_due", float(wd.get("wage_due", 0.0)))

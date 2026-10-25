@@ -715,7 +715,7 @@ func _animate() -> void:
 	hand_b.position = hb * hk
 	held.visible = carrying and _carry_kind != "crane"
 	if _prop != "":
-		_place_prop(ha, hb, side, back)
+		_place_prop(ha * hk, hb * hk, side, back)   # 1.47: предмет — у настоящей кисти (руки шире у полных)
 	gest.visible = _gest != ""
 	if gest.visible:
 		gest.queue_redraw()
@@ -861,7 +861,7 @@ func _place_prop(ha: Vector2, hb: Vector2, side: bool, back: bool) -> void:
 			prop_sp.position = ha + Vector2(0, 3)
 			prop_sp.scale = Vector2(0.36, 0.36)
 		_:
-			prop_sp.position = hb + Vector2(-3, -2)
+			prop_sp.position = hb + (Vector2(0, -1) if side else Vector2(-3, -2))   # 1.47: сбоку — прямо в кисти
 
 
 ## Значки над головой: что человеку сейчас нужно (туалет, еда, отдых, холод, настроение)
