@@ -31,7 +31,7 @@ func _initialize() -> void:
 
 func _tracks() -> void:
 	print("— пьесы")
-	check(MusicDirector.NEW_131.size() >= 8, "новых пьес: %d" % MusicDirector.NEW_131.size())
+	check(MusicDirector.NEW_131.size() >= 6, "новых пьес: %d" % MusicDirector.NEW_131.size())
 	var total := 0
 	for n: String in MusicDirector.NEW_131:
 		var path := "res://assets/sound/%s.ogg" % n
@@ -137,8 +137,8 @@ func _no_repeats() -> void:
 			rep += 1
 		hist2.append(n2)
 	check(rep == 0, "смены настроения тоже без повтора подряд (%d)" % rep)
-	check(MusicDirector.first_of(["music_night", "music_radio", "music_calm"], [], 0.5) == "music_night", "первым — «лицо» списка")
-	check(MusicDirector.first_of(["music_night", "music_radio", "music_calm"], ["music_night"], 0.0) != "music_night", "…если оно не звучало только что")
+	check(MusicDirector.first_of(["music_night", "music_calm", "music_calm"], [], 0.5) == "music_night", "первым — «лицо» списка")
+	check(MusicDirector.first_of(["music_night", "music_calm", "music_calm"], ["music_night"], 0.0) != "music_night", "…если оно не звучало только что")
 	check(MusicDirector.pick_next(["music_rain"], ["music_rain"], 0.3) == "music_rain", "из одного трека — он сам")
 
 
@@ -184,8 +184,8 @@ func _fade_math() -> void:
 			var b2 := MusicFade.next_boundary(pos, MusicDirector.phrase(n))
 			worst = maxf(worst, b2 - pos)
 	check(worst <= MusicFade.MAX_WAIT, "смена настроения ждёт не дольше %.1f с (%.1f)" % [MusicFade.MAX_WAIT, worst])
-	check(is_equal_approx(MusicDirector.overlap("music_shop"), MusicFade.XFADE), "старая петля перекрывается долгой сменой")
-	check(MusicDirector.overlap("music_jazz") < MusicFade.XFADE and MusicDirector.soft_end("music_jazz"), "новая кончается сама — короткий стык")
+	check(MusicDirector.LOOPED.is_empty(), "1.45: петель нет — все пьесы кончаются сами")
+	check(MusicDirector.overlap("music_shop") < MusicFade.XFADE and MusicDirector.soft_end("music_shop"), "новая кончается сама — короткий стык")
 
 
 ## Живая проверка автозагрузки Snd (если она есть в режиме -s): два плеера, смена, громкость, приглушение.
@@ -204,18 +204,18 @@ func _live() -> void:
 	check(both_music, "оба на шине «Музыка» — ползунок громкости действует на оба")
 	var started: Array = []
 	snd.connect("track_started", func(nm: String) -> void: started.append(nm))
-	snd.call("set_playlist", ["music_rain", "music_radio"], 0.6)
+	snd.call("set_playlist", ["music_rain", "music_calm"], 0.6)
 	await process_frame
 	check(str(snd.call("now_playing")) == "music_rain", "заиграл первый трек списка (%s)" % snd.call("now_playing"))
 	check(started.has("music_rain"), "сигнал track_started — для надписи «Музыка: …»")
-	snd.call("music", "music_radio", 0.6)
+	snd.call("music", "music_calm", 0.6)
 	await process_frame
 	var both := (mp[0] as AudioStreamPlayer).playing and (mp[1] as AudioStreamPlayer).playing
 	check(both, "во время смены звучат оба")
 	var t0 := Time.get_ticks_msec()
 	while Time.get_ticks_msec() - t0 < 2200:
 		await process_frame
-	check(str(snd.call("now_playing")) == "music_radio", "после смены — новый трек")
+	check(str(snd.call("now_playing")) == "music_calm", "после смены — новый трек")
 	var n_on := 0
 	for p2: AudioStreamPlayer in mp:
 		n_on += 1 if p2.playing else 0

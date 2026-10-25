@@ -9,35 +9,34 @@ const TITLES := {
 	"music_menu": "«Проходная»", "music_morning": "«Первая смена»", "music_shop": "«Норма»",
 	"music_march": "«Встречный план»", "music_evening": "«Пересменка»", "music_night": "«Ночная смена»",
 	"music_calm": "«Тихий цех»", "music_waltz": "«Заводской вальс»",
-	"music_estrada": "«Огни проспекта»", "music_accwaltz": "«Над заводской рекой»", "music_folk": "«Тропинка к проходной»",
-	"music_foundry": "«Литейный цех»", "music_jazz": "«Буфет на втором этаже»", "music_march2": "«Ударная вахта»",
-	"music_rain": "«Дождь над крышей цеха»", "music_radio": "«Ночной эфир»", "music_winter": "«Первый снег»",
+	"music_accwaltz": "«Над заводской рекой»", "music_folk": "«Тропинка к проходной»",
+	"music_march2": "«Ударная вахта»",
+	"music_rain": "«Дождь над крышей цеха»", "music_winter": "«Первый снег»",
 	"music_dawn": "«Утренний автобус»",
 }
+## 1.45: четырнадцать оригинальных пьес в классических жанрах (tools/gen_music_145.py), все кончаются сами — каденцией и затуханием.
 const ALL := ["music_morning", "music_shop", "music_march", "music_evening", "music_night", "music_calm", "music_waltz",
-	"music_estrada", "music_accwaltz", "music_folk", "music_foundry", "music_jazz", "music_march2", "music_rain",
-	"music_radio", "music_winter", "music_dawn"]
-const NEW_131 := ["music_estrada", "music_accwaltz", "music_folk", "music_foundry", "music_jazz", "music_march2",
-	"music_rain", "music_radio", "music_winter", "music_dawn"]
-const CLASSIC := ["music_calm", "music_waltz", "music_accwaltz"]
+	"music_accwaltz", "music_folk", "music_march2", "music_rain", "music_winter", "music_dawn"]
+const NEW_131 := ["music_accwaltz", "music_folk", "music_march2", "music_rain", "music_winter", "music_dawn"]
+## «Только вальсы»: венский, лирический и «снежный» вальсы.
+const CLASSIC := ["music_waltz", "music_accwaltz", "music_winter"]
 const MENU := ["music_menu", "music_accwaltz", "music_rain", "music_waltz"]
 const MOODS := {
-	"night": ["music_night", "music_radio", "music_calm"],
-	"evening": ["music_evening", "music_accwaltz", "music_jazz", "music_waltz", "music_estrada"],
-	"rush": ["music_march", "music_march2", "music_foundry", "music_shop"],
-	"morning": ["music_morning", "music_folk", "music_dawn", "music_shop"],
-	"day": ["music_shop", "music_estrada", "music_jazz", "music_foundry", "music_dawn", "music_calm", "music_folk"],
+	"night": ["music_night", "music_calm", "music_evening"],
+	"evening": ["music_evening", "music_accwaltz", "music_waltz", "music_folk"],
+	"rush": ["music_march", "music_march2", "music_shop"],
+	"morning": ["music_morning", "music_dawn", "music_folk", "music_shop"],
+	"day": ["music_shop", "music_dawn", "music_waltz", "music_folk", "music_calm", "music_morning"],
 }
 ## Длина музыкальной фразы (4 такта), с — на её границе удобно сменить трек.
 const PHRASE := {
-	"music_menu": 12.63, "music_morning": 10.0, "music_shop": 8.89, "music_march": 8.28, "music_evening": 8.57,
-	"music_night": 14.55, "music_calm": 8.0, "music_waltz": 8.0,
-	"music_estrada": 8.57, "music_accwaltz": 8.18, "music_folk": 7.74, "music_foundry": 10.0, "music_jazz": 7.27,
-	"music_march2": 7.74, "music_rain": 14.55, "music_radio": 16.0, "music_winter": 11.71, "music_dawn": 9.23,
+	"music_menu": 14.55, "music_morning": 7.83, "music_shop": 3.81, "music_march": 8.57, "music_evening": 16.55,
+	"music_night": 17.78, "music_calm": 12.63, "music_waltz": 4.62,
+	"music_accwaltz": 5.71, "music_folk": 5.0, "music_march2": 6.1, "music_rain": 10.91, "music_winter": 5.45,
+	"music_dawn": 7.27,
 }
-## Треки 1.28 и старше — петли, обрываются на последнем такте: их перекрываем долгой сменой.
-## Новые (1.31) кончаются сами — каденцией и затуханием; после них иногда бывает короткая тишина.
-const LOOPED := ["music_menu", "music_morning", "music_shop", "music_march", "music_evening", "music_night", "music_calm", "music_waltz"]
+## Раньше здесь были «петли» 1.28; теперь все пьесы кончаются сами — каденцией и затуханием (после них бывает короткая тишина).
+const LOOPED := []
 const RUSH_HOURS := 30.0   ## заказ со сроком ближе этого (игровых часов) и не готов — аврал
 
 

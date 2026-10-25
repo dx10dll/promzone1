@@ -1836,12 +1836,12 @@ help.settings.text,"Menu (Esc) → Settings:
 • Edge scrolling, pause on an event letter.
 • Language: Russian / English."
 help.music.title,Music
-help.music.text,"The music follows the situation; each time of day has several pieces of its own:
-• morning (6–10 h): “First Shift”, “Path to the Gatehouse”, “Morning Bus”;
-• day: “The Quota”, “Avenue Lights”, “Second-Floor Buffet”, “Foundry”, “Quiet Shop”;
-• rush (less than 30 hours to an order's deadline): “Counter-Plan”, “Shock Shift”, “Foundry”;
-• evening (18–22 h): “Shift Change”, “Over the Factory River”, “Factory Waltz”, “Second-Floor Buffet”;
-• night: “Night Shift”, “Night Broadcast”, “Quiet Shop”.
+help.music.text,"The music follows the situation: fourteen original pieces in classical genres (waltzes, a nocturne, a prelude, marches, a polonaise, a sonata allegro, variations); each time of day has several of its own:
+• morning (6–10 h): “First Shift”, “Morning Bus”, “Path to the Gatehouse”, “The Quota”;
+• day: “The Quota”, “Morning Bus”, “Factory Waltz”, “Path to the Gatehouse”, “Quiet Shop”, “First Shift”;
+• rush (less than 30 hours to an order's deadline): “Counter-Plan”, “Shock Shift”, “The Quota”;
+• evening (18–22 h): “Shift Change”, “Over the Factory River”, “Factory Waltz”, “Path to the Gatehouse”;
+• night: “Night Shift”, “Quiet Shop”, “Shift Change”.
 In winter “First Snow” plays first, in the rain “Rain on the Shop Roof”. In the main menu, “The Gatehouse”.
 A track doesn't cut off: it plays to the end of the musical phrase and flows smoothly into the next; the same piece never plays twice in a row. Under the pause menu the music is quieter. The mode is “Music selection” in settings."
 help.fps.title,Frame counter (F3)
