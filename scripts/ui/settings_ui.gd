@@ -10,6 +10,8 @@ const TOGGLES := [
 	["names_on_map", "Фамилии под людьми на карте"],
 	["fullscreen", "Полноэкранный режим"],
 	["intro", "Показывать интро"],   # 1.39
+	["calls_on", "Звонки советника"],   # 1.41
+	["reduce_motion", "Меньше анимации (звонки без тряски)"],   # 1.41
 ]
 const VOLUMES := [["vol_master", "Общая громкость"], ["vol_music", "Музыка"], ["vol_sfx", "Станки и инструмент"],
 	["vol_env", "Звуки окружения"], ["vol_ui", "Интерфейс"]]   # 1.29: цех, быт, голоса и город — одним ползунком
@@ -45,7 +47,7 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 		var cb := CheckBox.new()
 		cb.text = str(o[1])
 		cb.focus_mode = Control.FOCUS_NONE
-		cb.button_pressed = bool(Game.settings.get(key, key == "intro"))
+		cb.button_pressed = bool(Game.settings.get(key, key == "intro" or key == "calls_on"))
 		cb.toggled.connect(func(val: bool) -> void:
 			Game.settings[key] = val
 			Game.save_settings()

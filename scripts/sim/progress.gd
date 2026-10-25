@@ -318,6 +318,7 @@ func _check_goals() -> void:
 			stage_up = stage
 			sim.reputation = minf(100.0, sim.reputation + 5.0)
 			sim.story.info(L.t("Новый этап: «%s»") % stage_title(), L.t("Завод вырос! Открылось: %s.") % L.dt("stage.%s.opens" % str(stage_def().get("id", "")), str(stage_def().get("opens", ""))).to_lower(), "stage_up", Sim.LVL_GOOD)
+			sim.calls.on_stage(stage_title())
 			sim.paper.add(L.t("Главное"), L.t("Наш завод — %s!") % stage_title().to_lower(), L.t("Коллектив поздравляет руководство и себя. Открываются новые участки и службы."))
 	# сценарий
 	if not scn_done and not scenario_goals().is_empty():

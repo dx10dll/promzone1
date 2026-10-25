@@ -665,6 +665,7 @@ func ignite(c: Vector2i, why: String) -> void:
 		fire_start = sim.minute
 		brigade_at = -1.0
 		fires_total += 1
+		sim.calls.on_fire()
 		var r := sim.rooms.room_at(c)
 		var where := r.title() if r else L.t("на территории")
 		info(L.t("Пожар!"), L.t("%s: огонь %s. Все свободные бегут тушить. С огнетушителем — в разы быстрее; если огонь разойдётся, приедут пожарные — и будет проверка.") % [why, (L.t("в помещении «%s»") % where) if r else where], "fire", Sim.LVL_BAD, c, true)
@@ -807,6 +808,7 @@ func injure(w: Worker, cause: String) -> void:
 		"burn": L.t("получил{|а} ожог на пожаре"), "fight": L.t("пострадал{|а} в драке")}
 	var what := Nicks.gendered(str(texts.get(cause, L.t("получил{|а} травму"))), w.female)
 	w.sick_until = float(sim.day() + days - 1) * 1440.0 + 1200.0
+	sim.calls.on_injury()
 	w.away_why = "на больничном"
 	w.add_history(sim.day(), L.t("Травма: %s. Больничный %d дн.") % [what, days])
 	Nicks.count(w, "injury")
@@ -1009,6 +1011,7 @@ func _ev_reclamation(d: Dictionary) -> void:
 	sim.market.on_reclamation()
 	var p := str(d.get("product", ""))
 	var bad := int(d.get("bad", 1))
+	sim.calls.on_reclamation(Defs.product_name(p), bad)
 	var have := sim.ok_in_storage(p) - sim.orders.allocated(p)
 	var ch: Array = [{"text": L.t("Выплатить компенсацию (%s)") % Defs.money_str(float(d.get("comp", 0.0))), "hint": L.t("Репутация почти не пострадает")},
 		{"text": L.t("Отказать: «Брак не наш»"), "hint": L.t("Репутация −6")}]

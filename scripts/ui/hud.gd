@@ -76,6 +76,7 @@ var _crisis_l: Label
 var _crisis_target := ""
 var fix_box: Control = null      ## 1.20: окошко «Как исправить»
 var worker_pop: WorkerPop = null ## 1.21: меню над человеком
+var phone: PhoneCall = null      ## 1.41: входящие звонки (кнопка-телефон и диалог)
 var _t := 0.0
 
 
@@ -129,6 +130,9 @@ func setup(game: GameMain) -> void:
 	worker_pop = WorkerPop.new()
 	add_child(worker_pop)
 	worker_pop.setup(self)
+	phone = PhoneCall.new()
+	add_child(phone)
+	phone.setup(self, sim)
 	info.control_request.connect(func(w: Worker, on: bool) -> void:
 		if on:
 			ctl.take(w)
@@ -1275,6 +1279,17 @@ func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2
 
 
 # ---------------------------------------------------------------- окна
+
+## 1.41: кнопка действия в окне звонка.
+func call_action(a: String) -> void:
+	match a:
+		"logistics":
+			toggle_logistics()
+		"plan":
+			toggle_plan()
+		_:
+			open_window(a)
+
 
 func open_window(kind: String) -> void:
 	if g.tool.mode == "logistics":

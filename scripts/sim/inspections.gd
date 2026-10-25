@@ -103,12 +103,14 @@ func schedule(t: String, at: float, announced: bool, why: String = "", repeat: A
 		var txt := L.t("%s: %s, в %s") % [type_name(t), sim.season.date_str(dd), "%02d:%02d" % [int(fmod(at2, 1440.0) / 60.0), int(fmod(at2, 60.0))]]
 		if why != "":
 			txt += " (%s)" % why
+		sim.calls.on_notice(t, dd)
 		sim.notify(L.t("Объявлена проверка. %s. Подготовьтесь — список требований в окне «События».") % txt, Sim.LVL_WARN)
 
 
 func announce_visit(kind: String) -> void:
 	var at := sim.minute + 2.0 * 1440.0
 	schedule(kind, at, false, "")
+	sim.calls.on_visit_notice(kind)
 	var who := L.t("губернатор области") if kind == "governor" else L.t("корреспондент областной газеты")
 	var txt := L.t("Через два дня завод посетит %s. Наведите порядок: уберите грузы с пола, почините станки, оборудуйте помещения, позаботьтесь о настроении людей.") % who
 	if kind == "governor":
@@ -437,6 +439,7 @@ func _act(t: String, found: Array, repeat: Array, why: String) -> void:
 			rep_keys.append(str(vi["key"]))
 	warned[t] = wl
 	var name := type_name(t)
+	var due0 := sim.day() + int(Defs.inspections.get("prescription_days", 5))
 	history.push_front({"day": sim.day(), "type": t, "n": found.size(), "fine": fine, "why": why, "warns": warns})
 	if history.size() > 30:
 		history.resize(30)
@@ -447,6 +450,7 @@ func _act(t: String, found: Array, repeat: Array, why: String) -> void:
 		for w in sim.workers:
 			Mood.add(sim, w, "inspection_ok")
 		sim.story.info(L.t("Проверка без замечаний"), L.t("%s: нарушений не выявлено. Репутация завода растёт.") % name, "inspect", Sim.LVL_GOOD, Vector2i(-1, -1), true)
+		sim.calls.on_inspection(t, 0, 0.0, due0)
 		sim.paper.add(L.t("Проверки"), L.t("%s: без замечаний") % name, L.t("Инспектор пожал руку и сказал: «Побольше бы таких предприятий». Молодцы!"))
 		return
 	sim.reputation = maxf(0.0, sim.reputation - minf(5.0, float(found.size())))
@@ -473,6 +477,7 @@ func _act(t: String, found: Array, repeat: Array, why: String) -> void:
 	if worst_cell.x >= 0:
 		_suspend_room(worst_cell)
 		txt += L.t("\n\nНарушения повторились — участок остановлен на сутки.")
+	sim.calls.on_inspection(t, found.size(), fine, due)
 	if fine <= 0.0:
 		sim.story.letter("inspection_act", L.t("Акт проверки: ") + name, txt, str(tdef(t).get("icon", "inspect")), Sim.LVL_WARN,
 			[{"text": L.t("Понятно, устраним"), "hint": ""}], 0, {"fine": 0.0, "type": t})
@@ -567,6 +572,7 @@ func order_score() -> Dictionary:
 func _visit_result(kind: String) -> void:
 	var r := order_score()
 	var sc := float(r["score"])
+	sim.calls.on_visit_result(kind, sc)
 	var notes: Array = r["notes"]
 	var bad := ", ".join(PackedStringArray(notes))
 	if kind == "governor":

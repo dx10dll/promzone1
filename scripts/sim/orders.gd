@@ -93,6 +93,7 @@ func morning() -> void:
 	var had := by_status(["offer"]).size()
 	_special_offers()
 	if by_status(["offer"]).size() > had:
+		sim.calls.on_tender()
 		sim.notify(L.t("Пришёл тендер — решение за вами: «Заказы» → «Контракты»."), Sim.LVL_INFO)
 	for i in n:
 		sim.sales.inquiry(_maybe_trial(make_offer()))
@@ -492,6 +493,8 @@ func on_pickup_done(v: Vehicle) -> void:
 	sim.stats["shipped"] = int(sim.stats["shipped"]) + v.loaded
 	if late_days == 0:
 		sim.reputation = minf(100.0, sim.reputation + 3.0)
+		if int(o.get("defects", 0)) == 0:
+			sim.calls.on_delivered(Defs.product_name(str(o["product"])), ["contract", "export", "state"].has(okind))
 		sim.notify(L.t("Заказ отгружен вовремя: %s. Получено %s.") % [short(o), Defs.money_str(amount)], Sim.LVL_GOOD)
 	else:
 		sim.reputation = maxf(0.0, sim.reputation - 2.0)

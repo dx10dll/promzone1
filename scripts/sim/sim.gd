@@ -39,6 +39,7 @@ var social: Social        ## 1.14: разговоры, ссоры, драки
 var season: Season
 var story: Story
 var inspect: Inspections
+var calls: Calls   ## 1.41: телефонные звонки (очередь)
 var paper: Paper
 var progress: Progress
 var logi: Logistics
@@ -112,6 +113,7 @@ func _init() -> void:
 	season = Season.new(self)
 	story = Story.new(self)
 	inspect = Inspections.new(self)
+	calls = Calls.new(self)
 	paper = Paper.new(self)
 	progress = Progress.new(self)
 	logi = Logistics.new(self)
@@ -963,6 +965,7 @@ func roll_breakdown(m: Thing) -> void:
 		m.broken = true
 		m.working = false
 		sfx.emit("breakdown", m.cell)
+		calls.on_breakdown(m.title())
 		notify(L.t("%s сломался! Нужен ремонт (%s на запчасти). Чтобы станки не ломались, обслуживайте их вовремя — включите ППР в «Производство → Станки».") % [m.title(), Defs.money_str(Defs.b("repair_cost"))], LVL_BAD, m.cell)
 
 
@@ -2040,6 +2043,7 @@ func _timed(prev: float, now: float) -> void:
 		office.morning()
 		story.morning()
 		inspect.morning()
+		calls.morning()
 		progress.morning()
 		training.morning()
 		town.morning()
@@ -2053,6 +2057,8 @@ func _timed(prev: float, now: float) -> void:
 		if weekday() == 0:
 			paper.publish()
 		morning.emit(day())
+	if is_workday() and _crossed(prev, now, Defs.b("shift_end") + 60.0) and office.overtime_on():
+		calls.on_overtime()
 	if is_workday() and _crossed(prev, now, Defs.b("shift_end") + 30.0) and weekday() == 4:
 		_pay_wages()
 	# заводской гудок: начало и конец первой смены
@@ -2142,7 +2148,7 @@ func to_dict() -> Dictionary:
 		"power": power_kwh_day, "gate_x": gate_x, "rng": rng.state, "bp_at": bp_progress_at, "build_priority": build_priority,
 		"grid": power.to_dict(), "reserve": supply_reserve, "cons": cons, "cons_supply": cons_supply, "ppr": ppr,
 		"office": office.to_dict(),
-		"season": season.to_dict(), "story": story.to_dict(), "inspect": inspect.to_dict(), "paper": paper.to_dict(),
+		"season": season.to_dict(), "story": story.to_dict(), "inspect": inspect.to_dict(), "calls": calls.to_dict(), "paper": paper.to_dict(),
 		"progress": progress.to_dict(), "logi": logi.to_dict(), "grants": grants.to_dict(),
 		"sales": sales.to_dict(), "training": training.to_dict(), "career": career.to_dict(), "upkeep": upkeep.to_dict(), "eng": eng.to_dict(), "crew": crew.to_dict(), "market": market.to_dict(), "town": town.to_dict(), "crisis": crisis.to_dict(), "fauna": fauna.to_dict(), "dev": dev.to_dict(), "bmats": bmats.to_dict(), "legacy": {"zone": rooms.legacy.keys(), "water": water.bonus},
 		"company": company, "plan": plan.to_dict(), "faults": faults.to_dict(),
@@ -2174,6 +2180,7 @@ static func from_dict(d: Dictionary) -> Sim:
 	s.season.from_dict(d.get("season", {}))
 	s.story.from_dict(d.get("story", {}))
 	s.inspect.from_dict(d.get("inspect", {}))
+	s.calls.from_dict(d.get("calls", {}))
 	s.paper.from_dict(d.get("paper", {}))
 	s.progress.from_dict(d.get("progress", {}))
 	s.logi.from_dict(d.get("logi", {}))

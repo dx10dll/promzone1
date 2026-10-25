@@ -180,6 +180,7 @@ func _check_materials() -> void:
 			if err == "":
 				continue
 			sim.notify_once("auto_" + mat, L.t("Снабженец не смог докупить металл: ") + err, Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
+		sim.calls.on_metal_low(d, Defs.material_name(mat))
 		sim.notify_once("mat_" + mat, L.t("Металла «%s» не хватает на заказы: нужно ещё %d шт., а снабжению не хватает денег.") % [Defs.material_name(mat), d], Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
 
 

@@ -1,0 +1,56 @@
+keys,en
+"%s сломался. Нужны запчасти, и чем скорее, тем лучше. А ППР в «Производство → Станки» не даст такому повториться.","%s has broken down. We need spare parts, the sooner the better. And planned maintenance in ""Production → Machines"" will keep it from happening again."
+"В кассе минус. Пока не вернёте деньги, закупки и зарплата под угрозой. Выполняйте заказы и не берите лишнего.","The till is in the red. Until you get the money back, purchases and wages are at risk. Ship your orders and don't overspend."
+В партии «%s» нашли %d шт. с браком. Рассмотрите рекламацию и дайте ответ: заменить или компенсировать.,"The ""%s"" batch has %d defective pieces. Please review the claim and reply: replace or compensate."
+"В цеху несчастный случай. Проверьте охрану труда и аптечки, пока не пришла трудовая инспекция.",There's been an accident in the shop. Check workplace safety and first-aid kits before the labour inspectorate turns up.
+Главный инженер,Chief Engineer
+"Говорят, лучший ремонт — тот, что не понадобился. Проверим это в следующий вторник.",They say the best repair is the one you never needed. We'll test that next Tuesday.
+Государственный инспектор труда,State Labour Inspector
+График смены,Shift schedule
+"Губернатор уехал без восторгов, но и без претензий. Работайте, развивайтесь.","The governor left without enthusiasm, but without complaints. Keep working, keep growing."
+Губернатор уехал недовольным. Беспорядок на заводе заметили — делайте выводы.,"The governor left displeased. The mess at the plant was noticed, so draw your conclusions."
+Депутат,Deputy
+Добрый день. %s готов подписать контракт на регулярные поставки. Условия — во вкладке «Контракты».,"Good afternoon. %s is ready to sign a contract for regular deliveries. The terms are in the ""Contracts"" tab."
+Добрый день. Через два дня завод посетит губернатор области. Наведите порядок: от этого зависит поддержка.,Good afternoon. The regional governor will visit the plant in two days. Put things in order: support depends on it.
+"Если всё идёт по плану, значит, план составлен где-то не здесь.","If everything is going according to plan, the plan must have been drawn up somewhere else."
+Завтра проверка: %s. Загляните в «События → Проверки» — там список требований. Лучше исправить всё заранее.,"Inspection tomorrow: %s. Look in ""Events → Inspections"" for the list of requirements. Better to fix everything in advance."
+"Заказ «%s» получили вовремя. Спасибо, будем обращаться снова.","We received the ""%s"" order on time. Thank you, we'll come back."
+Заказчик — главный технолог,Customer — Chief Technologist
+Заказчик — начальник снабжения,Customer — Head of Procurement
+Здравствуйте. %s: проверка назначена на %s. Подготовьтесь заранее: список требований — в окне «События».,"Hello. %s: inspection scheduled for %s. Prepare in advance: the list of requirements is in the ""Events"" window."
+"Знаете, что главное на заводе? Чтобы станки работали, а отчёты были красивее станков.",Know what matters most at a plant? That the machines run and the reports look better than the machines.
+Инспектор пожарного надзора,Fire Safety Inspector
+Инспектор технадзора,Technical Supervision Inspector
+Инспектор-эколог,Environmental Inspector
+"Металла «%s» не хватает на заказы: нужно ещё %d шт. Давайте решим, где взять деньги, пока цех не встал.","We're short of ""%s"" metal for the orders: %d more pieces needed. Let's work out where to find the money before the shop stops."
+Налоговый инспектор,Tax Inspector
+Нарушений: %d. На первый раз ограничусь предупреждением. Устраните до %s — иначе будет штраф.,"Violations: %d. This time I'll settle for a warning. Fix them by %s, or there will be a fine."
+Новый этап — «%s»! Завод растёт. Теперь можно браться за более серьёзные заказы.,"New stage: ""%s""! The plant is growing. Now you can take on more serious orders."
+"Объявлен тендер. Требования строгие, зато и оплата достойная. Решение — во вкладке «Контракты».","A tender has been announced. The requirements are strict, but the pay is decent. Decide in the ""Contracts"" tab."
+Опять кассовый разрыв! Так нельзя: сократите расходы или берите заказы с предоплатой.,Another cash gap! This won't do: cut costs or take orders with prepayment.
+Открыть заказы,Open orders
+Открыть календарь,Open calendar
+Открыть логистику,Open logistics
+Открыть план,Open plan
+Открыть проверки,Open inspections
+Открыть снабжение,Open supply
+Открыть события,Open events
+Открыть станки,Open machines
+Открыть финансы,Open finances
+Открыть цели,Open goals
+Охрана труда,Workplace safety
+Партию «%s» приняли без замечаний. Качество на уровне — с вами приятно работать.,"The ""%s"" batch was accepted with no remarks. The quality is spot on — a pleasure working with you."
+"Пожар! Людей от огня, огнетушители в руки. Потом ждите пожарных — проверка будет.",Fire! Get people away from the flames and put extinguishers in hands. Then expect the fire brigade — there will be an inspection.
+"Проверка закончена: замечаний нет. Порядок образцовый, так держать.","Inspection complete: no remarks. Exemplary order, keep it up."
+Санитарный врач,Sanitary Doctor
+"Смена затянулась, люди валятся с ног. Сверхурочные хороши раз-два в месяц, не чаще.","The shift has dragged on and people are dropping. Overtime is fine once or twice a month, no more."
+"Совет: режим «План» — это калька. Нарисуйте будущий завод бесплатно, рабочие его не тронут, а потом нажмите «Утвердить план».","Tip: ""Plan"" mode is tracing paper. Draw your future plant for free, the workers won't touch it, then press ""Approve plan""."
+"Совет: слой «Логистика» показывает, кто в какую бытовку, столовую и душ ходит. Протяните линии от цеха — люди не будут бегать через весь завод.","Tip: the ""Logistics"" layer shows who goes to which locker room, canteen and shower. Draw lines from the shop so people don't run across the whole plant."
+"Составлен акт: нарушений %d, штраф %s. Устраните до %s, повторное нарушение обойдётся дороже.","Report drawn up: %d violations, fine %s. Fix them by %s; a repeat violation will cost more."
+Хорошие новости: губернатор остался доволен заводом. Субсидия уже в пути.,Good news: the governor was pleased with the plant. The subsidy is on its way.
+"Я тут подумал: кофе в цехе кончается быстрее, чем металл. Это тоже показатель.",I've been thinking: coffee in the shop runs out faster than metal. That's an indicator too.
+Входящий звонок,Incoming call
+Ответить на звонок,Answer the call
+Звонок,Call
+Звонки советника,Advisor calls
+Меньше анимации (звонки без тряски),Reduced motion (calls without shaking)

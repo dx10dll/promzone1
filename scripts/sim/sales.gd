@@ -367,6 +367,7 @@ func _contract_offers() -> void:
 	if year_ok() and sim.rng.randf() < 0.4:
 		_make_year(c)
 	contracts.append(c)
+	sim.calls.on_contract_offer(Company.firm(str(c["client"])))
 	sim.story.letter("contract", (L.t("Договор на год: %s") if bool(c.get("year", false)) else L.t("Контракт: %s")) % Company.firm(str(c["client"])), contract_text(c), "orders", Sim.LVL_GOOD,
 		[{"text": L.t("Подписать"), "hint": L.t("Поставки начнутся %s") % _day_str(int(c["start"]))}, {"text": L.t("Отказаться"), "hint": ""}, {"text": L.t("Подумать (вкладка «Контракты»)"), "hint": L.t("Предложение действует 2 дня"), "open": "orders"}], 2, {"contract": int(c["id"])})
 
