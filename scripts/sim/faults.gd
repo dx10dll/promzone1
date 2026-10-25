@@ -112,7 +112,7 @@ func tick() -> void:
 			sim.complete_net(layer, i)
 			list.erase(k)
 			rev += 1
-			sim.notify("Аварийная бригада закончила: %s устранён." % str(LAYERS.get(layer, "авария")).to_lower(), Sim.LVL_GOOD, sim.world.cell_of(i))
+			sim.notify(L.t("Аварийная бригада закончила: %s устранён.") % L.t(str(LAYERS.get(layer, "авария"))).to_lower(), Sim.LVL_GOOD, sim.world.cell_of(i))
 
 
 func to_dict() -> Dictionary:

@@ -157,7 +157,7 @@ func _scare() -> void:
 					_fly(p, Vector2(c) + Vector2(0.5, 0.5), false)
 					if r < 0.24:
 						p["inside"] = true
-						sim.notify_once("pigeon_in", "Голубь залетел в цех через открытые ворота — ходит между станками. Улетит сам.", Sim.LVL_INFO, c, 2880.0)
+						sim.notify_once("pigeon_in", L.t("Голубь залетел в цех через открытые ворота — ходит между станками. Улетит сам."), Sim.LVL_INFO, c, 2880.0)
 				else:
 					_fly(p, _edge_point(), true)
 
@@ -268,7 +268,7 @@ func _mice_spawn() -> void:
 			continue
 		var start := _mouse_target(i, Vector2(r.cells[0]) + Vector2(0.5, 0.5))
 		mice.append({"pos": start, "to": start, "room": i, "st": "sit", "until": sim.minute + 1.0, "dir": 1})
-		sim.notify_once("mice", "В помещении «%s» завелись мыши — там очень грязно. Нужна уборка: уборщица или разнорабочие (Люди → График смены → «Уборка»). Кот поможет." % r.title(), Sim.LVL_WARN, r.cells[0], 2880.0)
+		sim.notify_once("mice", L.t("В помещении «%s» завелись мыши — там очень грязно. Нужна уборка: уборщица или разнорабочие (Люди → График смены → «Уборка»). Кот поможет.") % r.title(), Sim.LVL_WARN, r.cells[0], 2880.0)
 		for w in sim.workers:
 			if w.present and sim.rooms.room_at(w.cell()) == r:
 				Mood.add(sim, w, "mice")
@@ -329,23 +329,23 @@ func pounce(cat: Cat) -> void:
 			mice.erase(prey)
 			caught_mice += 1
 			cat.mice += 1
-			cat.activity = "Поймал мышь!" if not cat.female else "Поймала мышь!"
+			cat.activity = L.t("Поймал мышь!") if not cat.female else L.t("Поймала мышь!")
 			if cat.mice % 3 == 1:
-				sim.notify("%s поймал%s мышь. Уже %d за всё время!" % [cat.name, "а" if cat.female else "", cat.mice], Sim.LVL_GOOD, cat.cell())
+				sim.notify(Nicks.gendered(L.t("%s поймал{|а} мышь. Уже %d за всё время!"), cat.female) % [cat.shown_name(), cat.mice], Sim.LVL_GOOD, cat.cell())
 		else:
 			prey["st"] = "run"
 			prey["to"] = _mouse_target(int(prey["room"]), prey["pos"])
-			cat.activity = "Мышь удрала"
+			cat.activity = L.t("Мышь удрала")
 	elif pigeons.has(prey):
 		if close and rng.randf() < 0.08:
 			pigeons.erase(prey)
 			caught_pigeons += 1
-			cat.activity = "Поймал голубя" if not cat.female else "Поймала голубя"
-			sim.notify_once("cat_pigeon", "%s поймал%s голубя — гордо несёт показать рабочим." % [cat.name, "а" if cat.female else ""], Sim.LVL_INFO, cat.cell(), 4320.0)
+			cat.activity = L.t("Поймал голубя") if not cat.female else L.t("Поймала голубя")
+			sim.notify_once("cat_pigeon", Nicks.gendered(L.t("%s поймал{|а} голубя — гордо несёт показать рабочим."), cat.female) % cat.shown_name(), Sim.LVL_INFO, cat.cell(), 4320.0)
 		else:
 			var c := _yard_cell()
 			_fly(prey, Vector2(c) + Vector2(0.5, 0.5) if c.x >= 0 else _edge_point(), c.x < 0)
-			cat.activity = "Голубь улетел"
+			cat.activity = L.t("Голубь улетел")
 
 
 func to_dict() -> Dictionary:

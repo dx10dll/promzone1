@@ -63,7 +63,7 @@ static func roll(sim: Sim, profs: Array, only_prof: String = "") -> Worker:
 			prof = only_prof if only_prof != "" else (str(profs[sim.rng.randi_range(0, profs.size() - 1)]) if not profs.is_empty() else "laborer")
 		var w := make(sim.rng, e2, prof)
 		sim.candidates.append(w.to_dict())
-		sim.notify(Nicks.gendered("★ %s приш{ёл|ла} наниматься (%s) — {он|она} среди кандидатов.", w.female) % [w.full_name(), w.prof_name().to_lower()], Sim.LVL_INFO)
+		sim.notify(Nicks.gendered(L.t("★ %s приш{ёл|ла} наниматься (%s) — {он|она} среди кандидатов."), w.female) % [w.full_name(), w.prof_lc() if L.is_en() else w.prof_name().to_lower()], Sim.LVL_INFO)
 		return w
 	return null
 

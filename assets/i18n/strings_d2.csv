@@ -1,0 +1,723 @@
+keys,en
+ООО «Техмаш-Регион»,Tekhmash-Region LLC
+АО «Заречный машзавод»,Zarechny Machine Works JSC
+ООО «ПромДеталь-Сервис»,PromDetal-Servis LLC
+ЗАО «Станкоагрегат»,Stankoagregat CJSC
+Мастерская «Ковальчук и сыновья»,Kovalchuk & Sons Workshop
+ООО «Металлист-Плюс»,Metallist-Plus LLC
+АО «Вектор-Деталь»,Vektor-Detal JSC
+Главный инженер: «%s» — и ещё %d %s в «Управление → Главный инженер».,Chief engineer: “%s” — and %d more %s in “Management → Chief Engineer”.
+совет|совета|советов,tip|tips
+подорожал прокат на комбинатах,steel mills raised rolled-metal prices
+выросли тарифы на перевозку,freight rates went up
+новые пошлины на сталь,new duties on steel
+комбинаты распродают запасы,steel mills are selling off stock
+упал спрос у строителей,demand from builders dropped
+открылся новый склад проката,a new rolled-metal warehouse opened
+Металл %s на %d%%,Metal %s by %d%%
+подорожал,went up
+подешевел,went down
+Новость с металлобазы: %s. %s,News from the metal depot: %s. %s
+"Держите запас «Только под заказы», пока цены не вернутся.",Keep the “Orders only” stock level until prices come back down.
+Самое время закупить металл впрок — поставьте запас «Большой».,A good time to buy metal ahead — set the stock level to “Large”.
+Кредит получен,Loan received
+Новый конкурент: %s,New competitor: %s
+В районе открылся %s. Специализация: %s.,%s has opened in the area. Specialization: %s.
+%s расширяется,%s is expanding
+"%s поставил новые станки — будет брать больше заказов. Держите сроки и качество, чтобы заказчики оставались с нами.",%s has installed new machines and will take more orders. Keep deadlines and quality up so customers stay with us.
+"%s снизил цены на 12%%%s — заказчики считают деньги, заявок к нам станет меньше на две недели.","%s cut prices by 12%%%s — customers are counting their money, and we'll get fewer requests for two weeks."
+ в ответ на наш демпинг, in response to our dumping
+Война цен,Price War
+Ответить демпингом,Answer with dumping
+"Цены −10%, заявок больше, маржа меньше","Prices −10%, more requests, thinner margin"
+Держать цены,Hold prices
+Заявок −15% две недели,Requests −15% for two weeks
+Сделать упор на качество (60 000 ₽),"Bet on quality (60,000 ₽)"
+"Реклама в отраслевом журнале: репутация +4, война цен кончится раньше","An ad in a trade journal: reputation +4, the price war ends sooner"
+%s обанкротился: его заказчики ищут новых подрядчиков — наша доля рынка вырастет.,%s went bankrupt: its customers are looking for new suppliers — our market share will grow.
+ Конкурсный управляющий распродаёт оборудование: «%s» с торгов — за 40%% цены., The receiver is auctioning off equipment: “%s” at 40%% of the price.
+Банкротство конкурента,Competitor Bankrupt
+Купить с торгов,Buy at auction
+Следующий такой станок обойдётся в 40% цены (две недели),The next such machine will cost 40% of the price (two weeks)
+Переманивают %s,%s Is Being Poached
+%s зовёт к себе %s (%s): обещают на 20%% больше. Человек думает.,"%s is inviting %s (%s) to join them, offering 20%% more. They're thinking it over."
+Поднять ставку на %s,Raise the wage by %s
+Останется и будет доволен,Will stay and be happy
+Поговорить по душам,Have a heart-to-heart
+"Останется, если %s у нас хорошо (настроение %d)",Will stay if %s happy here (mood %d)
+ей,she's
+ему,he's
+Перешли на демпинг: цены −10%. Вернуть цены можно в «Заказы → Конкуренты».,Switched to dumping: prices −10%. You can restore prices in “Orders → Competitors”.
+Денег на рекламу нет — держим цены.,No money for advertising — holding prices.
+Реклама в отраслевом журнале,Ad in a trade journal
+Статья о заводе вышла: заказчики помнят о качестве. Война цен скоро выдохнется.,The article about the plant is out: customers remember our quality. The price war will soon fizzle out.
+Станок с торгов,Machine from the auction
+Выкупили с торгов «%s»: ставьте его в течение двух недель — заплатите 40%% цены.,Bought “%s” at auction: install it within two weeks and pay 40%% of the price.
+конкурент,a competitor
+Звали к конкуренту — остался за прибавку,Was poached by a competitor — stayed for a raise
+%s остаётся: ставку подняли.,%s is staying: the wage was raised.
+Звали к конкуренту — остался: «Здесь свои»,Was poached by a competitor — stayed: “My people are here”
+"%s подумал и остался: «Здесь свои люди, куда я пойду».","%s thought it over and stayed: “My people are here, where would I go?”"
+Ушёл в %s,Left for %s
+%s ушёл в %s.,%s left for %s.
+Сертификат ISO 9001 приостановлен,ISO 9001 Certificate Suspended
+Две рекламации за срок действия — орган по сертификации приостановил сертификат. Наведите порядок с качеством и закажите аудит заново.,Two complaints during the validity period — the certification body has suspended the certificate. Sort out quality and order a new audit.
+Рекламация при сертификате ISO 9001: ещё одна — и сертификат приостановят.,A complaint while holding ISO 9001: one more and the certificate will be suspended.
+Контролёр ОТК и стол ОТК,QC inspector and QC table
+Качество в рейтинге от 65%,Quality rating of 65% or more
+Техотдел с технологом,Engineering department with a process engineer
+СОУТ проведена на всех местах,SOUT done at all workplaces
+Инструктаж по охране труда действует,Valid safety briefing
+Без рекламаций последние 14 дней,No complaints in the last 14 days
+Аудит уже назначен,The audit is already scheduled
+Сертификат действует до дня %d,The certificate is valid until day %d
+Сертификацию открывает ступень «ISO 9001» (Управление → Развитие),Certification is unlocked by the “ISO 9001” step (Management → Development)
+Не хватает денег: аудит стоит %s,Not enough money: the audit costs %s
+Сертификация ISO 9001: аудит,ISO 9001 certification: audit
+"Орган по сертификации приедет с аудитом в день %d. Проверят: ОТК, качество, техотдел, СОУТ, инструктаж, рекламации.","The certification body will come for the audit on day %d. They will check: QC, quality, engineering department, SOUT, safety briefing, complaints."
+Сертификат ISO 9001 истёк,ISO 9001 Certificate Expired
+Полгода прошло — нужен надзорный аудит (%s). Без сертификата премиальные заказчики уходят.,"Six months have passed — a surveillance audit is needed (%s). Without the certificate, premium customers leave."
+Сертификат ISO 9001 истекает через 10 дней — закажите надзорный аудит («Управление → ISO 9001»).,The ISO 9001 certificate expires in 10 days — order a surveillance audit (“Management → ISO 9001”).
+Сертификат ISO 9001 получен,ISO 9001 Certificate Obtained
+Сертификат ISO 9001 продлён,ISO 9001 Certificate Renewed
+"Аудитор доволен: система менеджмента качества работает. Сертификат действует до дня %d. Премиальные заказчики и экспорт — охотнее, заявок больше.%s","The auditor is satisfied: the quality management system works. The certificate is valid until day %d. Premium customers and export are more willing, more requests.%s"
+ Замечание: , Note: 
+Аудит ISO 9001: есть несоответствия,ISO 9001 Audit: Nonconformities Found
+Аудитор нашёл несоответствия: %s. Сертификат не выдан. Исправьте за две недели и закажите аудит снова — повторный обойдётся дешевле.,The auditor found nonconformities: %s. No certificate issued. Fix them within two weeks and order the audit again — a repeat audit is cheaper.
+действует до дня %d,valid until day %d
+аудит в день %d,audit on day %d
+несоответствия — исправить и повторить аудит,nonconformities — fix and repeat the audit
+приостановлен из-за рекламаций,suspended due to complaints
+истёк — нужен надзорный аудит,expired — a surveillance audit is needed
+нет сертификата,no certificate
+Лизинг: платёж за %s,Lease: payment for %s
+Лизинг за «%s» выплачен — станок полностью наш.,The lease for “%s” is paid off — the machine is fully ours.
+Страховку оформляет бухгалтерия после ступени «Банк и лизинг» (Управление → Развитие).,Insurance is arranged by the accounting department after the “Bank and Leasing” step (Management → Development).
+"Страховка: %s, первый взнос","Insurance: %s, first premium"
+"Полис «%s» оформлен: %s в неделю, действует со следующего дня.","Policy “%s” taken out: %s per week, effective from the next day."
+Страховка: %s,Insurance: %s
+Страховое возмещение: ,Insurance payout: 
+Без работы: ,Idle: 
+"Их передела нет ни в одном заказе в работе. Возьмите заказы на эти изделия, переобучите людей (Люди → Обучение) или не нанимайте новых, пока работы нет.","None of the orders in progress need their operation. Take orders for those products, retrain people (People → Training) or stop hiring until there's work."
+Узкое место — %s,Bottleneck — %s
+"За неделю отказали заказчикам на %s, больше всего — из-за этого передела (%s). %s","This week we turned down customers worth %s, mostly because of this operation (%s). %s"
+Станков сломано: %d,Machines broken: %d
+"Сломанный станок стоит, а заказы горят. Ремонт делает токарь или рукастый рабочий — проверьте, что у них есть время.",A broken machine stands idle while orders burn. Repairs are done by a turner or a handy worker — make sure they have time.
+Включите ППР,Turn on Scheduled Maintenance
+%d станка сильно изношены. Планово-предупредительный ремонт обслуживает их раньше — поломки реже.,%d machines are badly worn. Scheduled preventive maintenance services them earlier — fewer breakdowns.
+Горят сроки: %d %s,Deadlines burning: %d %s
+Поставьте им приоритет «срочно» — станки возьмут их первыми. Опоздание — неустойка 5% в день и минус репутация.,Give them “urgent” priority — machines will take them first. Being late means a 5% penalty per day and lost reputation.
+Люди недовольны (%d),People are unhappy (%d)
+"Больше всего злит: %s. Плохое настроение — медленная работа, прогулы и увольнения.","What annoys them most: %s. Bad mood means slow work, absences and resignations."
+Денег меньше недельной зарплаты,Less money than a week's wages
+"Ускорьте отгрузки готовых заказов, возьмите кредит или отложите покупки. Станки можно брать в лизинг — 20% сразу.","Speed up shipping finished orders, take a loan or postpone purchases. Machines can be leased — 20% up front."
+Металл подешевел (%d%%),Metal got cheaper (%d%%)
+Закупите впрок: запас «Большой» в «Производство → Металл и расходники».,Stock up: set the stock level to “Large” in “Production → Metal and Consumables”.
+Металл дорогой (+%d%%),Metal is expensive (+%d%%)
+Война цен у конкурентов,Price war among competitors
+"Заявок меньше на 15%. Можно ответить демпингом или переждать, держа качество.",15% fewer requests. You can answer with dumping or wait it out while keeping quality.
+Не проведена СОУТ,SOUT not done
+"Без спецоценки трудовая инспекция штрафует, а для ISO 9001 она обязательна.","Without the workplace assessment the labor inspectorate fines you, and ISO 9001 requires it."
+Пора провести инструктаж,Time for a safety briefing
+Инструктаж по охране труда — минус 30% травм. Без него штрафуют.,A safety briefing means 30% fewer injuries. Without it you get fined.
+Разбейте людей на бригады,Split people into crews
+"Бригадир ускоряет бригаду, люди меньше бегают по заводу.","A crew foreman speeds up the crew, and people run around the plant less."
+До ISO 9001 рукой подать (%d из 6),ISO 9001 is within reach (%d of 6)
+Осталось: %s. ,Remaining: %s. 
+Всё готово — заказывайте аудит. ,All set — order the audit. 
+Сертификат даёт больше заявок и премиальные цены.,The certificate brings more requests and premium prices.
+Застрахуйте оборудование,Insure your equipment
+"Станков на %s. Полис — %s в неделю, возмещает 80%% ремонта и ущерб от пожара.",Machines worth %s. A policy is %s per week and covers 80%% of repairs and fire damage.
+Помещений без назначения: %d,Unassigned rooms: %d
+"Назначьте их (кнопка «Помещения»): оборудованные цеха, бытовка и столовая поднимают настроение.","Assign them (the “Rooms” button): equipped shops, a locker room and a canteen lift the mood."
+АО «Агромашкомплекс»,Agromashkomplex JSC
+ПАО «Волжский автоагрегат»,Volzhsky Avtoagregat PJSC
+АО «Магистраль-Вагон»,Magistral-Vagon JSC
+ООО «Химмашпроект»,Khimmashproekt LLC
+АО «Невский машзавод»,Nevsky Machine Works JSC
+ПАО «Сталь Приполярья»,Stal Pripolyarya PJSC
+ООО «Агротехмаш»,Agrotekhmash LLC
+АО «Гидроузел»,Gidrouzel JSC
+ООО «Спецтехника-Урал»,Spetstekhnika-Ural LLC
+АО «Цемагрегат»,Tsemagregat JSC
+приём заказов на паузе (решение директора),order intake paused (director's decision)
+завод в долгах — новых заказов не берём,the plant is in debt — no new orders
+снято с ассортимента,discontinued
+нет оборудования: ,no equipment: 
+слишком много заказов в работе (%d),too many orders in progress (%d)
+маржа %d%% ниже порога %d%%,margin %d%% below the %d%% threshold
+не успеваем: проблемный участок — %s,too slow: bottleneck — %s
+не хватает денег на металл,not enough money for metal
+слишком много,too many
+не хватает денег,not enough money
+"все, кто работает на переделе «%s», на больничном или в отпуске (вернутся в день %d)",everyone on the “%s” operation is on sick leave or vacation (back on day %d)
+"Сейчас %s — наймите ещё одного человека, чтобы не простаивать.",Right now %s — hire one more person to avoid idle time.
+Поставьте ещё стол ОТК.,Add another QC table.
+Наймите ещё контролёра ОТК.,Hire another QC inspector.
+Купите станок для этого передела.,Buy a machine for this operation.
+Станки есть — наймите ещё человека на этот передел.,There are machines — hire another person for this operation.
+Поставьте ещё станок и наймите человека к нему.,Add another machine and hire a person for it.
+ Больше всего потеряли из-за передела «%s» (%s): %s. %s, The biggest losses came from the “%s” operation (%s): %s. %s
+Сбыт: за неделю отказали заказчикам на %s (%d заявок).%s Подробности — «Заказы» → «Рынок».,Sales: this week we turned down customers worth %s (%d requests).%s Details in “Orders” → “Market”.
+%s не дождался ответа и отдал контракт другому заводу.,%s got no answer and gave the contract to another plant.
+"Крупные заказчики ищут, с кем подписать контракт, — но завод не готов: нужна ступень «Контракты» (Управление → Развитие), её держит менеджер по сбыту.","Large customers are looking for someone to sign a contract with, but the plant isn't ready: it needs the “Contracts” step (Management → Development), held by the sales manager."
+Договор на год: %s,Annual Agreement: %s
+Контракт: %s,Contract: %s
+Поставки начнутся %s,Deliveries start %s
+Подумать (вкладка «Контракты»),Think it over (“Contracts” tab)
+Предложение действует 2 дня,The offer is valid for 2 days
+в день %d (%s),on day %d (%s)
+"%s предлагает долгосрочный контракт: %d шт. «%s» каждую неделю, %d %s подряд, по %s за штуку (на %d%% выше рынка). Всего %s.
+","%s offers a long-term contract: %d pcs of “%s” every week for %d %s, at %s apiece (%d%% above market). Total %s.
+"
+неделю|недели|недель,week|weeks
+"%s предлагает договор на год: %d шт. «%s» каждую неделю, %d недель подряд, по %s за штуку (на %d%% выше рынка). Всего %s.
+","%s offers an annual agreement: %d pcs of “%s” every week for %d weeks, at %s apiece (%d%% above market). Total %s.
+"
+"При подписании — аванс 10%% (%s). Сорвали партию — штраф 30%% её стоимости; третий срыв — договор расторгнут и неустойка 10%% от недопоставленного. Выполнили — премия 8%% и большой плюс к репутации.
+","On signing — a 10%% advance (%s). Miss a batch — a fine of 30%% of its value; a third miss ends the agreement with a penalty of 10%% of the undelivered amount. Fulfil it — an 8%% bonus and a big boost to reputation.
+"
+"Первая партия — в неделю со дня %d, каждая партия — к пятнице. Сорвали партию — штраф 30%% её стоимости, две — контракт расторгнут.
+","The first batch is due in the week from day %d, each batch by Friday. Miss a batch — a fine of 30%% of its value; two misses end the contract.
+"
+Сейчас сделать нельзя — нет оборудования: %s. До начала поставок %d дн.: поставьте станки и наймите людей.,Can't be done right now — no equipment: %s. %d days until deliveries start: install machines and hire people.
+Сейчас мощность нулевая: %s. Если людей больше нет — наймите.,Capacity is zero right now: %s. If there's nobody else — hire.
+Мощности хватает с запасом: можете делать ~%d шт. в неделю.,Plenty of capacity: you can make ~%d pcs per week.
+Мощности хватает впритык (~%d шт. в неделю): на другие заказы времени останется мало.,Capacity is just enough (~%d pcs per week): little time left for other orders.
+Мощности не хватает: сейчас ~%d шт. в неделю из %d. Узкое место — %s. %s,Not enough capacity: ~%d pcs per week now out of %d. Bottleneck — %s. %s
+Предложение уже недоступно,The offer is no longer available
+"Оплата: аванс по договору на год, ","Payment: advance on annual agreement, "
+"Контракт подписан: %s, %d шт. «%s» в неделю. Первая партия — в неделю со дня %d.","Contract signed: %s, %d pcs of “%s” per week. The first batch is due in the week from day %d."
+"Штраф: срыв партии по контракту, ","Fine: missed contract batch, "
+"штраф по контракту, ","contract fine, "
+"Штраф: неустойка за расторжение договора на год, ","Fine: penalty for terminating annual agreement, "
+"%s расторг договор на год: сорваны три партии. Неустойка %s, репутация сильно упала.","%s terminated the annual agreement: three batches missed. Penalty %s, reputation fell sharply."
+%s расторг контракт: сорваны две партии. Репутация упала.,%s terminated the contract: two batches missed. Reputation fell.
+Сорвана партия по %s с %s: штраф %s. %s,Missed a batch under the %s with %s: fine %s. %s
+договору,agreement
+контракту,contract
+Ещё один срыв — и контракт расторгнут.,One more miss and the contract is terminated.
+Ещё %d срыва — и договор расторгнут.,%d more misses and the agreement is terminated.
+"Оплата: премия за выполнение %s, %s","Payment: bonus for fulfilling the %s, %s"
+договора на год,annual agreement
+"Контракт с %s выполнен! Премия %s, репутация выросла.","Contract with %s fulfilled! Bonus %s, reputation went up."
+%s × %d для %s,%s × %d for %s
+ТОО «Степьмаш» (Казахстан),Stepmash LLP (Kazakhstan)
+ЧУП «Полесьетехника» (Беларусь),Polesyetekhnika PUE (Belarus)
+ООО «Узмаштех» (Узбекистан),Uzmashtekh LLC (Uzbekistan)
+ОсОО «Ала-Тоо Индастри» (Киргизия),Ala-Too Industry LLC (Kyrgyzstan)
+ООО «Араратмаш» (Армения),Araratmash LLC (Armenia)
+ФКП «Госзаказ-7»,FKP Goszakaz-7
+АО «Спецкомплект»,Spetskomplekt JSC
+ФГУП «Северный арсенал»,FSUE Severny Arsenal
+АО «НПО Восход»,NPO Voskhod JSC
+Пришёл тендер — решение за вами: «Заказы» → «Контракты».,A tender has arrived — your call: “Orders” → “Contracts”.
+Заказ уже не в работе,The order is no longer in progress
+Госзаказ не переносится,A state order can't be rescheduled
+Срок уже переносили — второй раз заказчик не согласится,The deadline was already moved — the customer won't agree a second time
+Заказ не найден,Order not found
+"Договорились с заказчиком: %s — срок до %s, скидка %d%%.","Agreed with the customer: %s — due by %s, discount %d%%."
+ИП Иванов,IE Ivanov
+"Госзаказ разыгрывают на тендере: нужна ступень «Тендеры» (Управление → Развитие), документы готовит юрист.",State orders are awarded by tender: you need the “Tenders” step (Management → Development); the lawyer prepares the documents.
+Госзаказ дают только режимным предприятиям: поставьте «Проходную с вахтой» (Объекты → Безопасность).,State orders go only to secure facilities: install a “Gatehouse with guard” (Objects → Safety).
+Заказ недоступен,Order unavailable
+Слишком много заказов в работе (максимум %d — растёт со штатом),Too many orders in progress (max %d — grows with staff)
+"Сбыт взял заказ: %s, %s. Срок — %s.","Sales took an order: %s, %s. Due %s."
+Заказ принят: %s. Срок — %s.,Order accepted: %s. Due %s.
+Партия по контракту: %s. Срок — %s.,Contract batch: %s. Due %s.
+" Пробная партия: срок вдвое больше, без неустойки."," Trial batch: twice the time, no penalty."
+Оплата: аванс 50% по госзаказу,Payment: 50% advance on a state order
+ Получен аванс %s., Advance received: %s.
+Оплата: аванс %d%% за %s,Payment: %d%% advance for %s
+ Аванс %s., Advance %s.
+ Металл не заказан: , Metal not ordered: 
+день %d (%s),day %d (%s)
+", сегодня",", today"
+", завтра",", tomorrow"
+", просрочен",", overdue"
+", через %d %s",", in %d %s"
+Заказ готов: %s. Клиент выслал машину.,Order ready: %s. The customer has sent a truck.
+"Клиент ушёл, репутация упала","The customer left, reputation fell"
+ Можно позвонить заказчику и перенести срок: «Заказы → В работе»., You can call the customer and move the deadline: “Orders → In Progress”.
+Просрочка по заказу: %s. Каждый день — штраф %d%%.%s,Order overdue: %s. Each day costs a %d%% penalty.%s
+Штраф: срыв госзаказа (возврат аванса и неустойка),Fine: missed state order (advance refund and penalty)
+Неустойка: возврат аванса за ,Penalty: advance refund for 
+Заказ сорван: %s. %s.,Order failed: %s. %s.
+Частичная оплата: ,Partial payment: 
+Машина уехала недогруженной (%d из %d): не хватило готовых деталей. Остаток заказа снова в работе.,The truck left underloaded (%d of %d): not enough finished parts. The rest of the order is back in progress.
+Оплата: ,Payment: 
+"неустойка за опоздание, ","late delivery penalty, "
+Заказ отгружен вовремя: %s. Получено %s.,Order shipped on time: %s. Received %s.
+Заказ отгружен с опозданием на %d дн.: получено %s.,Order shipped %d days late: received %s.
+в общей конторе (на 30% хуже),in the shared office (30% worse)
+линолеум,linoleum
+✗ нет: постройте помещение «%s» (%s),✗ missing: build a “%s” room (%s)
+Техотдел сам взялся за разработку: «%s». Выбрать другое — в окне «Разработки».,"The engineering department took up research on its own: “%s”. To pick something else, open the “Research” window."
+Техотдел закончил разработку: «%s»! %s,The engineering department finished research: “%s”! %s
+"Бухгалтер: зарплаты съедают %d%% выручки за последние недели. Посмотрите, кто простаивает (Производство → Станки), или возьмите больше заказов.","Accountant: wages are eating %d%% of revenue in recent weeks. Check who is idle (Production → Machines), or take more orders."
+Налог УСН %d%% с выручки недели,Simplified tax %d%% of the week's revenue
+Пени и штраф налоговой: учёт «на коленке»,Tax late fees and fine: “back-of-the-envelope” bookkeeping
+"Налоговая выписала штраф %s: на заводе больше %d человек, а бухгалтерии нет. Постройте бухгалтерию и наймите бухгалтера.",The tax office issued a fine of %s: the plant has more than %d people and no accounting department. Build an accounting office and hire an accountant.
+"Учёт ведётся «на коленке»: в штате больше %d человек, нужна бухгалтерия, иначе налоговая будет штрафовать.","Bookkeeping is done on the back of an envelope: with more than %d people on staff you need an accounting department, or the tax office will fine you."
+Банки кредитуют предприятия от этапа «Мастерская». Пока — гранты и программы поддержки,Banks lend to businesses from the “Workshop” stage. For now — grants and support programs
+Банк не даст больше двух кредитов одновременно,The bank won't give more than two loans at once
+Кредит больше 800 тыс. ₽ — после ступени «Банк и лизинг» (Управление → Развитие),A loan over 800k ₽ — after the “Bank and Leasing” step (Management → Development)
+Банк отказал: слишком низкая репутация,The bank refused: reputation too low
+Кредит получен: %s на %d нед.,Loan received: %s for %d wk.
+Банк выдал кредит %s под %d%% годовых. Платёж %s каждый понедельник.,The bank granted a loan of %s at %d%% per year. Payment of %s every Monday.
+Кредит получен: %s,Loan received: %s
+"%s: %s под %d%% годовых, платёж %s по понедельникам.","%s: %s at %d%% per year, payment of %s on Mondays."
+Погашение кредита с процентами,Loan repayment with interest
+Кредит полностью погашен.,The loan is fully repaid.
+"Смена больше %d человек без мастера: бардак, работа идёт на 10%% медленнее. Наймите мастера участка и поставьте ему стол (конторка мастера или контора).","A shift of more than %d people without a foreman: chaos, work goes 10%% slower. Hire a section foreman and give him a desk (foreman's booth or office)."
+Объявление о вакансии (кадровик): ,Job ad (HR officer): 
+"Кадровик нашёл замену: %s, %s.","The HR officer found a replacement: %s, %s."
+допустимые условия,acceptable conditions
+вредные условия 1-й степени,"harmful conditions, class 1"
+вредные 2-й степени,"harmful, class 2"
+вредные 3-й степени,"harmful, class 3"
+"котёл стоит не в котельной (отдельное помещение, бетонный пол, назначение «Котельная»)","the boiler isn't in a boiler room (a separate room, concrete floor, assigned as “Boiler Room”)"
+нет воды: протяните трубу от насоса,no water: run a pipe from the pump
+нет тока: автоматика горелки без электричества не работает,no power: the burner controls don't work without electricity
+ещё не установлен,not installed yet
+нет тока — протяните кабель от подстанции,no power — run a cable from the substation
+"рядом нет работающей насосной (нужна вплотную, под током)",no working pump station nearby (must be adjacent and powered)
+шум,noise
+аэрозоль и пары,aerosols and fumes
+тепловое излучение,heat radiation
+микроклимат,microclimate
+на улице,outdoors
+нет отопления,no heating
+освещённость,lighting
+нет электрического света,no electric light
+Лаборатория уже работает,The lab is already at work
+Все рабочие места уже оценены,All workplaces are already assessed
+СОУТ: замеры на %d %s,SOUT: measurements at %d %s
+рабочем месте|рабочих местах|рабочих местах,workplace|workplaces
+"Лаборатория начала спецоценку условий труда: %d %s. Результаты — к концу дня %d. Пока идут замеры, можно улучшить условия: вентиляция, свет, отопление.","The lab has started the workplace conditions assessment: %d %s. Results by the end of day %d. While measurements are under way you can improve conditions: ventilation, light, heating."
+место|места|мест,workplace|workplaces
+"СОУТ завершена: допустимых мест %d, вредных %d.","SOUT complete: %d acceptable workplaces, %d harmful."
+ На вредных местах положены доплата (4–12%% к ставке) и молоко — включите выдачу молока в «Люди → Охрана труда»., Harmful workplaces are entitled to extra pay (4–12%% of the wage) and milk — turn on milk handouts in “People → Labor Safety”.
+Спецоценка: %d %s проверено,Assessment: %d %s checked
+"Лаборатория замерила шум, свет, микроклимат и воздух. Вредных мест — %d. %s","The lab measured noise, light, microclimate and air. Harmful workplaces: %d. %s"
+Будет молоко и доплата.,There will be milk and extra pay.
+"%s без СИЗ (каска, очки, наушники): %s. Поставьте шкаф СИЗ (Объекты → Безопасность) и закупите комплекты — без них травм в полтора раза больше.","%s has no PPE (helmet, goggles, ear muffs): %s. Install a PPE cabinet (Objects → Safety) and buy kits — without them injuries are one and a half times more frequent."
+новичкам их выдают на заводе,newcomers get them at the plant
+старый комплект износился,the old kit is worn out
+Закончились комплекты СИЗ в шкафу. Закажите в «Люди → Охрана труда» (или включите автозакупку).,The PPE cabinet is out of kits. Order more in “People → Labor Safety” (or turn on auto-purchase).
+"Рабочих уже %d, а СОУТ не проведена на %d %s. Трудовая инспекция за это штрафует — закажите замеры в «Люди → Охрана труда».","There are already %d workers, and SOUT hasn't been done at %d %s. The labor inspectorate fines for this — order measurements in “People → Labor Safety”."
+месте|местах|местах,workplace|workplaces
+Молоко за вредность: %d %s,Milk for hazardous work: %d %s
+бутылка|бутылки|бутылок,bottle|bottles
+"В помещении «%s» дым и пары (%d%%): людям душно, работают медленнее. Поставьте вытяжной вентилятор и зонт над сварочным постом или камерой (Сети → Вентиляция).",Smoke and fumes in “%s” (%d%%): people are stuffy and work slower. Install an exhaust fan and a hood over the welding station or booth (Networks → Ventilation).
+"%s без сжатого воздуха: красят кистью, в полтора раза дольше. Поставьте компрессор и протяните пневмомагистраль (Сети → Сжатый воздух).",%s has no compressed air: painting by brush takes one and a half times longer. Install a compressor and run an air line (Networks → Compressed Air).
+Котёл не греет: %s.,The boiler isn't heating: %s.
+Неизвестный объект,Unknown object
+Нужна разработка техотдела: «%s»,Needs engineering research: “%s”
+Нужна ступень развития «%s» (Управление → Развитие),Needs the development step “%s” (Management → Development)
+Откроется на этапе «%s»,Unlocks at the “%s” stage
+оформлено,registered
+%d/%d клеток,%d/%d cells
+выполнено %d из %d,done %d of %d
+долг %s,debt %s
+долгов нет,no debts
+осталось %d,%d left
+все работают,all working
+течёт,leaking
+отремонтирована,repaired
+ — срок вышел!, — overdue!
+погашены,paid off
+"%d чел., настроение %d","%d people, mood %d"
+брак %.1f%% из %d дет.,scrap %.1f%% of %d parts
+деталей ещё нет,no parts yet
+"%d/%d чел., %d/%d дн.%s","%d/%d people, %d/%d days%s"
+ — нарушено, — broken
+%.1f млн,%.1f M
+Крыша отремонтирована,Roof Repaired
+Кровельщики закончили: в цеху больше не капает.,The roofers are done: no more dripping in the shop.
+Новый этап: «%s»,New Stage: “%s”
+Наш завод — %s!,Our plant is now a %s!
+Коллектив поздравляет руководство и себя. Открываются новые участки и службы.,The workforce congratulates the management and themselves. New sections and services are opening.
+Все цели выполнены. Можно продолжать без ограничений — завод ваш.,All goals achieved. You can carry on without limits — the plant is yours.
+ООО уже оформлено,The LLC is already registered
+"Нужно %s на регистрацию, печать и расчётный счёт","You need %s for registration, a seal and a bank account"
+Регистрация ООО,LLC registration
+ООО зарегистрировано,LLC Registered
+"Теперь вы — %s. Устав, печать, расчётный счёт — всё как у людей, на вывеске у ворот новая строчка. С вами охотнее работают крупные заказчики.","You are now %s. Charter, seal, bank account — all proper, and a new line on the sign at the gate. Large customers are more willing to work with you."
+Крыша уже в порядке или ремонт идёт,The roof is already fine or being repaired
+Нужно %s на кровельные работы,You need %s for the roofing work
+Ремонт: кровля цеха,Repair: shop roof
+Кровельщики приступили: через три дня крыша перестанет течь.,The roofers have started: in three days the roof will stop leaking.
+Долгов по зарплате нет,No wage arrears
+"Нужно %s, на счёте %s","You need %s, the account has %s"
+Зарплата: погашение долгов,Wages: paying off arrears
+Долги по зарплате погашены,Wage Arrears Paid Off
+"Люди получили всё, что им задолжали. В городе выдохнули.",People got everything they were owed. The town breathed a sigh of relief.
+Завод сократил слишком много людей. «Город на вас рассчитывал!» Репутация упала.,The plant laid off too many people. “The town was counting on you!” Reputation fell.
+"Неделя стройки позади: отдел сбыта начинает принимать заявки. Проверьте, что станки под током и есть кому работать.",The construction week is over: the sales department starts taking requests. Make sure the machines are powered and there's someone to work.
+Производство открыто раньше срока: сбыт уже принимает заявки — первые придут сегодня.,Production opened early: sales are already taking requests — the first will arrive today.
+"Зона разгрузки обязательна: сюда фургоны сгружают металл и ящики с оборудованием, без неё груз некуда класть. Сначала отметьте новую зону, потом стирайте старую.","The unloading zone is required: vans unload metal and equipment crates here, and without it there's nowhere to put the cargo. Mark a new zone first, then erase the old one."
+"Зона отгрузки обязательна: сюда приносят готовый заказ, и только отсюда грузит машина клиента. Сначала отметьте новую зону, потом стирайте старую.","The shipping zone is required: finished orders are brought here, and the customer's truck loads only from here. Mark a new zone first, then erase the old one."
+Объявление о вакансиях,Job ad
+Объявление размещено: пришли новые кандидаты.,Ad placed: new candidates have arrived.
+Нет такого кандидата,No such candidate
+" (иногородняя, живёт в общежитии)"," (from out of town, lives in the dormitory)"
+" (иногородний, живёт в общежитии)"," (from out of town, lives in the dormitory)"
+к началу следующей смены,by the start of the next shift
+в течение часа,within the hour
+"%s принят{|а} на работу, выйдет %s.",%s has been hired and will start %s.
+Расчёт при увольнении: ,Severance pay: 
+%s уволил{ся|ась} по собственному желанию: «Достало всё». Следите за настроением людей.,%s quit: “I've had enough.” Keep an eye on people's mood.
+%s уволен{|а}.,%s has been dismissed.
+Ставка изменена: %s → %s,Wage changed: %s → %s
+Некому выдавать,Nobody to pay
+Премия всем: %d чел.,Bonus for everyone: %d people
+Получил{|а} премию вместе со всеми,Got a bonus along with everyone
+Премия всему коллективу: %s. Люди довольны.,Bonus for the whole workforce: %s. People are happy.
+Ставки всем подняты на %d%%.,Everyone's wages raised by %d%%.
+Ставки подтянуты до рыночных: %d %s.,Wages brought up to market level: %d %s.
+Не хватает денег,Not enough money
+Премия: ,Bonus: 
+Получил{|а} премию %s,Got a bonus of %s
+%s получил{|а} премию. Настроение — на высоте.,%s got a bonus. Mood is sky-high.
+%s перейдёт в %s после этой смены.,%s will move to %s after this shift.
+Электромонтаж: кабель,Electrical: cable
+Сантехника: труба,Plumbing: pipe
+Вентиляция: воздуховод,Ventilation: duct
+Отмена чертежа сети,Network plan canceled
+Демонтаж: ,Dismantling: 
+Нечего заказывать,Nothing to order
+Расходники: %s × %d,Consumables: %s × %d
+Заказано: %s × %d. Курьер привезёт %s.,Ordered: %s × %d. A courier will bring it %s.
+Привезли расходники: %s.,Consumables delivered: %s.
+%s: партия «%s» × %d готова.,%s: batch of “%s” × %d is ready.
+"%s сломался! Нужен ремонт (%s на запчасти). Чтобы станки не ломались, обслуживайте их вовремя — включите ППР в «Производство → Станки».","%s broke down! Needs repair (%s for parts). To keep machines from breaking, service them on time — turn on scheduled maintenance in “Production → Machines”."
+Только внутри участка,Only inside the plot
+Кран-балку ставят в помещении: щёлкните внутри цеха,A bridge crane goes inside a room: click inside the shop
+Пролёт %d клеток — для кран-балки слишком широко (до 26),A span of %d cells is too wide for a bridge crane (max 26)
+В этом помещении уже есть кран-балка,This room already has a bridge crane
+Здесь висит светильник,A light hangs here
+Мешает стена,A wall is in the way
+Здесь под потолком уже что-то висит,Something already hangs under the ceiling here
+Место занято,The spot is taken
+Мешает %s — спилите его (Снос),%s is in the way — cut it down (Demolish)
+Нужен пол (только в помещении),Needs a floor (indoors only)
+Мешают грузы на полу,Cargo on the floor is in the way
+Насосная уже есть — одна даёт воду всему заводу,There's already a pump station — one supplies water to the whole plant
+Электрокотёл ставят рядом с насосной станцией — не дальше одной клетки,The electric boiler goes next to the pump station — no more than one cell away
+"Аккумулятор ставят вплотную к подстанции — в пределах одной клетки, можно по углам","A battery goes right next to the substation — within one cell, corners allowed"
+У подстанции уже %d аккумуляторов — больше не поместится,The substation already has %d batteries — no room for more
+Возврат: ,Refund: 
+"Проходная стала шире (будка и два турникета) и не поместилась на старом месте — её разобрали, деньги вернули. Поставьте новую у въезда.",The gatehouse got wider (a booth and two turnstiles) and didn't fit in its old place — it was dismantled and the money refunded. Place a new one at the entrance.
+%s: возьмём со склада оборудования — платить не нужно.,%s: we'll take it from the equipment store — no payment needed.
+Лизинг: аванс за ,Lease: advance for 
+Покупка: ,Purchase: 
+Этот объект не поворачивается,This object can't be rotated
+Сейчас с ним работают — попробуйте позже,Someone is working at it right now — try later
+Мешают грузы,Cargo
+Не помещается: ,Doesn't fit: 
+Стройка: ,Construction: 
+"Помещение — минимум 3×3 клетки (стены по краю, внутри пол).","A room is at least 3×3 cells (walls around the edge, floor inside)."
+Не хватает денег: помещение обойдётся в %s.,Not enough money: the room will cost %s.
+"Участок %s куплен: ещё %d×%d клеток%s. Старый забор между участками снесите (Снос), деревья спилят строители.",Plot %s bought: %d×%d more cells%s. Demolish the old fence between the plots (Demolish); the builders will cut down the trees.
+", на нём %s — стены и ворота целы, нужны свет, проводка и уборка",", with %s on it — walls and gates are intact, it needs light, wiring and cleaning"
+Отмена чертежа,Plan canceled
+Отмена покупки: ,Purchase canceled: 
+"%s уже везут — ящики сложат на склад оборудования, их можно поставить позже или продать (Производство → Склад оборудования).",%s is already on its way — the crates will go to the equipment store; you can install them later or sell them (Production → Equipment Store).
+Снос: возврат материалов,Demolition: materials refund
+Укажите количество,Enter a quantity
+Снабжение: на металл нет денег — само в долг не закупает. Купить в долг можно вручную: «Производство → Металл и расходники».,Supply: no money for metal — it doesn't buy on credit by itself. You can buy on credit manually: “Production → Metal and Consumables”.
+Отсрочка платежа за металл,Deferred payment for metal
+Денег на металл не хватило — %s отгрузил %s × %d в долг: %s вернуть за две недели (+5%%).,Not enough money for metal — %s shipped %s × %d on credit: repay %s within two weeks (+5%%).
+Металл: %s × %d (%s),Metal: %s × %d (%s)
+Поставщик %s предупредил: машина задержится на сутки.,Supplier %s warned: the truck will be a day late.
+Заказан металл: %s × %d. Привезут %s.,Metal ordered: %s × %d. Delivery %s.
+Отсрочка,Deferred
+сегодня к ,today by 
+завтра к ,tomorrow by 
+в день %d к %s,on day %d by %s
+"Водитель не дождался разгрузки и оставил груз у ворот — занесут, когда освободятся руки.",The driver didn't wait to be unloaded and left the cargo at the gate — it'll be carried in when hands are free.
+Привезли металл: %s. Разгружаем.,Metal delivered: %s. Unloading.
+Приехали за заказом: %s. Грузим.,Here to collect an order: %s. Loading.
+Аренда бокса,Box rent
+Электроэнергия: %d кВт·ч,Electricity: %d kWh
+Кассовый разрыв! Денег нет — срочно выполняйте заказы.,Cash gap! No money — finish orders urgently.
+Зарплата за неделю,Weekly wages
+Выдана зарплата за неделю: %s.,Weekly wages paid: %s.
+Фото повесили на доску почёта,Photo put up on the honor board
+"На доску почёта повесили фото: %s, %s. Лучший работник недели!","A photo went up on the honor board: %s, %s. Worker of the week!"
+Январь,January
+Февраль,February
+Март,March
+Апрель,April
+Май,May
+Июнь,June
+Июль,July
+Август,August
+Сентябрь,September
+Октябрь,October
+Ноябрь,November
+Декабрь,December
+Гололёд! На улице легко поскользнуться. Включите «Посыпать дорожки песком» в окне «События».,Ice! It's easy to slip outside. Turn on “Sand the paths” in the “Events” window.
+Отопление: %d %s от электрокотла,Heating: %d %s from the electric boiler
+батарея|батареи|батарей,radiator|radiators
+Батареи холодные: нет работающего электрокотла. Поставьте «Электрокотёл отопления» вплотную к насосной станции (Объекты → Водопровод) и подведите к нему ток.,Radiators are cold: no working electric boiler. Place a “Heating electric boiler” right next to the pump station (Objects → Plumbing) and connect power to it.
+Газ для котельной: %d %s,Gas for the boiler room: %d %s
+Песок и уборка территории,Sand and grounds cleaning
+"Наступила зима. Проверьте отопление: без батарей в цехах будет холодно, люди начнут мёрзнуть и злиться.","Winter is here. Check the heating: without radiators the shops will be cold, and people will freeze and get angry."
+"Весна! Снег начнёт таять, а с ним — гололёд и лужи.","Spring! The snow will start melting, and with it come ice and puddles."
+Лето. В горячих цехах будет жарко — пригодятся окна и кулер с водой.,Summer. Hot shops will get hot — windows and a water cooler will help.
+Осень. Скоро отопительный сезон.,Autumn. The heating season is coming.
+"Добро пожаловать в «Промзону»! У вас бокс в промзоне, старый токарный станок и трое работников.","Welcome to Promzona! You have a box in the industrial zone, an old lathe and three workers."
+Первый заказ уже принят: 12 втулок для ИП Сидоренко. Металл лежит на стеллаже.,The first order is already accepted: 12 bushings for IE Sidorenko. The metal is on the rack.
+"У ворот отмечены зона разгрузки (сюда фургоны сгружают металл — на поддоны заготовок) и зона отгрузки (сюда несут готовый заказ, отсюда его грузит машина клиента).","An unloading zone (vans unload metal here — onto blank pallets) and a shipping zone (finished orders are brought here, and the customer's truck loads them from here) are marked at the gate."
+"Сорок лет у станка, всех молодых учил — на старом заводе иначе и не звали.","Forty years at the machine, he taught all the youngsters — that's what they called him at the old plant."
+"Сорок лет у станка. Пришёл, потому что «без дела скучно».",Forty years at the machine. Came because “it's boring doing nothing”.
+Двадцать лет в ОТК на моторном заводе.,Twenty years in QC at the engine plant.
+После армии. Руки растут откуда надо.,Straight out of the army. Hands in the right place.
+ИП Сидоренко,IE Sidorenko
+Сохранение обновлено до 1.18: кабели и трубы теперь заводят прямо в клетку прибора — %d подключений дотянуто автоматически.,Save updated to 1.18: cables and pipes now run straight into the device's cell — %d connections extended automatically.
+Сохранение обновлено до 1.19: «Сайдвей ВМ-2215» теперь фрезерный станок — заготовки с него сложены рядом.,Save updated to 1.19: the “Sideway VM-2215” is now a milling machine — its blanks are stacked next to it.
+Сохранение обновлено до 1.20: батареи теперь греет электрокотёл у насосной — поставили его бесплатно и подключили.,Save updated to 1.20: radiators are now heated by an electric boiler at the pump station — it was placed for free and connected.
+Обновление 1.20: батареям нужен электрокотёл вплотную к насосной станции (Объекты → Водопровод). Рядом с насосной нет места — освободите клетку и поставьте его.,Update 1.20: radiators need an electric boiler right next to the pump station (Objects → Plumbing). There's no room next to the pump station — free up a cell and place it.
+"Сохранение обновлено до 0.8: в помещения повешено светильников — %d, проложен водопровод к туалетам и раковинам, станки подключены к своим розеткам.","Save updated to 0.8: lights hung in rooms — %d, plumbing run to toilets and sinks, machines connected to their sockets."
+"Сохранение из прошлой версии обновлено: проложена проводка, гараж назначен цехом.","Save from a previous version updated: wiring laid, the garage assigned as a shop."
+Принят{|а} на работу,Hired
+"«Чистое поле»: участок у трассы, вагончик и бригада из трёх строителей. Оформите программу «Цех с нуля» (Финансы → Гранты), стройте цех, потом нанимайте станочников.","“Bare Field”: a plot by the highway, a site trailer and a crew of three builders. Apply for the “Workshop from Scratch” program (Finance → Grants), build a shop, then hire machinists."
+"Начните с пола и стен будущего цеха (Стройка, B). Ток и вода — из техпомещения: тяните кабель и трубы оттуда (Сети, E).","Start with the floor and walls of the future shop (Build, B). Power and water come from the utility room: run cables and pipes from there (Networks, E)."
+Первая неделя — на стройку: заказов не будет. Готовы раньше — кнопка «Начать производство» в задачах слева.,The first week is for construction: there will be no orders. Ready earlier? Use the “Start production” button in the tasks on the left.
+Песочница: пустой участок и бригада строителей. Целей нет — всё на ваше усмотрение.,Sandbox: an empty plot and a crew of builders. No goals — it's all up to you.
+разгрузки,unloading
+отгрузки,shipping
+ и поддоны заготовок, and blank pallets
+"Обновление 1.29: зоны разгрузки и отгрузки теперь обязательны — у ворот отмечена зона %s%s. Фургоны сгружают металл на поддоны заготовок, а машина клиента грузит заказ только из зоны отгрузки. Зоны можно расширить или перенести (Стройка → Зоны на улице).","Update 1.29: unloading and shipping zones are now required — a %s zone%s has been marked at the gate. Vans unload metal onto blank pallets, and the customer's truck loads orders only from the shipping zone. Zones can be expanded or moved (Build → Outdoor Zones)."
+ и , and 
+Обновление 1.29: у ворот нет свободного места под зону %s. Освободите место и отметьте её (Стройка → Зоны на улице).,Update 1.29: there's no free space at the gate for a %s zone. Free up space and mark it (Build → Outdoor Zones).
+«Утильсталь»,“Utilstal”
+Стружку сметают в кучу в углу. Поставьте контейнер для стружки (Объекты → Склад): её будут сдавать в металлолом за деньги.,Chips are swept into a pile in the corner. Install a chip bin (Objects → Storage): chips will be sold for scrap.
+Контейнеры для стружки полны — ломовоз приедет в пятницу. Поставьте ещё контейнер.,The chip bins are full — the scrap truck comes on Friday. Add another bin.
+Оплата за металлолом,Scrap metal sale
+Приезжал ломовоз: %d кг стружки и %d %s брака сданы в металлолом за %s.,The scrap truck came: %d kg of chips and %d %s of scrap sold for %s.
+Ломовоз %s,Scrap truck %s
+"Едет ломовоз %s — заберёт стружку и брак, заплатит за металлолом.",The %s scrap truck is on its way — it will pick up chips and scrap and pay for the metal.
+Водитель ломовоза,Scrap truck driver
+Приехал ломовоз %s: водитель собирает стружку и брак.,The %s scrap truck has arrived: the driver is collecting chips and scrap.
+Идёт за стружкой,Going for chips
+Идёт за браком,Going for scrap parts
+Пересыпает стружку в короб,Pouring chips into the box
+Забирает брак в металлолом,Collecting scrap parts
+Несёт лом к машине,Carrying scrap to the truck
+Ломовоз %s увёз в пункт приёма %d кг стружки и %d %s брака — заплатил %s.,The %s scrap truck took %d kg of chips and %d %s of scrap parts to the collection point — paid %s.
+окна,windows
+много света из окон,lots of window light
+хороший пол,good floor
+электрический свет,electric light
+обстановка,furnishings
+грязища,filthy
+грязно,dirty
+Ждёт ремонта: нужен слесарь или наладчик и %s.,Waiting for repair: needs a fitter or setter and %s.
+Включите его в карточке станка или в списке станков.,Turn it on in the machine's card or in the machine list.
+Нет кабеля,No cable
+Заведите кабель от подстанции в клетку его розетки (меню «Сети»).,Run a cable from the substation to its socket cell (“Networks” menu).
+Не хватает мощности или отключена подстанция: проверьте «Сети».,Not enough capacity or the substation is off: check “Networks”.
+Опечатан проверкой,Sealed by inspection
+Устраните нарушение — после повторной проверки снимут пломбу.,Fix the violation — the seal will be removed after a re-inspection.
+Изношен,Worn out
+Состояние %d%%: ждёт обслуживания слесарем.,Condition %d%%: waiting for a fitter's service.
+Стоит вне цеха,Outside a shop
+"Разметьте зону «Цех» там, где стоит станок (Зоны → Производство).",Mark a “Shop” zone where the machine stands (Zones → Production).
+Нет воды,No water
+Протяните трубу от ввода воды или насоса (меню «Сети»).,Run a pipe from the water inlet or pump (“Networks” menu).
+Нет задания,No job
+Нет заказов на этот передел. Возьмите заказ или откройте рынок.,No orders for this operation. Take an order or open the market.
+Нет расходника,No consumable
+Закончился %s — закажите в «Металл и расходники».,Out of %s — order more in “Metal and Consumables”.
+Нет ни одного человека на этот передел: наймите (%s).,Nobody can do this operation: hire one (%s).
+Станочник не на смене,Machinist off shift
+"Все, кто умеет, сейчас дома или в другую смену.",Everyone who can do it is at home or on the other shift.
+Ждёт загрузки,Waiting for a load
+Печь ждёт деталей с предыдущей операции.,The furnace is waiting for parts from the previous operation.
+Ждёт рабочего,Waiting for a worker
+Загрузка есть — термист скоро запустит печь.,The load is ready — the heat treater will start the furnace soon.
+Выход забит,Output blocked
+Готовые детали некому унести: нужен разнорабочий или место на стеллаже.,Nobody to carry away finished parts: needs a laborer or space on a rack.
+Нет металла,No metal
+%s нет на складе — закажите в «Металл и расходники».,No %s in stock — order in “Metal and Consumables”.
+Ждёт заготовок,Waiting for blanks
+Не хватает: %s ×%d — несут или ждут предыдущей операции.,Missing: %s ×%d — being carried or waiting for the previous operation.
+Ждёт станочника,Waiting for a machinist
+"Заготовки есть, станочник занят на другой работе.","Blanks are ready, the machinist is busy with other work."
+Нет такой ступени,No such step
+Наймите: %s,Hire: %s
+Уже открыто,Already unlocked
+Участок уже куплен,The plot is already bought
+Уже исследуется,Already being researched
+Сделка уже идёт,The deal is already under way
+На этой карте больше нет свободных участков,There are no more free plots on this map
+На этой карте нет соседних участков,This map has no neighboring plots
+Сначала: «%s»,First: “%s”
+Нужен этап «%s»,Needs the “%s” stage
+Нужно %d человек в штате,Needs %d people on staff
+Нужен работающий отдел «%s»,Needs a working “%s” department
+Нужен свой кабинет: «%s»,Needs its own office: “%s”
+Нужен кабинет директора,Needs a director's office
+Директор занят: «%s»,The director is busy: “%s”
+Земля: «%s»,Land: “%s”
+Директор взялся за «%s» (%s): %d %s.,The director took on “%s” (%s): %d %s.
+Развитие: отмена «%s»,Development: cancel “%s”
+«%s» отложено. Вернули половину денег.,“%s” postponed. Half the money was refunded.
+Открыто: «%s»,Unlocked: “%s”
+Развитие,Development
+На заводе — «%s»,New at the plant: “%s”
+"«%s» открыто, но не работает: нет человека в отделе «%s».",“%s” is unlocked but not working: nobody in the “%s” department.
+Ящик: %s,Crate: %s
+ (%d из %d), (%d of %d)
+"Готовый заказ не донесли до зоны отгрузки — грузим в машину прямо со склада. Проверьте, свободна ли зона отгрузки и есть ли к ней проход.",The finished order didn't make it to the shipping zone — loading the truck straight from the warehouse. Check that the shipping zone is free and reachable.
+На складе нет полного комплекта,The store doesn't have a complete set
+Продажа со склада: ,Sale from the store: 
+оборудование: ,equipment: 
+ и др., etc.
+в зону разгрузки,to the unloading zone
+сразу к местам установки (зоны разгрузки нет),straight to the installation spots (no unloading zone)
+Привезли %s. Разгружаем %s.,Delivered %s. Unloading %s.
+Металл некуда разгружать! Расширьте зону разгрузки (Стройка → Зоны) и поставьте в неё поддоны заготовок.,Nowhere to unload metal! Expand the unloading zone (Build → Zones) and put blank pallets in it.
+"Зона отгрузки заполнена: расширьте её (Стройка → Зоны), чтобы готовые заказы ждали машину у ворот.",The shipping zone is full: expand it (Build → Zones) so finished orders can wait for the truck at the gate.
+в зону отгрузки,to the shipping zone
+к воротам,to the gate
+на склад,to the warehouse
+Несёт к месту установки: ,Carrying to the installation spot: 
+Несёт в руках: ,Carrying by hand: 
+Помещение без назначения,Unassigned room
+помещение не меньше %d×%d клеток внутри (сейчас %d×%d),room at least %d×%d cells inside (now %d×%d)
+ или , or 
+вода (протяните трубу от насоса),water (run a pipe from the pump)
+помещение от %d×%d клеток внутри,room from %d×%d cells inside
+пол: ,floor: 
+"Зоны стали обязательными: станком работают только в цехе, туалетом пользуются в зоне «Туалет» и т. д. Для %d объектов вне своих зон разметили маленькие зоны — поправьте их (меню «Зоны»).","Zones are now required: machines work only in a shop, the toilet is used in a “Toilet” zone and so on. Small zones were marked for %d objects outside their zones — adjust them (“Zones” menu)."
+Снабженец не смог докупить металл: ,The buyer couldn't purchase more metal: 
+"Металла «%s» не хватает на заказы: нужно ещё %d шт., а снабжению не хватает денег.","Not enough “%s” metal for the orders: %d more pcs needed, and supply is short of money."
+"Заканчивается %s (осталось на %d операций), а на покупку не хватает денег.","Running out of %s (enough for %d operations), and there's no money to buy more."
+Стройка стоит: все заняты производством. Наймите разнорабочего в разделе «Люди → Найм».,Construction has stalled: everyone is busy with production. Hire a laborer in “People → Hiring”.
+%s не подключён к электросети: заведите кабель от подстанции в клетку его розетки (меню «Сети»).,%s isn't connected to the grid: run a cable from the substation to its socket cell (“Networks” menu).
+«%s» — %s деталь: для операции «%s» нужен станок под %s детали. Такие есть в меню «Объекты».,“%s” is a %s part: the “%s” operation needs a machine for %s parts. You'll find them in the “Objects” menu.
+Некому выполнить операцию «%s» для «%s»: нужен работник с навыком от %d.,Nobody can do the “%s” operation for “%s”: needs a worker with skill %d or higher.
+мелкие,small
+средние,medium
+крупные,large
+мелкая,small
+средняя,medium
+крупная,large
+мелких,small
+средних,medium
+крупных,large
+только мелкие детали,small parts only
+мелкие и средние детали,small and medium parts
+детали любого размера,parts of any size
+детали: ,parts: 
+только мелкие,small only
+мелкие и средние,small and medium
+любого размера,any size
+быстрее в %.1f раза,%.1f times faster
+быстрее на %d%%,%d%% faster
+медленнее на %d%%,%d%% slower
+брака %s%d%%,scrap %s%d%%
+партия до %d,batch up to %d
+расход −%d%%,consumption −%d%%
+разряд от %d,grade %d+
+тополь,poplar
+берёза,birch
+клён,maple
+куст сирени,lilac bush
+куст шиповника,dog rose bush
+сзади,at the back
+слева,on the left
+справа,on the right
+ (ждёт: %s), (waiting: %s)
+ (ждёт ОТК), (waiting for QC)
+ (брак), (scrap)
+Помещение не помещается на участке,The room doesn't fit on the plot
+Мешает стена — пристройте помещение вплотную к стене (общая стена) или выберите свободное место,A wall is in the way — attach the room flush to a wall (shared wall) or pick a free spot
+Мешает объект — освободите место,An object is in the way — clear the spot
+Здесь уже строится другое помещение,Another room is already being built here
+Нет такого шаблона,No such template
+Аварийная бригада: ,Emergency crew: 
+авария,breakdown
+Аварийная бригада закончила: %s устранён.,The emergency crew is done: the %s is fixed.
+Заказаны стройматериалы: %s. Привезут %s.,Building materials ordered: %s. Delivery %s.
+стройматериалы: ,building materials: 
+у ворот (зоны разгрузки нет),at the gate (no unloading zone)
+Привезли %s. Разгружают %s.,Delivered %s. Unloading %s.
+Здесь на плане уже стоит объект,There's already an object here on the plan
+старый склад,an old warehouse
+бывшая пилорама,a former sawmill
+гаражный ряд,a row of garages
+ (для %s деталей), (for %s parts)
+"Выбило автомат: перегрузка сети (%.1f из %d кВт). Его сбросят на подстанции, но перегруз повторится — выключите лишний станок в его карточке или прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый).","A breaker tripped: grid overload (%.1f of %d kW). It will be reset at the substation, but the overload will recur — turn off an extra machine in its card or put battery cabinets next to the substation (+20 kW each)."
+ИП %s,IE %s
+"Токарный станок, верстак, стеллаж, быт, простые заказы","Lathe, workbench, rack, amenities, simple orders"
+Выполнить 10 заказов,Complete 10 orders
+Оборот 1 млн ₽,Turnover of 1 million ₽
+"Фрезерный и сверлильный станки, сварка, сборка, мастер участка, бухгалтерия, снабжение, кадры, отдел сбыта, охрана труда, проходная, подстанция, погрузчик, испытательный стенд; вторые ступени «Развития»: себестоимость, связь с ПТУ, партии, соцсфера (повар, медпункт, общежитие)","Milling and drilling machines, welding, assembly, section foreman, accounting, supply, HR, sales department, labor safety, gatehouse, substation, forklift, test bench; second “Development” steps: cost accounting, college ties, batches, social services (cook, first-aid post, dormitory)"
+Оформить ООО (окно «Цели»),Register an LLC (“Goals” window)
+Построить первый корпус: цех от 60 клеток,Build the first building: a shop of 60+ cells
+объём,volume
+Оборот 2 млн ₽,Turnover of 2 million ₽
+качество,quality
+Брак меньше 4% за неделю (от 60 деталей),Scrap under 4% for a week (60+ parts)
+люди,people
+"6 человек в штате, настроение от 55","6 people on staff, mood 55+"
+город,town
+Отношения с городом от 55,Relations with the town 55+
+"Термичка, покраска, кран-балка, станок с ЧПУ, начальник цеха, ПДО, техотдел, главный инженер, юротдел; третьи ступени «Развития»: банк и лизинг, контракты и экспорт, ISO 9001, тендеры, шефство (детсад, ДК, радио)","Heat treatment, painting, bridge crane, CNC machine, shop manager, production planning, engineering department, chief engineer, legal department; third “Development” steps: bank and leasing, contracts and export, ISO 9001, tenders, sponsorship (kindergarten, culture center, radio)"
+Выполнить крупный контракт (от 250 тыс. ₽),Complete a large contract (250k ₽ or more)
+14 человек в штате,14 people on staff
+Оборот 5 млн ₽,Turnover of 5 million ₽
+Пройти проверку без замечаний,Pass an inspection with no remarks
+Настроение от 60 при 14+ людях,Mood 60+ with 14+ people
+Отношения с городом от 60,Relations with the town 60+
+"Больше контрактов и практикантов, крупные гранты","More contracts and interns, large grants"
+Выполнить месячный план дважды,Fulfil the monthly plan twice
+28 человек в штате,28 people on staff
+Оборот 12 млн ₽,Turnover of 12 million ₽
+Брак меньше 2% за неделю (от 200 деталей),Scrap under 2% for a week (200+ parts)
+Настроение от 60 при 28+ людях,Mood 60+ with 28+ people
+Репутация 70,Reputation 70
+"Ещё больше контрактов, крупные госзаказы","Even more contracts, large state orders"
+Выполнить экспортный заказ или госзаказ,Complete an export order or a state order
+45 человек в штате,45 people on staff
+Оборот 30 млн ₽,Turnover of 30 million ₽
+Рейтинг 4 звезды,4-star rating
+Настроение от 65 при 45+ людях,Mood 65+ with 45+ people
+Отношения с городом от 75,Relations with the town 75+
+Вы — главный завод города. Дальше — бесконечная игра.,You are the town's main plant. From here on — an endless game.
+Новогодний корпоратив,New Year party
+Ковальчук и сыновья,Kovalchuk & Sons
+АО «%s»,%s JSC
+ЗАО «%s»,%s CJSC
+ПАО «%s»,%s PJSC
+ТОО «%s»,%s LLP
+ЧУП «%s»,%s PUE
+ОсОО «%s»,%s LLC
+ФКП «%s»,FKP %s
+ФГУП «%s»,FSUE %s
+МУП «%s»,MUP %s
+Автосервис «%s»,%s Car Service
+Совхоз «%s»,%s State Farm
+Депо «%s»,%s Depot
+Кооператив «%s»,%s Cooperative
+Комбинат «%s»,%s Works
+Казахстан,Kazakhstan
+Беларусь,Belarus
+Узбекистан,Uzbekistan
+Киргизия,Kyrgyzstan
+Армения,Armenia
+Северный арсенал,Severny Arsenal
+Механика плюс,Mekhanika Plus
+Северный подшипник,Severny Podshipnik
+Ала-Тоо Индастри,Ala-Too Industry
+Заречный машзавод,Zarechny Machine Works
+Невский машзавод,Nevsky Machine Works
+Волжский автоагрегат,Volzhsky Avtoagregat
+Металлист-Плюс,Metallist-Plus
+Принят на работу: %s%s,Hired as %s%s
+Принята на работу: %s%s,Hired as %s%s

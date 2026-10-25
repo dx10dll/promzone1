@@ -200,7 +200,7 @@ func _draw_scrap_board() -> void:
 		if v.kind != "scrap" or v.lane != 0:
 			continue
 		var p := veh_point(sim, v, 14.0, 68.0)
-		draw_string(fnt, p, "ЛОМ · " + Upkeep.FIRM.replace("«", "").replace("»", "").to_upper(), HORIZONTAL_ALIGNMENT_LEFT, 86.0, 8, Color(0.95, 0.93, 0.85, 0.9))
+		draw_string(fnt, p, L.t("ЛОМ · %s") % L.name(Upkeep.FIRM.replace("«", "").replace("»", "")).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, 86.0, 8, Color(0.95, 0.93, 0.85, 0.9))
 
 
 ## Дорожный указатель за правым краем участка: куда уезжает ломовоз, откуда приезжают пожарные.
@@ -208,7 +208,7 @@ func _draw_sign() -> void:
 	var w := sim.world
 	var fnt: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
 	var base := Vector2((w.w + 0.6) * T, (w.sidewalk_row + 0.85) * T)
-	var lines := ["Приём металлолома " + Upkeep.FIRM + "  →", "Пожарная часть № 7  →"]
+	var lines := [L.t("Приём металлолома %s  →") % L.name(Upkeep.FIRM), L.t("Пожарная часть № 7  →")]
 	var bw := 0.0
 	for s: String in lines:
 		bw = maxf(bw, fnt.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x)

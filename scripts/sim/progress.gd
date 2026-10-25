@@ -49,8 +49,13 @@ func stage_def(i: int = -1) -> Dictionary:
 	return arr[k] if not arr.is_empty() else {}
 
 
+## Название этапа на языке игры (1.39: в английском — stage.<id>.name).
 func stage_name(i: int = -1) -> String:
-	return str(stage_def(i).get("name", ""))
+	return L.dt("stage.%s.name" % str(stage_def(i).get("id", "")), str(stage_def(i).get("name", "")))
+
+
+func stage_title(i: int = -1) -> String:
+	return stage_name(i)
 
 
 # ================================================================ что открыто
@@ -59,16 +64,16 @@ func stage_name(i: int = -1) -> String:
 func locked_reason(def_id: String) -> String:
 	var d: Dictionary = Defs.objects.get(def_id, {})
 	if d.is_empty():
-		return "Неизвестный объект"
+		return L.t("Неизвестный объект")
 	if not sim.office.unlocked(d):
-		return "Нужна разработка техотдела: «%s»" % str(Defs.research.get(str(d.get("research", "")), {}).get("name", ""))
+		return L.t("Нужна разработка техотдела: «%s»") % Defs.research_name(str(d.get("research", "")))
 	var req := int(d.get("stage", 1))
 	if all_open or req <= stage or (pdef().get("early", []) as Array).has(def_id):
 		var dv := str(d.get("dev", ""))
 		if dv != "" and not sim.dev.on(dv):
-			return "Нужна ступень развития «%s» (Управление → Развитие)" % str(Develop.step_def(dv).get("name", dv))
+			return L.t("Нужна ступень развития «%s» (Управление → Развитие)") % Develop.sname(Develop.step_def(dv))
 		return ""
-	return "Откроется на этапе «%s»" % stage_name(req)
+	return L.t("Откроется на этапе «%s»") % stage_title(req)
 
 
 func dept_open(d: String) -> bool:
@@ -76,7 +81,7 @@ func dept_open(d: String) -> bool:
 
 
 func dept_lock_text(d: String) -> String:
-	return "Откроется на этапе «%s»" % stage_name(int(Defs.departments.get(d, {}).get("stage", 1)))
+	return L.t("Откроется на этапе «%s»") % stage_title(int(Defs.departments.get(d, {}).get("stage", 1)))
 
 
 ## Изделия, которые заказывают заводу этого профиля.
@@ -126,19 +131,19 @@ func goal_state(g: Dictionary) -> Array:
 			var e := float(sim.stats.get("earned", 0.0))
 			return [e >= n, "%s / %s" % [_short(e), _short(float(n))]]
 		"ooo":
-			return [ooo, "оформлено" if ooo else "нет"]
+			return [ooo, L.t("оформлено") if ooo else L.t("нет")]
 		"building":
 			var best := 0
 			for r in sim.rooms.list:
 				if r.type == "workshop" and r.valid:
 					best = maxi(best, r.area())
 			var area := int(g.get("area", 60))
-			return [best >= area, "%d/%d клеток" % [mini(best, area), area]]
+			return [best >= area, L.t("%d/%d клеток") % [mini(best, area), area]]
 		"staff":
 			var s := sim.workers.size()
 			return [s >= n, "%d/%d" % [mini(s, n), n]]
 		"big_order":
-			return [bool(flags.get("big_order", false)), "выполнен" if flags.get("big_order", false) else "нет"]
+			return [bool(flags.get("big_order", false)), L.t("выполнен") if flags.get("big_order", false) else L.t("нет")]
 		"clean":
 			var c := int(sim.stats.get("clean_inspections", 0))
 			return [c >= n, "%d/%d" % [mini(c, n), n]]
@@ -151,33 +156,33 @@ func goal_state(g: Dictionary) -> Array:
 			return [stars >= n, "%d/%d ★" % [stars, n]]
 		"export":
 			var ok := bool(flags.get("export", false)) or bool(flags.get("state", false))
-			return [ok, "выполнен" if ok else "нет"]
+			return [ok, L.t("выполнен") if ok else L.t("нет")]
 		"stage":
-			return [stage >= n, stage_name()]
+			return [stage >= n, stage_title()]
 		"grants":
 			var gd := sim.grants.done.size()
-			return [gd >= int(g.get("n", 1)), "выполнено %d из %d" % [gd, int(g.get("n", 1))]]
+			return [gd >= int(g.get("n", 1)), L.t("выполнено %d из %d") % [gd, int(g.get("n", 1))]]
 		"no_loans":
 			var d := sim.office.debt()
-			return [sim.office.loans.is_empty(), "долг %s" % Defs.money_str(d) if d > 0.0 else "долгов нет"]
+			return [sim.office.loans.is_empty(), L.t("долг %s") % Defs.money_str(d) if d > 0.0 else L.t("долгов нет")]
 		"restore":
 			var broken := 0
 			for oid in flags.get("old_ids", []):
 				var m: Thing = sim.things.get(int(oid))
 				if m and (m.broken or m.condition < 50.0):
 					broken += 1
-			return [broken == 0, "осталось %d" % broken if broken > 0 else "все работают"]
+			return [broken == 0, L.t("осталось %d") % broken if broken > 0 else L.t("все работают")]
 		"roof":
-			return [not roof_leak, "течёт" if roof_leak else "отремонтирована"]
+			return [not roof_leak, L.t("течёт") if roof_leak else L.t("отремонтирована")]
 		"arrears":
 			var a := arrears_total()
 			var late := arrears_until > 0.0 and sim.minute > arrears_until and a > 0.0
-			return [a <= 0.0, ("долг %s" % Defs.money_str(a)) + (" — срок вышел!" if late else "") if a > 0.0 else "погашены"]
+			return [a <= 0.0, (L.t("долг %s") % Defs.money_str(a)) + (L.t(" — срок вышел!") if late else "") if a > 0.0 else L.t("погашены")]
 		"mood":
 			var ms := int(g.get("staff", 0))
 			var avg := avg_mood()
 			var okm := sim.workers.size() >= ms and avg >= float(n)
-			return [okm, "%d чел., настроение %d" % [sim.workers.size(), int(avg)]]
+			return [okm, L.t("%d чел., настроение %d") % [sim.workers.size(), int(avg)]]
 		"town_rel":
 			var tr := sim.town.rel if sim.town else 0.0
 			return [tr >= float(n), "%d/%d" % [int(tr), n]]
@@ -186,7 +191,7 @@ func goal_state(g: Dictionary) -> Array:
 			var mn := int(g.get("min", 50))
 			var pct := float(g.get("pct", 3))
 			var okq := int(q[0]) >= mn and float(q[1]) * 100.0 < pct
-			return [okq, ("брак %.1f%% из %d дет." % [float(q[1]) * 100.0, int(q[0])]) if int(q[0]) > 0 else "деталей ещё нет"]
+			return [okq, (L.t("брак %.1f%% из %d дет.") % [float(q[1]) * 100.0, int(q[0])]) if int(q[0]) > 0 else L.t("деталей ещё нет")]
 		"steps":
 			var c := sim.dev.count_on()
 			return [c >= n, "%d/%d" % [mini(c, n), n]]
@@ -196,14 +201,14 @@ func goal_state(g: Dictionary) -> Array:
 			var days := int(g.get("days", 56))
 			var passed := sim.day() - start_day
 			var okk := not keep_fail and passed >= days
-			return [okk, "%d/%d чел., %d/%d дн.%s" % [sim.workers.size(), need, mini(passed, days), days, " — нарушено" if keep_fail else ""]]
+			return [okk, L.t("%d/%d чел., %d/%d дн.%s") % [sim.workers.size(), need, mini(passed, days), days, L.t(" — нарушено") if keep_fail else ""]]
 	return [false, ""]
 
 
 func _short(v: float) -> String:
 	if v >= 1000000.0:
-		return "%.1f млн" % (v / 1000000.0)
-	return "%d тыс." % int(v / 1000.0)
+		return L.t("%.1f млн") % (v / 1000000.0)
+	return L.t("%d тыс.") % int(v / 1000.0)
 
 
 func stage_goals() -> Array:
@@ -279,7 +284,7 @@ func tick(dt: float) -> void:
 	if roof_fix_at > 0.0 and sim.minute >= roof_fix_at:
 		roof_fix_at = -1.0
 		roof_leak = false
-		sim.story.info("Крыша отремонтирована", "Кровельщики закончили: в цеху больше не капает.", "build", Sim.LVL_GOOD)
+		sim.story.info(L.t("Крыша отремонтирована"), L.t("Кровельщики закончили: в цеху больше не капает."), "build", Sim.LVL_GOOD)
 	_t -= dt
 	if _t <= 0.0:
 		_t = 30.0
@@ -312,8 +317,8 @@ func _check_goals() -> void:
 			stage += 1
 			stage_up = stage
 			sim.reputation = minf(100.0, sim.reputation + 5.0)
-			sim.story.info("Новый этап: «%s»" % stage_name(), "Завод вырос! Открылось: %s." % str(stage_def().get("opens", "")).to_lower(), "stage_up", Sim.LVL_GOOD)
-			sim.paper.add("Главное", "Наш завод — %s!" % stage_name().to_lower(), "Коллектив поздравляет руководство и себя. Открываются новые участки и службы.")
+			sim.story.info(L.t("Новый этап: «%s»") % stage_title(), L.t("Завод вырос! Открылось: %s.") % L.dt("stage.%s.opens" % str(stage_def().get("id", "")), str(stage_def().get("opens", ""))).to_lower(), "stage_up", Sim.LVL_GOOD)
+			sim.paper.add(L.t("Главное"), L.t("Наш завод — %s!") % stage_title().to_lower(), L.t("Коллектив поздравляет руководство и себя. Открываются новые участки и службы."))
 	# сценарий
 	if not scn_done and not scenario_goals().is_empty():
 		var all2 := true
@@ -325,7 +330,7 @@ func _check_goals() -> void:
 			scn_done = true
 			scn_up = true
 			sim.stats["scenario_done"] = true
-			sim.story.info("Сценарий «%s» пройден!" % str(sdef().get("name", "")), "Все цели выполнены. Можно продолжать без ограничений — завод ваш.", "star", Sim.LVL_GOOD)
+			sim.story.info(L.t("Сценарий «%s» пройден!") % L.dt("scn.%s.name" % sim.scenario, str(sdef().get("name", ""))), L.t("Все цели выполнены. Можно продолжать без ограничений — завод ваш."), "star", Sim.LVL_GOOD)
 
 
 ## Отметки о достижениях от других систем.
@@ -412,13 +417,13 @@ func stars_text(n: int = -1) -> String:
 
 func register_ooo() -> String:
 	if ooo:
-		return "ООО уже оформлено"
+		return L.t("ООО уже оформлено")
 	var cost := 50000.0
 	if not sim.can_afford(cost):
-		return "Нужно %s на регистрацию, печать и расчётный счёт" % Defs.money_str(cost)
+		return L.t("Нужно %s на регистрацию, печать и расчётный счёт") % Defs.money_str(cost)
 	sim.spend(cost, "Регистрация ООО")
 	ooo = true
-	sim.story.info("ООО зарегистрировано", "Теперь вы — %s. Устав, печать, расчётный счёт — всё как у людей, на вывеске у ворот новая строчка. С вами охотнее работают крупные заказчики." % Company.title(sim), "office", Sim.LVL_GOOD)
+	sim.story.info(L.t("ООО зарегистрировано"), L.t("Теперь вы — %s. Устав, печать, расчётный счёт — всё как у людей, на вывеске у ворот новая строчка. С вами охотнее работают крупные заказчики.") % Company.title(sim), "office", Sim.LVL_GOOD)
 	sim.reputation = minf(100.0, sim.reputation + 3.0)
 	_check_goals()
 	return ""
@@ -426,13 +431,13 @@ func register_ooo() -> String:
 
 func repair_roof() -> String:
 	if not roof_leak or roof_fix_at > 0.0:
-		return "Крыша уже в порядке или ремонт идёт"
+		return L.t("Крыша уже в порядке или ремонт идёт")
 	var cost := 180000.0
 	if not sim.can_afford(cost):
-		return "Нужно %s на кровельные работы" % Defs.money_str(cost)
+		return L.t("Нужно %s на кровельные работы") % Defs.money_str(cost)
 	sim.spend(cost, "Ремонт: кровля цеха")
 	roof_fix_at = sim.minute + 3.0 * 1440.0
-	sim.notify("Кровельщики приступили: через три дня крыша перестанет течь.", Sim.LVL_INFO)
+	sim.notify(L.t("Кровельщики приступили: через три дня крыша перестанет течь."), Sim.LVL_INFO)
 	return ""
 
 
@@ -446,9 +451,9 @@ func arrears_total() -> float:
 func pay_arrears() -> String:
 	var a := arrears_total()
 	if a <= 0.0:
-		return "Долгов по зарплате нет"
+		return L.t("Долгов по зарплате нет")
 	if not sim.can_afford(a):
-		return "Нужно %s, на счёте %s" % [Defs.money_str(a), Defs.money_str(sim.money)]
+		return L.t("Нужно %s, на счёте %s") % [Defs.money_str(a), Defs.money_str(sim.money)]
 	sim.spend(a, "Зарплата: погашение долгов")
 	for w in sim.workers:
 		w.set_meta("arrears", 0.0)
@@ -456,7 +461,7 @@ func pay_arrears() -> String:
 			if str(w.thoughts[i]["id"]) == "arrears":
 				w.thoughts.remove_at(i)
 		Mood.add(sim, w, "arrears_paid")
-	sim.story.info("Долги по зарплате погашены", "Люди получили всё, что им задолжали. В городе выдохнули.", "money", Sim.LVL_GOOD)
+	sim.story.info(L.t("Долги по зарплате погашены"), L.t("Люди получили всё, что им задолжали. В городе выдохнули."), "money", Sim.LVL_GOOD)
 	sim.reputation = minf(100.0, sim.reputation + 5.0)
 	return ""
 
@@ -470,7 +475,7 @@ func _check_keep() -> void:
 			if sim.workers.size() < need and sim.day() - start_day < int(g.get("days", 56)):
 				keep_fail = true
 				sim.reputation = maxf(0.0, sim.reputation - 10.0)
-				sim.story.info("Губернатор недоволен", "Завод сократил слишком много людей. «Город на вас рассчитывал!» Репутация упала.", "staff", Sim.LVL_BAD, Vector2i(-1, -1), true)
+				sim.story.info(L.t("Губернатор недоволен"), L.t("Завод сократил слишком много людей. «Город на вас рассчитывал!» Репутация упала."), "staff", Sim.LVL_BAD, Vector2i(-1, -1), true)
 
 
 # ================================================================ бродячие собаки
@@ -599,7 +604,7 @@ func quiet_left() -> int:
 func quiet_morning() -> void:
 	if quiet_until > 0 and sim.day() >= quiet_until:
 		quiet_until = 0
-		sim.notify("Неделя стройки позади: отдел сбыта начинает принимать заявки. Проверьте, что станки под током и есть кому работать.", Sim.LVL_GOOD)
+		sim.notify(L.t("Неделя стройки позади: отдел сбыта начинает принимать заявки. Проверьте, что станки под током и есть кому работать."), Sim.LVL_GOOD)
 
 
 ## Кнопка «Начать производство раньше».
@@ -607,6 +612,6 @@ func start_early() -> void:
 	if not quiet():
 		return
 	quiet_until = 0
-	sim.notify("Производство открыто раньше срока: сбыт уже принимает заявки — первые придут сегодня.", Sim.LVL_GOOD)
+	sim.notify(L.t("Производство открыто раньше срока: сбыт уже принимает заявки — первые придут сегодня."), Sim.LVL_GOOD)
 	sim.orders.open_early()
 

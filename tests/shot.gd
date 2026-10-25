@@ -65,9 +65,16 @@ func _ready() -> void:
 	if args.size() > 7 and args[7] == "cust132":
 		Game.pending_opts["customs"] = shot132_people()
 		Game.pending_opts["custom_chance"] = 1.0
+	if args.size() > 7 and args[7].begins_with("p139:"):
+		# 1.39: начало игры после ребаланса — сценарий, как у обычного игрока, с замером econ_probe
+		Game.pending_scn = args[7].split(":")[1]
+		Game.pending_story = args[7].split(":")[2] if args[7].split(":").size() > 2 else "market"
+		Game.pending_opts = {"lots": true, "flora": true, "money": 1000000}
 	target = load("res://scenes/game.tscn").instantiate()
 	add_child(target)
 	var gm := target as GameMain
+	if args.size() > 7 and args[7].begins_with("p139:"):
+		_setup_p139(gm.sim)
 	if args.size() > 7 and args[7] == "expand":
 		gm.sim.money += 400000.0
 		var t := gm.tool
@@ -1617,6 +1624,33 @@ func _box(sim: Sim, r: Rect2i, floor_id: int, door: Vector2i) -> void:
 				w.wall[i] = World.W_BRICK
 	w.wall[w.idx(door)] = World.W_DOOR
 	w.refresh_all()
+
+
+## 1.39: те же помещения и покупки, что в tests/econ_probe.gd (склад в гараже, цех, раздевалка, туалет, станок).
+func _setup_p139(sim: Sim) -> void:
+	var P := preload("res://tests/econ_probe.gd")
+	var log: Array = []
+	var scn := sim.scenario
+	var anchor := Vector2(Scenario.GARAGE.get_center()) if scn == "garage" else Vector2(sim.world.plot.get_center())
+	if scn == "field":
+		anchor = Vector2(16, 20)
+	if scn == "garage":
+		P.buy_in(sim, "rack", Rect2i(Scenario.GARAGE.position + Vector2i(1, 1), Scenario.GARAGE.size - Vector2i(2, 2)), log)
+		P.put_template(sim, "storage", anchor, log)
+		P.hire_prof(sim, "laborer", log)
+	var o: Vector2i = P.put_template(sim, "workshop", anchor, log)
+	P.put_template(sim, "locker", anchor, log)
+	P.put_template(sim, "wc", anchor, log)
+	if o.x >= 0:
+		var inner := Rect2i(o + Vector2i(2, 2), Templates.inner("workshop") - Vector2i(2, 2))
+		P.buy_in(sim, "workbench", inner, log)
+		P.buy_in(sim, "lathe_tv4", inner, log)
+		Scenario.autowire(sim)
+		Scenario.autopipe(sim)
+		P.hire_prof(sim, "turner", log)
+	for l: String in log:
+		print("p139: ", l)
+	print("p139: деньги после стройки ", int(sim.money))
 
 
 ## Пристройка из теста этапа 2: бытовка, столовая, туалет, кабели.

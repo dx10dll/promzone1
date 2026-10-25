@@ -207,9 +207,9 @@ func _store(kg: float, near: Vector2i) -> void:
 			best = b
 	if best == null:
 		if bins().is_empty():
-			sim.notify_once("no_chip_bin", "Стружку сметают в кучу в углу. Поставьте контейнер для стружки (Объекты → Склад): её будут сдавать в металлолом за деньги.", Sim.LVL_INFO, near, 2880.0)
+			sim.notify_once("no_chip_bin", L.t("Стружку сметают в кучу в углу. Поставьте контейнер для стружки (Объекты → Склад): её будут сдавать в металлолом за деньги."), Sim.LVL_INFO, near, 2880.0)
 		else:
-			sim.notify_once("chip_full", "Контейнеры для стружки полны — ломовоз приедет в пятницу. Поставьте ещё контейнер.", Sim.LVL_WARN, near, 1440.0)
+			sim.notify_once("chip_full", L.t("Контейнеры для стружки полны — ломовоз приедет в пятницу. Поставьте ещё контейнер."), Sim.LVL_WARN, near, 1440.0)
 		return
 	bin_kg[best.id] = minf(BIN_CAP, float(bin_kg.get(best.id, 0.0)) + kg)
 
@@ -258,7 +258,7 @@ func pickup(forced: bool = false) -> float:
 	pickups += 1
 	_last_pickup_day = sim.day()
 	sim.stats["scrap_kg"] = int(sim.stats.get("scrap_kg", 0)) + int(kg)
-	sim.notify("Приезжал ломовоз: %d кг стружки и %d %s брака сданы в металлолом за %s." % [int(kg), parts.size(), Defs.plural(parts.size(), "деталь", "детали", "деталей"), Defs.money_str(money)], Sim.LVL_GOOD)
+	sim.notify(L.t("Приезжал ломовоз: %d кг стружки и %d %s брака сданы в металлолом за %s.") % [int(kg), parts.size(), Defs.plural(parts.size(), "деталь", "детали", "деталей"), Defs.money_str(money)], Sim.LVL_GOOD)
 	sim.sfx.emit("cash", Vector2i(-1, -1))
 	return money
 
@@ -279,9 +279,9 @@ func call_truck() -> bool:
 	v.body = "truck"
 	v.color = 0
 	v.hold = true
-	v.cargo_desc = "Ломовоз " + FIRM
+	v.cargo_desc = L.t("Ломовоз %s") % L.t(FIRM)
 	run = {"vid": v.id, "st": "wait", "q": [], "kg": 0.0, "parts": 0, "pm": 0.0, "ck": 0.0, "cp": 0, "cpm": 0.0, "t": 0.0, "on": 0.0}
-	sim.notify("Едет ломовоз %s — заберёт стружку и брак, заплатит за металлолом." % FIRM, Sim.LVL_INFO)
+	sim.notify(L.t("Едет ломовоз %s — заберёт стружку и брак, заплатит за металлолом.") % L.t(FIRM), Sim.LVL_INFO)
 	return true
 
 
@@ -313,12 +313,12 @@ func on_truck_park(v: Vehicle) -> void:
 	run["q"] = ids
 	run["st"] = "go"
 	run["on"] = 0.0
-	driver = FireBrigade.make_guest(sim, "Водитель ломовоза", "overall", "#4a5a6a", "cap", "#3a3a40", "")
+	driver = FireBrigade.make_guest(sim, L.t("Водитель ломовоза"), "overall", "#4a5a6a", "cap", "#3a3a40", "")
 	var dc := _truck_cell(v)
 	driver.pos = Vector2(dc) + Vector2(0.5, 0.5)
 	driver.exit_cell = dc
 	sim.visitors.append(driver)
-	sim.notify("Приехал ломовоз %s: водитель собирает стружку и брак." % FIRM, Sim.LVL_INFO, dc)
+	sim.notify(L.t("Приехал ломовоз %s: водитель собирает стружку и брак.") % L.t(FIRM), Sim.LVL_INFO, dc)
 
 
 ## Куда водитель ссыпает лом: тротуар у заднего борта.
@@ -351,7 +351,7 @@ func _tick_run(dt: float) -> void:
 				q.pop_front()
 				return
 			var acc := sim.brain.best_access(t, driver.cell())
-			driver.activity = "Идёт за стружкой" if t.def_id == "chip_bin" else "Идёт за браком"
+			driver.activity = L.t("Идёт за стружкой") if t.def_id == "chip_bin" else L.t("Идёт за браком")
 			var r := sim.brain.move_to(driver, acc, dt)
 			if r == 1:
 				run["st"] = "load"
@@ -365,7 +365,7 @@ func _tick_run(dt: float) -> void:
 				run["st"] = "back"
 				return
 			driver.anim = "work"
-			driver.activity = "Пересыпает стружку в короб" if t2.def_id == "chip_bin" else "Забирает брак в металлолом"
+			driver.activity = L.t("Пересыпает стружку в короб") if t2.def_id == "chip_bin" else L.t("Забирает брак в металлолом")
 			run["t"] = float(run["t"]) - dt
 			if float(run["t"]) > 0.0:
 				return
@@ -382,7 +382,7 @@ func _tick_run(dt: float) -> void:
 			driver.prop = "chips"
 			run["st"] = "back"
 		"back":
-			driver.activity = "Несёт лом к машине"
+			driver.activity = L.t("Несёт лом к машине")
 			var dc := _truck_cell(v)
 			var r2 := sim.brain.move_to(driver, dc, dt)
 			if r2 != 0:
@@ -413,7 +413,7 @@ func _finish_run(v: Vehicle) -> void:
 		pickups += 1
 		_last_pickup_day = sim.day()
 		sim.stats["scrap_kg"] = int(sim.stats.get("scrap_kg", 0)) + int(kg)
-		sim.notify("Ломовоз %s увёз в пункт приёма %d кг стружки и %d %s брака — заплатил %s." % [FIRM, int(kg), parts, Defs.plural(parts, "деталь", "детали", "деталей"), Defs.money_str(money)], Sim.LVL_GOOD, Vector2i(int(v.park_x), sim.world.sidewalk_row))
+		sim.notify(L.t("Ломовоз %s увёз в пункт приёма %d кг стружки и %d %s брака — заплатил %s.") % [L.t(FIRM), int(kg), parts, Defs.plural(parts, "деталь", "детали", "деталей"), Defs.money_str(money)], Sim.LVL_GOOD, Vector2i(int(v.park_x), sim.world.sidewalk_row))
 		sim.sfx.emit("cash", Vector2i(-1, -1))
 	_end_run(v)
 
@@ -477,9 +477,9 @@ func level_parts(r: Rooms.Room) -> Array:
 	var out: Array = []
 	var area := r.area()
 	if r.windows > 0:
-		out.append(["окна", 1.0])
+		out.append([L.t("окна"), 1.0])
 		if r.windows * 12 >= area:
-			out.append(["много света из окон", 1.0])
+			out.append([L.t("много света из окон"), 1.0])
 	var d: Dictionary = Defs.rooms.get(r.type, {})
 	var floors: Array = d.get("floors", [])
 	var good := 0
@@ -488,21 +488,21 @@ func level_parts(r: Rooms.Room) -> Array:
 		if (not floors.is_empty() and floors.has(f)) or (floors.is_empty() and (f == 2 or f == 3)):
 			good += 1
 	if area > 0 and float(good) / float(area) >= 0.8:
-		out.append(["хороший пол", 1.0])
+		out.append([L.t("хороший пол"), 1.0])
 	if r.powered and r.lit:
-		out.append(["электрический свет", 1.0])
+		out.append([L.t("электрический свет"), 1.0])
 	var decor := 0.0
 	for tid in r.things:
 		var t: Thing = sim.things.get(tid)
 		if t:
 			decor += float(t.def().get("prestige", 0))
 	if decor > 0.0:
-		out.append(["обстановка", snappedf(minf(6.0, decor * 30.0 / maxf(30.0, float(area))), 0.1)])
+		out.append([L.t("обстановка"), snappedf(minf(6.0, decor * 30.0 / maxf(30.0, float(area))), 0.1)])
 	var rd := room_dirt(r)
 	if rd > VERY_DIRTY:
-		out.append(["грязища", -2.0])
+		out.append([L.t("грязища"), -2.0])
 	elif rd > DIRTY * 0.7:
-		out.append(["грязно", -1.0])
+		out.append([L.t("грязно"), -1.0])
 	return out
 
 
@@ -632,8 +632,8 @@ func from_dict(d: Dictionary) -> void:
 	if not dd.is_empty() and not run.is_empty():
 		driver = Worker.from_dict(dd)
 		driver.visitor = true
-		driver.activity = "Водитель ломовоза"
-		driver.set_meta("who", "Водитель ломовоза")
+		driver.activity = L.t("Водитель ломовоза")
+		driver.set_meta("who", L.t("Водитель ломовоза"))
 		driver.set_meta("veh", true)
 		driver.prop = "chips" if str(run.get("st", "")) == "back" else ""
 		sim.visitors.append(driver)

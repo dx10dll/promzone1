@@ -108,6 +108,9 @@ static func _cat(cats: Control, tex: Texture2D, text: String, on: bool, cb: Call
 ## Квадратная плитка: значок, название в две строки, цена. Наведение — описание внизу меню.
 static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: String, cost_col: Color, desc: String,
 		mode: String, arg: Variant, lock: String = "", stripe: Color = Color(0, 0, 0, 0), tint: Color = Color.WHITE) -> Button:
+	title = L.t(title)   # 1.40: названия, цены и описания из данных — ключ перевода сам русский текст
+	cost = L.t(cost)
+	desc = L.t(desc)
 	var b := Button.new()
 	b.toggle_mode = true
 	b.focus_mode = Control.FOCUS_NONE
@@ -163,7 +166,7 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 	if lock != "":
 		b.disabled = true
 		b.modulate = Color(1, 1, 1, 0.42)
-		full += " — закрыто: " + lock + "."
+		full += L.t(" — закрыто: %s.") % lock
 	b.mouse_entered.connect(func() -> void:
 		if _info:
 			_info.text = full
@@ -245,9 +248,9 @@ static func _hyph_cut(wd: String, f: Font, px: int, width: float) -> int:
 		var r := wd.substr(i)
 		var lc := l[l.length() - 1]
 		var r0 := r[0]
-		if r0 in VOW or r0 in "ьъйЬЪЙ":
+		if r0 in _vow() or r0 in "ьъйЬЪЙ":
 			continue
-		if lc in VOW and not (r.length() > 1 and r[1] in VOW):
+		if lc in _vow() and not (r.length() > 1 and r[1] in _vow()):
 			continue
 		if not _has_vowel(l) or not _has_vowel(r):
 			continue
@@ -259,9 +262,14 @@ static func _hyph_cut(wd: String, f: Font, px: int, width: float) -> int:
 	return best
 
 
+## 1.40: в английском переносим и латиницу.
+static func _vow() -> String:
+	return VOW + "aeiouyAEIOUY" if L.is_en() else VOW
+
+
 static func _has_vowel(t: String) -> bool:
 	for ch in t:
-		if ch in VOW:
+		if ch in _vow():
 			return true
 	return false
 
@@ -327,22 +335,22 @@ static func mats_status(sim: Sim) -> String:
 		var eta := INF
 		for o: Dictionary in bm.orders:
 			eta = minf(eta, float(o["eta"]))
-		return "Стройматериалы едут: %s · %s" % [BuildMats.desc(cm), sim._eta_str(eta)]
+		return L.t("Стройматериалы едут: %s · %s") % [BuildMats.desc(cm), sim._eta_str(eta)]
 	var waiting := 0
 	for k in need.keys():
 		if bm.free_on_ground(str(k)) <= 0:
 			waiting += int(need[k])
 	if waiting > 0:
-		return "Стройка ждёт материал: %d кл. — заказ уйдёт сам" % waiting
-	return "Материал на площадке — строят"
+		return L.t("Стройка ждёт материал: %d кл. — заказ уйдёт сам") % waiting
+	return L.t("Материал на площадке — строят")
 
 
 static func _money(h: Hud, cost: float, mode: String, arg: Variant) -> Array:
 	var lease := mode == "object" and h.sim.market.can_lease(str(arg), cost)
 	if lease:
-		return ["лизинг " + Defs.money_str(roundf(cost * Market.LEASE_ADV)), UITheme.INFO]
+		return [L.t("лизинг %s") % Defs.money_str(roundf(cost * Market.LEASE_ADV)), UITheme.INFO]
 	if cost <= 0.0:
-		return ["бесплатно", UITheme.GOOD]
+		return [L.t("бесплатно"), UITheme.GOOD]
 	return [Defs.money_str(cost), UITheme.ACCENT]
 
 
@@ -372,7 +380,7 @@ static func _pick(h: Hud, cap: String, cur: int, items: Dictionary, cb: Callable
 	var n := 1
 	for k in items.keys():
 		var d: Dictionary = items[k]
-		ob.add_item("%s · %s/кл." % [str(d["name"]), Defs.money_str(float(d["cost"]))], int(d["id"]))
+		ob.add_item(L.t("%s · %s/кл.") % [L.t(str(d["name"])), Defs.money_str(float(d["cost"]))], int(d["id"]))
 		if int(d["id"]) == cur:
 			sel = n
 		n += 1
@@ -387,7 +395,7 @@ static func _pick(h: Hud, cap: String, cur: int, items: Dictionary, cb: Callable
 
 static func _head_text(_head: Control, text: String) -> void:
 	if _info_def == "":
-		_info_def = text
+		_info_def = L.t(text)
 
 
 # ---------------------------------------------------------------- стройка
@@ -423,18 +431,18 @@ static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 				var td: Dictionary = Defs.templates[tk]
 				var tid := str(tk)
 				var inn := Templates.inner(tid)
-				var tdesc := "%s Внутри %d×%d клеток, снаружи со стенами %d×%d." % [str(td.get("desc", "")), inn.x, inn.y, inn.x + 2, inn.y + 2]
+				var tdesc := L.t("%s Внутри %d×%d клеток, снаружи со стенами %d×%d.") % [L.t(str(td.get("desc", ""))), inn.x, inn.y, inn.x + 2, inn.y + 2]
 				_tile(h, grid, Tex.ui("zone_" + str(td.get("zone", "workshop"))), str(td["name"]), Defs.money_str(Templates.cost(h.sim, tid)), UITheme.ACCENT, tdesc, "template", tid, Templates.locked(h.sim, tid))
 			for k0 in [["concrete", "Цех рамкой"], ["tile", "Бытовка рамкой"], ["lino", "Кабинет рамкой"]]:
 				var fd0: Dictionary = Defs.floors[str(k0[0])]
-				_tile(h, grid, Tex.tile("icon_room_" + str(k0[0])), str(k0[1]), Defs.money_str(float(fd0["cost"])) + "/кл.", UITheme.ACCENT,
-					"пол «%s» по всей площади, стены по контуру (общие с соседями не дублируются) и дверь посередине нижней стены. Цена — за клетку пола, плюс стены и дверь." % str(fd0["name"]).to_lower(), "roomframe", int(fd0["id"]))
+				_tile(h, grid, Tex.tile("icon_room_" + str(k0[0])), str(k0[1]), _per_cell(float(fd0["cost"])), UITheme.ACCENT,
+					L.t("пол «%s» по всей площади, стены по контуру (общие с соседями не дублируются) и дверь посередине нижней стены. Цена — за клетку пола, плюс стены и дверь.") % L.t(str(fd0["name"])).to_lower(), "roomframe", int(fd0["id"]))
 		"floor":
 			_head_text(head, "Протяните прямоугольник. Цех — бетон или наливной пол, быт — плитка, кабинеты — линолеум или паркет.")
 			for k in Defs.floors.keys():
 				var fd: Dictionary = Defs.floors[k]
 				var tk := str(fd.get("tex", k))
-				_tile(h, grid, Tex.tile("concrete_0" if tk == "concrete" else tk), str(fd["name"]), Defs.money_str(float(fd["cost"])) + "/кл.", UITheme.ACCENT, str(fd.get("desc", "")), "floor", int(fd["id"]))
+				_tile(h, grid, Tex.tile("concrete_0" if tk == "concrete" else tk), str(fd["name"]), _per_cell(float(fd["cost"])), UITheme.ACCENT, str(fd.get("desc", "")), "floor", int(fd["id"]))
 		"wall", "open":
 			_head_text(head, "Стены — контуром прямоугольника. Перегородкой удобно делить большой зал на кабинеты." if build_cat == "wall" else "Окна, двери и ворота ставят в стену: протяните вдоль неё.")
 			var icons := {"brick": "icon_wall", "concrete_wall": "icon_wall_concrete", "sandwich": "icon_wall_sandwich", "partition": "icon_wall_partition",
@@ -448,10 +456,15 @@ static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 				if (build_cat == "wall") != (kind == "wall"):
 					continue
 				var mode := "wall" if kind == "wall" else kind
-				_tile(h, grid, Tex.tile(str(icons.get(k2, "icon_wall"))), str(wd["name"]), Defs.money_str(float(wd["cost"])) + "/кл.", UITheme.ACCENT, str(wd.get("desc", "")), mode, int(wd["id"]))
+				_tile(h, grid, Tex.tile(str(icons.get(k2, "icon_wall"))), str(wd["name"]), _per_cell(float(wd["cost"])), UITheme.ACCENT, str(wd.get("desc", "")), mode, int(wd["id"]))
 		"yard":
 			_head_text(head, "Зоны на улице рисуют прямоугольником у ворот. Разгрузка и отгрузка обязательны — их можно расширить или перенести, но не убрать. Внутренние зоны — в меню «Зоны».")
 			_yard_tiles(h, grid)
+
+
+## Цена за клетку: «1 200 ₽/кл.».
+static func _per_cell(cost: float) -> String:
+	return L.t("%s/кл.") % Defs.money_str(cost)
 
 
 static func _yard_tiles(h: Hud, grid: Control) -> void:
@@ -485,7 +498,7 @@ static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> voi
 			lz.disabled = true
 			lz.tooltip_text = "Лизинг открывает ступень «Банк и лизинг» (Управление → Развитие), её держит бухгалтер."
 		else:
-			lz.tooltip_text = "Станки от %s: %d%% сразу, остальное +%d%% платежами %d недель (Финансы → Кредиты и лизинг)" % [Defs.money_str(Market.LEASE_MIN), int(Market.LEASE_ADV * 100.0), int(Market.LEASE_UP * 100.0), Market.LEASE_WEEKS]
+			lz.tooltip_text = L.t("Станки от %s: %d%% сразу, остальное +%d%% платежами %d недель (Финансы → Кредиты и лизинг)") % [Defs.money_str(Market.LEASE_MIN), int(Market.LEASE_ADV * 100.0), int(Market.LEASE_UP * 100.0), Market.LEASE_WEEKS]
 		lz.toggled.connect(func(v: bool) -> void:
 			h.sim.market.leasing_on = v
 			h._fill_sub())
@@ -496,11 +509,11 @@ static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> voi
 		if str(od.get("cat", "")) != h.obj_cat or bool(od.get("legacy", false)):
 			continue
 		var sz: Array = od.get("size", [1, 1])
-		var desc := "%s Размер %d×%d." % [str(od.get("desc", "")), int(sz[0]), int(sz[1])]
+		var desc := L.t("%s Размер %d×%d.") % [L.t(str(od.get("desc", ""))), int(sz[0]), int(sz[1])]
 		if od.has("machine") and str(od.get("kind", "")) == "machine":
 			desc += " " + Defs.machine_spec(str(k3)) + "."
 		if od.has("power"):
-			desc += " Мощность %s кВт." % str(od["power"])
+			desc += L.t(" Мощность %s кВт.") % str(od["power"])
 		var price := h.sim.thing_cost(str(k3))
 		var m := _money(h, price, "object", k3)
 		_tile(h, grid, Tex.obj(k3 if k3 != "chair" else "chair_down"), str(od["name"]), str(m[0]), m[1], desc, "object", k3, h.sim.progress.locked_reason(str(k3)))
@@ -532,7 +545,7 @@ static func _zones(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 			if str(Defs.departments[dk].get("room", "")) == t2 and not h.sim.progress.dept_open(str(dk)):
 				lock = h.sim.progress.dept_lock_text(str(dk))
 		var n := h.sim.rooms.of_type(t2, false).size()
-		_tile(h, grid, Tex.ui("zone_" + t2), str(d.get("name", t2)), ("есть: %d" % n) if n > 0 else "", UITheme.GOOD, "нужно: %s. %s" % [Rooms.req_text(t2), str(d.get("desc", ""))], "room", t2, lock, gc, gc.lightened(0.35))
+		_tile(h, grid, Tex.ui("zone_" + t2), str(d.get("name", t2)), (L.t("есть: %d") % n) if n > 0 else "", UITheme.GOOD, L.t("нужно: %s. %s") % [Rooms.req_text(t2), L.t(str(d.get("desc", "")))], "room", t2, lock, gc, gc.lightened(0.35))
 	if zone_cat == "store":
 		_yard_tiles(h, grid)
 	_tile(h, grid, Tex.ui("zone_erase"), "Стереть разметку", "", UITheme.MUTED, "протяните или щёлкните — клетки станут неразмеченными.", "room", "_erase")
@@ -557,22 +570,22 @@ static func _power(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 			for t0: Thing in h.sim.things.values():
 				if t0.built and str(t0.def().get("power_source", "")) != "":
 					ntr += 1
-			_head_text(head, ("Подстанции (%d): %d кВт · нагрузка %.1f кВт. Мало — аккумуляторы вплотную к подстанции." % [ntr, int(pw.total_kw()), pw.total_load]) if ntr > 0 else "Тока нет: поставьте подстанцию в техпомещении и заведите кабель в её клетку.")
+			_head_text(head, (L.t("Подстанции (%d): %d кВт · нагрузка %.1f кВт. Мало — аккумуляторы вплотную к подстанции.") % [ntr, int(pw.total_kw()), pw.total_load]) if ntr > 0 else "Тока нет: поставьте подстанцию в техпомещении и заведите кабель в её клетку.")
 			if h.net_kind == "power":
-				_tile(h, grid, Tex.ui("cable"), "Кабель", Defs.money_str(Defs.b("cable_cost")) + "/кл.", UITheme.ACCENT, "протяните мышью — ляжет уголком. Прибор подключён, если кабель заведён прямо в клетку его розетки (жёлтый значок), подстанция — в любую её клетку.", "cable", null)
+				_tile(h, grid, Tex.ui("cable"), "Кабель", _per_cell(Defs.b("cable_cost")), UITheme.ACCENT, "протяните мышью — ляжет уголком. Прибор подключён, если кабель заведён прямо в клетку его розетки (жёлтый значок), подстанция — в любую её клетку.", "cable", null)
 				_tile(h, grid, Tex.ui("uncable"), "Снять кабель", "", UITheme.MUTED, "выделите область — вернётся 30% стоимости.", "uncable", null)
 			for k in Defs.objects.keys():
 				var od: Dictionary = Defs.objects[k]
 				if str(od.get("cat", "")) != ("Электрика" if h.net_kind == "power" else "Освещение") or bool(od.get("legacy", false)):
 					continue
-				var desc := str(od.get("desc", ""))
+				var desc := L.t(str(od.get("desc", "")))
 				if od.has("capacity_kw"):
-					desc += " Мощность %d кВт." % int(od["capacity_kw"])
+					desc += L.t(" Мощность %d кВт.") % int(od["capacity_kw"])
 				var m := _money(h, h.sim.thing_cost(str(k)), "object", k)
 				_tile(h, grid, Tex.obj(k), str(od["name"]), str(m[0]), m[1], desc, "object", k, h.sim.progress.locked_reason(str(k)))
 		"water":
 			_head_text(head, "Насосная станция — в техпомещении; трубы тяните от неё прямо в клетки туалетов, раковин и котла (синий кружок).")
-			_tile(h, grid, Tex.tile("icon_pipe"), "Труба", Defs.money_str(Defs.b("pipe_cost")) + "/кл.", UITheme.ACCENT, "протяните мышью — ляжет уголком.", "pipe", null)
+			_tile(h, grid, Tex.tile("icon_pipe"), "Труба", _per_cell(Defs.b("pipe_cost")), UITheme.ACCENT, "протяните мышью — ляжет уголком.", "pipe", null)
 			_tile(h, grid, Tex.tile("icon_unpipe"), "Снять трубу", "", UITheme.MUTED, "выделите область — вернётся 30% стоимости.", "unpipe", null)
 			for kw in Defs.objects.keys():
 				if bool(Defs.objects[kw].get("legacy", false)):
@@ -583,7 +596,7 @@ static func _power(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 			var vent := h.net_kind == "vent"
 			_head_text(head, "Воздуховод — от вытяжного вентилятора по помещениям со сваркой, покраской и печью." if vent else "Пневмомагистраль — от компрессора к покрасочной камере и сборочным столам.")
 			var lay := "duct" if vent else "air"
-			_tile(h, grid, Tex.tile("icon_" + lay), "Воздуховод" if vent else "Пневмомагистраль", Defs.money_str(Defs.b(lay + "_cost")) + "/кл.", UITheme.ACCENT, "протяните мышью — линия ляжет уголком.", lay, null)
+			_tile(h, grid, Tex.tile("icon_" + lay), "Воздуховод" if vent else "Пневмомагистраль", _per_cell(Defs.b(lay + "_cost")), UITheme.ACCENT, "протяните мышью — линия ляжет уголком.", lay, null)
 			_tile(h, grid, Tex.tile("icon_un" + lay), "Снять", "", UITheme.MUTED, "выделите область — вернётся 30% стоимости.", "un" + lay, null)
 			for kv in Defs.objects.keys():
 				if str(Defs.objects[kv].get("net", "")) == h.net_kind:

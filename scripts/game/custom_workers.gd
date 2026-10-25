@@ -101,7 +101,7 @@ static func check_part(s: String, required: bool = true) -> String:
 	if letters < NAME_MIN:
 		return "слишком коротко"
 	if t.length() > NAME_MAX:
-		return "слишком длинно (до %d букв)" % NAME_MAX
+		return L.t("слишком длинно (до %d букв)") % NAME_MAX
 	return ""
 
 
@@ -235,7 +235,7 @@ static func new_entry(r: RandomNumberGenerator) -> Dictionary:
 static func subtitle(e: Dictionary) -> String:
 	var pf := str(e.get("prof", ""))
 	var age := int(e.get("age", 30))
-	return "%s · %d %s" % [str(Worker.PROF_NAMES.get(pf, "Любая профессия")), age, Defs.plural(age, "год", "года", "лет")]
+	return "%s · %d %s" % [L.t(str(Worker.PROF_NAMES.get(pf, "Любая профессия"))), age, L.pl(age, "год|года|лет")]
 
 
 static func fio(e: Dictionary) -> String:

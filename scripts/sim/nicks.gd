@@ -106,23 +106,23 @@ static func daily(sim: Sim) -> void:
 
 static func _give(sim: Sim, w: Worker, rule: Dictionary, on_factory: bool) -> void:
 	var pool: Array = rule["f"] if w.female else rule["m"]
-	var nick := str(pool[sim.rng.randi_range(0, pool.size() - 1)])
+	var nick := L.t(str(pool[sim.rng.randi_range(0, pool.size() - 1)]))   # 1.39: в английском — английское прозвище
 	# не дублируем прозвища в одном коллективе
 	for o in sim.workers:
 		if o != w and o.nick == nick:
 			return
 	var whys: Array = rule["why"]
-	var why := gendered(str(whys[sim.rng.randi_range(0, whys.size() - 1)]), w.female)
-	why = why.replace("%s", w.first)
+	var why := gendered(L.t(str(whys[sim.rng.randi_range(0, whys.size() - 1)])), w.female)
+	why = why.replace("%s", L.name(w.first))
 	w.nick = nick
 	w.nick_why = why
 	if not on_factory:
-		w.add_history(sim.day(), "Ещё на прошлой работе прозвали «%s». %s" % [nick, why])
+		w.add_history(sim.day(), L.t("Ещё на прошлой работе прозвали «%s». %s") % [nick, why])
 		return
-	w.add_history(sim.day(), gendered("{Получил|Получила} прозвище «%s». %s", w.female) % [nick, why])
+	w.add_history(sim.day(), gendered(L.t("{Получил|Получила} прозвище «%s». %s"), w.female) % [nick, why])
 	Mood.add(sim, w, "nickname")
-	sim.story.info("Новое прозвище: «%s»" % nick, "%s %s теперь на заводе — «%s». %s" % [w.first, w.last, nick, why], "staff", Sim.LVL_INFO, w.cell() if w.present else Vector2i(-1, -1))
-	sim.paper.add("Люди завода", "Почему %s %s теперь «%s»" % [w.first, w.last, nick], why)
+	sim.story.info(L.t("Новое прозвище: «%s»") % nick, L.t("%s %s теперь на заводе — «%s». %s") % [L.name(w.first), L.name(w.last), nick, why], "staff", Sim.LVL_INFO, w.cell() if w.present else Vector2i(-1, -1))
+	sim.paper.add(L.t("Люди завода"), L.t("Почему %s %s теперь «%s»") % [L.name(w.first), L.name(w.last), nick], why)
 
 
 ## «{пришёл|пришла}» → нужная форма по полу.

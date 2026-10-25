@@ -1,6 +1,8 @@
 {
  "minute_real_seconds": 0.5,
- "start_money": 300000,
+ "start_money": 600000,
+ "early_advance": 0.3,
+ "early_advance_days": 14,
  "start_reputation": 50,
  "shift_start": 480,
  "shift_end": 1020,

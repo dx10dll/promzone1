@@ -119,8 +119,8 @@ static func build(win: GameWindow) -> void:
 	if sel == "" or not Defs.research.has(sel):
 		sel = of.research_cur if of.research_cur != "" else "root"
 	var rate := of.research_rate()
-	win._info("изучено %d из %d" % [of.research_done.size(), Defs.research.size()] + (" · ~%.1f очка за смену" % rate if rate > 0.0 else ""))
-	win._intro("Разработки ведёт технолог в техотделе — дерево открывается, когда он появится. Изученное открывает новые изделия, станки и улучшения. Щёлкните по разработке — внизу подробности.")
+	win._info(L.t("изучено %d из %d") % [of.research_done.size(), Defs.research.size()] + (L.t(" · ~%.1f очка за смену") % rate if rate > 0.0 else ""))
+	win._intro(L.t("Разработки ведёт технолог в техотделе — дерево открывается, когда он появится. Изученное открывает новые изделия, станки и улучшения. Щёлкните по разработке — внизу подробности."))
 	var lay := layout()
 	var tv := TreeView.new()
 	tv.sim = sim
@@ -139,7 +139,7 @@ static func build(win: GameWindow) -> void:
 		var ic := win._icon(Tex.ui(str(BRANCH_ICONS.get(bname, "research"))), 20)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		hv.add_child(ic)
-		var nl := UITheme.label(bname, 12, UITheme.TEXT, UITheme.f_semi)
+		var nl := UITheme.label(L.t(bname), 12, UITheme.TEXT, UITheme.f_semi)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.clip_text = true
 		nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -168,7 +168,7 @@ static func _root_node(win: GameWindow) -> Button:
 	var st := "works" if open(sim) else "locked"
 	if of.research_cur != "" and open(sim):
 		st = "busy"
-	var b := DevTree._btn(st, sel == "root", "Техотдел: здесь технолог ведёт разработки", func() -> void:
+	var b := DevTree._btn(st, sel == "root", L.t("Техотдел: здесь технолог ведёт разработки"), func() -> void:
 		sel = "root"
 		win.rebuild(true))
 	var v := DevTree._inner(b)
@@ -178,17 +178,17 @@ static func _root_node(win: GameWindow) -> Button:
 	var ic := win._icon(Tex.ui("research"), 22)
 	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hh.add_child(ic)
-	var rl := DevTree._lab("Техотдел", 14, UITheme.TEXT, UITheme.f_semi)
+	var rl := DevTree._lab(L.t("Техотдел"), 14, UITheme.TEXT, UITheme.f_semi)
 	rl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hh.add_child(rl)
 	v.add_child(hh)
 	if not open(sim):
-		v.add_child(DevTree._lab("нет технолога — дерево закрыто", 12, UITheme.WARN))
+		v.add_child(DevTree._lab(L.t("нет технолога — дерево закрыто"), 12, UITheme.WARN))
 	elif of.research_cur != "":
 		var rd: Dictionary = Defs.research[of.research_cur]
-		v.add_child(DevTree._lab("разрабатывает: «%s» · %d%%" % [str(rd["name"]), int(float(of.research_pts.get(of.research_cur, 0.0)) / float(rd["cost"]) * 100.0)], 12, UITheme.ACCENT))
+		v.add_child(DevTree._lab(L.t("разрабатывает: «%s» · %d%%") % [L.t(str(rd["name"])), int(float(of.research_pts.get(of.research_cur, 0.0)) / float(rd["cost"]) * 100.0)], 12, UITheme.ACCENT))
 	else:
-		v.add_child(DevTree._lab("✓ свободен — выберите разработку", 12, UITheme.GOOD))
+		v.add_child(DevTree._lab(L.t("✓ свободен — выберите разработку"), 12, UITheme.GOOD))
 	return b
 
 
@@ -197,35 +197,35 @@ static func _node(win: GameWindow, id: String, narrow: bool = false) -> Button:
 	var of := sim.office
 	var rd: Dictionary = Defs.research[id]
 	var st := status(sim, id)
-	var b := DevTree._btn(st, sel == id, str(rd.get("desc", "")), func() -> void:
+	var b := DevTree._btn(st, sel == id, L.t(str(rd.get("desc", ""))), func() -> void:
 		sel = id
 		win.rebuild(true))
 	var v := DevTree._inner(b)
-	var nm := str(rd.get("short", rd["name"])) if narrow else str(rd["name"])
-	b.tooltip_text = str(rd["name"]) + "\n" + str(rd.get("desc", ""))
+	var nm := L.t(str(rd.get("short", rd["name"])) if narrow else str(rd["name"]))
+	b.tooltip_text = L.t(str(rd["name"])) + "\n" + L.t(str(rd.get("desc", "")))
 	v.add_child(DevTree._lab(nm, (11 if nm.length() <= 10 else 10) if narrow else (12 if nm.length() <= 16 else 11), UITheme.TEXT if st != "locked" else UITheme.MUTED, UITheme.f_semi, true))
 	var sp := Control.new()
 	sp.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sp.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(sp)
-	var txt := "%d очков" % int(rd["cost"])
+	var txt := L.t("%d очков") % int(rd["cost"])
 	var col := UITheme.DIM
 	match st:
 		"works":
-			txt = "✓ изучено"
+			txt = L.t("✓ изучено")
 			col = UITheme.GOOD
 		"busy":
-			txt = "идёт · %d%%" % int(float(of.research_pts.get(id, 0.0)) / float(rd["cost"]) * 100.0)
+			txt = L.t("идёт · %d%%") % int(float(of.research_pts.get(id, 0.0)) / float(rd["cost"]) * 100.0)
 			col = UITheme.ACCENT
 		"ready":
 			var pts := float(of.research_pts.get(id, 0.0))
-			txt = ("%d очков" % int(rd["cost"])) + (" · начато" if pts > 0.0 else "")
+			txt = (L.t("%d очков") % int(rd["cost"])) + (L.t(" · начато") if pts > 0.0 else "")
 			col = Color("#9ab4cc")
 		_:
 			# зависимость из другой ветки — подписью
 			for rq in rd.get("req", []):
 				if str(Defs.research[rq]["branch"]) != str(rd["branch"]) and not of.has_tech(str(rq)):
-					txt = "после «%s»" % str(Defs.research[rq]["name"])
+					txt = L.t("после «%s»") % L.t(str(Defs.research[rq]["name"]))
 	v.add_child(DevTree._lab(txt, 11, col, null, true))
 	if st == "busy":
 		var pb := UITheme.bar(float(of.research_pts.get(id, 0.0)) / float(rd["cost"]) * 100.0, UITheme.ACCENT, 60, 4)
@@ -243,23 +243,23 @@ static func _details(win: GameWindow) -> PanelContainer:
 	var v := UITheme.vbox(6)
 	c.add_child(v)
 	if sel == "root" or not Defs.research.has(sel):
-		v.add_child(UITheme.label("Техотдел", 17, UITheme.TEXT, UITheme.f_semi))
-		v.add_child(UITheme.para("Корень дерева разработок. Очки дают технологи за столами техотдела (стол ИТР, кульман, линолеум — или общая контора). Пока технолога нет, дерево закрыто: видно, что впереди, но разрабатывать некому.", 13))
+		v.add_child(UITheme.label(L.t("Техотдел"), 17, UITheme.TEXT, UITheme.f_semi))
+		v.add_child(UITheme.para(L.t("Корень дерева разработок. Очки дают технологи за столами техотдела (стол ИТР, кульман, линолеум — или общая контора). Пока технолога нет, дерево закрыто: видно, что впереди, но разрабатывать некому."), 13))
 		var staff := of.staff("tech")
-		DevTree._req(v, not staff.is_empty(), ("технолог: " + staff[0].full_name()) if not staff.is_empty() else "технолог в штате")
+		DevTree._req(v, not staff.is_empty(), (L.t("технолог: %s") % staff[0].full_name()) if not staff.is_empty() else L.t("технолог в штате"))
 		var rs := of.room_status("tech")
-		DevTree._req(v, int(rs[0]) >= 0, "кабинет: " + str(rs[1]).trim_prefix("✓ ").trim_prefix("× "))
+		DevTree._req(v, int(rs[0]) >= 0, L.t("кабинет: %s") % str(rs[1]).trim_prefix("✓ ").trim_prefix("× "))
 		if staff.is_empty():
 			var row := UITheme.hbox(8)
 			if sim.progress.dept_open("tech"):
-				row.add_child(UITheme.primary("Найти технолога · %s" % Defs.money_str(sim.ad_price("technologist")), func() -> void:
+				row.add_child(UITheme.primary(L.t("Найти технолога · %s") % Defs.money_str(sim.ad_price("technologist")), func() -> void:
 					var err := sim.post_ad("technologist")
 					if err != "":
 						win.hud.toast(err, Sim.LVL_WARN)
 						return
 					win.hud.open_window("staff")
 					if win.hud.win:
-						win.hud.win.select_tab("hire"), "Объявление по профессии — откроется найм"))
+						win.hud.win.select_tab("hire"), L.t("Объявление по профессии — откроется найм")))
 			else:
 				row.add_child(win._cl(sim.progress.dept_lock_text("tech"), 13, UITheme.MUTED))
 			v.add_child(row)
@@ -269,29 +269,29 @@ static func _details(win: GameWindow) -> PanelContainer:
 	var th := UITheme.hbox(10)
 	th.add_child(win._icon(Tex.ui(str(BRANCH_ICONS.get(str(rd["branch"]), "research"))), 28))
 	var tv := UITheme.vbox(0)
-	tv.add_child(UITheme.label("«%s»" % str(rd["name"]), 17, UITheme.TEXT, UITheme.f_semi))
-	tv.add_child(UITheme.label("ветка «%s» · %d очков" % [str(rd["branch"]), int(rd["cost"])], 12, UITheme.MUTED))
+	tv.add_child(UITheme.label(L.t("«%s»") % L.t(str(rd["name"])), 17, UITheme.TEXT, UITheme.f_semi))
+	tv.add_child(UITheme.label(L.t("ветка «%s» · %d очков") % [L.t(str(rd["branch"])), int(rd["cost"])], 12, UITheme.MUTED))
 	th.add_child(tv)
 	th.add_child(UITheme.spacer())
 	var chips := {"works": ["изучено", UITheme.GOOD], "busy": ["в работе", UITheme.ACCENT], "ready": ["можно начать", UITheme.INFO], "locked": ["закрыто", UITheme.MUTED]}
-	th.add_child(UITheme.chip(str(chips[st][0]), chips[st][1]))
+	th.add_child(UITheme.chip(L.t(str(chips[st][0])), chips[st][1]))
 	v.add_child(th)
-	v.add_child(UITheme.para(str(rd.get("desc", "")), 13, UITheme.TEXT))
-	DevTree._req(v, open(sim), "технолог в техотделе")
+	v.add_child(UITheme.para(L.t(str(rd.get("desc", ""))), 13, UITheme.TEXT))
+	DevTree._req(v, open(sim), L.t("технолог в техотделе"))
 	for rq in rd.get("req", []):
-		DevTree._req(v, of.has_tech(str(rq)), "сначала: «%s»" % str(Defs.research[rq]["name"]))
+		DevTree._req(v, of.has_tech(str(rq)), L.t("сначала: «%s»") % L.t(str(Defs.research[rq]["name"])))
 	var row2 := UITheme.hbox(8)
 	match st:
 		"ready":
 			var pts := float(of.research_pts.get(sel, 0.0))
 			var key := sel
-			row2.add_child(UITheme.primary("Разрабатывать" + (" (%.0f из %d)" % [pts, int(rd["cost"])] if pts > 0.0 else ""), func() -> void:
+			row2.add_child(UITheme.primary(L.t("Разрабатывать") + (L.t(" (%.0f из %d)") % [pts, int(rd["cost"])] if pts > 0.0 else ""), func() -> void:
 				of.set_research(key)
-				win.rebuild(true), "Технолог переключится на эту разработку; набранные очки прежней сохранятся"))
+				win.rebuild(true), L.t("Технолог переключится на эту разработку; набранные очки прежней сохранятся")))
 		"busy":
 			var pb := UITheme.bar(float(of.research_pts.get(sel, 0.0)) / float(rd["cost"]) * 100.0, UITheme.ACCENT, 260, 8)
 			row2.add_child(pb)
-			row2.add_child(win._cl("%.1f из %d очков" % [float(of.research_pts.get(sel, 0.0)), int(rd["cost"])], 13, UITheme.ACCENT))
+			row2.add_child(win._cl(L.t("%.1f из %d очков") % [float(of.research_pts.get(sel, 0.0)), int(rd["cost"])], 13, UITheme.ACCENT))
 	if row2.get_child_count() > 0:
 		v.add_child(row2)
 	return c

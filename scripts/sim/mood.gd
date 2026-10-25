@@ -23,6 +23,11 @@ static func add(sim: Sim, w: Worker, id: String) -> void:
 	w.thoughts.append({"id": id, "until": until, "mood": v})
 
 
+## Текст мысли на языке игры (data/thoughts.json, ключ thought.<id>.text).
+static func thought_text(id: String) -> String:
+	return L.dt("thought.%s.text" % id, str(Defs.thoughts.get(id, {}).get("text", id)))
+
+
 static func has_trait(w: Worker, t: String) -> bool:
 	return w.traits.has(t)
 
@@ -52,33 +57,33 @@ static func breakdown(sim: Sim, w: Worker) -> Array:
 	for t in w.traits:
 		var d: Dictionary = Defs.traits.get(t, {})
 		if d.has("mood"):
-			out.append([str(d["name"]), float(d["mood"])])
+			out.append([L.dt("trait.%s.name" % t, str(d["name"])), float(d["mood"])])
 	for th: Dictionary in w.thoughts:
 		if float(th["until"]) > sim.minute:
-			out.append([str(Defs.thoughts.get(str(th["id"]), {}).get("text", th["id"])), float(th["mood"])])
+			out.append([thought_text(str(th["id"])), float(th["mood"])])
 	if float(w.needs["food"]) < 15.0:
-		out.append(["Голоден", -8.0])
+		out.append([L.t("Голоден"), -8.0])
 	if float(w.needs["rest"]) < 15.0:
-		out.append(["Вымотан", -6.0])
+		out.append([L.t("Вымотан"), -6.0])
 	if float(w.needs["bladder"]) < 10.0:
-		out.append(["Очень хочет в туалет", -4.0])
+		out.append([L.t("Очень хочет в туалет"), -4.0])
 	var market := float(market_wage(w))
 	var ratio := float(w.wage) / maxf(1.0, market)
 	var wk := trait_val(w, "wage_k", 1.0)
 	if ratio < 0.9:
-		out.append(["Платят меньше, чем везде", -7.0 * wk])
+		out.append([L.t("Платят меньше, чем везде"), -7.0 * wk])
 	elif ratio >= 1.15:
-		out.append(["Хорошо платят", 5.0 * wk])
+		out.append([L.t("Хорошо платят"), 5.0 * wk])
 	if w.shift == 1:
 		var nm := trait_val(w, "night_mood", 0.0)
 		if nm < 0.0:
-			out.append(["Вторая смена — мука", nm])
+			out.append([L.t("Вторая смена — мука"), nm])
 		elif nm > 0.0:
-			out.append(["Сова: вечером работается лучше", nm])
+			out.append([L.t("Сова: вечером работается лучше"), nm])
 	else:
 		var dm := trait_val(w, "day_mood", 0.0)
 		if dm != 0.0:
-			out.append(["Рано вставать", dm])
+			out.append([L.t("Рано вставать"), dm])
 	if sim and sim.training and sim.get_worker(w.id) == w:
 		out.append_array(sim.training.mood_parts(w))
 	if sim and sim.town and sim.get_worker(w.id) == w:
@@ -108,22 +113,22 @@ static func life(sim: Sim, w: Worker) -> Dictionary:
 	for th: Dictionary in w.thoughts:
 		if float(th["until"]) > sim.minute:
 			var td: Dictionary = Defs.thoughts.get(str(th["id"]), {})
-			add.call(str(td.get("grp", "work")), str(td.get("text", th["id"])), float(th["mood"]))
+			add.call(str(td.get("grp", "work")), thought_text(str(th["id"])), float(th["mood"]))
 	if float(w.needs["food"]) < 15.0:
-		add.call("byt", "Голоден", -8.0)
+		add.call("byt", L.t("Голоден"), -8.0)
 	if float(w.needs["rest"]) < 15.0:
-		add.call("byt", "Вымотан", -6.0)
+		add.call("byt", L.t("Вымотан"), -6.0)
 	var ratio := float(w.wage) / maxf(1.0, float(market_wage(w)))
 	var wk := trait_val(w, "wage_k", 1.0)
 	if ratio < 0.9:
-		add.call("money", "Платят меньше, чем везде", -7.0 * wk)
+		add.call("money", L.t("Платят меньше, чем везде"), -7.0 * wk)
 	elif ratio >= 1.15:
-		add.call("money", "Хорошо платят", 5.0 * wk)
+		add.call("money", L.t("Хорошо платят"), 5.0 * wk)
 	else:
-		add.call("money", "Платят как везде", 0.0)
+		add.call("money", L.t("Платят как везде"), 0.0)
 	if w.shift == 1:
 		var nm := trait_val(w, "night_mood", 0.0)
-		add.call("home", "Вторая смена", nm if nm != 0.0 else -2.0)
+		add.call("home", L.t("Вторая смена"), nm if nm != 0.0 else -2.0)
 	if sim and sim.training and sim.get_worker(w.id) == w:
 		for p in sim.training.mood_parts(w):
 			add.call("work", str(p[0]), float(p[1]))
@@ -131,7 +136,7 @@ static func life(sim: Sim, w: Worker) -> Dictionary:
 		for p2 in sim.town.mood_parts(w):
 			add.call("home", str(p2[0]), float(p2[1]))
 	if sim and sim.get_worker(w.id) == w and veteran(sim, w):
-		add.call("team", "Ветеран завода — уважают", 3.0)
+		add.call("team", L.t("Ветеран завода — уважают"), 3.0)
 	for g2 in out.keys():
 		out[g2]["v"] = clampf(55.0 + 3.0 * float(out[g2]["v"]), 0.0, 100.0)
 	return out
@@ -151,7 +156,7 @@ static func life_worst(sim: Sim, w: Worker) -> Array:
 		return []
 	for g2 in LIFE:
 		if g2[0] == worst:
-			return [worst, str(g2[1]), str(LIFE_HINT[worst])]
+			return [worst, L.t(str(g2[1])), L.t(str(LIFE_HINT[worst]))]
 	return []
 
 
@@ -177,14 +182,14 @@ static func refresh(sim: Sim, w: Worker) -> void:
 
 static func label(m: float) -> String:
 	if m >= 75.0:
-		return "Отличное"
+		return L.t("Отличное")
 	if m >= 60.0:
-		return "Хорошее"
+		return L.t("Хорошее")
 	if m >= 35.0:
-		return "Нормальное"
+		return L.t("Нормальное")
 	if m >= 20.0:
-		return "Плохое"
-	return "Ужасное"
+		return L.t("Плохое")
+	return L.t("Ужасное")
 
 
 static func color(m: float) -> Color:

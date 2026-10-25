@@ -3,8 +3,8 @@ extends Node2D
 ## справа внизу подпись к фону («Механический цех · 10:00») и полоса смены видов,
 ## справа вверху — что нового в версии. Фон — показательный завод в течение дня (MenuScenes).
 
-const VERSION_TEXT := "Версия 1.38.2"
-const WHATS_NEW := ["Меню и „Создать рабочего“ не тормозят со временем", "F3 в меню — строка диагностики (кадры, узлы, память)", "„Создать рабочего“ снова без лагов"]
+const VERSION_TEXT := "Версия 1.39"
+const WHATS_NEW := ["Игра переведена на английский, язык — в настройках", "Интро перед главным меню", "Баланс: больше стартовых денег, дешевле стройка", "Первые две недели клиенты платят аванс 30%", "Стартовый капитал зависит от сложности"]
 
 var sim: Sim
 var cam := Camera2D.new()
@@ -33,6 +33,7 @@ var _cards: Array[Control] = [] ## карточки «Сейчас на заво
 var _snap := PackedByteArray()  ## 1.38.2: снимок завода утром первого вида — из него «новый день» (MenuScenes.restore)
 var _retired: Array = []        ## [мир, кадров до release()] — сменённые миры: отпускаем, когда их виды уже удалены
 var diag: DiagLine = null       ## 1.38.2: F3 — строка диагностики (кадры, узлы, объекты, память)
+var intro: IntroPlayer = null   ## 1.39: интро-ролик при запуске (поверх меню, пока не кончится)
 
 
 func _ready() -> void:
@@ -46,7 +47,11 @@ func _ready() -> void:
 	cam.make_current()
 	_show_scene()
 	Snd.stop_ambient()
-	Snd.set_playlist(MusicDirector.MENU)   # 1.31: плавно, из игры — перекрёстным затуханием
+	# 1.39: при запуске — интро-ролик; музыка меню — после него
+	var play_intro := IntroPlayer.should_play(self)
+	Game.intro_seen = true
+	if not play_intro:
+		Snd.set_playlist(MusicDirector.MENU)   # 1.31: плавно, из игры — перекрёстным затуханием
 	var vl := CanvasLayer.new()
 	vl.layer = 1
 	add_child(vl)
@@ -69,6 +74,10 @@ func _ready() -> void:
 	for a: String in OS.get_cmdline_user_args():
 		if a.begins_with("--soak-editor="):
 			_soak_editor.call_deferred(int(a.get_slice("=", 1)))
+	if play_intro:
+		intro = IntroPlayer.new()
+		intro.done.connect(func() -> void: Snd.set_playlist(MusicDirector.MENU))
+		add_child(intro)
 
 
 ## 1.38.1: `Promzona -- --bench-editor [--bench-bg]`: открыть «Создать рабочего», 200 раз нажать его кнопки, напечатать
@@ -313,7 +322,7 @@ func jump(i: int) -> void:
 func _time_text() -> String:
 	var tod := int(sim.tod())
 	var days := ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"]
-	return "%02d:%02d · %s" % [tod / 60, tod % 60, days[(sim.day() - 1) % 7]]
+	return "%02d:%02d · %s" % [tod / 60, tod % 60, tr(str(days[(sim.day() - 1) % 7]))]
 
 
 func _update_caption() -> void:
@@ -382,7 +391,7 @@ func _build_ui() -> void:
 	bottom.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	bottom.custom_minimum_size = Vector2(0, 60)
 	col.add_child(bottom)
-	var ver := UITheme.label(VERSION_TEXT + "  ·  шрифты IBM Plex Sans (SIL OFL) и DejaVu Sans", 12, Color(1, 1, 1, 0.38))
+	var ver := UITheme.label(VERSION_TEXT.replace("Версия", tr("Версия")) + "  ·  " + tr("шрифты IBM Plex Sans (SIL OFL) и DejaVu Sans"), 12, Color(1, 1, 1, 0.38))
 	ver.anchor_top = 1.0
 	ver.anchor_bottom = 1.0
 	ver.offset_left = 72
@@ -440,23 +449,32 @@ func _build_news() -> void:
 	_cards.append(box)
 	var v := UITheme.vbox(5)
 	box.add_child(v)
-	v.add_child(UITheme.label("ЧТО НОВОГО · " + VERSION_TEXT.replace("Версия ", ""), 11, Color(0.88, 0.66, 0.23, 0.9), UITheme.f_caps if UITheme.f_caps else UITheme.f_semi))
-	for s in WHATS_NEW:
+	v.add_child(UITheme.label(tr("ЧТО НОВОГО") + " · " + VERSION_TEXT.replace("Версия ", ""), 11, Color(0.88, 0.66, 0.23, 0.9), UITheme.f_caps if UITheme.f_caps else UITheme.f_semi))
+	var shown := 0
+	for s0: Variant in WHATS_NEW:
+		var s := L.or_hide(str(s0))   # 1.39: в английском непереведённые пункты не показываем
+		if s == "":
+			continue
+		shown += 1
 		var h := UITheme.hbox(8)
 		var dot := ColorRect.new()
 		dot.color = UITheme.ACCENT
 		dot.custom_minimum_size = Vector2(5, 5)
 		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(dot)
-		h.add_child(UITheme.label(str(s), 13, Color(0.93, 0.9, 0.84, 0.86)))
+		var nl := UITheme.label(s, 13, Color(0.93, 0.9, 0.84, 0.86))
+		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART   # 1.39: по-английски строки длиннее — переносим
+		nl.custom_minimum_size = Vector2(258, 0)
+		h.add_child(nl)
 		v.add_child(h)
+	box.visible = shown > 0
 
 
 ## Пункт меню: значок, надпись, при наведении — янтарная планка слева и сдвиг вправо.
 func _big(text: String, cb: Callable, sub_text: String = "", icon: String = "") -> MenuItem:
 	var b := MenuItem.new()
-	b.title = text
-	b.hint = sub_text
+	b.title = tr(text)   # 1.39: пункт рисуется сам (draw_string) — переводим здесь
+	b.hint = tr(sub_text)
 	b.icon_tex = Tex.ui(icon) if icon != "" else null
 	b.icon_raw = Tex.is_color(b.icon_tex)   # 1.38: цветные значки владельца — без перекраски
 	b.pressed.connect(cb)
@@ -470,14 +488,14 @@ func _fill_menu() -> void:
 	if not saves.is_empty() and not bool((saves[0] as Dictionary).get("broken", false)):
 		var s: Dictionary = saves[0]
 		var b := _big("Продолжить", func() -> void: Game.start_load(str(s["slot"])),
-			"%s%s · %s" % [(str(s["company"]) + " · ") if s.has("company") else "", Defs.money_str(float(s.get("money", 0))), Game.pc_time(str(s.get("saved_at", "")))], "play1")
+			"%s%s · %s" % [(Company.retitle(str(s["company"])) + " · ") if s.has("company") else "", Defs.money_str(float(s.get("money", 0))), Game.pc_time(str(s.get("saved_at", "")))], "play1")
 		b.primary = true
 	_big("Новая игра", _show_new_game, "Профиль, сценарий, сложность", "factory")
 	var lb := _big("Загрузить", _show_load, "", "load")
 	lb.disabled = saves.is_empty()
 	var cw := CustomWorkers.load_data()
 	var n_cw := (cw["workers"] as Array).filter(func(e: Dictionary) -> bool: return bool(e.get("enabled", true))).size()
-	var cb := _big("Создать рабочего", _show_custom, ("В списке: %d · шанс %d%%" % [n_cw, roundi(float(cw["chance"]) * 100.0)]) if n_cw > 0 else "Придумайте людей для своего завода", "")
+	var cb := _big("Создать рабочего", _show_custom, (tr("В списке: %d · шанс %d%%") % [n_cw, roundi(float(cw["chance"]) * 100.0)]) if n_cw > 0 else "Придумайте людей для своего завода", "")
 	cb.icon_tex = UITheme.micon("people")
 	cb.icon_raw = true
 	_big("Достижения", _show_achievements, "", "medal")
@@ -692,7 +710,7 @@ func _fill_new_game() -> void:
 		b.focus_mode = Control.FOCUS_NONE
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(380, 54)
-		b.text = "%s   %s\n%s" % [str(pd["name"]), "★".repeat(int(pd.get("difficulty", 1))) + "☆".repeat(5 - int(pd.get("difficulty", 1))), str(pd.get("prod", ""))]
+		b.text = "%s   %s\n%s" % [_prof(key, "name"), "★".repeat(int(pd.get("difficulty", 1))) + "☆".repeat(5 - int(pd.get("difficulty", 1))), _prof(key, "prod")]
 		b.add_theme_font_size_override("font_size", 14)
 		var prods: Array = pd.get("products", [])
 		if not prods.is_empty():
@@ -702,7 +720,7 @@ func _fill_new_game() -> void:
 		if locked:
 			b.tooltip_text = "Появится в следующих версиях"
 		elif off:
-			b.tooltip_text = "В сценарии «%s» доступны: %s" % [str(Defs.scenarios[str(ng["scn"])]["name"]), ", ".join(PackedStringArray(allowed.map(func(x: Variant) -> String: return str(Defs.profiles[str(x)]["name"]))))]
+			b.tooltip_text = tr("В сценарии «%s» доступны: %s") % [_scn(str(ng["scn"]), "name"), ", ".join(PackedStringArray(allowed.map(func(x: Variant) -> String: return _prof(str(x), "name"))))]
 		b.pressed.connect(func() -> void:
 			ng["profile"] = key
 			_fill_new_game())
@@ -725,7 +743,7 @@ func _fill_new_game() -> void:
 		b2.expand_icon = false
 		b2.add_theme_constant_override("icon_max_width", 44 if Tex.is_color(b2.icon) else 36)
 		UITheme.icon_colors(b2)   # 1.38: картинки сценариев владельца — без перекраски
-		b2.text = "%s\n%s" % [str(sd["name"]), str(sd.get("tag", ""))]
+		b2.text = "%s\n%s" % [_scn(key2, "name"), _scn(key2, "tag")]
 		b2.add_theme_font_size_override("font_size", 15)
 		b2.pressed.connect(func() -> void:
 			ng["scn"] = key2
@@ -740,13 +758,18 @@ func _fill_new_game() -> void:
 	c3.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var pd2: Dictionary = Defs.profiles[str(ng["profile"])]
 	var sd2: Dictionary = Defs.scenarios[str(ng["scn"])]
-	c3.add_child(UITheme.label("%s · «%s»" % [str(pd2["name"]), str(sd2["name"])], 18, UITheme.TEXT, UITheme.f_semi))
-	c3.add_child(_wrapped(str(sd2.get("desc", "")), 14, UITheme.TEXT))
-	c3.add_child(_wrapped(str(pd2.get("desc", "")), 14, UITheme.MUTED))
-	c3.add_child(_wrapped("Цеха: %s. %s" % [str(pd2.get("shops", "")), str(pd2.get("mechanic", ""))], 13, UITheme.INFO))
+	var pk := str(ng["profile"])
+	var sk := str(ng["scn"])
+	c3.add_child(UITheme.label(tr("%s · «%s»") % [_prof(pk, "name"), _scn(sk, "name")], 18, UITheme.TEXT, UITheme.f_semi))
+	c3.add_child(_wrapped(_scn(sk, "desc"), 14, UITheme.TEXT))
+	c3.add_child(_wrapped(_prof(pk, "desc"), 14, UITheme.MUTED))
+	c3.add_child(_wrapped(tr("Цеха: %s. %s") % [_prof(pk, "shops"), _prof(pk, "mechanic")], 13, UITheme.INFO))
 	var goals: Array = sd2.get("goals", [])
 	if not goals.is_empty():
-		c3.add_child(_wrapped("Цели: " + "; ".join(PackedStringArray(goals.map(func(g: Dictionary) -> String: return str(g.get("text", ""))))) + ".", 13, UITheme.GOOD))
+		var gl: Array[String] = []
+		for gi in goals.size():
+			gl.append(L.dt("scn.%s.goal%d" % [sk, gi], str((goals[gi] as Dictionary).get("text", ""))))
+		c3.add_child(_wrapped(tr("Цели: ") + "; ".join(PackedStringArray(gl)) + ".", 13, UITheme.GOOD))
 	c3.add_child(HSeparator.new())
 	c3.add_child(UITheme.label("3. Сложность", 17, UITheme.TEXT, UITheme.f_semi))
 	var srow := UITheme.hbox(6)
@@ -754,8 +777,8 @@ func _fill_new_game() -> void:
 		var md: Dictionary = Defs.events.get("modes", {}).get(m, {})
 		var cb := Button.new()
 		cb.toggle_mode = true
-		cb.text = str(md.get("name", m))
-		cb.tooltip_text = str(md.get("desc", ""))
+		cb.text = _mode(m, "name")
+		cb.tooltip_text = _mode(m, "desc")
 		cb.button_pressed = m == str(ng["story"])
 		cb.focus_mode = Control.FOCUS_NONE
 		cb.add_theme_font_size_override("font_size", 13)
@@ -765,7 +788,7 @@ func _fill_new_game() -> void:
 			_fill_new_game())
 		srow.add_child(cb)
 	c3.add_child(srow)
-	c3.add_child(_wrapped(str(Defs.events.get("modes", {}).get(str(ng["story"]), {}).get("desc", "")), 13, UITheme.MUTED))
+	c3.add_child(_wrapped(_mode(str(ng["story"]), "desc"), 13, UITheme.MUTED))
 	if str(ng["scn"]) == "garage":
 		var tut := CheckBox.new()
 		tut.text = "Обучение по шагам"
@@ -820,7 +843,7 @@ func _fill_company() -> void:
 	bh.add_child(back)
 	var sd: Dictionary = Defs.scenarios[str(ng["scn"])]
 	var pd: Dictionary = Defs.profiles[str(ng["profile"])]
-	var sum := UITheme.label("%s · «%s» · сложность: %s" % [str(pd["name"]), str(sd["name"]), str(Defs.events.get("modes", {}).get(str(ng["story"]), {}).get("name", ng["story"]))], 14, UITheme.MUTED)
+	var sum := UITheme.label(tr("%s · «%s» · сложность: %s") % [_prof(str(ng["profile"]), "name"), _scn(str(ng["scn"]), "name"), _mode(str(ng["story"]), "name")], 14, UITheme.MUTED)
 	sum.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sum.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	bh.add_child(sum)
@@ -828,13 +851,27 @@ func _fill_company() -> void:
 		var cd: Dictionary = ng["company"]
 		var nm := Company.clean_name(str(cd.get("name", "")))
 		var opts := {"tutorial": bool(ng["tutorial"]) and str(ng["scn"]) == "garage", "money": ng["money"], "map": ng["map"], "start": ng["start"], "all_open": ng["all_open"], "flora": true, "lots": true,
-			"company": {"name": nm if nm != "" else "Прогресс", "emblem": (cd.get("emblem", {}) as Dictionary).duplicate()}}
+			"company": {"name": nm if nm != "" else tr("Прогресс"), "emblem": (cd.get("emblem", {}) as Dictionary).duplicate()}}
 		Game.start_new_game(0, str(ng["story"]), str(ng["scn"]), str(ng["profile"]), opts))
 	go.custom_minimum_size = Vector2(240, 50)
 	go.add_theme_font_size_override("font_size", 20)
 	_amber(go)
 	bh.add_child(go)
 	root.add_child(bh)
+
+
+## 1.39: тексты профиля, сценария и сложности из data/*.json — на языке игры (L.dt, ключи profile.mech.name …).
+func _prof(k: String, f: String) -> String:
+	return L.dt("profile.%s.%s" % [k, f], str(Defs.profiles.get(k, {}).get(f, "")))
+
+
+func _scn(k: String, f: String) -> String:
+	var sd: Dictionary = Defs.scenarios.get(k, {})
+	return L.dt("scn.%s.%s" % [k, f], str(sd.get(f, "")), {"money": L.money_words(float(sd.get("money", 0)))})
+
+
+func _mode(k: String, f: String) -> String:
+	return L.dt("mode.%s.%s" % [k, f], str(Defs.events.get("modes", {}).get(k, {}).get(f, k if f == "name" else "")))
 
 
 func _wrapped(t: String, size: int, col: Color) -> Label:
@@ -879,8 +916,9 @@ func _show_load() -> void:
 			h.add_child(Emblem.View.new(em, 40.0))
 		var iv := UITheme.vbox(0)
 		iv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		iv.add_child(UITheme.label(str(s.get("title", slot)) + ((" · " + str(s["company"])) if s.has("company") else ""), 15, UITheme.TEXT, UITheme.f_med))
-		iv.add_child(UITheme.label("Сохранено %s · в игре %s %s · %s" % [Game.pc_time(str(s.get("saved_at", ""))), str(s.get("date", "")), str(s.get("time", "")), Defs.money_str(float(s.get("money", 0)))], 12, UITheme.MUTED))
+		var rows := L.save_rows(s, slot)   # 1.39: метка сохранения — на языке игры
+		iv.add_child(UITheme.label(rows[0], 15, UITheme.TEXT, UITheme.f_med))
+		iv.add_child(UITheme.label(rows[1], 12, UITheme.MUTED))
 		h.add_child(iv)
 		var b := UITheme.button("Загрузить", func() -> void: Game.start_load(slot))
 		b.disabled = bool(s.get("broken", false))
@@ -918,8 +956,8 @@ func _show_achievements() -> void:
 		h.add_child(ic)
 		var iv := UITheme.vbox(0)
 		iv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		iv.add_child(UITheme.label(str(a["name"]), 15, UITheme.TEXT if has else UITheme.MUTED, UITheme.f_med))
-		iv.add_child(UITheme.label(str(a["desc"]), 12, UITheme.MUTED))
+		iv.add_child(UITheme.label(Achievements.name_of(a), 15, UITheme.TEXT if has else UITheme.MUTED, UITheme.f_med))
+		iv.add_child(UITheme.label(Achievements.desc_of(a), 12, UITheme.MUTED))
 		h.add_child(iv)
 		if has:
 			h.add_child(UITheme.label(str(Achievements.got[str(a["id"])]), 12, UITheme.GOOD))
@@ -939,8 +977,20 @@ func _show_settings() -> void:
 	var v := UITheme.vbox(10)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(v)
-	SettingsUI.build(v)
-	v.add_child(UITheme.label("Сохранения и настройки лежат в папке пользователя:\n" + ProjectSettings.globalize_path("user://"), 12, UITheme.MUTED))
+	SettingsUI.build(v, Callable(), _relang)
+	v.add_child(UITheme.label(tr("Сохранения и настройки лежат в папке пользователя:") + "\n" + ProjectSettings.globalize_path("user://"), 12, UITheme.MUTED))
+
+
+## 1.39: язык сменился — пересобрать меню (пункты рисуются сами) и снова открыть настройки.
+func _relang() -> void:
+	sub = null
+	ng_root = null
+	for c in ui.get_children():
+		c.queue_free()
+	_cards.clear()
+	cap_title = null
+	_build_ui()
+	_show_settings()
 
 
 ## Векторный логотип «ПРОМЗОНА» (assets/vec/logo.json, tools/gen_logo.py).
@@ -953,7 +1003,7 @@ class Logo:
 	var _px := 0
 
 	func _init() -> void:
-		var f := FileAccess.get_file_as_string("res://assets/vec/logo.json")
+		var f := FileAccess.get_file_as_string("res://assets/vec/logo_en.json" if L.is_en() else "res://assets/vec/logo.json")   # 1.39: PROMZONA
 		var d: Variant = JSON.parse_string(f)
 		if d is Dictionary:
 			_svg = str(d.get("svg", ""))

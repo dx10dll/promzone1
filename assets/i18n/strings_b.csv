@@ -1,0 +1,790 @@
+keys,en
+ЛИЧНАЯ КАРТОЧКА РАБОТНИКА,PERSONNEL RECORD CARD
+ТАБ. № %s,PERS. No. %s
+ОТДЕЛ КАДРОВ • ПРИНЯТ • ,HR DEPARTMENT • HIRED • 
+день,day
+Почему «%s»: %s,Why “%s”: %s
+1-я смена,Shift 1
+2-я смена,Shift 2
+ смена, shift
+★ свой,★ custom
+Свой рабочий: собран в главном меню («Создать рабочего»),Your own worker: made in the main menu (“Create a Worker”)
+★ бригадир · ,★ foreman · 
+ИТР,Office staff
+практикант,trainee
+Практика до дня %d,Traineeship until day %d
+председатель профкома,union chair
+живёт в общежитии,lives in the dorm
+Не опаздывает. Иногородняя,Never late. From out of town
+Не опаздывает. Иногородний,Never late. From out of town
+Не опаздывает,Never late
+негде жить,nowhere to live
+"Иногородняя без койки в общежитии — снимает угол, недовольна","From out of town with no dorm bed: rents a corner, unhappy"
+"Иногородний без койки в общежитии — снимает угол, недоволен","From out of town with no dorm bed: rents a corner, unhappy"
+рабочее место: ,workplace: 
+"Закреплено за человеком: работает здесь первым. Если не может — на больничном, занят другим делом, не на смене — встаёт любой, кто умеет. Сменить — в карточке станка.","Assigned to this person: they work here first. If they can't (off sick, busy elsewhere, off shift), anyone qualified steps in. Change it in the machine card."
+дети: %d%s,children: %d%s
+ · в садике, · in kindergarten
+%d %s · %s · на заводе с дня %d,%d %s · %s · at the plant since day %d
+год,year
+года,years
+лет,years
+Отпустить — пусть работает сам,Release: back to own work
+Вернуть к обычной работе (Esc),Back to normal work (Esc)
+Взять под управление,Take Control
+"Человек бросит своё и будет ждать ваших команд: щёлкните по стройке, станку, грузу или месту — и выберите «Сделать сейчас»","They'll drop what they're doing and wait for your orders: click a build site, machine, load or spot and choose “Do it now”"
+Настроение,Mood
+Обзор,Overview
+Навыки,Skills
+Отношения,Relations
+История,History
+"Урезать ставку: сэкономите, но человек обидится","Cut pay: you save money, but they'll be offended"
+Поднять ставку: настроение вверх,Raise pay: mood goes up
+Премия %s,Bonus %s
+Разовая премия: хорошее настроение на три дня,One-off bonus: good mood for three days
+Учить…,Train…
+"Курсы, наставник, инструктаж (Люди → Обучение)","Courses, mentor, briefing (People → Training)"
+Отменить приказ,Cancel order
+приказ отменён,order cancelled
+Вернуть к обычной работе сейчас,Back to normal work now
+Экзамен на %d-й разряд,Exam for grade %d
+"На смене сделает пробную деталь, мастер примет. Сдал — разряд и просьба о прибавке; не сдал — пересдача через неделю.",Will make a test part on shift for the foreman. Pass: new grade and a request for a raise; fail: retake in a week.
+Показать,Show
+Перевести камеру на человека,Point the camera at them
+Уволить,Fire
+Уволить с выплатой расчёта,Fire with final pay
+Разряд подтверждён экзаменом. Руки уже тянут на %d-й — скоро сдаст пробную деталь мастеру.,Grade confirmed by exam. Their hands are already ready for grade %d; soon they'll take a test part to the foreman.
+"Разряд подтверждают экзаменом: пробная деталь мастеру, когда навык подрастёт.",Grades are confirmed by exam: a test part for the foreman once the skill grows.
+"Медицинская категория растёт с опытом: вторая — с навыком 4, первая — с 6, высшая — с 8.","Medical category grows with experience: second at skill 4, first at 6, highest at 8."
+"Категория растёт с опытом: II — с навыком 4, I — с 6, ведущий — с 8.","Category grows with experience: II at skill 4, I at 6, lead at 8."
+Руководитель: у должности нет разрядов.,Manager: this post has no grades.
+Простая работа — без разрядов.,Simple work: no grades.
+Потребности,Needs
+Сытость,Fullness
+Бодрость,Energy
+смен,shifts
+операций,operations
+скорость,speed
+СИЗ,PPE
+рабочее место,workplace
+Что важно,What matters
+О чём думает,On their mind
+Смена,Shift
+Основной навык профессии,Main skill of the trade
+Обучение,Training
+на курсах: %s %d → %d,on a course: %s %d → %d
+Наставник: %s%s,Mentor: %s%s
+ (другая смена — не учит!), (other shift: not teaching!)
+Ученики: ,Apprentices: 
+"Не учится. Курсы дают +2 к навыку, наставник утраивает рост у станка.",Not training. Courses give +2 skill; a mentor triples growth at the machine.
+Курсы и наставник…,Courses and mentor…
+Люди → Обучение,People → Training
+«%s» — %d чел.%s,“%s”: %d ppl%s
+ · бригадир: , · foreman: 
+ · бригадир (+10% к ставке), · foreman (+10% pay)
+Не в бригаде,Not in a crew
+Отношения в коллективе,Relations at work
+"Пока ни с кем не сблизился и не поссорился. Отношения складываются, когда люди работают в одном помещении.",Hasn't made friends or enemies yet. Relations form when people work in the same room.
+друг,friend
+приятель,buddy
+не ладят,at odds
+недолюбливает,dislikes
+На заводе с дня %d · отработал смен: %d · операций: %d,At the plant since day %d · shifts worked: %d · operations: %d
+Прозвище «%s»%s,Nickname “%s”%s
+тушил пожары,fought fires
+травмы,injuries
+поднимал автоматы,reset breakers
+перекуры,smoke breaks
+ремонты,repairs
+попадался на выносе,caught pilfering
+Записи в карточке,Card entries
+Записей пока нет.,No entries yet.
+Гость завода,Plant visitor
+Приехал по делу и уедет сам — ничего делать не нужно.,Here on business and will leave on their own: nothing to do.
+Пожарный,Firefighter
+"Пожарный расчёт тушит огонь и уедет, когда пожар потушат.",The fire crew is putting out the fire and will leave once it's out.
+Что проверяет:,Inspects:
+"Нарушения записываются, когда инспектор заходит в помещение. Успеете исправить до его прихода — не запишет.",Violations are recorded when the inspector enters a room. Fix them before they arrive and nothing gets written down.
+"Оценивает порядок: грузы на полу, сломанные станки, оборудованные помещения, настроение людей, снег на дорожках, нарушения.","Rates the order: loads on the floor, broken machines, equipped rooms, people's mood, snow on paths, violations."
+Не закреплять,Don't assign
+ · уже: , · already: 
+Паспорт станка,Machine Passport
+Объект,Object
+инв. № %05d,inv. No. %05d
+"Не работает: стоит вне зоны %s. Разметьте зону там, где он стоит.",Not working: stands outside a %s zone. Mark the zone where it stands.
+Разметить,Mark zone
+Откроется меню «Зоны» с нужной зоной,Opens the “Zones” menu with the right zone
+Закреплён за: ,Assigned to: 
+"никем — работает любой, кто умеет",nobody: anyone qualified works here
+"Хозяин работает на своём месте первым. Если он не может — на больничном, в отпуске, занят другим делом или не на смене — встаёт любой, кто умеет. Освободился — сменщик доделает деталь и уступит.","The owner works at their own place first. If they can't (off sick, on leave, busy elsewhere or off shift), anyone qualified steps in. Once free, the substitute finishes the part and makes way."
+Сменить…,Change…
+Закрепить место за другим человеком,Assign the place to someone else
+Выключить,Turn off
+Включить,Turn on
+Выключенный станок не работает и не берёт нагрузку сети. Металл с него вернут на склад.,A switched-off machine doesn't work and draws no power. Its metal is returned to storage.
+Выключенный агрегат не работает и не берёт нагрузку сети.,A switched-off unit doesn't work and draws no power.
+Повернуть,Rotate
+Повернуть объект на месте на 90° (клавиша R при установке),Rotate the object 90° in place (R key when placing)
+Сеть…,Network…
+"Меню «Сети»: кабель, подстанция, мощность","“Networks” menu: cable, substation, capacity"
+Охрана труда…,Labour safety…
+"СОУТ, СИЗ и молоко за вредность","SOUT, PPE and milk for hazardous work"
+Отменить заказ,Cancel order
+Отменить установку; деньги за ещё не привезённое вернут,Cancel the installation; money for anything not yet delivered is refunded
+Не сносить,Keep
+Снять пометку о демонтаже,Remove the demolition mark
+Демонтаж,Dismantle
+"Рабочие разберут объект и унесут в ящиках на склад оборудования (помещение «Склад» или зона разгрузки). Поставить снова — бесплатно, продать — за полцены (Производство → Склад оборудования).",Workers will take the object apart and carry it in crates to equipment storage (a “Warehouse” room or an unloading zone). Placing it again is free; selling it gets half price (Production → Equipment storage).
+Состояние,Condition
+Операция,Operation
+Монтаж,Installing
+Заказан,Ordered
+Под снос,To demolish
+Нет тока,No power
+Режет,Cutting
+Ждёт,Waiting
+Выключен,Off
+Тянет,Drawing
+Не подключён,Not connected
+Работает,Working
+Не греет,Not heating
+Греет,Heating
+Не сезон,Off season
+Сломан,Broken
+Простаивает,Idle
+Конструкция,Structure
+клетка %d·%d,cell %d·%d
+Клетка,Cell
+под снос,to demolish
+чертёж,blueprint
+построено,built
+"Стоимость клетки %s, стройка ~%d мин.","Cell cost %s, build time ~%d min."
+Стена помещения «%s».,Wall of room “%s”.
+на участке — строят по очереди,on site: built in turn
+едет машиной,on a truck
+заказывается у поставщика,being ordered from the supplier
+Материал: %s — %s.,"Material: %s, %s."
+Отменить чертёж,Cancel blueprint
+Деньги за чертёж вернутся,Money for the blueprint is refunded
+Снести,Demolish
+"Рабочие разберут, клетка освободится",Workers will tear it down and free the cell
+Граница участка — не сносится,Plot boundary: can't be demolished
+ (соседний участок покупают: Развитие → Земля), (neighbouring plots are bought: Development → Land)
+Груз на земле,Load on the ground
+Груз,Load
+%s — %d шт.,%s: %d pcs
+несут %d,carrying %d
+• %s — %d шт.,• %s: %d pcs
+Поддон: %d из %d. Строители берут отсюда материал на ближайшую стройку.,Pallet: %d of %d. Builders take material from here to the nearest build site.
+Ящик с оборудованием ждёт установки или места на складе оборудования.,A crate of equipment waiting to be installed or for room in equipment storage.
+"Металл занесут на стеллаж, когда освободятся руки.",The metal will be carried to a rack when hands are free.
+Лежит в зоне разгрузки — отсюда металл берут прямо к станкам.,In the unloading zone: metal is taken straight to the machines from here.
+Детали отнесут дальше по маршруту или на склад.,Parts will be carried on along the route or to storage.
+Авария,Breakdown
+бригада едет,crew on the way
+чинят,being fixed
+ждёт ремонта,awaiting repair
+Перебит кабель: дальше по линии тока нет — станки и свет за обрывом стоят.,Cable cut: no power further down the line; machines and lights past the break are dead.
+"Лопнула труба: дальше по ней воды нет — туалеты и раковины за прорывом сухие, на полу лужа.","Burst pipe: no water further along; toilets and sinks past the break are dry, and there's a puddle on the floor."
+" Любой свободный рабочий заменит кусок, как при прокладке сети."," Any free worker will replace the section, as when laying a network."
+Аварийная бригада (%s),Emergency crew (%s)
+"Починят за час, своих людей не отвлекать","Fixed within an hour, without pulling your own people"
+Дерево,Tree
+Куст,Bush
+спилят,to be felled
+Растёт на участке и мешает строить: на этой клетке нельзя поставить объект. Пол и стену можно — строитель сначала спилит дерево.,Grows on the plot and blocks building: no object can go on this cell. Floor and walls can: a builder will fell the tree first.
+Это чужая земля. Соседние участки покупают через «Развитие → Земля».,This is someone else's land. Neighbouring plots are bought via “Development → Land”.
+Городская аллея вдоль дороги.,A city avenue along the road.
+Оставить,Keep
+Пусть растёт,Let it grow
+Спилить,Fell
+Выкорчевать,Uproot
+Рабочий уберёт за %d мин.,A worker will clear it in %d min.
+Зона,Zone
+Помещение,Room
+Площадь %d кл. · окон %d · дверей %d%s,Area %d cells · windows %d · doors %d%s
+ · в зале ещё %d %s, · %d more %s in the hall
+зона,zone
+зоны,zones
+зон,zones
+Назначение,Purpose
+— не назначено —,— not assigned —
+"%s
+Нужно: %s; помещение от %d×%d клеток внутри.","%s
+Needs: %s; room at least %d×%d cells inside."
+"Выберите назначение — от него зависит, как люди используют помещение и что они о нём думают.",Choose a purpose: it decides how people use the room and what they think of it.
+Требования:,Requirements:
+помещение от %d×%d клеток внутри (у вас %d×%d),room at least %d×%d cells inside (yours is %d×%d)
+пол,floor
+Обустройство: %s %d из 5%s,Comfort: %s %d of 5%s
+"Выше уровень — лучше настроение: окна, хороший пол, электрический свет, растения и декор (Объекты → Декор), чистота.","Higher level, better mood: windows, a good floor, electric light, plants and decor (Objects → Decor), cleanliness."
+Чистота: %d%%%s,Cleanliness: %d%%%s
+ — нужна уборка,: needs cleaning
+Воздух: %s · %s,Air: %s · %s
+чисто,clean
+"душно, %d%%","stuffy, %d%%"
+"дым, %d%%","smoke, %d%%"
+вентиляция ×%.1f,ventilation ×%.1f
+нужна вентиляция (Сети → Вентиляция),needs ventilation (Networks → Ventilation)
+без вентиляции,no ventilation
+Свет: есть,Light: yes
+ (электричество), (electric)
+" (дневной, из окон)"," (daylight, from windows)"
+Свет: нет — проложите кабель от подстанции в помещение,Light: none; run a cable from the substation into the room
+"Как исправить: протяните кабель от щитка к этому объекту («Сети», E). Если кабель есть — проверьте, не выбит ли автомат, и хватает ли мощности подстанции.","How to fix: run a cable from the panel to this object (“Networks”, E). If there is a cable, check whether the breaker has tripped and whether the substation has enough capacity."
+"Как исправить: отправьте в ремонт кнопкой ниже — придёт слесарь или станочник. Чтобы ломалось реже, включите ППР (Производство → Станки).","How to fix: send it for repair with the button below; a fitter or machinist will come. To make breakdowns rarer, turn on scheduled maintenance (Production → Machines)."
+"Как исправить: котлу нужен ток, вода (труба от водомера) и топливо. Подробности — в строке состояния ниже.","How to fix: the boiler needs power, water (a pipe from the water meter) and fuel. Details are in the status line below."
+"Нет работы или некому работать: проверьте заказы, металл на стеллаже и есть ли станочник нужной профессии.","No work or no one to work: check orders, metal on the rack and whether there is a machinist of the right trade."
+Как исправить: протяните воздуховод от вытяжного вентилятора к зонту («Сети» → «Вентиляция»).,How to fix: run a duct from the exhaust fan to the hood (“Networks” → “Ventilation”).
+Сейчас: ,Now: 
+Записано нарушений: %d,Violations recorded: %d
+"Ходит по заводу и смотрит, как всё устроено.",Walks around the plant looking at how things are run.
+Не оборудовано,Not equipped
+Не вышел на работу,Didn't show up for work
+Дома · %s,At home · %s
+%s до %s,%s until %s
+ · ⚑ приказ до %02d:%02d, · ⚑ order until %02d:%02d
+ · риск ухода!, · may quit!
+Ничего особенного,Nothing special
+…и ещё %d,…and %d more
+…остальное и цифры — у кадровика (отдел кадров),…the rest and the numbers are with HR (personnel department)
+хорошо,good
+норма,OK
+терпимо,tolerable
+плохо,bad
+ничего особенного,nothing special
+"
+
+Что помогает: ","
+
+What helps: "
+Проседает «%s»: %s,“%s” is sagging: %s
+кабинет,office
+контора,shared office
+нет!,none!
+Отдел: %s,Department: %s
+НЕТ РАБОЧЕГО МЕСТА — поставьте стол ИТР в кабинет,NO WORKPLACE: put an office desk in an office room
+работает в общей конторе (−30%),works in the shared office (−30%)
+на месте %+d °C,%+d °C at the workplace
+вредность %s: +%d%% к ставке%s,hazard %s: +%d%% pay%s
+", молоко",", milk"
+", молоко не дают",", no milk"
+%s за смену,%s per shift
+на рынке ~%s,market rate ~%s
+ — недоплачиваете,: you're underpaying
+ · ночные +%d%%, · night shift +%d%%
+ · переходит в %s, · moving to %s
+1-ю смену,shift 1
+2-ю смену,shift 2
+", бригадир (+10% к ставке)",", foreman (+10% pay)"
+", бригадир — ",", foreman: "
+"на курсах: %s, %d%%","on a course: %s, %d%%"
+наставник: ,mentor: 
+ученики: ,apprentices: 
+практика до дня %d,traineeship until day %d
+дружит: ,friends with: 
+не ладит: ,at odds with: 
+"Заказано у поставщика. Фургон с оборудованием приедет %s, ящики разгрузят и принесут сюда.",Ordered from the supplier. The van with the equipment arrives %s; the crates will be unloaded and carried here.
+Привезли. Ящики несут к месту установки: %d из %d.%s,Delivered. Crates are being carried to the installation spot: %d of %d.%s
+"
+Совет: отметьте зону разгрузки у ворот (Стройка → Зоны на улице).","
+Tip: mark an unloading zone by the gate (Build → Outdoor zones)."
+Всё на месте — ждёт монтажа. Прогресс: %d%%,"Everything's here, waiting for installation. Progress: %d%%"
+"Помечен под снос: рабочие разберут его, когда освободятся.",Marked for demolition: workers will take it apart when they're free.
+Мощность: %d кВт,Capacity: %d kW
+Кабель не подведён — тяните кабель от подстанции прямо в клетки розеток станков и приборов.,No cable connected: run cable from the substation right into the socket cells of machines and devices.
+Сеть: нагрузка %.1f из %d кВт · потребителей %d · помещений %d,Network: load %.1f of %d kW · consumers %d · rooms %d
+АВТОМАТ ВЫБИТ — ждём электрика или рабочего.,BREAKER TRIPPED: waiting for an electrician or a worker.
+"ПЕРЕГРУЗ: станки тянут больше, чем даёт подстанция. Скоро выбьет автомат — поставьте вплотную аккумуляторные шкафы.",OVERLOAD: machines draw more than the substation gives. The breaker will trip soon; place battery cabinets right next to it.
+Своих %d кВт. Аккумуляторов нет: вплотную к подстанции (и по углам) можно поставить до %d шкафов — каждый +%d кВт (Объекты → Электрика).,"Own %d kW. No batteries: up to %d cabinets can go right next to the substation (and at the corners), each +%d kW (Objects → Electrical)."
+"Своих %d кВт + аккумуляторы: %d из %d шкафов, +%d кВт.","Own %d kW + batteries: %d of %d cabinets, +%d kW."
+Мощности мало — прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый) или выключите лишний станок.,Low capacity: put battery cabinets against the substation (+20 kW each) or turn off a spare machine.
+Дней без травм: %d. В помещении с табло травм на 5%% меньше.,Days without injuries: %d. Rooms with the board see 5%% fewer injuries.
+Профком: ,Union committee: 
+председатель — %s,chair: %s
+есть,yes
+профсоюза пока нет,no union yet
+Подстанция: ,Substation: 
+рядом — шкаф добавляет ей %d кВт мощности,adjacent: the cabinet adds %d kW of capacity
+НЕТ — поставьте шкаф вплотную к подстанции,NONE: place the cabinet right next to a substation
+Не подключена к водопроводу — протяните трубу.,Not connected to the water supply: lay a pipe.
+Приборов в сети: %d · напора хватает на %d,Fixtures on the network: %d · pressure is enough for %d
+Не работает,Not working
+станочник,machinist
+Ремонт: %s запчастей и полдня работы слесаря или станочника.,Repair: %s in parts and half a day's work for a fitter or machinist.
+Нет питания: заведите кабель от подстанции в клетку розетки станка.,No power: run a cable from the substation into the machine's socket cell.
+Нет тока: выбит автомат или сеть без источника.,No power: breaker tripped or the network has no source.
+Некому работать: нужен %s — наймите в разделе «Люди → Найм».,No one to work: needs a %s; hire one in “People → Hiring”.
+"Нет работы: нет заказа, металла или деталей с прошлой операции.","No work: no order, metal or parts from the previous operation."
+Задание: %s · операция %d из %d,Job: %s · operation %d of %d
+Ждёт: ,Waiting for: 
+Нет расходников (%s) — снабжение уже везёт.,Out of consumables (%s): supply is already bringing more.
+Тяжёлая деталь без кран-балки: на %d%% медленнее.,Heavy part without an overhead crane: %d%% slower.
+"Печь: партия до %d деталей, греется сама.","Furnace: batches of up to %d parts, heats up by itself."
+Изношен — ждёт обслуживания (%s).,Worn: waiting for service (%s).
+Сильно изношен — может сломаться!,Badly worn: may break down!
+Сжатый воздух: ,Compressed air: 
+есть — краскопульт,yes: spray gun
+мало давления — медленнее,low pressure: slower
+"НЕТ — красят кистью, в 1,5 раза дольше (Сети → Сжатый воздух)","NONE: painting by brush, 1.5 times longer (Networks → Compressed air)"
+"есть — пневмогайковёрт, на 20% быстрее","yes: pneumatic wrench, 20% faster"
+мало давления,low pressure
+нет (с ним на 20% быстрее),none (20% faster with it)
+СОУТ: не проводилась,SOUT: not carried out
+СОУТ: класс %s (%s),SOUT: class %s (%s)
+ · сейчас , · now 
+допустимо,acceptable
+вредно: ,hazardous: 
+ — переоценка снизит класс,: reassessment will lower the class
+Вытяжной зонт: ,Exhaust hood: 
+работает,working
+нет — дым идёт в помещение,none: smoke goes into the room
+Работает: %s · нужен %s,Operator: %s · needs a %s
+Вход %d · выход %d · операций %d · %.1f кВт,In %d · out %d · operations %d · %.1f kW
+Заполнено: %d из %d,Filled: %d of %d
+· %s — %d шт.,· %s: %d pcs
+· …и ещё %d наименований,· …and %d more items
+Контролёр: ,Inspector: 
+Мест: %d · занято %d,Seats: %d · taken %d
+свободен,free
+В бытовке,In the locker room
+Стоит не в бытовке — переодеваться здесь не так приятно.,Not in a locker room: changing here is less pleasant.
+Занято,Occupied
+Свободно,Free
+Рабочее место: ,Workplace: 
+свободно,free
+"Стоит не в кабинете: обнесите стенами, постелите линолеум и назначьте помещение (контора, бухгалтерия, ПДО…).","Not in an office: wall it in, lay linoleum and assign the room (office, accounting, planning…)."
+Потребляет %.1f кВт · %s,Draws %.1f kW · %s
+питание есть,powered
+НЕТ ПИТАНИЯ,NO POWER
+Стружки: %d из %d кг,Chips: %d of %d kg
+"Во всех контейнерах: %d кг ≈ %s. Ломовоз приезжает по пятницам, забирает стружку и брак из тары.",In all bins: %d kg ≈ %s. The scrap truck comes on Fridays and takes chips and rejects from the bins.
+Сдано в металлолом за всё время: %s,Sold as scrap metal in total: %s
+Производительность: до %d клеток площади · %.1f кВт,Throughput: up to %d cells of floor area · %.1f kW
+Тянет из: ,Draws from: 
+ниоткуда — поставьте в помещение или подведите воздуховод,nowhere: put it in a room or connect a duct
+"Площадь сети %d кл., вентиляторов %d: кратность ×%.1f","Network area %d cells, fans %d: air change ×%.1f"
+Нет тока — подведите кабель к розетке.,No power: run a cable to the socket.
+Подключён к вентилятору,Connected to a fan
+Не тянет: подведите воздуховод к сети с работающим вентилятором.,No draw: connect a duct to a network with a working fan.
+Над: ,Above: 
+станков рядом нет — зонт вешают над станком или вплотную,no machines nearby: a hood is hung over a machine or right next to it
+Держит %d потребителей · %.1f кВт под нагрузкой,Serves %d consumers · %.1f kW under load
+Пневмомагистраль не подведена (Сети → Сжатый воздух).,Air line not connected (Networks → Compressed air).
+Подключено потребителей: %d · работают сейчас: %d,Consumers connected: %d · working now: %d
+В компрессорной — тихо,Quiet in the compressor room
+Шумит под 90 дБ: лучше в отдельной компрессорной.,Noisy at 90 dB: better in a separate compressor room.
+Не греет: ,Not heating: 
+Греет батарей: %d из %d (подключённых трубой к его водопроводу),Heating radiators: %d of %d (piped to its water network)
+Газ — %d%% от цены городского тепла. Аварии на теплотрассе не страшны.,Gas: %d%% of the price of city heating. Heating-main breakdowns don't matter.
+Тепло: от своего газового котла,Heat: from our own gas boiler
+Батарея холодная: нет работающего электрокотла. Поставьте его вплотную к насосной станции (Объекты → Водопровод) и подведите ток.,Radiator is cold: no working electric boiler. Put one right next to the pumping station (Objects → Plumbing) and connect power.
+Тепло: от электрокотла у насосной,Heat: from the electric boiler at the pumping station
+" — АВАРИЯ, батарея холодная",": BREAKDOWN, the radiator is cold"
+Греет воду для всех батарей завода (%d шт.) · %.1f кВт,Heats water for all the plant's radiators (%d) · %.1f kW
+Смотрит за помещением «%s»,Watching room “%s”
+Висит не в помещении — смотреть не за чем,Not hanging in a room: nothing to watch
+Записывает,Recording
+Нет тока: подведите кабель не дальше 3 клеток,No power: run a cable within 3 cells
+Комплектов СИЗ на складе: %d,PPE kits in stock: %d
+Без СИЗ сейчас: %d чел.,Without PPE now: %d ppl
+У всех рабочих СИЗ в порядке.,All workers have proper PPE.
+Нарезано заготовок: ,Blanks cut: 
+нет,none
+Первая операция из заготовки на %d%% быстрее. Запас — до %d на материал.,The first operation from a blank is %d%% faster. Stock: up to %d per material.
+Режет: ,Cutting: 
+ · нет питания, · no power
+Стоимость: ,Cost: 
+Помещение: ,Room: 
+ (не оборудовано), (not equipped)
+Бригады,Crews
+График смены,Shift Schedule
+Охрана,Security
+Профсоюз,Union
+бригад %d из %d · без бригады %d чел.,crews %d of %d · without a crew %d ppl
+"Бригадир получает +10% к ставке и ускоряет свою бригаду на 3–6% (если работает в ту же смену). Люди берут работу в первую очередь на станках своего участка — меньше беготни по заводу. Дружная бригада работает веселее, склочник в бригаде портит всем настроение.",A foreman gets +10% pay and speeds up their crew by 3–6% (if on the same shift). People take work first on the machines of their own section: less running around the plant. A close-knit crew works more cheerfully; a troublemaker spoils everyone's mood.
+Сформировать автоматически,Form automatically
+"Бригада на каждый цех со станками: люди — к своим станкам, бригадир — самый опытный. Текущие бригады будут расформированы.","A crew for every shop with machines: people go to their own machines, the most experienced becomes foreman. Current crews will be disbanded."
+Новая бригада,New crew
+"Пустая бригада: добавьте людей, бригадира и участок","An empty crew: add people, a foreman and a section"
+По пятницам бригада с наибольшим числом операций на человека получает вымпел: +6 к настроению и +3% к скорости на неделю,Every Friday the crew with the most operations per person wins the pennant: +6 mood and +3% speed for a week
+Премия победителям %s,Bonus for winners %s
+Каждому в бригаде-победителе,For each member of the winning crew
+"%d операций за неделю, %.1f на человека%s","%d operations this week, %.1f per person%s"
+ · вымпел сейчас у них, · they hold the pennant now
+нужно две бригады и больше,needs two crews or more
+Бригад пока нет. «Сформировать автоматически» соберёт бригаду на каждый цех со станками — или создайте вручную.,"No crews yet. “Form automatically” makes a crew for every shop with machines, or create one by hand."
+Без бригады,Without a crew
+"Щёлкните, чтобы переименовать",Click to rename
+%d чел.,%d ppl
+вымпел,pennant
+Побед в соцсоревновании: %d%s,Socialist competition wins: %d%s
+ · вымпел этой недели у них, · they hold this week's pennant
+"Расформировать: люди останутся на заводе, просто без бригады","Disband: people stay at the plant, just without a crew"
+Бригадир,Foreman
+— не назначен —,— not assigned —
+ (2-я смена), (shift 2)
+Только свой участок,Own section only
+"Люди бригады не берут работу на чужих станках, даже если там простой","Crew members won't take work on other crews' machines, even if those stand idle"
+"Сейчас за «%s» — нажмите, чтобы забрать",Now held by “%s”: click to take it over
+Закрепить помещение (%d клеток) за бригадой,Assign the room (%d cells) to the crew
+Снять закрепление,Unassign
+нет помещений со станками,no rooms with machines
+"%s, %s. Нажмите, чтобы убрать из бригады","%s, %s. Click to remove from the crew"
++ добавить,+ add
+ (из «%s»), (from “%s”)
+свой график,own schedule
+график %d-й смены,shift %d schedule
+дружная,close-knit
+ссорятся,quarrelling
+обычная,ordinary
+Сплочённость: средние отношения внутри бригады,Cohesion: average relations within the crew
+"Выберите, что рисовать, и щёлкайте по клеткам (по 15 минут). Планёрка в начале смены — +3% к скорости на всю смену (если есть бригадир или мастер). Перерыв — чай и отдых, курильщики курят по графику. Уборка в конце — участок чистый к сдаче смены. Обед — не меньше 30 минут, иначе трудовая инспекция оштрафует. Разные графики бригадам — меньше очередей в столовой.","Choose what to paint and click the cells (15 minutes each). A briefing at the start of the shift gives +3% speed for the whole shift (if there's a foreman or supervisor). Break: tea and rest; smokers smoke on schedule. Clean-up at the end: the section is clean for handover. Lunch: at least 30 minutes, or the labour inspectorate will fine you. Different schedules for crews mean shorter canteen queues."
+1-я смена · 8:00,Shift 1 · 8:00
+2-я смена · 17:00,Shift 2 · 17:00
+Свой график бригады,The crew's own schedule
+Бригада работает по общему графику смены,The crew follows the shift's common schedule
+Кисть,Brush
+"общий график смены — измените клетку, появится свой",common shift schedule: change a cell to get its own
+%d мин,%d min
+Шаблоны,Presets
+Только обед,Lunch only
+Как раньше: обед 45 минут,As before: a 45-minute lunch
+Порядок,Orderly
+"Планёрка, обед час, чай после обеда, уборка в конце","Briefing, an hour's lunch, tea after lunch, clean-up at the end"
+Два чаепития,Two tea breaks
+"Планёрка, перерыв до и после обеда, уборка","Briefing, breaks before and after lunch, clean-up"
+Аврал,Rush job
+"Обед 30 минут и больше ничего: выпуск выше, люди устают","A 30-minute lunch and nothing else: more output, people get tired"
+Вернуть общий,Back to common
+Бригада снова работает по общему графику своей смены,The crew follows its shift's common schedule again
+Все графики,All schedules
+"Сравните, чтобы обеды бригад не совпадали: меньше очередей в столовой.",Compare them so crews' lunches don't overlap: shorter canteen queues.
+%d ч %02d мин,%d h %02d min
+шанс поймать несуна на выходе: %d%%,chance to catch a pilferer at the exit: %d%%
+"Несуны выносят металл и расходники, уходя со смены. Охранник на проходной ловит больше половины, камеры отпугивают и записывают, а инвентаризация по пятницам показывает, сколько ушло мимо. Охрана ещё и отбивает охоту проносить спиртное.","Pilferers carry out metal and consumables when leaving the shift. A guard at the gatehouse catches more than half, cameras deter and record, and the Friday stocktake shows how much slipped past. Security also discourages smuggling in alcohol."
+Нанять охранника…,Hire a guard…
+Откроется найм; можно дать объявление на охранника,Opens hiring; you can post an ad for a guard
+Проходная,Gatehouse
+Объекты → Безопасность,Objects → Security
+"Проходная с турникетами у въезда: люди проходят через турникеты, охранник сидит в будке","A gatehouse with turnstiles at the entrance: people pass the turnstiles, a guard sits in the booth"
+Охранники,Guards
+на смене %d,on shift %d
+наймите в «Найме»,hire in “Hiring”
+Камеры,Cameras
+работают / всего,working / total
+Смотрят: %s,Watching: %s
+Камере нужен ток,A camera needs power
+Задержано,Detained
+недостача %s,shortage %s
+Досмотр силами ЧОП · %s в день,Searches by a private security firm · %s a day
+"Нанятая охранная фирма досматривает всех на проходной: ловит 85% несунов, но людям неприятно. Работает, только когда в будке охранник на смене","A hired security firm searches everyone at the gatehouse: catches 85% of pilferers, but people dislike it. Works only when a guard is on shift in the booth"
+. Нужна проходная.,. Needs a gatehouse.
+с инвентаризации пропало на %s,the stocktake found %s missing
+"Подробности — в пятницу, на инвентаризации","Details on Friday, at the stocktake"
+Охранников нет.,No guards.
+охрана %d · %s · %s,security %d · %s · %s
+Журнал охраны,Security log
+Пока тихо.,All quiet so far.
+"Профком ведёт переговоры о колдоговоре, заранее предупреждает о забастовках и участвует в расследовании несчастных случаев.","The union committee negotiates the collective agreement, warns of strikes in advance and takes part in accident investigations."
+профсоюза нет,no union
+Профсоюза пока нет,No union yet
+"Он появится сам, когда рабочих станет %d и больше — быстрее, если в коллективе есть активист или люди недовольны.",It will appear on its own once there are %d workers or more; sooner if there's an activist or people are unhappy.
+%d из %d рабочих,%d of %d workers
+доволен администрацией,happy with management
+держит нейтралитет,stays neutral
+недоволен,unhappy
+профком %s,union committee %s
+председатель не выбран,no chair elected
+председатель · с дня %d,chair · since day %d
+Комната профкома,Union office
+Председатель там работает — профком спокойнее,The chair works there: the committee is calmer
+"Помещение со столом ИТР и доской профкома (Объекты → Офис), назначьте «Профком»",A room with an office desk and a union board (Objects → Office); assign it as “Union”
+До забастовки люди терпят на %d %s %s обычного; перед забастовкой профком предупредит письмом.,"Before striking, people will hold out %d %s %s than usual; the committee will warn you by letter before a strike."
+дня,days
+дней,days
+дольше,longer
+меньше,less
+Проект колдоговора,Draft collective agreement
+"Отметьте пункты, на которые согласны. Три и больше — профком доволен; меньше двух — будет недоволен.",Tick the clauses you agree to. Three or more: the committee is happy; fewer than two: it will be unhappy.
+Подписать на %d дней,Sign for %d days
+Колдоговор до дня %d,Collective agreement until day %d
+нарушен в день %d,broken on day %d
+Договор подписан без единого пункта — профком недоволен.,Agreement signed without a single clause: the committee is unhappy.
+Колдоговор,Collective agreement
+Профком готовит проект (с дня %d). Как будет готов — придёт письмо.,The committee is preparing a draft (since day %d). You'll get a letter when it's ready.
+Акты Н-1,N-1 reports
+После каждой травмы комиссия за %d рабочих дня расследует причины и составляет акт Н-1. Причины по вине предприятия — компенсация пострадавшему и штраф трудовой инспекции; табло «Дней без травм» снижает травмы на 5%%.,After every injury a commission investigates the causes within %d working days and draws up an N-1 report. If the company is at fault: compensation for the victim and a labour inspectorate fine. A “Days without injuries” board reduces injuries by 5%%.
+%d %s без травм,%d %s without injuries
+Несчастных случаев не было.,No accidents so far.
+расследование,investigation
+акт ждёт подписи,report awaiting signature
+не оформлен,not filed
+", штраф %s",", fine %s"
+День %d · %s (%s),Day %d · %s (%s)
+"Щёлкните по стройке, станку, грузу или месту на полу — выберите «Сделать сейчас»","Click a build site, machine, load or spot on the floor and choose “Do it now”"
+Камера на человека,Camera on the person
+Отпустить,Release
+%s вернулся к обычной работе.,%s is back to normal work.
+%s вернулась к обычной работе.,%s is back to normal work.
+%s: %s — управление снято.,%s: %s; control released.
+Под управлением: %s · %s,Under control: %s · %s
+Сейчас: %s,Now: %s
+ждёт команды,waiting for orders
+Сюда %s не пройти и делать здесь нечего.,"%s can't get there, and there's nothing to do here."
+%s — что сделать?,%s: what to do?
+"Человек бросит своё и сделает то, что вы покажете щелчком",They'll drop what they're doing and do what you show with a click
+Открыть карточку,Open Card
+"Полная карточка: навыки, настроение, история","Full card: skills, mood, history"
+настроение %d,mood %d
+Нельзя: %s,Can't: %s
+Неделя стройки: заказов не будет ещё %d %s,Construction week: no orders for %d more %s
+План стройки: ≈ %s,Construction plan: ≈ %s
+открыть,open
+По плану ждут стен: зоны и объекты,Waiting for walls in the plan: zones and objects
+решить,decide
+Ещё писем: %d,More letters: %d
+Пожар! Люди тушат,Fire! People are putting it out
+Забастовка: %s,Strike: %s
+Долг по зарплате — люди уходят (%d из %d),Wage arrears: people are leaving (%d of %d)
+Нечем работать: нет инструмента и денег,Nothing to work with: no tools and no money
+Кассовый разрыв — денег нет,Cash gap: no money
+Выбит автомат — часть завода без тока,Breaker tripped: part of the plant has no power
+Идёт проверка: %s,Inspection under way: %s
+Скоро проверка: %s,Inspection soon: %s
+Заказы в работе: %d,Orders in progress: %d
+срок %s,due %s
+", просрочено %d",", %d overdue"
+Заказов в работе нет,No orders in progress
+нанять человека,hire someone
+нужен кабинет,needs an office
+Нужен отдел: %s,Department needed: %s
+Развитие: «%s»,Development: “%s”
+%.1f дн.,%.1f d
+Постройте кабинет директора,Build a director's office
+откроет «Развитие»,opens “Development”
+Можно открыть: «%s»,Can be opened: “%s”
+Грант: %s,Grant: %s
+%d/%d · %d дн.,%d/%d · %d d
+совет,tip
+Цели этапа: выполнено %d из %d,Stage goals: %d of %d done
+· на выбор: ещё %d из %d дорог,· to choose: %d more of %d routes
+ЧТО ДЕЛАТЬ,TO DO
+  · срочно: %d,  · urgent: %d
+▶  Начать производство раньше,▶  Start Production Early
+Сбыт начнёт принимать заявки уже сегодня,Sales will start taking orders today
+"%s
+Щёлкните — откроется, где это сделать","%s
+Click to open where it's done"
+%s млн,%sM
+%s тыс.,%sk
+%s%.1f млн,%s%.1fM
+%s%d тыс.,%s%dk
+Данных пока нет — график появится через пару дней,No data yet: the chart will appear in a couple of days
+Данных пока нет,No data yet
+ПРЗ.%06d.%03d,PRZ.%06d.%03d
+Круг 40 ГОСТ 2590-2006 / 45 ГОСТ 1050-2013,Round bar 40 GOST 2590-2006 / 45 GOST 1050-2013
+Шестигранник 27 ГОСТ 2879-2006 / 35 ГОСТ 1050-2013,Hexagon bar 27 GOST 2879-2006 / 35 GOST 1050-2013
+Круг 60 ГОСТ 2590-2006 / 40Х ГОСТ 4543-2016,Round bar 60 GOST 2590-2006 / 40Kh GOST 4543-2016
+Лист Б-ПН-8 ГОСТ 19903-2015 / Ст3сп ГОСТ 14637-89,Plate B-PN-8 GOST 19903-2015 / St3sp GOST 14637-89
+Поковка гр. IV ГОСТ 8479-70 / 45 ГОСТ 1050-2013,Forging gr. IV GOST 8479-70 / 45 GOST 1050-2013
+Труба 40×40×3 ГОСТ 30245-2003 / С245 ГОСТ 27772-2015,Tube 40×40×3 GOST 30245-2003 / S245 GOST 27772-2015
+Изм.,Rev.
+Лист,Sheet
+№ докум.,Doc. No.
+Подп.,Sign.
+Дата,Date
+Разраб.,Drawn
+Пров.,Checked
+Т.контр.,T.ctrl
+Н.контр.,N.ctrl
+Утв.,Appr.
+Петров,Petrov
+Савина,Savina
+Кузнецов,Kuznetsov
+Орлова,Orlova
+Директор,Director
+Сборочный чертёж,Assembly drawing
+Лит.,Lit.
+Масса,Mass
+Масштаб,Scale
+О,O
+Лист 1,Sheet 1
+Листов 1,Sheets 1
+ООО «Прогресс»,Progress LLC
+Заказ № %d · %s · %d шт.,Order No. %d · %s · %d pcs
+1. Сварные швы по ГОСТ 14771-76.,1. Welds per GOST 14771-76.
+"2. Покрытие: эмаль ПФ-115 ГОСТ 6465-76, цвет по заказу.","2. Coating: PF-115 enamel GOST 6465-76, colour as ordered."
+3. Неуказанные катеты швов — 4 мм.,3. Unspecified weld legs: 4 mm.
+1. Перед сборкой детали промыть и смазать.,1. Wash and grease parts before assembly.
+"2. Узел испытать на стенде, утечки не допускаются.",2. Bench-test the unit; no leaks allowed.
+3. Остальные технические требования по ТУ заказчика.,3. Other technical requirements per customer specs.
+1. *Размеры для справок.,1. *Reference dimensions.
+"2. Неуказанные предельные отклонения: валов h14, отв. H14, ост. ±IT14/2.","2. Unspecified tolerances: shafts h14, holes H14, other ±IT14/2."
+"3. Острые кромки притупить R0,5.",3. Break sharp edges R0.5.
+"4. Закалка ТВЧ, HRC 45...50.","4. Induction hardening, HRC 45...50."
+D-8×%d×%d ГОСТ 1139-80,D-8×%d×%d GOST 1139-80
+Паз 8P9,Slot 8P9
+2 фаски 1×45°,2 chamfers 1×45°
+А–А,A–A
+%d отв. Ø%d равном. на Ø%d,%d holes Ø%d equally spaced on Ø%d
+□%d (под ось),□%d (for axle)
+%d вырезов R%d,%d notches R%d
+3 отв. Ø%d,3 holes Ø%d
+Б–Б,B–B
+ГОСТ 14771-76-Т1-△4,GOST 14771-76-T1-△4
+Профиль □40×3,Profile □40×3
+Поз.,Item
+Наименование,Name
+Кол.,Qty
+Промзона — %s,Promzona — %s
+Автосохранение не удалось: %s,Autosave failed: %s
+Быстрое сохранение,Quick save
+Игра сохранена (F9 — загрузить).,Game saved (F9 to load).
+Музыка: %s,Music: %s
+"%d кадр/с · кадр %.1f мс · логика %.1f мс · симуляция %.1f мс/кадр · людей на заводе %d
+%s · %s · V-Sync %s · предел %s · вызовов отрисовки %d","%d fps · frame %.1f ms · logic %.1f ms · simulation %.1f ms/frame · people at the plant %d
+%s · %s · V-Sync %s · limit %s · draw calls %d"
+вкл.,on
+"Зоны и помещения: что где, чего не хватает","Zones and rooms: what's where, what's missing"
+Коммуникации,Utilities
+"Все сети сразу: кабель, водопровод, сжатый воздух, вентиляция — и кому чего не хватает","All networks at once: cable, water, compressed air, ventilation, and who's missing what"
+"Где светло от ламп и окон, где темно","Where lamps and windows make it bright, where it's dark"
+Температура,Temperature
+"Тепло и холод по помещениям, батареи","Heat and cold by room, radiators"
+Потоки людей,Foot traffic
+Где чаще ходят — тропы и пробки,Where people walk most: paths and jams
+Загрузка станков,Machine load
+"Работает, простаивает, брак (нужен ПДО)","Working, idle, rejects (needs planning dept.)"
+Чистота,Cleanliness
+"Стружка и грязь, уровень обустройства","Chips and dirt, comfort level"
+Бригады и охрана,Crews and security
+"Участки бригад, камеры и посты","Crew sections, cameras and posts"
+СЛОИ,LAYERS
+Загрузку станков считает диспетчер ПДО: наймите диспетчера (Управление → Отделы).,Machine load is tracked by the planning dispatcher: hire one (Management → Departments).
+"Щёлкните по значку ещё раз, чтобы выключить",Click the icon again to turn it off
+ЯНВ,JAN
+ФЕВ,FEB
+МАРТ,MAR
+АПР,APR
+МАЙ,MAY
+ИЮНЬ,JUN
+ИЮЛЬ,JUL
+АВГ,AUG
+СЕНТ,SEP
+ОКТ,OCT
+НОЯБ,NOV
+ДЕК,DEC
+"Зона «%s»: протяните прямоугольник по полу помещения или щёлкните по помещению, чтобы залить его целиком.",Zone “%s”: drag a rectangle on the room's floor or click a room to fill it entirely.
+"Планировка: рисуйте стены, полы, зоны и станки — это калька, бесплатно. Готово — «Утвердить план».","Planning: draw walls, floors, zones and machines. It's tracing paper, free of charge. When ready, “Approve Plan”."
+ПЛАНИРОВКА — ничего не строится и не стоит денег,PLANNING: nothing gets built and nothing costs money
+стен и проёмов %d,walls and openings %d
+пола %d кл.,floor %d cells
+зон %d,zones %d
+объектов %d,objects %d
+На плане: %s · по смете ≈ %s,On the plan: %s · estimate ≈ %s
+"Выберите стену, пол, зону или станок в меню снизу и рисуйте. Снос стирает план.","Pick a wall, floor, zone or machine in the menu below and draw. Demolish erases the plan."
+Утвердить план,Approve Plan
+"План утверждён: пол %d кл., стены %d, объектов заказано %d.","Plan approved: floor %d cells, walls %d, objects ordered %d."
+"Ещё %d объектов ждут пола и стен — поставим сами, когда достроят.",%d more objects are waiting for floors and walls; we'll place them once those are built.
+Денег хватило не на всё — остаток остался на плане.,Not enough money for everything: the rest stays on the plan.
+"Превратить план в чертежи: рабочие начнут строить, деньги спишутся по смете","Turn the plan into blueprints: workers start building, money is charged per the estimate"
+Стереть план,Erase Plan
+"Убрать всё, что нарисовано на плане",Remove everything drawn on the plan
+Готово,Done
+Выйти из планировки — план останется бледной калькой поверх завода (V),Leave planning: the plan stays as faint tracing over the plant (V)
+%s: зажмите ЛКМ и протяните прямоугольник,%s: hold LMB and drag a rectangle
+Стены: протяните контур будущего помещения,Walls: drag the outline of the future room
+%s: протяните вдоль существующей стены или чертежа,%s: drag along an existing wall or blueprint
+"%s: щёлкните, чтобы поставить",%s: click to place
+R — повернуть,R: rotate
+%s: щёлкните — помещение встанет центром под курсором (внутри %d×%d),%s: click and the room is centred under the cursor (inside %d×%d)
+Снос: выделите область. Объекты упакуют в ящики и унесут на склад оборудования,Demolish: select an area. Objects will be packed in crates and taken to equipment storage
+Отмена чертежей: выделите область. Деньги вернутся полностью,Cancel blueprints: select an area. Money is refunded in full
+Стереть разметку: протяните прямоугольник или щёлкните по зоне,Erase markings: drag a rectangle or click a zone
+Зона «%s»: протяните прямоугольник или щёлкните по помещению — зальёт целиком,Zone “%s”: drag a rectangle or click a room to fill it entirely
+Зоны: выберите зону в меню или щёлкните по помещению — откроется его карточка,Zones: pick a zone in the menu or click a room to open its card
+Кабель: протяните от подстанции прямо в клетку розетки станка или в помещение,Cable: drag from the substation right into a machine's socket cell or into a room
+Снять кабель: выделите область,Remove cable: select an area
+Труба: протяните от насоса к туалету или раковине,Pipe: drag from the pump to a toilet or sink
+Снять трубу: выделите область,Remove pipe: select an area
+Воздуховод: протяните от вентилятора по помещениям и к зонтам,Duct: drag from the fan through the rooms and to the hoods
+Снять воздуховод: выделите область,Remove duct: select an area
+Пневмомагистраль: протяните от компрессора к покрасочной камере и сборочным столам,Air line: drag from the compressor to the paint booth and assembly tables
+Снять пневмомагистраль: выделите область,Remove air line: select an area
+Убрать зону на улице: выделите область,Remove outdoor zone: select an area
+Зона разгрузки: протяните прямоугольник у ворот,Unloading zone: drag a rectangle by the gate
+Зона отгрузки: протяните прямоугольник у ворот,Shipping zone: drag a rectangle by the gate
+ПЛАН,PLAN
+ПКМ или Esc — выйти,RMB or Esc to exit
+"Здесь нет помещения: нужен пол, обнесённый стенами с дверью.",No room here: you need a floor enclosed by walls with a door.
+"Нажмите, чтобы показать место",Click to show the spot
+"Нажмите, чтобы открыть окно",Click to open the window
+СЛУЖЕБНАЯ ЗАПИСКА,INTERNAL MEMO
+К РЕШЕНИЮ,FOR DECISION
+Ваше решение,Your decision
+по умолчанию,default
+"Будет выбрано само, если не решить вовремя",Chosen automatically if you don't decide in time
+◎ Показать на карте,◎ Show on Map
+ещё ждут решения: %d,still awaiting decision: %d
+"Если не решить за %d игровых часов, будет выбран вариант «%s».","If you don't decide within %d game hours, “%s” will be chosen."
+Чертёж: %s,Drawing: %s
+Размеры у каждого заказа свои. Чертёж — для интереса: по нему ничего настраивать не нужно.,Dimensions differ for every order. The drawing is just for interest: nothing needs to be set up from it.
+Начать производство раньше?,Start Production Early?
+"До конца недели стройки ещё %d %s. Если цех готов, можно начать раньше: отдел сбыта примет первые заявки уже сегодня.","%d %s left in the construction week. If the shop is ready, you can start early: the sales department will take its first orders today."
+нет ни одного станка,no machines at all
+станки без тока — протяните кабель от подстанции в их розетки,machines without power: run a cable from the substation into their sockets
+нет станочников — наймите в «Людях»,no machinists: hire some in “People”
+нет стеллажа под металл,no rack for metal
+"Пока что: %s. Заказы будут ждать, пока это не исправите.",For now: %s. Orders will wait until you fix this.
+Ещё построю,I'll Build More
+Начать производство,Start Production
+Паспорт завода,Plant Passport
+%s · этап «%s» %s · в штате %d · основан %s,%s · stage “%s” %s · staff %d · founded %s
+Завод переименован: теперь он называется %s. Новая вывеска уже у ворот.,The plant has been renamed: it's now called %s. The new sign is already at the gate.
+Эмблема обновлена.,Emblem updated.
+Достижение получено,Achievement unlocked
+Новый этап: «%s»!,New stage: “%s”!
+отдел: %s,department: %s
+Завод вырос! Открылось: %s.,The plant has grown! Unlocked: %s.
+"В «Развитии» можно исследовать: %s (Управление → Развитие, нужен кабинет директора).","In “Development” you can research: %s (Management → Development, needs a director's office)."
+Дальше — «%s». Цели: %s.,Next: “%s”. Goals: %s.
+И любые %d на выбор: %s.,And any %d of your choice: %s.
+"Отлично, работаем!","Great, Let's Work!"
+Сценарий «%s» пройден!,Scenario “%s” complete!
+"Все цели выполнены, рейтинг завода — %s. Можно продолжать без ограничений: растите до градообразующего предприятия или начните другой сценарий с другим профилем завода.","All goals met, plant rating: %s. You can keep playing without limits: grow into a town-forming enterprise, or start another scenario with a different plant profile."
+Продолжить игру,Continue Playing
+В главное меню,To Main Menu
+Завод закрыт,Plant Closed
+Конец игры,Game Over
+"%s проработал %d %s (до %s). Выполнено заказов: %d, репутация %d.","%s ran for %d %s (until %s). Orders completed: %d, reputation %d."
+"Чтобы такого не было: платите зарплату вовремя (в долг — не чаще раза в 3 месяца), не набирайте заказов больше, чем успеваете, и держите запас денег на две зарплаты.","To avoid this: pay wages on time (in arrears no more than once every 3 months), don't take on more orders than you can handle, and keep a cash reserve for two payrolls."
+Загрузить сохранение,Load a Save
+Начать заново,Start Over
+Что не так,What's wrong
+Как исправить,How to fix
+Устраните причину — после этого строка пропадёт.,Remove the cause and this line will disappear.
+Показать место,Show Spot
+Понятно,Got It
+Уволить: %s,Fire: %s
+"%s · в штате %d дн. Выберите причину — от неё зависит, будут ли последствия. Расчёт за отработанные дни выплачивается всегда.",%s · on staff %d d. Choose a reason: it decides whether there are consequences. Pay for days worked is always paid out.
+законно,lawful
+нет оснований,no grounds
+Не хватает денег на выплату,Not enough money for the payout
+Не увольнять,Don't Fire
+Долги растут,Debts Are Growing
+На счёте %s. Кредиторы звонят каждый день. Можно продолжать в надежде выправить положение — или начать заново.,"%s in the account. Creditors call every day. You can carry on hoping to turn things around, or start over."
+день|дня|дней,day|days
+год|года|лет,year|years
+зона|зоны|зон,zone|zones
+Круг 40 ГОСТ 2590-2006,Round bar 40 GOST 2590-2006
+45 ГОСТ 1050-2013,45 GOST 1050-2013
+Шестигранник 27 ГОСТ 2879-2006,Hexagon bar 27 GOST 2879-2006
+35 ГОСТ 1050-2013,35 GOST 1050-2013
+Круг 60 ГОСТ 2590-2006,Round bar 60 GOST 2590-2006
+40Х ГОСТ 4543-2016,40Kh GOST 4543-2016
+Лист Б-ПН-8 ГОСТ 19903-2015,Plate B-PN-8 GOST 19903-2015
+Ст3сп ГОСТ 14637-89,St3sp GOST 14637-89
+Поковка гр. IV ГОСТ 8479-70,Forging gr. IV GOST 8479-70
+Труба 40×40×3 ГОСТ 30245-2003,Tube 40×40×3 GOST 30245-2003
+С245 ГОСТ 27772-2015,S245 GOST 27772-2015

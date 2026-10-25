@@ -1,0 +1,1124 @@
+keys,en
+В работе,Active
+Рынок,Market
+Контракты,Contracts
+Конкуренты,Competitors
+План ПДО,Production Plan
+Архив,Archive
+Станки,Machines
+Простой,Idle
+Металл и расходники,Metal & Supplies
+Маршруты изделий,Product Routes
+Склад оборудования,Equipment Store
+Сотрудники,Staff
+Найм,Hiring
+Обучение,Training
+Охрана труда,Workplace Safety
+Бригады,Crews
+График смены,Shift Schedule
+Охрана,Security
+Профсоюз,Trade Union
+Доска почёта,Honor Board
+Сводка,Summary
+Графики,Charts
+По неделям,By Week
+Кредиты и лизинг,Loans & Leasing
+Страхование,Insurance
+Гранты,Grants
+Развитие и отделы,Growth & Departments
+Разработки,Research
+Этап роста,Growth Stage
+Рейтинг,Rating
+Сценарий,Scenario
+Сейчас,Now
+Проверки,Inspections
+Календарь,Calendar
+Хроника,Chronicle
+Многотиражка,Factory Paper
+Журнал,Log
+Обзор,Overview
+Общежитие,Dormitory
+Столовая и медпункт,Canteen & First Aid
+Детсад и ДК,Kindergarten & Club
+Заводское радио,Factory Radio
+Кот,Cat
+"Движение денег по неделям и статьям, себестоимость и маржа заказов, прогноз кассы.","Cash flow by week and category, order cost and margin, cash forecast."
+Страховые полисы оформляет и ведёт бухгалтерия.,Insurance policies are arranged and managed by accounting.
+"Долгие контракты с крупными заказчиками: поставки партиями по графику, цена выше рыночной. И экспортные заказы при репутации от 60.",Long contracts with big customers: scheduled batch deliveries above market price. Plus export orders at reputation 60+.
+"Сертификация ISO 9001: аудитор проверяет ОТК, качество, техотдел, СОУТ и инструктажи. Сертификат даёт больше заявок и премиальные цены.","ISO 9001 certification: the auditor checks QC, quality, the technical office, SOUT and safety briefings. The certificate brings more inquiries and premium prices."
+"Таблица конкурентов: доли рынка, цены, войны цен. Ценовая политика — демпинг или премиум. На 10% больше заявок.","Competitor table: market shares, prices, price wars. Pricing policy: dumping or premium. 10% more inquiries."
+"План производства с прогнозом сроков, приоритеты заказов, вдвое меньше переналадок, оценка «успеваем?» на рынке.","Production plan with lead-time forecast, order priorities, half the changeovers, and a “can we make it?” estimate on the market."
+"Бригады и бригадиры, участки, соцсоревнование между бригадами.","Crews and crew leaders, sections, socialist competition between crews."
+"Свой график смены по 15 минут: планёрка, обед, перерывы, уборка.","Your own shift schedule in 15-minute steps: briefing, lunch, breaks, cleanup."
+Доска почёта: лучшие рабочие месяца и соцсоревнование.,Honor board: best workers of the month and socialist competition.
+"Советы главного инженера, ППР без вашего участия, сводка сетей: мощность, воздух, вода.","Chief engineer's advice, planned maintenance without your input, utilities summary: power, air, water."
+Нужна ступень развития «%s»,Needs growth step “%s”
+Нужен отдел «%s»,Needs the “%s” department
+ветка «%s» · %s · %d %s,branch “%s” · %s · %d %s
+Откроется: %s,Unlocks: %s
+"Ступень открыта, но не работает: нет человека в отделе «%s».",The step is open but idle: nobody works in the “%s” department.
+Директор уже занимается: осталось %.1f дн.,The director is already on it: %.1f days left
+Можно начать.,Ready to start.
+Открыть «Развитие»,Open “Growth”
+Управление → Развитие,Management → Growth
+специалист: %s,specialist: %s
+Кабинет: %s,Office: %s
+Сотрудник: ✓ %s,Staff: ✓ %s
+ — нет своего стола, — no desk of their own
+Сотрудник: × нет,Staff: × none
+Найти: %s · %s,Find: %s · %s
+Объявление по профессии — откроется найм,Job ad for this profession — opens Hiring
+Построить кабинет,Build an office
+Откроется каталог помещений с этим типом,Opens the room catalog with this type
+"Заказов в работе нет. Сбыт возьмёт подходящие завтра утром — или посмотрите в «Рынке», почему отказывает.","No active orders. Sales will take suitable ones tomorrow morning, or check the Market to see why it declines."
+Заказ,Order
+Готовность,Progress
+Срок,Due
+Приоритет,Priority
+Сумма,Total
+выполнено %d · сорвано %d,done %d · failed %d
+Пока пусто.,Nothing yet.
+Итог,Result
+Оплата,Payment
+ВЫПОЛНЕН,DONE
+ОПОЗДАНИЕ %d ДН.,LATE %d D.
+СОРВАН,FAILED
+Отказы сбыта за две недели,"Declined by sales, last two weeks"
+Отказов не было.,Nothing declined.
+день %d,day %d
+в работе %d из %d · загрузка ~%.1f раб. дн. · репутация %d,active %d of %d · load ~%.1f work days · reputation %d
+"Отдел сбыта сам берёт заказы, которые завод успеет сделать с выгодой, и сам закупает металл. Ваше дело — мощности, ассортимент и крупные контракты. Приоритет заказа: станки и рабочие сначала делают детали для срочных.","The sales office takes orders the plant can make at a profit, and buys the metal itself. Your job is capacity, product range and big contracts. Order priority: machines and workers make parts for urgent orders first."
+Стратегия сбыта,Sales Strategy
+"С запасом — срывов почти нет, но и заказов меньше. Впритык — больше заказов, но любая поломка ведёт к просрочке (ступень «Впритык» в «Развитии»). Маржа — не брать заказы дешевле себестоимости плюс этот процент.","Safe: almost no missed deadlines, but fewer orders. Tight: more orders, but any breakdown means a late order (the “Tight” step in Growth). Margin: don't take orders below cost plus this percentage."
+Брать:,Take:
+"«Впритык» открывает ступень развития «Впритык» (Управление → Развитие), её держит ПДО.","“Tight” is unlocked by the “Tight” growth step (Management → Growth), held by the planning office."
+Маржа от:,Margin from:
+Новые заказы:,New orders:
+Брать,Take
+Не брать,Don't take
+"Сбыт не берёт новых заказов, пока не разрешите.",Sales won't take new orders until you allow it.
+Сбыт снова принимает заказы.,Sales is accepting orders again.
+"Завод в долгах — сбыт новых заказов не берёт, пока касса в минусе.",The plant is in debt: sales takes no new orders while the cash is negative.
+За 7 дней,Last 7 Days
+взято %d %s на %s,taken %d %s for %s
+отказано %d на %s,declined %d for %s
+в рассмотрении %d на %s,under review %d for %s
+Узкое место,Bottleneck
+некому работать на переделе «%s»,nobody to work at “%s”
+"«%s» — %s, упущено %s","“%s”: %s, lost %s"
+нет оборудования,no equipment
+не успевает,can't keep up
+Подробнее в «Рынке» →,More in the Market →
+нет — мощности свободны,"none, capacity is free"
+ждут решения: %d,awaiting decision: %d
+Контракты и тендеры →,Contracts & tenders →
+заявки за 7 дней · цены меняются по понедельникам,inquiries over 7 days · prices change on Mondays
+"Заявки заказчиков за неделю по изделиям вашего профиля. Снимите изделие с ассортимента — сбыт перестанет его брать, и станки займутся выгодным. × — передел, для которого нет оборудования.","Customer inquiries this week for products in your profile. Drop a product from the range and sales stops taking it, so the machines do something profitable. × marks a process you have no equipment for."
+Упущено за неделю: %s.%s,Lost this week: %s.%s
+ По переделам: , By process: 
+Изделие и маршрут,Product & route
+Цена за шт.,Unit price
+Спрос за неделю,Weekly demand
+Мощность,Capacity
+нужна разработка техотдела,needs technical office research
+без изменений,unchanged
+в ассортименте,in range
+снято,dropped
+Снять с ассортимента или вернуть: сбыт берёт заказы только на изделия в ассортименте,Drop from the range or bring back: sales only takes orders for products in the range
+ · маржа %d%%, · margin %d%%
+успеваем,on time
+впритык,tight
+не успеваем,too slow
+%d шт. на %s,%d pcs for %s
+взято %d шт.,taken %d pcs
+~%d в нед.,~%d/wk
+нет людей,no people
+нет станков,no machines
+предложений %d · действующих контрактов %d из %d,offers %d · active contracts %d of %d
+"Крупные клиенты предлагают контракт раз в одну-две недели (если репутация от 35). Одновременно — до %d %s, с ростом завода больше. С этапа «Среднее предприятие» приходят тендеры: экспорт и госзаказ.","Big clients offer a contract every week or two (at reputation 35+). Up to %d %s at once, more as the plant grows. From the “Medium Enterprise” stage, tenders arrive: export and state orders."
+Новых предложений нет.,No new offers.
+Ждут решения,Awaiting Decision
+%s × %d в неделю,%s × %d per week
+договор на год,one-year deal
+контракт,contract
+%s за шт. (+%d%% к рынку) · %d %s · всего %s,%s per pc (+%d%% to market) · %d %s · total %s
+"Аванс 10%% (%s) сразу при подписании. Терпит два срыва, третий — расторжение и неустойка 10%% от недопоставленного. В конце — премия 8%%.",10%% advance (%s) on signing. Tolerates two misses; the third means termination and a 10%% penalty on the undelivered amount. 8%% bonus at the end.
+первая партия — в неделю со дня %d · ответить до дня %d,first batch in the week from day %d · reply by day %d
+Подписать,Sign
+Отказаться,Decline
+Действующие контракты,Active Contracts
+"подписан, первая партия — в неделю со дня %d (через %d дн.)","signed, first batch in the week from day %d (in %d d.)"
+партия %d из %d · сдано %d · сорвано %d из %d допустимых,batch %d of %d · delivered %d · missed %d of %d allowed
+ · срок партии %s, · batch due %s
+%s × %d в неделю по %s,%s × %d per week at %s
+ · договор на год, · one-year deal
+Завершённые,Finished
+выполнен,completed
+расторгнут,terminated
+Горящий,Rush
+Аванс 50% при принятии. Срыв срока — возврат аванса и неустойка. Сдача военной приёмке без брака.,50% advance on acceptance. Missing the deadline means refunding the advance plus a penalty. Delivered to military acceptance with zero defects.
+"Экспорт: цена выше, но любой брак в партии вернётся рекламацией.","Export: higher price, but any defect in the batch comes back as a claim."
+%s за шт. · всего %s · срок %d %s,%s per pc · total %s · due in %d %s
+себестоимость ~%s/шт · маржа ~%d%%%s · %s,cost ~%s/pc · margin ~%d%%%s · %s
+ — убыточный!, — loss-making!
+%s · маржа — ступень «Себестоимость»,%s · margin needs the “Unit Cost” step
+загрузка ~%.1f раб. дн. (проблемный участок — %s): %s,load ~%.1f work days (bottleneck: %s): %s
+не успеем без найма,won't make it without hiring
+"Нет оборудования: %s — принять можно, но сделать не получится","No equipment: %s. You can accept, but you won't be able to make it"
+Принять,Accept
+Собирается из своих деталей: %s,Assembled from your own parts: %s
+"Металл: %s%s, ~%s · свободно на складе %d","Metal: %s%s, ~%s · free in stock %d"
+ (%d шт. на изделие), (%d pcs per item)
+%d из %d,%d of %d
+"готов, ждём машину","ready, waiting for the truck"
+отгрузка %d/%d,shipping %d/%d
+просрочен,overdue
+через %d дн.,in %d d.
+сегодня,today
+пробная · ,trial · 
+перенесён · ,postponed · 
+низк.,low
+обычн.,normal
+срочн.,urgent
+Станки и рабочие сначала делают детали для срочных заказов,Machines and workers make parts for urgent orders first
++%d дн.,+%d d.
+"Позвонить заказчику: срок +%d рабочих дня, скидка %d%%, репутация −2. Один раз на заказ.","Call the customer: +%d working days, %d%% discount, reputation −2. Once per order."
+Чертёж,Drawing
+Рабочий чертёж детали по ЕСКД,Working drawing of the part (ESKD)
+"Снабжение работает само: металл и расходники докупаются под принятые заказы (с запасом на брак) и приезжают фургоном в рабочее время. Оборудование заказывается, когда вы ставите объект. Цены на металл гуляют: индекс меняется каждый день, иногда — скачком.","Supply runs itself: metal and consumables are bought for accepted orders (with a margin for scrap) and arrive by van during work hours. Equipment is ordered when you place an object. Metal prices drift: the index changes daily, sometimes in a jump."
+индекс цены металла %.2f%s,metal price index %.2f%s
+ · %s%d%% за неделю, · %s%d%% this week
+Поставщик металла,Metal Supplier
+"%s — розница, +%d%% к цене. Снабженец в отделе снабжения найдёт опт дешевле.","%s: retail, +%d%% on price. A buyer in the supply office will find cheaper wholesale."
+Запас сверх заказов,Stock above orders
+Только под заказы,Orders only
+"Покупать ровно под принятые заказы — дешевле, но если ОТК забракует, ждать новый металл.","Buy exactly for accepted orders: cheaper, but if QC rejects parts, you wait for new metal."
+Небольшой,Small
+Сверх заказов держать ещё ~20% (не меньше 8 шт.) основного металла профиля.,Keep another ~20% (at least 8 pcs) of the profile's main metal on top of orders.
+Большой,Large
+"Сверх заказов держать ещё ~50% (не меньше 24 шт.) — новые заказы стартуют сразу, но деньги лежат на складе.","Keep another ~50% (at least 24 pcs) on top of orders: new orders start at once, but the money sits in the warehouse."
+В пути,On the Way
+%s × %d уп. — %s,%s × %d pk. — %s
+Оборудование: %s — %s,Equipment: %s — %s
+едет,on the way
+Ничего не едет.,Nothing on the way.
+Индекс цены металла,Metal Price Index
+"1.00 — обычная цена. Дёшево — закупайте впрок (запас «Большой»), дорого — только под заказы.",1.00 is the normal price. Cheap: buy ahead (“Large” stock); expensive: buy only for orders.
+дешевле обычного,cheaper than usual
+дороже обычного,pricier than usual
+обычная цена,normal price
+Индекс,Index
+Снабженец: %s,Buyer: %s
+металл дешевеет — можно подождать,"metal is getting cheaper, you can wait"
+металл дорожает — выгодно закупить впрок,"metal is getting pricier, worth buying ahead"
+цена стоит,price is steady
+График и прогноз цены ведёт снабженец (Управление → Отделы).,The price chart and forecast are kept by the buyer (Management → Departments).
+Металл,Metal
+Марка,Grade
+На складе,In Stock
+Под заказы,For Orders
+Цена,Price
+Впрок,Buy Ahead
+%s/шт,%s/pc
++20 шт.,+20 pcs
+Закупить 20 штук впрок по сегодняшней цене: %s,Buy 20 pieces ahead at today's price: %s
+"Расходники — докупаются сами, когда остаётся четверть упаковки",Consumables: restocked automatically when a quarter of a pack is left
+%.0f ед.,%.0f u.
+упаковка — %d ед. за %s,pack: %d u. for %s
+%s: на складе %.0f ед.%s — докупается автоматически,"%s: %.0f u. in stock%s, restocked automatically"
+ · едет, · on the way
+Демонтированное и неустановленное оборудование лежит в ящиках в помещении «Склад» (или в зоне разгрузки). Поставите такой же объект — возьмут отсюда бесплатно. Ненужное можно продать за полцены.,Dismantled and uninstalled equipment is kept in crates in the “Storage” room (or the unloading zone). Place the same object and it comes from here for free. Sell what you don't need at half price.
+ящиков на комплект: %d,crates per set: %d
+Продать · %s,Sell · %s
+Склад оборудования пуст.,The equipment store is empty.
+"Совет: назначьте помещение «Склад» — ящики будут лежать там, а не в зоне разгрузки.","Tip: assign a “Storage” room so the crates sit there, not in the unloading zone."
+%d чел. · на заводе %d · фонд оплаты ~%s в неделю,%d people · %d at the plant · payroll ~%s a week
+"Зарплата выдаётся по пятницам. Щёлкните по строке — камера покажет человека и откроется его карточка (мысли, навыки, история, действия).","Wages are paid on Fridays. Click a row: the camera shows the person and opens their card (thoughts, skills, history, actions)."
+Премия всем · %s,Bonus for all · %s
+По %s каждому: хорошее настроение на три дня,%s each: good mood for three days
+Ставки +5%,Wages +5%
+Повысить ставку всем на 5%%: +%s в неделю,Raise everyone's wage by 5%%: +%s a week
+По рынку (%d),To market (%d)
+"Поднять до рыночной ставку тем, кто получает меньше: иначе они недовольны и уходят",Raise the wage to market level for those who earn less; otherwise they're unhappy and leave
+Пока никого нет. Наймите людей в разделе «Найм».,Nobody here yet. Hire people in the “Hiring” section.
+"Поиск: имя, профессия, черта, занятие…","Search: name, profession, trait, activity…"
+Сортировка:,Sort:
+профессия,profession
+настроение,mood
+разряд,grade
+ставка,wage
+стаж,tenure
+Все %d,All %d
+1-я смена %d,1st shift %d
+2-я смена %d,2nd shift %d
+ИТР,Office
+Недовольные,Unhappy
+Без дела %d,Idle %d
+Новички %d,Newcomers %d
+Нет на месте,Away
+Сотрудник,Employee
+Смена,Shift
+Ставка,Wage
+Настроение,Mood
+не вышел,no-show
+в отпуске,on vacation
+на больничном,on sick leave
+дома,at home
+2-я,2nd
+1-я,1st
+Показать на заводе и открыть карточку,Show at the plant and open the card
+Никого не нашлось — попробуйте другое слово или фильтр «Все».,Nobody found. Try another word or the “All” filter.
+найдено %d,found %d
+Кандидатов: %d · новые приходят сами по понедельникам,Candidates: %d · new ones come on Mondays
+Выберите профессию — внизу кандидаты этой профессии. Нет подходящих — «Найти»: придут кандидаты только этой профессии. Черты характера видны не все: остальное откроется на работе (отдел кадров узнаёт сразу).,Pick a profession to see its candidates below. No good ones? Press “Find” and candidates of that profession only will come. Not all traits are visible: the rest show up on the job (HR knows right away).
+Кого ищем?,Who are we looking for?
+"Поиск профессии: токарь, сварщик, повар…","Search a profession: turner, welder, cook…"
+Кандидатов сейчас: %d,Candidates now: %d
+Сейчас таких кандидатов нет — выберите и нажмите «Найти»,No such candidates now. Select and press “Find”
+"Такой профессии нет — попробуйте иначе: «слесарь», «мастер», «инженер».","No such profession. Try another word: “fitter”, “foreman”, “engineer”."
+Объявление по профессии: придут несколько кандидатов — все «%s»,"Job ad: several candidates will come, all “%s”"
+Показать всех кандидатов (%d),Show all candidates (%d)
+Только «%s»,Only “%s”
+Кандидатов пока нет. Выберите профессию и нажмите «Найти» — или дождитесь понедельника.,"No candidates yet. Pick a profession and press “Find”, or wait for Monday."
+Среди кандидатов нет профессии «%s». Нажмите «Найти» — или посмотрите всех кандидатов (%d).,"No “%s” among the candidates. Press “Find”, or see all candidates (%d)."
+Все кандидаты — %d,All candidates — %d
+Кандидаты: %s — %d,Candidates: %s — %d
+★ свой,★ yours
+%s %s %s — свой рабочий: собран в главном меню («Создать рабочего»),"%s %s %s is your own worker, made in the main menu (“Create a Worker”)"
+%s · %s за смену,%s · %s per shift
++ ещё ?,+ more ?
+Остальные черты откроются на работе; отдел кадров узнаёт сразу,The other traits show up on the job; HR knows right away
+иногородняя · нужна койка,from out of town · needs a bed
+иногородний · нужна койка,from out of town · needs a bed
+"Приедет, если в общежитии есть свободная койка. Живёт рядом — не опаздывает","Comes if there's a free bed in the dormitory. Lives close, so never late"
+дети: %d,kids: %d
+Нужен садик — иначе иногда будет сидеть с ребёнком,"Needs a kindergarten, or will sometimes stay home with the kid"
+Нанять,Hire
+на курсах %d · с наставником %d · практикантов %d,in courses %d · with a mentor %d · interns %d
+"Курсы повышения разряда дают +2 к навыку, курсы смежной профессии — допуск к другим станкам (навык до 3). Наставник утраивает рост ученика у станка, но сам работает на 8% медленнее; он должен быть опытнее на 2 и работать в ту же смену.",Grade courses give +2 to a skill; cross-training courses allow work on other machines (skill up to 3). A mentor triples the apprentice's growth at the machine but works 8% slower; the mentor must be 2 points better and on the same shift.
+Подобрать наставников,Assign mentors
+Назначено наставников: %d,Mentors assigned: %d
+Подходящих пар нет: наставник должен быть опытнее ученика на 2 и работать в ту же смену.,No suitable pairs: a mentor must be 2 points better than the apprentice and on the same shift.
+"Каждому, кто до 3-го разряда, — опытного наставника из той же смены",Everyone below grade 3 gets an experienced mentor from the same shift
+Учебный класс,Classroom
+"Помещение с линолеумом, две парты и доска (Объекты → Офис), назначенное «Учебным классом». Курсы в нём вдвое-втрое дешевле учебного центра, и человек не пропадает на несколько дней.","A room with linoleum, two desks and a board (Objects → Office), assigned as a “Classroom”. Courses there cost two to three times less than at the training center, and the person doesn't vanish for days."
+нет класса,no classroom
+Парты + доска в комнате → «Учебный класс».,Desks + board in a room → “Classroom”.
+%d из %d мест,%d of %d seats
+занято за партами,taken at the desks
+В классе,In class
+"Дешевле, человек остаётся на заводе","Cheaper, the person stays at the plant"
+Учебный центр,Training center
+"С выездом на несколько дней, дороже","Away for several days, pricier"
+Инструктаж по ОТ,Safety Briefing
+"Все, кто на смене, по очереди слушают инженера по охране труда (полчаса). Действует %d дней: травм на 30%% меньше. Без него трудовая инспекция штрафует, если рабочих 6 и больше.",Everyone on shift takes turns listening to the safety engineer (half an hour). Valid for %d days: 30%% fewer injuries. Without it the labor inspectorate fines you if you have 6+ workers.
+идёт,in progress
+осталось %d чел.,%d people left
+действует,valid
+до дня %d · травм на 30%% меньше,until day %d · 30%% fewer injuries
+не проводился,never held
+"травм больше, возможен штраф","more injuries, fine possible"
+Провести · %s,Hold · %s
+Практиканты ПТУ,Vocational School Interns
+"По понедельникам приходит практикант (до %d одновременно) на %d дней. Стипендия %s за смену, учится вдвое быстрее; в конце практики — решите, брать ли в штат.","An intern comes on Mondays (up to %d at once) for %d days. Stipend %s per shift, learns twice as fast; at the end of the internship you decide whether to hire."
+договор есть,agreement signed
+сейчас %d из %d мест,now %d of %d places
+Расторгнуть,Terminate
+нет договора,no agreement
+"молодые руки, стипендия %s","young hands, stipend %s"
+Заключить · %s,Sign · %s
+Рабочих пока нет.,No workers yet.
+Навыки,Skills
+Учёба и наставник,Training & Mentor
+практикант до дня %d,intern until day %d
+в классе,in class
+в центре,at the center
+наставник %s,mentor %s
+ (другая смена!), (other shift!)
+ученики: %s,apprentices: %s
+ (смежная), (cross)
+Курсы ▾,Courses ▾
+Нет доступных курсов,No courses available
+Записать на курсы (%s),Enroll in courses (%s)
+в своём классе,in our classroom
+в учебном центре,at the training center
+Отменить,Cancel
+Отменить курсы (деньги не вернут),Cancel the courses (no refund)
+Снять наставника,Remove mentor
+ (другая смена), (other shift)
+Наставник ▾,Mentor ▾
+"Нет подходящего: нужен опытнее на 2 (навык от 6), у кого меньше двух учеников",No one suitable: needs someone 2 points better (skill 6+) with fewer than two apprentices
+Назначить наставника,Assign a mentor
+дней без травм: %d,days without injuries: %d
+Спецоценка (СОУТ),Workplace Assessment (SOUT)
+"Лаборатория замеряет шум, воздух (сварочный аэрозоль, пары краски), микроклимат и свет. На вредных местах положены доплата к ставке (3.1 — 4%, 3.2 — 8%, 3.3 — 12%) и молоко. Трудовая инспекция штрафует, если СОУТ не проведена (при 4 рабочих и больше). Улучшили условия — закажите замеры заново, класс снизится.","The lab measures noise, air (welding fumes, paint vapor), microclimate and light. Hazardous workplaces get a wage supplement (3.1: 4%, 3.2: 8%, 3.3: 12%) and milk. The labor inspectorate fines you if SOUT hasn't been done (with 4+ workers). Improved conditions? Order the measurements again and the class will drop."
+идут замеры,measuring
+%d мест · итог к концу дня %d,%d places · results by end of day %d
+нет мест,no places
+станков пока нет,no machines yet
+не оценено: %d,not assessed: %d
+все оценены,all assessed
+мест %d · допустимых %d · вредных %d,places %d · acceptable %d · hazardous %d
+Новые · %s,New · %s
+"Замеры только там, где СОУТ ещё не проводилась (%s за место)",Measure only where SOUT hasn't been done yet (%s per place)
+Все заново · %s,All again · %s
+"Повторные замеры на всех местах — после того, как улучшили вентиляцию, свет или отопление","Re-measure every place after improving ventilation, light or heating"
+СИЗ,PPE
+"Комплект (каска, очки, наушники, перчатки, респиратор) служит около 20 смен. Без СИЗ травм в полтора раза больше; в наушниках шум не раздражает, в респираторе дым — меньше. Шкаф СИЗ (Объекты → Безопасность): рабочие сами берут новый комплект, когда старый износится. Новички приходят без СИЗ.","A kit (helmet, goggles, ear muffs, gloves, respirator) lasts about 20 shifts. Without PPE injuries are 1.5× more common; with ear muffs noise doesn't annoy, with a respirator smoke bothers less. PPE cabinet (Objects → Safety): workers take a new kit themselves when the old one wears out. Newcomers arrive without PPE."
+нет шкафа,no cabinet
+Объекты → Безопасность → шкаф СИЗ,Objects → Safety → PPE cabinet
+без СИЗ: %d,without PPE: %d
+все в СИЗ,everyone in PPE
+шкафов %d · комплектов на складе %d,cabinets %d · kits in stock %d
+Купить 5 · %s,Buy 5 · %s
+Курьер привезёт в течение пары часов. При автозакупке снабжение докупает само.,"A courier brings it within a couple of hours. With auto-purchasing, supply restocks itself."
+везут,on the way
+Молоко за вредность,Hazard Milk
+"Положено тем, кто работает на местах класса 3.x по СОУТ. Людям обидно без молока, а трудовая инспекция за это штрафует.","Due to those working at class 3.x places per SOUT. People resent going without milk, and the labor inspectorate fines for it."
+положено %d чел.,due to %d people
+%s на человека за смену,%s per person per shift
+Выдавать молоко,Hand out milk
+Рабочие места,Workplaces
+Класс условий труда по последним замерам и что вредит сейчас.,Working-condition class from the latest measurements and what's harmful now.
+"карта опасных мест: что вредит на каждом рабочем месте. Травм на 15% меньше, штраф по акту Н-1 вдвое меньше.","map of hazardous places: what's harmful at each workplace. 15% fewer injuries, half the N-1 report fine."
+Станков пока нет.,No machines yet.
+в норме,fine
+не оценено,not assessed
+Сломан — ждёт ремонта,"Broken, awaiting repair"
+Выключен,Switched off
+Не подключён к сети,Not connected to the grid
+Нет тока,No power
+Работает,Working
+Ждёт заготовок или рабочего,Waiting for blanks or a worker
+Некому работать,Nobody to work
+Простаивает: нет работы,Idle: no work
+%d %s · работают %d%s,%d %s · %d working%s
+ · сломано %d, · %d broken
+Щёлкните по строке — камера покажет станок и откроется его карточка. Состояние падает от работы; ниже %d%% станок могут остановить на ремонт.,Click a row: the camera shows the machine and opens its card. Condition drops with use; below %d%% the machine may be stopped for repair.
+ППР,PM
+"Планово-предупредительный ремонт: слесари обслуживают станки уже при износе ниже %d%% (обычно — ниже %d%%).
+Обслуживание чаще и дороже, зато станки почти не ломаются.
+Ремонт сломанного станка — %s и полдня простоя.","Planned maintenance: fitters service machines already when wear drops below %d%% (normally below %d%%).
+More frequent and costlier servicing, but machines almost never break.
+Repairing a broken machine costs %s and half a day of downtime."
+кладовая инструмента: есть,tool crib: yes
+кладовая инструмента: нет,tool crib: no
+Инструментальная кладовая: режущего инструмента уходит на четверть меньше,Tool crib: a quarter less cutting tools used
+Станков пока нет. Поставьте их через «Объекты» (O).,No machines yet. Place them via “Objects” (O).
+Станок,Machine
+Задание,Job
+Состояние,Condition
+Операций,Ops
+нет задания,no job
+%s · оп. %d из %d,%s · op. %d of %d
+ · в печи %d, · in furnace %d
+Выключить,Turn off
+Включить,Turn on
+Показать станок на заводе,Show the machine at the plant
+станков %d · работают %d · стоят %d%s,machines %d · working %d · stopped %d%s
+ · требуют внимания %d, · need attention %d
+"Все станки, которые сейчас не работают, и почему. Сверху — то, что само не пройдёт (поломка, нет тока, нет металла). Щёлкните по строке — камера покажет станок.","All machines that aren't working right now, and why. On top: what won't clear itself (breakdown, no power, no metal). Click a row: the camera shows the machine."
+Все станки работают. Так держать!,All machines are working. Keep it up!
+Нужно вмешаться,Needs action
+Скоро встанет совсем,About to stop completely
+Обычное ожидание,Normal waiting
+без помещения,no room
+Маршрут — последовательность операций по переделам. В скобках — сколько деталей ждут следующей операции (незавершённое производство).,A route is the sequence of operations by process. In brackets: how many parts wait for the next operation (work in progress).
+Изделие,Product
+Маршрут,Route
+Спрос,Demand
+нет оборудования: %s,no equipment: %s
+размер: мелкий,size: small
+размер: средний,size: medium
+размер: крупный,size: large
+нужно %d · в работе %d,need %d · in progress %d
+налог с выручки %d%% · долг по кредитам %s,sales tax %d%% · loan debt %s
+Сегодня,Today
+приход минус расход,income minus spending
+Репутация,Reputation
+"заработано и потрачено за всё время, отчёт по неделям и статьям, налог 5% вместо 6%, кредит под 17%. Дальше в «Развитии» — себестоимость и прогноз кассы, банк, лизинг и страхование.","earned and spent all-time, report by week and category, 5% tax instead of 6%, loans at 17%. Further in Growth: unit cost and cash forecast, bank, leasing and insurance."
+Последние операции,Recent Transactions
+"день %d, %s","day %d, %s"
+Через 2 недели,In 2 Weeks
+прогноз бухгалтера: %s,accountant's forecast: %s
+прогноз кассы — ступень «Себестоимость» (Управление → Развитие),cash forecast needs the “Unit Cost” step (Management → Growth)
+Заработано,Earned
+за всё время,all-time
+Потрачено,Spent
+Сделано деталей,Parts Made
+"брак, пойманный ОТК: %s",scrap caught by QC: %s
+Отгружено,Shipped
+деталей клиентам,parts to clients
+выполнено / сорвано,done / failed
+Долг,Debt
+по кредитам,on loans
+Движение денег,Cash Flow
+Долг по зарплате: %s — задерживают %d дн.,"Wage arrears: %s, delayed %d d."
+"Люди жалуются и уходят — первым тот, у кого настроение хуже. Трое за две недели (уже %d) — трудовая инспекция закроет завод.","People complain and quit, the unhappiest first. Three in two weeks (already %d) and the labor inspectorate will close the plant."
+Выплатить долги по зарплате · %s,Pay wage arrears · %s
+Долги по зарплате выплачены — люди успокоились.,"Wage arrears paid, people have calmed down."
+"Не хватает денег: сдайте готовые заказы, продайте лишнее или возьмите кредит","Not enough money: deliver finished orders, sell something or take a loan"
+Кредиты,Loans
+"Касса в минусе %d дн.: репутация падает каждый день, сбыт не берёт новых заказов, снабжение не покупает металл в долг.","Cash negative for %d d.: reputation drops daily, sales takes no new orders, supply won't buy metal on credit."
+Зарплату в долг (когда денег не хватает): %s,Wages on credit (when money runs short): %s
+"можно — один раз, потом через 3 месяца.","available once, then again in 3 months."
+"уже выдавали, снова можно через %d дн. До тех пор нехватка денег = задержка зарплаты.","already used, available again in %d d. Until then, a cash shortage means delayed wages."
+последние %d событий,last %d events
+"
+Нажмите — открыть, где с этим разбираться","
+Click to open where to deal with it"
+"Отчёт по статьям ведёт бухгалтерия. Постройте помещение «Бухгалтерия» (стол ИТР, сейф, линолеум) и наймите бухгалтера — появится движение денег по неделям и статьям.","The category report is kept by accounting. Build an “Accounting” room (office desk, safe, linoleum) and hire an accountant to see cash flow by week and category."
+Данных пока нет.,No data yet.
+"последние %d %s, по статьям","last %d %s, by category"
+Статья,Category
+Неделя %d,Week %d
+Операционный итог,Operating Total
+С учётом стройки и кредитов,Incl. construction & loans
+в работе %d из %d,active %d of %d
+"Программы поддержки: оформите программу, выполните условия до срока — фонд возместит затраты. Деньги приходят только после выполнения. Одновременно — не больше %d программ.","Support programs: sign up, meet the conditions before the deadline, and the fund reimburses your costs. Money comes only after completion. No more than %d programs at once."
+срок до %s (%s),due %s (%s)
+сегодня последний день,last day today
+осталось %d %s,%d %s left
+Можно оформить,Available
+"Сейчас подходящих программ нет. Они появляются по ситуации: когда растёт штат, не хватает бытовки или столовой, цех стал тесным, касса ушла в минус — и на следующих этапах роста.","No suitable programs right now. They appear as things happen: when staff grows, you lack a locker room or canteen, the shop gets cramped, the cash goes negative, and at later growth stages."
+Условия: %s · срок %d дн.,Conditions: %s · term %d d.
+Оформить,Apply
+Выполнено: %s,Completed: %s
+банк «Заводской кредит» · ставка %d%% годовых%s,“Zavodskoy Kredit” bank · %d%% a year%s
+ (льготная), (reduced)
+"Платёж — каждый понедельник, равными долями (аннуитет). Не больше двух кредитов одновременно. С бухгалтерией ставка ниже, после ступени «Банк и лизинг» — ещё ниже, и банк даёт до 3 млн ₽. Кредиты открываются на этапе «Мастерская».","Payment every Monday in equal installments (annuity). No more than two loans at once. With accounting the rate is lower, after the “Bank & Leasing” step lower still, and the bank lends up to 3 million ₽. Loans open at the “Workshop” stage."
+"Банки кредитуют предприятия, которые уже работают: кредиты откроются на этапе «Мастерская». Пока поддержку дают гранты и программы.","Banks lend to businesses that are already running: loans open at the “Workshop” stage. Until then, grants and programs are your support."
+на %d недель · платёж %s в неделю,for %d weeks · %s a week
+переплата %s,overpayment %s
+Взять кредит,Take loan
+Кредиты — с этапа «Мастерская»,Loans start at the “Workshop” stage
+нужна ступень развития «Банк и лизинг»,needs the “Bank & Leasing” growth step
+Лизинг станков,Machine Leasing
+"Станок от %s — %d%% сразу, остальное с удорожанием %d%% равными платежами %d недель по понедельникам. Деньги на развитие остаются в кассе.","Machines from %s: %d%% up front, the rest with a %d%% markup in equal payments over %d weeks, on Mondays. The money stays in your cash for growth."
+Покупать станки в лизинг,Lease new machines
+"Лизинг открывает ступень «Банк и лизинг» (Управление → Развитие), её держит бухгалтер","Leasing is unlocked by the “Bank & Leasing” step (Management → Growth), held by the accountant"
+Касается новых покупок станков (Объекты → Станки и др.),Applies to new machine purchases (Objects → Machines etc.)
+"Лизинг · %s в неделю, осталось %s","Leasing · %s a week, %s left"
+осталось %d платежей по %s,%d payments of %s left
+всего %s,total %s
+Текущие кредиты,Current Loans
+%d%% годовых,%d%% a year
+"План производства ведёт ПДО. Постройте помещение «ПДО» (стол ИТР, доска планирования, линолеум) или общую контору и наймите диспетчера: появятся план с прогнозом сроков, приоритеты заказов и автоприём.","The production plan is kept by the planning office. Build a “Planning Office” room (office desk, planning board, linoleum) or a shared office and hire a dispatcher: you get a plan with lead-time forecast, order priorities and auto-accept."
+ · проблемный участок — %s, · bottleneck: %s
+загрузка ~%.1f раб. дн.%s,load ~%.1f work days%s
+"Зелёное — сделано, тёмно-зелёное — прогноз до готовности, жёлтая черта — срок. Шкала — две недели от сегодняшнего дня.",Green: done; dark green: forecast to completion; yellow line: deadline. The scale is two weeks from today.
+Заказов в работе нет.,No active orders.
+прогноз: день %d,forecast: day %d
+готов,ready
+срок: день %d,due: day %d
+ (ждут %d), (%d waiting)
+ · готово %d из %d, · %d of %d done
+работают %d из %d отделов,%d of %d departments working
+"Каждый отдел открывает новые возможности, как бюрократия: нужен кабинет со столом ИТР и сотрудник. Пока завод маленький, всех можно посадить в общую «Контору» — но там они работают на 30% хуже.","Each department unlocks new options, bureaucracy-style: it needs an office with an office desk and an employee. While the plant is small, everyone can sit in a shared “Office”, but they work 30% worse there."
+закрыто,locked
+работает · %d%%,working · %d%%
+не работает,not working
+Даёт: %s.,Gives: %s.
+ — нет стола!, — no desk!
+Сотрудник: %s,Staff: %s
+Сотрудника нет,No staff
+"Аврал: +25% к скорости, но брака больше","Rush job: +25% speed, but more scrap"
+Сверхурочные: +2 часа за полуторную оплату,Overtime: +2 hours at time-and-a-half
+Кадровик сам нанимает замену уволившимся,HR hires replacements for those who quit
+Кадровик сам нанимает замену уволившимся (ступень «Кадровый резерв»),HR hires replacements for those who quit (“Talent Pool” step)
+ (нужен отдел), (needs department)
+"Объявлен аврал! Рабочие ускорились, но брака станет больше.","Rush job declared! Workers sped up, but there will be more scrap."
+"Введены сверхурочные: смена длиннее на 2 часа, оплата за них полуторная.","Overtime introduced: the shift is 2 hours longer, paid at time-and-a-half."
+Разработки технолога,Technologist's Research
+~%.1f очка за смену,~%.1f points per shift
+техотдел не работает — наймите технолога,technical office idle: hire a technologist
+изучено %d из %d,studied %d of %d
+Все разработки,All research
+Управление → Разработки,Management → Research
+Сейчас: «%s» · %d%%,Now: “%s” · %d%%
+"Разработки теперь деревом: «Все разработки» — ветки, зависимости, что открывает каждая.","Research is now a tree: “All research” shows branches, dependencies and what each one unlocks."
+получено %d из %d,earned %d of %d
+Достижения общие для всех партий.,Achievements are shared across all games.
+Достижения общие для всех партий. В песочнице они не засчитываются.,Achievements are shared across all games. They don't count in sandbox mode.
+получено %s,earned %s
+Решений не ждёт ничего,Nothing awaits a decision
+Решить,Decide
+"ПОЖАР! Горит клеток: %d, идёт %d мин.","FIRE! Cells burning: %d, for %d min."
+Показать,Show
+"Забастовка, %d-й день. Требование: %s.","Strike, day %d. Demand: %s."
+Обещано забастовщикам: %s — до %s.,"Promised to the strikers: %s, by %s."
+Рабочие недовольны уже %d %s подряд — дело идёт к забастовке.,Workers have been unhappy for %d %s in a row; a strike is coming.
+План месяца,Monthly Plan
+"%s: отгружено %d из %d, осталось %d %s","%s: shipped %d of %d, %d %s left"
+Действует сейчас,In Effect Now
+%d ч,%d h
+%d дн.,%d d.
+• %s — ещё %s,"• %s, %s more"
+"• Должник: %s — %s, срок %s","• Debtor: %s, %s, due %s"
+износ станков,machine wear
+время переналадки,changeover time
+брак,scrap
+скорость переноски,carrying speed
+• Рацпредложения: %s ×%.2f,• Suggestions: %s ×%.2f
+Статистика,Statistics
+травм за месяц: %d · пожаров всего: %d · забастовок: %d,injuries this month: %d · fires total: %d · strikes: %d
+проверок без замечаний: %d из %d,clean inspections: %d of %d
+Погода и отопление,Weather & Heating
+На улице %+d °C (днём около %+d).,Outside %+d °C (around %+d by day).
+ Идёт снег., It's snowing.
+ Снега на дорожках: %d%%., Snow on the paths: %d%%.
+ Гололёд!, Black ice!
+"Отопительный сезон: %s · батарей %d, каждая греет ~%d клеток.","Heating season: %s · radiators %d, each heats ~%d cells."
+нет,no
+Холодно — поставьте батареи (Объекты → Быт). Ниже +%d °C люди мёрзнут и работают медленнее.,Cold: add radiators (Objects → Amenities). Below +%d °C people freeze and work slower.
+"Посыпать дорожки песком (%s в день, когда нужно)","Sand the paths (%s a day, when needed)"
+Подрядчик посыпает песком и чистит снег — меньше травм на льду,A contractor sands the paths and clears snow: fewer injuries on ice
+Рассказчик,Storyteller
+Как часто и насколько тяжёлые события случаются на заводе,How often and how hard events hit the plant
+"Плановые проверки объявляют за три дня, внезапные — не объявляют. Инспектор обходит завод: пока он идёт, нарушения можно успеть исправить. Повторное нарушение по предписанию — двойной штраф и остановка участка.","Scheduled inspections are announced three days ahead; surprise ones aren't. The inspector walks the plant, and while he does you can still fix violations. A repeat violation of an order means a double fine and a section shutdown."
+Сейчас на заводе: %s. %s. Найдено нарушений: %d.,At the plant now: %s. %s. Violations found: %d.
+Ближайшие проверки,Upcoming Inspections
+Пока не объявлено.,Nothing announced yet.
+дата неизвестна,date unknown
+Предписание: %s,Order: %s
+"устранить до %s, потом повторная проверка","fix by %s, then a follow-up inspection"
+История,History
+Проверок ещё не было.,No inspections yet.
+" · %d наруш., штраф %s"," · %d viol., fine %s"
+ПРОВЕРЕНО,CHECKED
+ШТРАФ,FINE
+Что проверят прямо сейчас,What They'd Check Right Now
+"Требования:
+• %s","Requirements:
+• %s"
+Бухгалтерия: работает ✓,Accounting: working ✓
+Бухгалтерия: нет — риск штрафа высокий,"Accounting: none, high fine risk"
+✓ нарушений нет,✓ no violations
+…и ещё %d,…and %d more
+   → как исправить?,   → how to fix?
+Как исправить: %s,How to fix: %s
+"
+Нажмите — подробнее и показать место","
+Click for details and to show the spot"
+"
+Нажмите — подробнее","
+Click for details"
+сейчас: %s,now: %s
+"Игровой месяц — две недели, год — 168 дней. В конце каждого месяца подводится план: выполнили — репутация и настроение растут. Если план горит, можно объявить аврал (штурмовщина).","A game month is two weeks, a year is 168 days. At the end of each month the plan is tallied: met it, and reputation and mood rise. If the plan is slipping, you can declare a rush (storming)."
+"морозы, снег, отопление","frost, snow, heating"
+"таяние, гололёд","thaw, black ice"
+"паводок, субботник","floods, cleanup day"
+сезон отпусков,vacation season
+жара в горячих цехах,heat in hot shops
+заказчики закрывают год,customers close the year
+Пока ничего не случилось. Это ненадолго.,Nothing has happened yet. Not for long.
+"Первый номер выйдет в понедельник. Редакция собирает новости: передовиков, происшествия, итоги недели и, конечно, объявления.","The first issue comes out on Monday. The editors are collecting news: best workers, incidents, weekly results and, of course, notices."
+Номер:,Issue:
+Газета коллектива %s · выходит по понедельникам · № %d · %s,The %s staff newspaper · out on Mondays · No. %d · %s
+Оформить · 50 000 ₽,"Register · 50,000 ₽"
+Ремонт · 180 000 ₽,"Repair · 180,000 ₽"
+Выплатить всё,Pay all
+этап %d из %d · %s,stage %d of %d · %s
+Песочница: всё открыто сразу.,Sandbox: everything is open.
+Чтобы стать «%s»,To become “%s”
+И любые %d на выбор · выполнено %d,And any %d of these · done %d
+Откроется: %s.,Unlocks: %s.
+"Вы — градообразующее предприятие. Дальше — бесконечная игра: растите, сколько хватит места.",You are the town's backbone enterprise. From here it's an endless game: grow as far as the land allows.
+Путь завода,The Plant's Path
+%s · %s чел.,%s · %s people
+рейтинг завода %s,plant rating %s
+Звёзды складываются из пяти показателей и пересчитываются каждое утро. Сценарии и этапы требуют определённого числа звёзд.,Stars are made of five indicators and recalculated every morning. Scenarios and stages require a certain number of stars.
+Сдавайте заказы в срок и выполняйте месячный план.,Deliver orders on time and meet the monthly plan.
+"Меньше брака: опытные люди, исправные станки, мастер, ОТК.","Less scrap: experienced people, working machines, a foreman, QC."
+"Без травм и пожаров, без нарушений после проверок. Аптечки, огнетушители, отдых.","No injuries or fires, no violations after inspections. First aid kits, extinguishers, rest."
+"Настроение: столовая, бытовка, зарплата, отопление.","Mood: canteen, locker room, wages, heating."
+"Деньги на счёте растут, долги под контролем.","Money in the account grows, debts under control."
+Сценарий «%s»,Scenario “%s”
+★ Сценарий пройден! Можно продолжать без ограничений.,★ Scenario complete! You can keep playing without limits.
+Целей нет — свободная игра.,No goals: free play.
+Цели сценария,Scenario Goals
+Отремонтировать крышу,Repair the roof
+На территории %d %s — %s.,There are %d %s on the grounds: %s.
+"заводские, охраняют склад","the plant's own, guarding the warehouse"
+"бродячие, людям неуютно","strays, people feel uneasy"
+лучший работник недели — каждый понедельник,"best worker of the week, every Monday"
+"Очки недели: операции у станков, перевозки, пойманные несуны. По понедельникам лучший попадает на доску почёта. Если на заводе висит настоящая доска почёта (Объекты → Декор), человеку приятно, а остальным есть к чему стремиться.","Weekly points: machine operations, hauling, catching thieves. Every Monday the best one goes on the honor board. If the plant has a real honor board (Objects → Decor), the person is pleased and the others have something to strive for."
+на заводе нет доски — Объекты → Декор,no board at the plant: Objects → Decor
+Без доски фото «вешают» только здесь: настроения не прибавляет,"Without a board, photos “hang” only here: no mood boost"
+ДОСКА ПОЧЁТА,HONOR BOARD
+лучшие люди нашего завода,the best people of our plant
+Лидеры этой недели,This Week's Leaders
+"Неделя только началась —
+очков ещё ни у кого нет.","The week has just begun:
+no one has points yet."
+1-е место · %d оч.,1st place · %d pts
+2-е место · %d оч.,2nd place · %d pts
+3-е место · %d оч.,3rd place · %d pts
+По заслугам,For Merit
+ветеран завода · %d %s,plant veteran · %d %s
+золотые руки · %s %d,golden hands · %s %d
+лучший наставник · %d %s,best mentor · %d %s
+"Наберите людей —
+и будет кого отметить.","Hire people,
+and there'll be someone to honor."
+Лучшие прошлых недель,Best of Past Weeks
+Первое фото повесят в понедельник.,The first photo goes up on Monday.
+%s · день %d,%s · day %d
+"%s, %s. Показать на заводе","%s, %s. Show at the plant"
+наша доля рынка %d%% · заявок ×%.2f,our market share %d%% · inquiries ×%.2f
+"Заказчики выбирают между нами и соседними заводами. Нашу долю определяют мощность (станочники), качество, доля заказов, сданных вовремя, репутация, цены и сертификат ISO 9001. Чем выше конкурентоспособность — тем больше заявок каждое утро.","Customers choose between us and neighboring plants. Our share depends on capacity (machinists), quality, the share of orders delivered on time, reputation, prices and ISO 9001 certification. The more competitive we are, the more inquiries every morning."
+Наша доля рынка,Our Market Share
+%s%d%% за неделю,%s%d%% this week
+заводов в районе: %d,plants in the district: %d
+Ценовая политика,Pricing Policy
+"Демпинг — цены −10%: заявок на треть больше, но маржа тоньше и соседи могут начать войну цен. Премиум — цены +12%: заявок меньше; с сертификатом ISO 9001 заказчики почти не уходят.","Dumping: prices −10%, a third more inquiries, but thinner margins, and neighbors may start a price war. Premium: prices +12%, fewer inquiries; with ISO 9001 customers hardly leave."
+Демпинг,Dumping
+По рынку,Market
+Премиум,Premium
+у соседей война цен,neighbors are in a price war
+"Заявок −15%, пока она идёт (если мы не демпингуем)",Inquiries −15% while it lasts (unless we're dumping)
+Конкурентоспособность,Competitiveness
+"Множитель числа заявок: качество из рейтинга, доля заказов, сданных вовремя, ценовая политика и сертификат.","Inquiry multiplier: quality from the rating, share of orders on time, pricing policy and certificate."
+Качество,Quality
+Сдано вовремя,On time
+есть,yes
+Заявок,Inquiries
+Завод,Plant
+Специализация,Specialization
+Цены,Prices
+Доля рынка,Market Share
+Наш завод,Our plant
+война цен,price war
+ниже рынка,below market
+выше рынка,above market
+по рынку,market
+~%d станков,~%d machines
+Доля рынка по дням,Market Share by Day
+каждая точка — день,each point is a day
+Наведите мышь на график — увидите значения за день. Статистика копится с начала игры (до года).,Hover over a chart to see the day's values. Statistics accumulate from the start of the game (up to a year).
+2 недели,2 weeks
+4 недели,4 weeks
+12 недель,12 weeks
+всё,all
+Деньги на счёте,Money in the Account
+Выручка и расходы по дням,Revenue & Spending by Day
+"Поступления (оплата заказов, гранты) и все расходы за день. Кредиты не учитываются.","Income (order payments, grants) and all spending per day. Loans are excluded."
+выручка и расходы по дням.,revenue and spending by day.
+Пришло,In
+Ушло,Out
+доли рынка — наша и конкурентов — по неделям.,"market shares, ours and competitors', by week."
+Люди и репутация,People & Reputation
+"Среднее настроение рабочих и репутация завода, 0–100.","Average worker mood and plant reputation, 0–100."
+среднее настроение коллектива по дням.,the team's average mood by day.
+"заказы +%s, зарплаты −%s, аренда −%s, кредиты и полисы −%s","orders +%s, wages −%s, rent −%s, loans and policies −%s"
+полисов %d · взносы %s в неделю · выплачено %s,policies %d · premiums %s a week · paid out %s
+"Страховая компания «Заводская защита». Взнос — по понедельникам, полис начинает действовать со следующего дня. Штрафы проверок не страхуются — по закону их платит сам завод.",The “Zavodskaya Zashchita” insurance company. Premiums on Mondays; a policy takes effect the next day. Inspection fines aren't insurable: by law the plant pays them itself.
+%s в неделю,%s a week
+выплачено: %s,paid out: %s
+действует с дня %d,in effect from day %d
+не оформлен,not taken
+Расторгнуть полис,Cancel policy
+сертификат: %s,certificate: %s
+"ISO 9001 — международный стандарт системы менеджмента качества. Сертификат даёт +12% к заявкам, премиальные цены без потери заказчиков, контракты чаще, экспорт — уже с этапа «Малое предприятие». Две рекламации за срок действия — сертификат приостановят.","ISO 9001 is the international quality management standard. The certificate gives +12% inquiries, premium prices without losing customers, more frequent contracts, and export from the “Small Enterprise” stage. Two claims during its term and the certificate is suspended."
+ISO 9001 • СЕРТИФИЦИРОВАНО • ,ISO 9001 • CERTIFIED • 
+ISO 9001 • СИСТЕМА КАЧЕСТВА • ,ISO 9001 • QUALITY SYSTEM • 
+ДО ДНЯ,UNTIL DAY
+НЕТ,NO
+СЕРТ.,CERT.
+Сертификат действует,Certificate valid
+Аудит назначен,Audit scheduled
+Есть несоответствия,Nonconformities found
+Приостановлен,Suspended
+Истёк,Expired
+Сертификата нет,No certificate
+Рекламаций за срок: %d из 2 допустимых.,Claims this term: %d of 2 allowed.
+Надзорный аудит · %s,Surveillance audit · %s
+Заказать аудит · %s,Order an audit · %s
+Аудитор приедет через три дня и проверит требования на тот момент,The auditor arrives in three days and checks the requirements as of that moment
+Требования (%d из 6),Requirements (%d of 6)
+Аудитор проверяет их в день аудита. Выполните всё заранее.,The auditor checks them on the audit day. Get everything done in advance.
+советов: %d,tips: %d
+САМОЙЛОВ,SAMOYLOV
+"%s, главный инженер","%s, chief engineer"
+"Пётр, главный инженер","Pyotr, chief engineer"
+«Завод — не станки. Завод — это порядок».,“A plant isn't machines. A plant is order.”
+"«Сначала проблемный участок, потом всё остальное».","“The bottleneck first, everything else after.”"
+"«Брак дешевле поймать в цеху, чем у заказчика».",“Scrap is cheaper to catch in the shop than at the customer's.”
+"«Станок любит смазку, а человек — уважение».","“A machine loves grease, and a person loves respect.”"
+Записка по понедельникам,Monday memo
+Каждый понедельник — напоминание о главном совете,"Every Monday, a reminder of the top tip"
+Электросеть,Power Grid
+%.0f / %d кВт,%.0f / %d kW
+запас %d%%,headroom %d%%
+Сжатый воздух,Compressed Air
+%d компр.,%d compr.
+потребителей: %d,consumers: %d
+Вода,Water
+есть насос,pump installed
+нет насоса,no pump
+ППР станков: %s,Machine PM: %s
+ведёт сам,handles it himself
+включён,on
+выключен,off
+"«Претензий нет. Завод работает как часы — так держать». Новые советы появятся, когда что-то пойдёт не так.","“No complaints. The plant runs like clockwork, keep it up.” New tips will appear when something goes wrong."
+Открыть →,Open →
+Помещения →,Rooms →
+Нет такой программы,No such program
+Одновременно можно вести не больше %d программ,You can run no more than %d programs at once
+Программа «%s» оформлена. Выполните условия до %s — %s возместит %s.,Program “%s” registered. Meet the conditions by %s and %s will reimburse %s.
+Новая программа поддержки: «%s» — %s вернёт %s. Финансы → Гранты.,"New support program: “%s”, %s will return %s. Finance → Grants."
+Грант: %s,Grant: %s
+Грант выплачен,Grant paid
+%s проверил выполнение программы «%s» и перечислил %s.,%s checked the “%s” program and transferred %s.
+Экономика,Economy
+Завод получил грант: «%s»,The plant received a grant: “%s”
+%s поддержал предприятие: %s на развитие.,%s supported the enterprise: %s for development.
+"Срок программы «%s» вышел — условия не выполнены, денег не будет.","The “%s” program has expired: conditions not met, no money."
+день|дня|дней,day|days
+заказ|заказа|заказов,order|orders
+контракта|контрактов|контрактов,contract|contracts
+неделя|недели|недель,week|weeks
+рабочий день|рабочих дня|рабочих дней,working day|working days
+станок|станка|станков,machine|machines
+запись|записи|записей,entry|entries
+собака|собаки|собак,dog|dogs
+смена|смены|смен,shift|shifts
+ученик|ученика|учеников,apprentice|apprentices
+«%s»,“%s”
+ОТК,QC
+С запасом,Safe
+Обычно,Normal
+Впритык,Tight
+Экспорт,Export
+Госзаказ,State order
+Контракт,Contract
+Выручка от заказов,Order revenue
+Расходники,Consumables
+Зарплата,Wages
+Электроэнергия,Electricity
+Аренда,Rent
+Обслуживание и ремонт,Maintenance & repair
+Стройка и оборудование,Construction & equipment
+Налоги,Taxes
+Штрафы проверок,Inspection fines
+Неустойки заказчикам,Customer penalties
+Найм и премии,Hiring & bonuses
+Прочее,Other
+Выпуск и сроки,Output & deadlines
+Безопасность,Safety
+Настроение людей,People's mood
+Финансы,Finance
+"Цены на 10% ниже рынка: заявок на треть больше, но маржа тоньше. Конкуренты в долгу не останутся.","Prices 10% below market: a third more inquiries, but thinner margins. Competitors will strike back."
+Обычные цены.,Normal prices.
+Цены на 12% выше: заявок меньше. С сертификатом ISO 9001 заказчики почти не уходят.,Prices 12% higher: fewer inquiries. With ISO 9001 customers hardly leave.
+Имущество и оборудование,Property & equipment
+Возмещает 80% стоимости ремонта станков и ущерб от пожара.,Covers 80% of machine repair costs and fire damage.
+Ответственность перед заказчиками,Liability to customers
+"Возмещает половину неустоек за опоздание, компенсаций по рекламациям и штрафов по контрактам.","Covers half of late-delivery penalties, claim compensations and contract fines."
+Несчастный случай,Accident
+Полностью выплачивает компенсацию пострадавшему по акту Н-1.,Pays the full compensation to the injured under an N-1 report.
+Токарное дело,Turning
+Контроль качества,Quality control
+Стройка,Construction
+Погрузка,Hauling
+Электрика,Electrical
+Фрезерное дело,Milling
+Сварка,Welding
+Термообработка,Heat treatment
+Литьё,Casting
+Штамповка,Stamping
+Покраска,Painting
+Сборка,Assembly
+Слесарное дело,Fitting
+Руководство,Management
+Работа с документами,Paperwork
+Инженерное дело,Engineering
+Уборка,Cleaning
+Наладка станков,Machine setup
+Работа на ЧПУ,CNC operation
+Кулинария,Cooking
+Медицина,Medicine
+product.pin.name,Pin
+product.pin.desc,A simple cylindrical part.
+product.bushing.name,Bushing
+product.bushing.desc,A bushing with an inner bore.
+product.fitting.name,Fitting
+product.fitting.desc,A threaded fitting made from hex bar.
+product.bolt.name,M16 Bolt
+product.bolt.desc,"Hex-head bolt: turning the shank and cutting the thread. Small stuff, but everyone needs it."
+product.nut.name,M16 Nut
+product.nut.desc,"A nut from hex bar: cut off, face the ends, drill and tap the thread."
+product.stud.name,M12 Stud
+product.stud.desc,"A stud threaded at both ends, for flanges and covers."
+product.shaft.name,Shaft
+product.shaft.desc,A stepped shaft of alloy steel.
+product.bracket.name,Bracket
+product.bracket.desc,"A sheet bracket: milling, drilling, painting."
+product.housing.name,Bearing Housing
+product.housing.desc,"A housing from a forging: turning, milling the mounting face, drilling the bolt holes."
+product.spline_shaft.name,Spline Shaft
+product.spline_shaft.desc,"Spline shaft: turning, milling the splines, hardening in the furnace."
+product.frame.name,Welded Frame
+product.frame.desc,A frame of 40×40 tube: welding and painting.
+product.drive_unit.name,Drive Unit
+product.drive_unit.desc,"An assembled unit: a shaft, two bushings and a bearing housing. You make the parts yourself."
+product.flange.name,Flange
+product.flange.desc,A weld-neck flange from a forging: turning and drilling the stud holes.
+product.gear.name,Spur Gear
+product.gear.desc,"A gear wheel: turning the blank, hobbing the teeth and hardening."
+product.gearbox.name,Spur Gearbox
+product.gearbox.desc,"An assembled, painted gearbox. You make all the parts yourself, so it takes nearly the whole plant."
+product.disc.name,Harrow Disc
+product.disc.desc,A spherical disc for a disc harrow: cutting and hardening.
+product.harrow.name,Harrow Section
+product.harrow.desc,"A welded tine harrow section, painted red as it should be."
+product.beam.name,Welded Beam
+product.beam.desc,An I-beam for frameworks: welding and priming.
+product.truss.name,Roof Truss
+product.truss.desc,"A roof truss for a hangar: tack assembly, full welding, painting. Bulky, so it needs an overhead crane."
+product.valve.name,Wedge Gate Valve
+product.valve.desc,An assembled gate valve. Each one is hydro-tested on the test bench.
+product.pump.name,Centrifugal Pump
+product.pump.desc,"An assembled pump: assembly, pressure testing, painting."
+product.axle.name,Railcar Axle
+product.axle.desc,"A wheelset axle: turning, heat treatment and ultrasonic testing. Acceptance is strict."
+product.brake_cyl.name,Brake Cylinder
+product.brake_cyl.desc,A railcar brake cylinder: assembly and leak testing.
+product.bench_lathe.name,Bench Lathe
+product.bench_lathe.desc,"A bench lathe: import substitution in its purest form. Long cycle: gearbox, shafts, bed, testing."
+product.node12k.name,Unit 12-K
+product.node12k.desc,"A unit to the customer's drawings. What it is, you're not supposed to know."
+product.item7t.name,Item 7T
+product.item7t.desc,A state-order item. Delivered to military acceptance.
+product.cast_cover.name,Cast Cover
+product.cast_cover.desc,A bearing unit cover: casting and facing the end on a lathe.
+product.cast_body.name,Cast Gearbox Housing
+product.cast_body.desc,"A cast-iron housing: casting, milling the faces and drilling the bolt holes."
+product.washer.name,Spring Washer
+product.washer.desc,Blanking and setting in a single press stroke. Ordered by the hundred.
+product.clamp.name,Mounting Clamp
+product.clamp.desc,"Blanking, bending and painting: cheap and plenty."
+product.bracket_st.name,Bent Bracket
+product.bracket_st.desc,A stamped angle with holes: replaces the milled one where precision isn't needed.
+material.bar45.name,Round Bar St45
+material.bar45.desc,"Steel 45 bar, Ø40 mm."
+material.hex27.name,Hex Bar S27
+material.hex27.desc,Hexagonal bar of steel 35.
+material.bar40x.name,Round Bar 40Kh
+material.bar40x.desc,"Alloy steel 40Kh bar, Ø60 mm."
+material.plate8.name,8 mm Plate
+material.plate8.desc,Sheet steel blank cut to size.
+material.forging.name,Housing Forging
+material.forging.desc,A steel forging for a bearing housing.
+material.profile40.name,40×40 Tube
+material.profile40.desc,"A length of 40×40×3 square tube, one meter."
+material.charge.name,Charge
+material.charge.desc,"Steel scrap and pigs for melting: cheap, but the castings still need machining."
+material.strip2.name,2 mm Strip
+material.strip2.desc,"Strip cut from 2 mm sheet, for the press."
+consumable.tools.name,Cutting Tools
+consumable.tools.short,tools
+consumable.tools.pack,"a set of cutters, mills and drills"
+consumable.tools.desc,"Used up in turning, milling and drilling."
+consumable.electrodes.name,Welding Wire & Gas
+consumable.electrodes.short,wire
+consumable.electrodes.pack,a spool of wire and a gas cylinder
+consumable.electrodes.desc,Used up in welding: one unit per frame.
+consumable.paint.name,Primer & Paint
+consumable.paint.short,paint
+consumable.paint.pack,buckets of primer and enamel
+consumable.paint.desc,Used up in the paint booth.
+consumable.ppe.name,Workwear & PPE
+consumable.ppe.short,PPE
+consumable.ppe.pack,"5 kits: helmet, goggles, ear muffs, gloves, respirator"
+consumable.ppe.desc,Handed out from the PPE cabinet; a kit lasts about 20 shifts. Without PPE injuries are 1.5× more common.
+consumable.sand.name,Molding Sand
+consumable.sand.short,sand
+consumable.sand.pack,bags of sand-clay mix for 20 flasks
+consumable.sand.desc,Used up in casting: one flask per casting.
+supplier.base.name,Metal Depot No. 3
+supplier.base.desc,"Retail: pricey, but fast and no surprises. Works without a buyer."
+supplier.ural.name,“UralStalTorg”
+supplier.ural.desc,"Wholesale supplier: delivers the next day, occasionally late."
+supplier.opt.name,ProkatOpt LLC
+supplier.opt.desc,"The cheapest metal, but slow delivery and frequent missed deadlines."
+process.turning.name,Turning
+process.milling.name,Milling
+process.drilling.name,Drilling
+process.welding.name,Welding
+process.heat.name,Heat treatment
+process.paint.name,Painting
+process.assembly.name,Assembly
+process.test.name,Testing
+process.casting.name,Casting
+process.stamping.name,Stamping
+department.foreman.name,Section Foreman
+department.foreman.desc,Hands out shift tasks and keeps discipline. One foreman manages up to 12 people on his shift.
+department.foreman.gives0,the shift works 8–15% faster
+department.foreman.gives1,15% less scrap
+department.foreman.gives2,half the absenteeism
+department.foreman.gives3,"without a foreman, a shift of over 10 people works 10% worse"
+department.chief.name,Shop Manager
+department.chief.desc,Runs the whole shop through the foremen and introduces policies.
+department.chief.gives0,+5% speed for all workers
+department.chief.gives1,"“Rush job” policy: +25% speed, but more scrap and fatigue"
+department.chief.gives2,“Overtime” policy: the shift is 2 hours longer at time-and-a-half
+department.chief.gives3,in Growth: socialist competition and the honor board
+department.accounting.name,Accounting
+department.accounting.desc,"Bookkeeping, taxes and reporting."
+department.accounting.gives0,no tax penalties or fines (mandatory with more than 8 staff)
+department.accounting.gives1,"5% tax instead of 6%, thanks to proper bookkeeping"
+department.accounting.gives2,weekly profit and loss report
+department.accounting.gives3,bank loans at 17% instead of 22%
+department.accounting.gives4,"in Growth: unit cost, bank, leasing and insurance"
+department.supply.name,Supply Office
+department.supply.desc,Finding metal suppliers and contracts.
+department.supply.gives0,choice of supplier: wholesale 10–23% cheaper than retail
+department.supply.gives1,"without a buyer, metal is bought retail at the metal depot"
+department.pdo.name,Planning Office
+department.pdo.desc,Production planning and dispatch office.
+department.pdo.gives0,order priorities
+department.pdo.gives1,the “Production Plan” window with a lead-time forecast
+department.pdo.gives2,half the machine changeover time
+department.pdo.gives3,a “can we make it?” estimate on the market
+department.pdo.gives4,in Growth: batches and “tight” scheduling
+department.hr.name,HR Department
+department.hr.desc,Recruiting.
+department.hr.gives0,6 candidates instead of 4
+department.hr.gives1,all candidates' traits and exact mood numbers are visible
+department.hr.gives2,job ads at half price
+department.hr.gives3,in Growth: vocational school ties and a talent pool
+department.tech.name,Technical Office
+department.tech.desc,Developing products and processes.
+department.tech.gives0,"research points: new products, a CNC machine, faster operations, 5S, kanban"
+department.tech.gives1,in Growth: ISO 9001 certification
+department.sales.name,Sales Department
+department.sales.desc,The sales manager handles customers and watches competitors.
+department.sales.gives0,"competitor table, market shares and prices"
+department.sales.gives1,pricing policy: dumping or premium
+department.sales.gives2,10% more inquiries
+department.sales.gives3,in Growth: contracts with big clients and export
+department.safety.name,Workplace Safety
+department.safety.desc,"The safety engineer: hazardous spots, SOUT, accident investigations."
+department.safety.gives0,map of hazardous spots and workplace assessment (SOUT)
+department.safety.gives1,your own N-1 report: half the fine
+department.safety.gives2,15% fewer injuries
+department.engineer.name,Chief Engineer
+department.engineer.desc,The chief engineer watches the machines and utilities and points out what matters most.
+department.engineer.gives0,the chief engineer's advice
+department.engineer.gives1,planned maintenance turns on by itself for new machines
+department.engineer.gives2,"utilities summary: power, air, water"
+department.legal.name,Legal Department
+department.legal.desc,"The lawyer: contracts, claims, courts."
+department.legal.gives0,appealing fines: 60% chance instead of 40%
+department.legal.gives1,dispute a customer's claim
+department.legal.gives2,"in Growth: tenders, state orders and military acceptance"
+grant.wc_locker.title,Basic Sanitation
+grant.wc_locker.org,Employment Center
+grant.wc_locker.desc,Set up a toilet with a sink and a locker room with lockers: the employment center will reimburse the cost of minimum working conditions.
+grant.wc_locker.goal0,an equipped toilet
+grant.wc_locker.goal1,an equipped locker room
+grant.wc_more.title,Another Toilet for the Team
+grant.wc_more.org,Employment Center
+grant.wc_more.desc,There are more people now: add one more toilet stall with a sink so nobody has to queue.
+grant.wc_more.goal0,1 more toilet stall
+grant.wc_more.goal1,1 more sink
+grant.locker_grow.title,Bigger Locker Room
+grant.locker_grow.org,Employment Center
+grant.locker_grow.desc,The locker room is cramped. Expand it by at least 6 cells and add two more lockers; the employment center will pay.
+grant.locker_grow.goal0,locker room 6 cells bigger
+grant.locker_grow.goal1,2 more lockers
+grant.canteen.title,Hot Meals at Work
+grant.canteen.org,Regional SME Support Program
+grant.canteen.desc,"A canteen with a table, chairs and a fridge or microwave: the region will cover the furniture and appliances."
+grant.canteen.goal0,an equipped canteen
+grant.canteen_grow.title,A Bigger Canteen
+grant.canteen_grow.org,Regional SME Support Program
+grant.canteen_grow.desc,"Lots of people, small canteen. Expand it by 8 cells and add one more dining table."
+grant.canteen_grow.goal0,canteen 8 cells bigger
+grant.canteen_grow.goal1,1 more dining table
+grant.rest.title,Break Room
+grant.rest.org,Employment Center
+grant.rest.desc,"A sofa, a water cooler and a kettle: a place to catch a breath. People tire less and quarrel less."
+grant.rest.goal0,an equipped break room
+grant.shower.title,Showers for Workers
+grant.shower.org,Social Insurance Fund
+grant.shower.desc,"After a shift at the machine you need a shower. Set up a shower room with stalls and water, and the fund will return part of the cost."
+grant.shower.goal0,an equipped shower room
+grant.jobs.title,Job Creation
+grant.jobs.org,Employment Center
+grant.jobs.desc,Hire three new workers: every job created earns compensation.
+grant.jobs.goal0,hire 3 people
+grant.workshop.title,Shop from Scratch
+grant.workshop.org,Industrial Development Fund
+grant.workshop.desc,"Build a shop of 60+ cells: concrete floor, walls, ceiling lights. The fund will return part of the construction cost."
+grant.workshop.goal0,an equipped shop of 60+ cells
+grant.workshop.goal1,"lights in the shop, connected to the grid"
+grant.workshop_grow.title,Shop Expansion
+grant.workshop_grow.org,Industrial Development Fund
+grant.workshop_grow.desc,The shop is cramped: expand it by 30 cells and light it. The fund will pay part of the construction.
+grant.workshop_grow.goal0,shop 30 cells bigger
+grant.workshop_grow.goal1,"lights in the shop, connected to the grid"
+grant.safety.title,Workplace Safety
+grant.safety.org,Social Insurance Fund
+grant.safety.desc,An extinguisher in every room and a first aid kit at the plant: the fund will return part of your insurance contributions.
+grant.safety.goal0,an extinguisher in every room
+grant.safety.goal1,a first aid kit
+grant.ppe.title,Protective Gear for All
+grant.ppe.org,Social Insurance Fund
+grant.ppe.desc,"Install a PPE cabinet so workers take new helmets, goggles and gloves themselves. The fund will compensate."
+grant.ppe.goal0,a PPE cabinet
+grant.light.title,Energy-Efficient Lighting
+grant.light.org,Regional Ministry of Energy
+grant.light.desc,Replace incandescent bulbs with tube lights: install 4 new tube lights for power savings and a subsidy.
+grant.light.goal0,4 new tube lights
+grant.vent.title,Clean Air in the Shop
+grant.vent.org,Regional Consumer Protection Agency
+grant.vent.desc,"Welding, painting or the furnace make smoke. Install an exhaust fan with a duct, and the region will pay half."
+grant.vent.goal0,an exhaust fan
+grant.machines.title,Machine Park Upgrade
+grant.machines.org,Industrial Development Fund
+grant.machines.desc,Install two new machines and connect them to the grid: the fund will reimburse a third of the cost.
+grant.machines.goal0,2 new powered machines
+grant.heat.title,Warm Shops
+grant.heat.org,Regional Housing & Utilities Program
+grant.heat.desc,Add three more radiators (heated by the electric boiler at the pump house): the region will pay for the setup.
+grant.heat.goal0,3 more radiators
+grant.storage.title,Warehousing
+grant.storage.org,Industrial Development Fund
+grant.storage.desc,A separate warehouse with racks: order in production and fewer losses.
+grant.storage.goal0,an equipped warehouse
+grant.storage.goal1,3 metal racks
+grant.storage_grow.title,More Racks
+grant.storage_grow.org,Industrial Development Fund
+grant.storage_grow.desc,Metal is lying on the floor: add three more racks in the warehouse.
+grant.storage_grow.goal0,3 more racks
+grant.qc.title,Quality Control
+grant.qc.org,Industrial Development Fund
+grant.qc.desc,"A QC table and an inspector: less scrap reaches the customer, and the fund covers the equipment."
+grant.qc.goal0,a QC table
+grant.accounting.title,Digital Bookkeeping
+grant.accounting.org,Regional Ministry of Industry & Trade
+grant.accounting.desc,Set up an accounting office and seat an accountant there: the program will pay for the computer and furniture.
+grant.accounting.goal0,an equipped accounting office
+grant.accounting.goal1,an accountant on staff
+grant.classroom.title,Classroom
+grant.classroom.org,Regional Workforce Training Center
+grant.classroom.desc,A classroom with desks and a board: training people at the plant is cheaper and faster.
+grant.classroom.goal0,an equipped classroom
+grant.medbay.title,Our Own First Aid Post
+grant.medbay.org,Social Insurance Fund
+grant.medbay.desc,"A first aid post with a couch and a medicine cabinet: the injured get help right away, fewer sick days."
+grant.medbay.goal0,an equipped first aid post
+grant.crisis.title,Crisis Support
+grant.crisis.org,Regional SME Support Program
+grant.crisis.desc,The plant is struggling: cash is negative. Deliver two orders in two weeks and the region will help with money so you don't have to close.
+grant.crisis.goal0,2 completed orders
+grant.export.title,Export Accelerator
+grant.export.org,Russian Export Center
+grant.export.desc,Complete five orders on time: the center will cover product certification.
+grant.export.goal0,5 completed orders
+grant.staff20.title,Town-Forming Enterprise
+grant.staff20.org,Regional Administration
+grant.staff20.desc,Grow the staff to 20 people: the region supports new jobs in a single-industry town.
+grant.staff20.goal0,20 people on staff

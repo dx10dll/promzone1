@@ -47,7 +47,7 @@ static func body_of(look: Dictionary) -> Dictionary:
 
 static func body_name(w: Worker) -> String:
 	var names: Array = body_of(w.look)["name"]
-	return str(names[1 if w.female else 0])
+	return L.t(str(names[1 if w.female else 0]))
 
 
 static func random_body(rng: RandomNumberGenerator, age: int) -> String:

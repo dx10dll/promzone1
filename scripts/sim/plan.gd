@@ -89,15 +89,15 @@ func add_obj(def_id: String, c: Vector2i, rot: int) -> String:
 func can_add_obj(def_id: String, c: Vector2i, rot: int) -> String:
 	var d: Dictionary = Defs.objects.get(def_id, {})
 	if d.is_empty():
-		return "Неизвестный объект"
+		return L.t("Неизвестный объект")
 	var r := obj_rect(def_id, c, rot)
 	for y in range(r.position.y, r.end.y):
 		for x in range(r.position.x, r.end.x):
 			if not sim.world.in_plot(Vector2i(x, y)):
-				return "Только внутри участка"
+				return L.t("Только внутри участка")
 	for o: Dictionary in objs:
 		if obj_rect(str(o["def"]), Vector2i(int(o["x"]), int(o["y"])), int(o["rot"])).intersects(r):
-			return "Здесь на плане уже стоит объект"
+			return L.t("Здесь на плане уже стоит объект")
 	return ""
 
 

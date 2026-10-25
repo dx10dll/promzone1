@@ -53,7 +53,7 @@ func pay_wages(total: float) -> bool:
 		return true
 	if can_credit_wages():
 		wage_credit_day = sim.day()
-		sim.story.info("Зарплату выдали в долг", "Денег на зарплату не хватило — выдали из резерва, касса ушла в минус. Так выручить можно только раз в три месяца: в следующий раз зарплату задержат, и люди начнут уходить. Срочно сдавайте заказы или берите кредит (Финансы → Кредиты).", "money", Sim.LVL_BAD, Vector2i(-1, -1), true)
+		sim.story.info(L.t("Зарплату выдали в долг"), L.t("Денег на зарплату не хватило — выдали из резерва, касса ушла в минус. Так выручить можно только раз в три месяца: в следующий раз зарплату задержат, и люди начнут уходить. Срочно сдавайте заказы или берите кредит (Финансы → Кредиты)."), "money", Sim.LVL_BAD, Vector2i(-1, -1), true)
 		return true
 	# задержка: долг каждому
 	for w in sim.workers:
@@ -63,15 +63,15 @@ func pay_wages(total: float) -> bool:
 		Mood.add(sim, w, "wage_late")
 	if unpaid_since < 0:
 		unpaid_since = sim.day()
-	sim.story.letter("crisis_wages", "Нечем платить зарплату", "Денег нет, а в долг зарплату уже выдавали меньше трёх месяцев назад (снова можно через %d дн.). Люди остались без денег — жалуются и грозят уволиться. Если трое уйдут за две недели, придёт трудовая инспекция и закроет завод. Долг по зарплате: %s." % [credit_left_days(), Defs.money_str(sim.progress.arrears_total())],
-		"strike", Sim.LVL_BAD, [{"text": "Взять кредит и выплатить", "hint": _loan_hint()}, {"text": "Попросить потерпеть до следующей недели", "hint": "Настроение упадёт ещё, кто-то может уйти"}], 1)
+	sim.story.letter("crisis_wages", L.t("Нечем платить зарплату"), L.t("Денег нет, а в долг зарплату уже выдавали меньше трёх месяцев назад (снова можно через %d дн.). Люди остались без денег — жалуются и грозят уволиться. Если трое уйдут за две недели, придёт трудовая инспекция и закроет завод. Долг по зарплате: %s.") % [credit_left_days(), Defs.money_str(sim.progress.arrears_total())],
+		"strike", Sim.LVL_BAD, [{"text": L.t("Взять кредит и выплатить"), "hint": _loan_hint()}, {"text": L.t("Попросить потерпеть до следующей недели"), "hint": L.t("Настроение упадёт ещё, кто-то может уйти")}], 1)
 	return false
 
 
 func _loan_hint() -> String:
 	if sim.progress.stage < 2:
-		return "Банки кредитуют с этапа «Мастерская» — сейчас не дадут"
-	return "Кредит 800 000 ₽ на полгода, если банк одобрит"
+		return L.t("Банки кредитуют с этапа «Мастерская» — сейчас не дадут")
+	return L.t("Кредит 800 000 ₽ на полгода, если банк одобрит")
 
 
 func _wages_daily() -> void:
@@ -82,7 +82,7 @@ func _wages_daily() -> void:
 	if unpaid_since < 0:
 		unpaid_since = sim.day()
 	var days := sim.day() - unpaid_since
-	sim.notify_once("arrears_daily", "Люди жалуются: зарплату задерживают уже %d дн. (долг %s). Грозят уволиться — выплатите: Финансы → «Выплатить долги по зарплате»." % [maxi(1, days), Defs.money_str(arr)], Sim.LVL_BAD, Vector2i(-1, -1), 1200.0)
+	sim.notify_once("arrears_daily", L.t("Люди жалуются: зарплату задерживают уже %d дн. (долг %s). Грозят уволиться — выплатите: Финансы → «Выплатить долги по зарплате».") % [maxi(1, days), Defs.money_str(arr)], Sim.LVL_BAD, Vector2i(-1, -1), 1200.0)
 	if days < 3:
 		return
 	# уходит тот, у кого настроение хуже всех
@@ -109,10 +109,10 @@ func _quit_unpaid(w: Worker) -> void:
 	arrears_quits.append(sim.day())
 	arrears_quits = arrears_quits.filter(func(dd: int) -> bool: return sim.day() - dd < QUIT_WINDOW)
 	var n := arrears_quits.size()
-	sim.notify(Nicks.gendered("%s уволил{ся|ась}: «Не платят — работать не буду». Уже %d за две недели — после %d-го придёт трудовая инспекция.", fem) % [nm, n, QUITS_TO_CLOSE], Sim.LVL_BAD)
+	sim.notify(Nicks.gendered(L.t("%s уволил{ся|ась}: «Не платят — работать не буду». Уже %d за две недели — после %d-го придёт трудовая инспекция."), fem) % [nm, n, QUITS_TO_CLOSE], Sim.LVL_BAD)
 	if n >= QUITS_TO_CLOSE:
-		close("labor", "Трудовая инспекция закрыла завод",
-			"За две недели %d человек уволились, потому что им не платили зарплату. Они написали жалобу — трудовая инспекция проверила ведомости, наложила арест на счёт и приостановила деятельность предприятия. Завод закрыт." % n)
+		close("labor", L.t("Трудовая инспекция закрыла завод"),
+			L.t("За две недели %d человек уволились, потому что им не платили зарплату. Они написали жалобу — трудовая инспекция проверила ведомости, наложила арест на счёт и приостановила деятельность предприятия. Завод закрыт.") % n)
 
 
 ## Конец игры.
@@ -142,10 +142,10 @@ func _tools_daily() -> void:
 				if not w.is_itr():
 					Mood.add(sim, w, "no_tools")
 			if int(tools_short[c2]) == 1 and sim.story.get_letter_by_ev("crisis_tools").is_empty():
-				sim.story.letter("crisis_tools", "Нечем работать: кончился %s" % str(cd.get("short", c2)),
-					"%s закончился, а денег на новый (%s) нет. Станки стоят, люди простаивают, жалуются и грозят уволиться." % [str(cd.get("name", c2)), Defs.money_str(float(cd.get("price", 0.0)))],
-					"wrench", Sim.LVL_BAD, [{"text": "Взять у поставщика в долг", "hint": "%s через две недели (+10%%)" % Defs.money_str(float(cd.get("price", 0.0)) * 1.1)},
-						{"text": "Пусть ждут денег", "hint": "Настроение падает каждый день"}], 0, {"cons": c2})
+				sim.story.letter("crisis_tools", L.t("Нечем работать: кончился %s") % L.dt("consumable.%s.short" % c2, str(cd.get("short", c2))),
+					L.t("%s закончился, а денег на новый (%s) нет. Станки стоят, люди простаивают, жалуются и грозят уволиться.") % [L.dt("consumable.%s.name" % c2, str(cd.get("name", c2))), Defs.money_str(float(cd.get("price", 0.0)))],
+					"wrench", Sim.LVL_BAD, [{"text": L.t("Взять у поставщика в долг"), "hint": L.t("%s через две недели (+10%%)") % Defs.money_str(float(cd.get("price", 0.0)) * 1.1)},
+						{"text": L.t("Пусть ждут денег"), "hint": L.t("Настроение падает каждый день")}], 0, {"cons": c2})
 		else:
 			tools_short.erase(c2)
 
@@ -157,7 +157,7 @@ func _debt_daily() -> void:
 		debt_days += 1
 		if debt_days >= 2:
 			sim.reputation = maxf(0.0, sim.reputation - 1.0)
-			sim.notify_once("debt_rep", "Завод в долгах %d дн.: поставщики и заказчики это знают — репутация падает каждый день, сбыт новых заказов не берёт." % debt_days, Sim.LVL_BAD, Vector2i(-1, -1), 1200.0)
+			sim.notify_once("debt_rep", L.t("Завод в долгах %d дн.: поставщики и заказчики это знают — репутация падает каждый день, сбыт новых заказов не берёт.") % debt_days, Sim.LVL_BAD, Vector2i(-1, -1), 1200.0)
 	else:
 		debt_days = 0
 
@@ -172,17 +172,17 @@ func _clients_daily() -> void:
 		var promise := float(o.get("promise", -1.0))
 		if promise > 0.0 and sim.minute > promise:
 			o["promise"] = -1.0
-			sim.orders.fail(o, "Заказчик не дождался обещанного срока и расторг договор со скандалом")
+			sim.orders.fail(o, L.t("Заказчик не дождался обещанного срока и расторг договор со скандалом"))
 			sim.reputation = maxf(0.0, sim.reputation - 4.0)
 			continue
 		if late >= 2.0 and not visited.has(int(o["id"])) and sim.story.get_letter_by_ev("crisis_client").is_empty():
 			visited[int(o["id"])] = true
 			var sum := float(o["price"]) * int(o["qty"])
-			sim.story.letter("crisis_client", "Заказчик приехал разбираться",
-				"Представитель «%s» приехал на завод: заказ «%s» просрочен на %d дн. Требует объяснений и денег за срыв графика." % [str(o["client"]), sim.orders.short(o), int(late)],
-				"handshake", Sim.LVL_BAD, [{"text": "Извиниться и заплатить неустойку", "hint": "%s, срок +4 дня" % Defs.money_str(sum * 0.1)},
-					{"text": "Пообещать сдать за 2 дня", "hint": "Не успеете — заказ отменят со скандалом"},
-					{"text": "Отказаться от заказа", "hint": "Неустойка %s, репутация −6" % Defs.money_str(sum * 0.05)}], 0, {"order": int(o["id"])})
+			sim.story.letter("crisis_client", L.t("Заказчик приехал разбираться"),
+				L.t("Представитель «%s» приехал на завод: заказ «%s» просрочен на %d дн. Требует объяснений и денег за срыв графика.") % [str(o["client"]), sim.orders.short(o), int(late)],
+				"handshake", Sim.LVL_BAD, [{"text": L.t("Извиниться и заплатить неустойку"), "hint": L.t("%s, срок +4 дня") % Defs.money_str(sum * 0.1)},
+					{"text": L.t("Пообещать сдать за 2 дня"), "hint": L.t("Не успеете — заказ отменят со скандалом")},
+					{"text": L.t("Отказаться от заказа"), "hint": L.t("Неустойка %s, репутация −6") % Defs.money_str(sum * 0.05)}], 0, {"order": int(o["id"])})
 	if hits > 0:
 		sim.reputation = maxf(0.0, sim.reputation - minf(3.0, float(hits)))
 
@@ -193,7 +193,7 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 			if choice == 0:
 				var err := sim.office.take_loan(800000.0, 26)
 				if err != "":
-					sim.notify("Кредит не дали: %s." % err, Sim.LVL_BAD)
+					sim.notify(L.t("Кредит не дали: %s.") % err, Sim.LVL_BAD)
 				else:
 					var e2 := sim.progress.pay_arrears()
 					if e2 == "":
@@ -207,7 +207,7 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 			if choice == 0 and not cd.is_empty():
 				sim.office.add_debt(float(cd["price"]) * 1.1, 2, "Отсрочка платежа за расходники")
 				sim.cons_supply.append({"cons": c, "packs": 1, "eta": sim.to_work_time(sim.minute + 120.0)})
-				sim.notify("Поставщик отгрузил %s в долг — привезут через пару часов." % str(cd.get("pack", c)), Sim.LVL_WARN)
+				sim.notify(L.t("Поставщик отгрузил %s в долг — привезут через пару часов.") % L.dt("consumable.%s.pack" % c, str(cd.get("pack", c))), Sim.LVL_WARN)
 				tools_short.erase(c)
 		"crisis_client":
 			var o := sim.orders.get_order(int(d.get("order", -1)))
@@ -219,13 +219,13 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 					sim.spend(sum * 0.1, "Неустойка заказчику: " + sim.orders.short(o))
 					o["deadline"] = float(o["deadline"]) + 4.0 * 1440.0
 					sim.reputation = maxf(0.0, sim.reputation - 1.0)
-					sim.notify("Заказчик принял извинения: срок продлён на 4 дня.", Sim.LVL_INFO)
+					sim.notify(L.t("Заказчик принял извинения: срок продлён на 4 дня."), Sim.LVL_INFO)
 				1:
 					o["promise"] = sim.minute + 2.0 * 1440.0
-					sim.notify("Пообещали сдать «%s» за 2 дня. Не успеете — заказ отменят." % sim.orders.short(o), Sim.LVL_WARN)
+					sim.notify(L.t("Пообещали сдать «%s» за 2 дня. Не успеете — заказ отменят.") % sim.orders.short(o), Sim.LVL_WARN)
 				2:
 					sim.spend(sum * 0.05, "Неустойка за отказ: " + sim.orders.short(o))
-					sim.orders.fail(o, "Отказались от заказа")
+					sim.orders.fail(o, L.t("Отказались от заказа"))
 					sim.reputation = maxf(0.0, sim.reputation - 6.0)
 
 
@@ -240,18 +240,18 @@ func fire_reasons(w: Worker) -> Array:
 	var weak := w.grade() <= 1 and tenure >= 20 and not w.is_itr()
 	var sev := float(w.wage) * 10.0
 	var agree := float(w.wage) * 5.0
-	out.append({"key": "agree", "name": "По соглашению сторон", "legal": true, "cost": agree,
-		"why": "Договорились по-хорошему: компенсация %s. Остальные спокойны." % Defs.money_str(agree)})
-	out.append({"key": "cut", "name": "Сокращение штата", "legal": true, "cost": sev,
-		"why": "Законно, но положено выходное пособие — %s (две недели ставки). Люди слегка тревожатся." % Defs.money_str(sev)})
-	out.append({"key": "absence", "name": "За прогулы", "legal": abs_n > 0, "cost": 0.0,
-		"why": ("Прогулов: %d — основание есть, без выплат." % abs_n) if abs_n > 0 else "Прогулов не было — уволенный пойдёт в суд и к инспектору."})
-	out.append({"key": "theft", "name": "За кражу (по статье)", "legal": theft > 0, "cost": 0.0,
-		"why": "Пойман%s на краже — основание есть, честные одобрят." % ("а" if w.female else "") if theft > 0 else "На краже не ловили — это клевета, будет суд."})
-	out.append({"key": "weak", "name": "Не справляется с работой", "legal": weak, "cost": 0.0,
-		"why": "Низкий разряд и брак после испытательного срока — по аттестации можно." if weak else "Работает нормально или ещё на испытательном сроке (20 дней) — оснований нет."})
-	out.append({"key": "none", "name": "Без причины", "legal": false, "cost": 0.0,
-		"why": "Незаконно: уволенный подаст в суд (≈ %s) и пожалуется в трудовую инспекцию, остальные обидятся." % Defs.money_str(float(w.wage) * 15.0)})
+	out.append({"key": "agree", "name": L.t("По соглашению сторон"), "legal": true, "cost": agree,
+		"why": L.t("Договорились по-хорошему: компенсация %s. Остальные спокойны.") % Defs.money_str(agree)})
+	out.append({"key": "cut", "name": L.t("Сокращение штата"), "legal": true, "cost": sev,
+		"why": L.t("Законно, но положено выходное пособие — %s (две недели ставки). Люди слегка тревожатся.") % Defs.money_str(sev)})
+	out.append({"key": "absence", "name": L.t("За прогулы"), "legal": abs_n > 0, "cost": 0.0,
+		"why": (L.t("Прогулов: %d — основание есть, без выплат.") % abs_n) if abs_n > 0 else L.t("Прогулов не было — уволенный пойдёт в суд и к инспектору.")})
+	out.append({"key": "theft", "name": L.t("За кражу (по статье)"), "legal": theft > 0, "cost": 0.0,
+		"why": Nicks.gendered(L.t("Пойман{|а} на краже — основание есть, честные одобрят."), w.female) if theft > 0 else L.t("На краже не ловили — это клевета, будет суд.")})
+	out.append({"key": "weak", "name": L.t("Не справляется с работой"), "legal": weak, "cost": 0.0,
+		"why": L.t("Низкий разряд и брак после испытательного срока — по аттестации можно.") if weak else L.t("Работает нормально или ещё на испытательном сроке (20 дней) — оснований нет.")})
+	out.append({"key": "none", "name": L.t("Без причины"), "legal": false, "cost": 0.0,
+		"why": L.t("Незаконно: уволенный подаст в суд (≈ %s) и пожалуется в трудовую инспекцию, остальные обидятся.") % Defs.money_str(float(w.wage) * 15.0)})
 	return out
 
 
@@ -262,10 +262,10 @@ func fire_with(w: Worker, key: String) -> String:
 		if str(x["key"]) == key:
 			r = x
 	if r.is_empty():
-		return "Неизвестная причина"
+		return L.t("Неизвестная причина")
 	var cost := float(r["cost"])
 	if cost > 0.0 and not sim.can_afford(cost):
-		return "Не хватает денег на выплату: %s" % Defs.money_str(cost)
+		return L.t("Не хватает денег на выплату: %s") % Defs.money_str(cost)
 	var nm := w.full_name()
 	var fem := w.female
 	var wage := float(w.wage)
@@ -279,16 +279,16 @@ func fire_with(w: Worker, key: String) -> String:
 		if key == "cut":
 			for o in sim.workers:
 				Mood.add(sim, o, "coworker_fired")
-		return Nicks.gendered("%s уволен{|а}: %s.", fem) % [nm, str(r["name"]).to_lower()]
+		return Nicks.gendered(L.t("%s уволен{|а}: %s."), fem) % [nm, str(r["name"]).to_lower()]
 	# незаконно: суд, жалоба, обида
 	var sum := wage * 15.0 * (0.5 if sim.office.active("legal") else 1.0)
 	suits.append({"name": nm, "due": sim.day() + 7, "sum": sum})
-	sim.inspect.schedule("labor", sim.minute + 3.0 * 1440.0, false, "жалоба уволенного")
+	sim.inspect.schedule("labor", sim.minute + 3.0 * 1440.0, false, L.t("жалоба уволенного"))
 	sim.reputation = maxf(0.0, sim.reputation - 2.0)
 	for o in sim.workers:
 		Mood.add(sim, o, "coworker_fired")
-	sim.notify(Nicks.gendered("%s уволен{|а} без законной причины и подал{|а} в суд: через неделю суд, придётся заплатить ≈ %s. И жалоба в трудовую инспекцию.", fem) % [nm, Defs.money_str(sum)], Sim.LVL_BAD)
-	return Nicks.gendered("%s уволен{|а} незаконно — будет суд.", fem) % nm
+	sim.notify(Nicks.gendered(L.t("%s уволен{|а} без законной причины и подал{|а} в суд: через неделю суд, придётся заплатить ≈ %s. И жалоба в трудовую инспекцию."), fem) % [nm, Defs.money_str(sum)], Sim.LVL_BAD)
+	return Nicks.gendered(L.t("%s уволен{|а} незаконно — будет суд."), fem) % nm
 
 
 func _suits_daily() -> void:
@@ -298,7 +298,7 @@ func _suits_daily() -> void:
 			var sum := float(su["sum"])
 			sim.spend(sum, "Суд: незаконное увольнение (%s)" % str(su["name"]))
 			sim.reputation = maxf(0.0, sim.reputation - 2.0)
-			sim.notify("Суд восстановил справедливость: %s уволили незаконно. Завод выплатил %s за вынужденный прогул и моральный вред." % [str(su["name"]), Defs.money_str(sum)], Sim.LVL_BAD)
+			sim.notify(L.t("Суд восстановил справедливость: %s уволили незаконно. Завод выплатил %s за вынужденный прогул и моральный вред.") % [str(su["name"]), Defs.money_str(sum)], Sim.LVL_BAD)
 		else:
 			keep.append(su)
 	suits = keep

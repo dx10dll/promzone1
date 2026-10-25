@@ -254,20 +254,20 @@ func absent_note(pr: String) -> String:
 			back = minf(back, w.sick_until)
 	if total == 0:
 		return ""
-	return "все, кто работает на переделе «%s», на больничном или в отпуске (вернутся в день %d)" % [Defs.process_name(pr), int(back / 1440.0) + 1]
+	return L.t("все, кто работает на переделе «%s», на больничном или в отпуске (вернутся в день %d)") % [Defs.process_name(pr), int(back / 1440.0) + 1]
 
 
 ## Что сделать, чтобы передел перестал быть проблемным участком.
 func advice(pr: String) -> String:
 	var an := absent_note(pr)
 	if an != "":
-		return "Сейчас %s — наймите ещё одного человека, чтобы не простаивать." % an
+		return L.t("Сейчас %s — наймите ещё одного человека, чтобы не простаивать.") % an
 	if pr == "qc":
 		if sim.things_of("qc").size() <= int(sim.office.ops_for("qc")):
-			return "Поставьте ещё стол ОТК."
-		return "Наймите ещё контролёра ОТК."
+			return L.t("Поставьте ещё стол ОТК.")
+		return L.t("Наймите ещё контролёра ОТК.")
 	if not sim.prod.processes_available().has(pr):
-		return "Купите станок для этого передела."
+		return L.t("Купите станок для этого передела.")
 	var n := 0
 	for w in sim.workers:
 		if sim.prod.is_operator_for(w, pr):
@@ -277,8 +277,8 @@ func advice(pr: String) -> String:
 		if t.process() == pr:
 			m += 1
 	if n < m:
-		return "Станки есть — наймите ещё человека на этот передел."
-	return "Поставьте ещё станок и наймите человека к нему."
+		return L.t("Станки есть — наймите ещё человека на этот передел.")
+	return L.t("Поставьте ещё станок и наймите человека к нему.")
 
 
 # ================================================================ рынок
@@ -322,8 +322,8 @@ func _weekly_report() -> void:
 	if str(s["top"]) != "":
 		var pr := str(s["top"])
 		var no_equip := pr != "qc" and not sim.prod.processes_available().has(pr)
-		tail = " Больше всего потеряли из-за передела «%s» (%s): %s. %s" % [Defs.process_name(pr), "нет оборудования" if no_equip else "не успевает", Defs.money_str(float(s["top_sum"])), advice(pr)]
-	sim.notify("Сбыт: за неделю отказали заказчикам на %s (%d заявок).%s Подробности — «Заказы» → «Рынок»." % [Defs.money_str(float(s["lost_sum"])), int(s["lost"]), tail], Sim.LVL_WARN)
+		tail = L.t(" Больше всего потеряли из-за передела «%s» (%s): %s. %s") % [Defs.process_name(pr), L.t("нет оборудования") if no_equip else L.t("не успевает"), Defs.money_str(float(s["top_sum"])), advice(pr)]
+	sim.notify(L.t("Сбыт: за неделю отказали заказчикам на %s (%d заявок).%s Подробности — «Заказы» → «Рынок».") % [Defs.money_str(float(s["lost_sum"])), int(s["lost"]), tail], Sim.LVL_WARN)
 
 
 # ================================================================ контракты
@@ -348,7 +348,7 @@ func _contract_offers() -> void:
 	for c: Dictionary in by_state(["offer"]):
 		if sim.minute > float(c["until"]):
 			c["status"] = "expired"
-			sim.notify("%s не дождался ответа и отдал контракт другому заводу." % str(c["client"]), Sim.LVL_INFO)
+			sim.notify(L.t("%s не дождался ответа и отдал контракт другому заводу.") % Company.firm(str(c["client"])), Sim.LVL_INFO)
 	contracts = contracts.filter(func(c: Dictionary) -> bool: return str(c["status"]) != "expired")
 	if not enabled or paused or sim.money < 0.0 or float(sim.day()) < next_contract or not sim.is_workday() or sim.progress.quiet():
 		return
@@ -359,7 +359,7 @@ func _contract_offers() -> void:
 		return
 	if not sim.dev.on("mkt3"):
 		if sim.progress.stage >= 3:
-			sim.notify_once("no_sales_mgr", "Крупные заказчики ищут, с кем подписать контракт, — но завод не готов: нужна ступень «Контракты» (Управление → Развитие), её держит менеджер по сбыту.", Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
+			sim.notify_once("no_sales_mgr", L.t("Крупные заказчики ищут, с кем подписать контракт, — но завод не готов: нужна ступень «Контракты» (Управление → Развитие), её держит менеджер по сбыту."), Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
 		return
 	var c := _new_contract()
 	if c.is_empty():
@@ -367,8 +367,8 @@ func _contract_offers() -> void:
 	if year_ok() and sim.rng.randf() < 0.4:
 		_make_year(c)
 	contracts.append(c)
-	sim.story.letter("contract", ("Договор на год: %s" if bool(c.get("year", false)) else "Контракт: %s") % str(c["client"]), contract_text(c), "orders", Sim.LVL_GOOD,
-		[{"text": "Подписать", "hint": "Поставки начнутся %s" % _day_str(int(c["start"]))}, {"text": "Отказаться", "hint": ""}, {"text": "Подумать (вкладка «Контракты»)", "hint": "Предложение действует 2 дня", "open": "orders"}], 2, {"contract": int(c["id"])})
+	sim.story.letter("contract", (L.t("Договор на год: %s") if bool(c.get("year", false)) else L.t("Контракт: %s")) % Company.firm(str(c["client"])), contract_text(c), "orders", Sim.LVL_GOOD,
+		[{"text": L.t("Подписать"), "hint": L.t("Поставки начнутся %s") % _day_str(int(c["start"]))}, {"text": L.t("Отказаться"), "hint": ""}, {"text": L.t("Подумать (вкладка «Контракты»)"), "hint": L.t("Предложение действует 2 дня"), "open": "orders"}], 2, {"contract": int(c["id"])})
 
 
 ## 1.26: договор на год — большому заводу (от «Среднего предприятия», репутация от 55), один за раз.
@@ -408,7 +408,7 @@ static func total(c: Dictionary) -> float:
 
 
 func _day_str(d: int) -> String:
-	return "в день %d (%s)" % [d, sim.weekday_name(d)]
+	return L.t("в день %d (%s)") % [d, L.t(sim.weekday_name(d))]
 
 
 ## Предложение контракта: изделие, которое завод может делать или почти может (не хватает 1–2 переделов —
@@ -454,15 +454,15 @@ func _new_contract() -> Dictionary:
 ## Текст предложения и оценка: хватит ли мощности.
 func contract_text(c: Dictionary) -> String:
 	var p := str(c["product"])
-	var t := "%s предлагает долгосрочный контракт: %d шт. «%s» каждую неделю, %d %s подряд, по %s за штуку (на %d%% выше рынка). Всего %s.\n" % [
+	var t := L.t("%s предлагает долгосрочный контракт: %d шт. «%s» каждую неделю, %d %s подряд, по %s за штуку (на %d%% выше рынка). Всего %s.\n") % [
 		str(c["client"]), int(c["per_week"]), Defs.product_name(p), int(c["weeks"]), Defs.plural(int(c["weeks"]), "неделю", "недели", "недель"),
 		Defs.money_str(float(c["price"])), int(round(float(c["prem"]) * 100.0)), Defs.money_str(float(c["price"]) * int(c["per_week"]) * int(c["weeks"]))]
 	if bool(c.get("year", false)):
-		t = "%s предлагает договор на год: %d шт. «%s» каждую неделю, %d недель подряд, по %s за штуку (на %d%% выше рынка). Всего %s.\n" % [
+		t = L.t("%s предлагает договор на год: %d шт. «%s» каждую неделю, %d недель подряд, по %s за штуку (на %d%% выше рынка). Всего %s.\n") % [
 			str(c["client"]), int(c["per_week"]), Defs.product_name(p), int(c["weeks"]), Defs.money_str(float(c["price"])), int(round(float(c["prem"]) * 100.0)), Defs.money_str(total(c))]
-		t += "При подписании — аванс 10%% (%s). Сорвали партию — штраф 30%% её стоимости; третий срыв — договор расторгнут и неустойка 10%% от недопоставленного. Выполнили — премия 8%% и большой плюс к репутации.\n" % Defs.money_str(total(c) * 0.1)
+		t += L.t("При подписании — аванс 10%% (%s). Сорвали партию — штраф 30%% её стоимости; третий срыв — договор расторгнут и неустойка 10%% от недопоставленного. Выполнили — премия 8%% и большой плюс к репутации.\n") % Defs.money_str(total(c) * 0.1)
 	else:
-		t += "Первая партия — в неделю со дня %d, каждая партия — к пятнице. Сорвали партию — штраф 30%% её стоимости, две — контракт расторгнут.\n" % int(c["start"])
+		t += L.t("Первая партия — в неделю со дня %d, каждая партия — к пятнице. Сорвали партию — штраф 30%% её стоимости, две — контракт расторгнут.\n") % int(c["start"])
 	t += assess(c)
 	return t
 
@@ -475,7 +475,7 @@ func assess(c: Dictionary) -> String:
 		var av := sim.prod.processes_available()
 		for pr in miss:
 			names.append(sim.prod.missing_name(p, pr, av))
-		return "Сейчас сделать нельзя — нет оборудования: %s. До начала поставок %d дн.: поставьте станки и наймите людей." % [", ".join(names), maxi(0, int(c["start"]) - sim.day())]
+		return L.t("Сейчас сделать нельзя — нет оборудования: %s. До начала поставок %d дн.: поставьте станки и наймите людей.") % [", ".join(names), maxi(0, int(c["start"]) - sim.day())]
 	var cap := capacity_week(p)
 	var need := float(int(c["per_week"]))
 	if cap <= 0.0:
@@ -484,11 +484,11 @@ func assess(c: Dictionary) -> String:
 		for pr0 in acc0.keys():
 			var an := absent_note(str(pr0))
 			if an != "":
-				return "Сейчас мощность нулевая: %s. Если людей больше нет — наймите." % an
+				return L.t("Сейчас мощность нулевая: %s. Если людей больше нет — наймите.") % an
 	if cap >= need * 1.6:
-		return "Мощности хватает с запасом: можете делать ~%d шт. в неделю." % int(cap)
+		return L.t("Мощности хватает с запасом: можете делать ~%d шт. в неделю.") % int(cap)
 	if cap >= need:
-		return "Мощности хватает впритык (~%d шт. в неделю): на другие заказы времени останется мало." % int(cap)
+		return L.t("Мощности хватает впритык (~%d шт. в неделю): на другие заказы времени останется мало.") % int(cap)
 	var acc := {}
 	sim.office._add_route_load(acc, p, 1.0)
 	var worst := ""
@@ -498,18 +498,18 @@ func assess(c: Dictionary) -> String:
 		if v < wv:
 			wv = v
 			worst = str(pr2)
-	return "Мощности не хватает: сейчас ~%d шт. в неделю из %d. Узкое место — %s. %s" % [int(cap), int(need), Defs.process_name(worst).to_lower(), advice(worst)]
+	return L.t("Мощности не хватает: сейчас ~%d шт. в неделю из %d. Узкое место — %s. %s") % [int(cap), int(need), Defs.process_name(worst).to_lower(), advice(worst)]
 
 
 func sign(id: int) -> String:
 	var c := contract(id)
 	if c.is_empty() or str(c["status"]) != "offer":
-		return "Предложение уже недоступно"
+		return L.t("Предложение уже недоступно")
 	c["status"] = "wait" if sim.day() < int(c["start"]) else "active"
 	if bool(c.get("year", false)):
 		c["advance"] = total(c) * 0.1
 		sim.earn(float(c["advance"]), "Оплата: аванс по договору на год, " + str(c["client"]))
-	sim.notify("Контракт подписан: %s, %d шт. «%s» в неделю. Первая партия — в неделю со дня %d." % [str(c["client"]), int(c["per_week"]), Defs.product_name(str(c["product"])), int(c["start"])], Sim.LVL_GOOD)
+	sim.notify(L.t("Контракт подписан: %s, %d шт. «%s» в неделю. Первая партия — в неделю со дня %d.") % [Company.firm(str(c["client"])), int(c["per_week"]), Defs.product_name(str(c["product"])), int(c["start"])], Sim.LVL_GOOD)
 	if sim.weekday() == 0 and sim.day() >= int(c["start"]):
 		_contract_orders()
 	return ""
@@ -563,14 +563,14 @@ func on_order_closed(o: Dictionary, ok: bool) -> void:
 				var pen := left * 0.1
 				sim.spend(pen, "Штраф: неустойка за расторжение договора на год, " + str(c["client"]))
 				sim.reputation = maxf(0.0, sim.reputation - 15.0)
-				sim.notify("%s расторг договор на год: сорваны три партии. Неустойка %s, репутация сильно упала." % [str(c["client"]), Defs.money_str(pen)], Sim.LVL_BAD)
+				sim.notify(L.t("%s расторг договор на год: сорваны три партии. Неустойка %s, репутация сильно упала.") % [Company.firm(str(c["client"])), Defs.money_str(pen)], Sim.LVL_BAD)
 				return
 			sim.reputation = maxf(0.0, sim.reputation - 10.0)
-			sim.notify("%s расторг контракт: сорваны две партии. Репутация упала." % str(c["client"]), Sim.LVL_BAD)
+			sim.notify(L.t("%s расторг контракт: сорваны две партии. Репутация упала.") % Company.firm(str(c["client"])), Sim.LVL_BAD)
 			return
 		var left_f := max_fails(c) - int(c["fails"])
-		sim.notify("Сорвана партия по %s с %s: штраф %s. %s" % ["договору" if bool(c.get("year", false)) else "контракту", str(c["client"]), Defs.money_str(fine),
-			"Ещё один срыв — и контракт расторгнут." if left_f <= 1 else "Ещё %d срыва — и договор расторгнут." % left_f], Sim.LVL_BAD)
+		sim.notify(L.t("Сорвана партия по %s с %s: штраф %s. %s") % [L.t("договору") if bool(c.get("year", false)) else L.t("контракту"), Company.firm(str(c["client"])), Defs.money_str(fine),
+			L.t("Ещё один срыв — и контракт расторгнут.") if left_f <= 1 else L.t("Ещё %d срыва — и договор расторгнут.") % left_f], Sim.LVL_BAD)
 	if int(c["done_w"]) + int(c["fails"]) >= int(c["weeks"]):
 		c["status"] = "done"
 		var yr := bool(c.get("year", false))
@@ -580,7 +580,7 @@ func on_order_closed(o: Dictionary, ok: bool) -> void:
 		sim.stats["contracts_done"] = int(sim.stats.get("contracts_done", 0)) + 1
 		if yr:
 			sim.stats["year_contracts_done"] = int(sim.stats.get("year_contracts_done", 0)) + 1
-		sim.notify("Контракт с %s выполнен! Премия %s, репутация выросла." % [str(c["client"]), Defs.money_str(bonus)], Sim.LVL_GOOD)
+		sim.notify(L.t("Контракт с %s выполнен! Премия %s, репутация выросла.") % [Company.firm(str(c["client"])), Defs.money_str(bonus)], Sim.LVL_GOOD)
 
 
 # ================================================================ сохранение

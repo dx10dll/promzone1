@@ -350,7 +350,25 @@ func _river(x0: float, y0: float, y1: float) -> void:
 	draw_multiline(lines, Color(0.8, 0.9, 0.95, 0.16), 2.0)
 
 
-func _water_name(c: Vector2, s: String) -> void:
+## 1.40: надписи города на языке игры. В английском — перевод из таблицы, а улицы — латиницей
+## с английским словом: «ул. Мичуринская» → «Michurinskaya St.», «Моршанское ш.» → «Morshanskoe Hwy».
+static func _tx(s: String) -> String:
+	if not L.is_en() or s == "":
+		return s
+	var t := L.t(s)
+	if t != s:
+		return t
+	for p: Array in [["ул. ", "", " St."], ["пр. ", "", " Ave."], ["б-р ", "", " Blvd."], ["р. ", "", " River"]]:
+		if s.begins_with(str(p[0])):
+			return L.translit(s.trim_prefix(str(p[0]))) + str(p[2])
+	for q: Array in [[" ш.", " Hwy"], [" шоссе", " Highway"], [" наб.", " Emb."], [" набережная", " Embankment"]]:
+		if s.ends_with(str(q[0])):
+			return L.translit(s.trim_suffix(str(q[0]))) + str(q[1])
+	return L.translit(s)
+
+
+func _water_name(c: Vector2, s0: String) -> void:
+	var s := _tx(s0)
 	draw_set_transform(c, -PI * 0.5, Vector2.ONE)
 	var sz := _font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 34)
 	draw_string(_font, Vector2(-sz.x * 0.5, 12), s, HORIZONTAL_ALIGNMENT_LEFT, -1, 34, Color(0.82, 0.92, 0.98, 0.5))
@@ -358,7 +376,8 @@ func _water_name(c: Vector2, s: String) -> void:
 
 
 ## Название улицы прямо на асфальте — как на карте, читается и при отдалении.
-func _road_name(c: Vector2, s: String, vertical: bool) -> void:
+func _road_name(c: Vector2, s0: String, vertical: bool) -> void:
+	var s := _tx(s0)
 	draw_set_transform(c, -PI * 0.5 if vertical else 0.0, Vector2.ONE)
 	var sz := _font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 22)
 	draw_string(_font, Vector2(-sz.x * 0.5, 8), s, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(0.95, 0.95, 0.9, 0.42))
@@ -555,7 +574,7 @@ func _panel_tall(r: Rect2, floors: int, street: String, num: int) -> void:
 
 ## Домовой знак: синяя табличка — улица и номер дома.
 func _house_plate(p: Vector2, street: String, num: int) -> void:
-	var s := street.replace("ул. ", "")
+	var s := _tx(street.replace("ул. ", ""))
 	var sz := _font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 7)
 	var r := Rect2(p, Vector2(sz.x + 22, 11))
 	draw_rect(r, C_SIGN)
@@ -640,7 +659,9 @@ func _tag(c: Vector2, s: String, sub: String = "", px: float = 26.0) -> void:
 	_tags.append([c, s, sub, px])
 
 
-func _draw_tag(c: Vector2, s: String, sub: String, px: float) -> void:
+func _draw_tag(c: Vector2, s0: String, sub0: String, px: float) -> void:
+	var s := _tx(s0)
+	var sub := _tx(sub0)
 	var fs := int(px)
 	var ss := int(px * 0.62)
 	var sz := _font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
@@ -661,7 +682,8 @@ func _sign(p: Vector2, names: Array) -> void:
 	_signs.append([p, names])
 
 
-func _draw_sign(p: Vector2, names: Array) -> void:
+func _draw_sign(p: Vector2, names0: Array) -> void:
+	var names := names0.map(func(x: Variant) -> String: return _tx(str(x)))
 	var fs := 15
 	var bw := 0.0
 	for s: String in names:
@@ -1422,7 +1444,7 @@ func _panel_house(r: Rect2) -> void:
 func _school(r: Rect2) -> void:
 	draw_rect(r, Color("#6a6f58"))
 	var body := Rect2(r.position, Vector2(r.size.x, r.size.y * 0.45))
-	_building(body, Color("#c9b98f"), Color("#d8c9a2"), 0, "Школа №%d" % _rng.randi_range(3, 27))
+	_building(body, Color("#c9b98f"), Color("#d8c9a2"), 0, L.t("Школа №%d") % _rng.randi_range(3, 27))
 	var field := Rect2(r.position + Vector2(r.size.x * 0.1, r.size.y * 0.55), Vector2(r.size.x * 0.8, r.size.y * 0.4))
 	draw_rect(field, Color("#5f8a4a"))
 	draw_rect(field.grow(-4), Color(1, 1, 1, 0.5), false, 1.5)
@@ -1460,7 +1482,8 @@ func _building(r: Rect2, roof_col: Color, wall_col: Color, gates: int = 0, sign_
 
 
 ## Вывеска на крыше: светлые буквы на тёмной табличке. k — масштаб.
-func _label(c: Vector2, s: String, k: float) -> void:
+func _label(c: Vector2, s0: String, k: float) -> void:
+	var s := _tx(s0)
 	var px := int(round(22 * k))
 	var sz := _font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, px)
 	var r := Rect2(c - Vector2(sz.x * 0.5 + 6, sz.y * 0.5 + 2), sz + Vector2(12, 4))

@@ -24,6 +24,17 @@ static func def(id: String) -> Dictionary:
 	return {}
 
 
+## 1.39: текст программы на языке игры: title, org, desc (ключ grant.<id>.<поле>).
+static func text(g: Dictionary, f: String) -> String:
+	return L.dt("grant.%s.%s" % [str(g.get("id", "")), f], str(g.get(f, "")))
+
+
+## Условие программы № i (ключ grant.<id>.goal<i>).
+static func goal_text(g: Dictionary, i: int) -> String:
+	var gl: Array = g.get("goals", [])
+	return L.dt("grant.%s.goal%d" % [str(g.get("id", "")), i], str((gl[i] as Dictionary).get("text", "")) if i < gl.size() else "")
+
+
 func max_active() -> int:
 	return 2 if sim.progress.stage < 3 else 3
 
@@ -115,9 +126,9 @@ func is_active(id: String) -> bool:
 func take(id: String) -> String:
 	var g := def(id)
 	if g.is_empty():
-		return "Нет такой программы"
+		return L.t("Нет такой программы")
 	if active.size() >= max_active():
-		return "Одновременно можно вести не больше %d программ" % max_active()
+		return L.t("Одновременно можно вести не больше %d программ") % max_active()
 	var base := {"workers": [], "machines": [], "orders": int(sim.stats.get("orders_done", 0)), "things": {}, "areas": {}}
 	for goal: Dictionary in g.get("goals", []):
 		if goal.has("def"):
@@ -129,7 +140,7 @@ func take(id: String) -> String:
 	for m in sim.things_of("machine"):
 		(base["machines"] as Array).append(m.id)
 	active.append({"id": id, "start": sim.day(), "until": sim.day() + int(g.get("days", 14)), "base": base})
-	sim.notify("Программа «%s» оформлена. Выполните условия до %s — %s возместит %s." % [str(g["title"]), sim.season.date_str(sim.day() + int(g.get("days", 14))), str(g["org"]), Defs.money_str(float(g["reward"]))], Sim.LVL_GOOD)
+	sim.notify(L.t("Программа «%s» оформлена. Выполните условия до %s — %s возместит %s.") % [text(g, "title"), sim.season.date_str(sim.day() + int(g.get("days", 14))), text(g, "org"), Defs.money_str(float(g["reward"]))], Sim.LVL_GOOD)
 	return ""
 
 
@@ -216,7 +227,7 @@ func tick(dt: float) -> void:
 		if not seen.has(oid):
 			seen.append(oid)
 			if sim.day() > 0:
-				sim.notify("Новая программа поддержки: «%s» — %s вернёт %s. Финансы → Гранты." % [str(og["title"]), str(og["org"]), Defs.money_str(float(og["reward"]))], Sim.LVL_INFO)
+				sim.notify(L.t("Новая программа поддержки: «%s» — %s вернёт %s. Финансы → Гранты.") % [text(og, "title"), text(og, "org"), Defs.money_str(float(og["reward"]))], Sim.LVL_INFO)
 	for a: Dictionary in active.duplicate():
 		var g := def(str(a["id"]))
 		if g.is_empty():
@@ -225,16 +236,16 @@ func tick(dt: float) -> void:
 		if all_ok(a):
 			active.erase(a)
 			done.append(str(a["id"]))
-			sim.earn(float(g["reward"]), "Грант: " + str(g["title"]))
+			sim.earn(float(g["reward"]), L.t("Грант: %s") % text(g, "title"))
 			sim.reputation = minf(100.0, sim.reputation + 2.0)
 			sim.sfx.emit("cash", Vector2i(-1, -1))
-			sim.story.info("Грант выплачен", "%s проверил выполнение программы «%s» и перечислил %s." % [str(g["org"]), str(g["title"]), Defs.money_str(float(g["reward"]))], "money", Sim.LVL_GOOD, Vector2i(-1, -1), true)
-			sim.paper.add("Экономика", "Завод получил грант: «%s»" % str(g["title"]), "%s поддержал предприятие: %s на развитие." % [str(g["org"]), Defs.money_str(float(g["reward"]))])
+			sim.story.info(L.t("Грант выплачен"), L.t("%s проверил выполнение программы «%s» и перечислил %s.") % [text(g, "org"), text(g, "title"), Defs.money_str(float(g["reward"]))], "money", Sim.LVL_GOOD, Vector2i(-1, -1), true)
+			sim.paper.add(L.t("Экономика"), L.t("Завод получил грант: «%s»") % text(g, "title"), L.t("%s поддержал предприятие: %s на развитие.") % [text(g, "org"), Defs.money_str(float(g["reward"]))])
 		elif sim.day() > int(a["until"]):
 			active.erase(a)
 			failed.append(str(a["id"]))
 			sim.reputation = maxf(0.0, sim.reputation - 1.0)
-			sim.notify("Срок программы «%s» вышел — условия не выполнены, денег не будет." % str(g["title"]), Sim.LVL_WARN)
+			sim.notify(L.t("Срок программы «%s» вышел — условия не выполнены, денег не будет.") % text(g, "title"), Sim.LVL_WARN)
 
 
 func to_dict() -> Dictionary:

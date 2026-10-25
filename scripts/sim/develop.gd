@@ -34,6 +34,11 @@ static func step_def(id: String) -> Dictionary:
 	return {}
 
 
+## 1.39: название ступени на языке игры.
+static func sname(sd: Dictionary) -> String:
+	return L.dt("develop.%s.name" % str(sd.get("id", "")), str(sd.get("name", "")))
+
+
 static func branch_of(id: String) -> Dictionary:
 	for b: Dictionary in branches():
 		for s: Dictionary in b.get("steps", []):
@@ -127,39 +132,39 @@ func count_on() -> int:
 func block_reason(id: String) -> String:
 	var sd := step_def(id)
 	if sd.is_empty():
-		return "Нет такой ступени"
+		return L.t("Нет такой ступени")
 	if sd.has("dept"):
 		var d := str(sd["dept"])
 		if not sim.progress.dept_open(d):
 			return sim.progress.dept_lock_text(d)
-		return "Наймите: %s" % str(Worker.PROF_NAMES.get(str(Defs.departments.get(d, {}).get("prof", "")), "")).to_lower()
+		return L.t("Наймите: %s") % L.t(str(Worker.PROF_NAMES.get(str(Defs.departments.get(d, {}).get("prof", "")), ""))).to_lower()
 	if done.has(id) or (sd.has("lot") and on(id)):
-		return "Уже открыто" if not sd.has("lot") else "Участок уже куплен"
+		return L.t("Уже открыто") if not sd.has("lot") else L.t("Участок уже куплен")
 	if cur == id:
-		return "Уже исследуется" if not sd.has("lot") else "Сделка уже идёт"
+		return L.t("Уже исследуется") if not sd.has("lot") else L.t("Сделка уже идёт")
 	if sd.has("lot") and int(sd["lot"]) >= sim.world.lots.size():
-		return "На этой карте больше нет свободных участков" if not sim.world.lots.is_empty() else "На этой карте нет соседних участков"
+		return L.t("На этой карте больше нет свободных участков") if not sim.world.lots.is_empty() else L.t("На этой карте нет соседних участков")
 	var pv := prev_of(id)
 	if pv != "" and not on(pv):
-		return "Сначала: «%s»" % str(step_def(pv)["name"])
+		return L.t("Сначала: «%s»") % sname(step_def(pv))
 	var st := int(sd.get("stage", 1))
 	if sim.progress.stage < st and not sim.progress.all_open:
-		return "Нужен этап «%s»" % sim.progress.stage_name(st)
+		return L.t("Нужен этап «%s»") % sim.progress.stage_title(st)
 	var need_staff := int(sd.get("staff", 0))
 	if sim.workers.size() < need_staff:
-		return "Нужно %d человек в штате" % need_staff
+		return L.t("Нужно %d человек в штате") % need_staff
 	var holder := str(sd.get("holder", ""))
 	if holder != "" and not sim.office.active(holder):
-		return "Нужен работающий отдел «%s»" % str(Defs.departments.get(holder, {}).get("name", holder))
+		return L.t("Нужен работающий отдел «%s»") % Defs.dept_name(holder)
 	if bool(sd.get("own_room", false)) and holder != "" and int(sim.office.room_status(holder)[0]) < 1:
 		var room := str(Defs.departments.get(holder, {}).get("room", ""))
-		return "Нужен свой кабинет: «%s»" % str(Defs.rooms.get(room, {}).get("name", room))
+		return L.t("Нужен свой кабинет: «%s»") % Defs.room_name(room)
 	if not root_ok():
-		return "Нужен кабинет директора"
+		return L.t("Нужен кабинет директора")
 	if cur != "":
-		return "Директор занят: «%s»" % str(step_def(cur).get("name", cur))
+		return L.t("Директор занят: «%s»") % sname(step_def(cur))
 	if sim.money < cost_of(id):
-		return "Не хватает денег: %s" % Defs.money_str(cost_of(id))
+		return L.t("Не хватает денег: %s") % Defs.money_str(cost_of(id))
 	return ""
 
 
@@ -214,7 +219,7 @@ func start(id: String) -> String:
 	cur = id
 	cur_start = sim.minute
 	cur_end = sim.minute + float(sd.get("days", 1)) * 1440.0
-	sim.notify("Директор взялся за «%s» (%s): %d %s." % [str(sd["name"]), str(branch_of(id).get("name", "")).to_lower(), int(sd.get("days", 1)), Defs.plural(int(sd.get("days", 1)), "день", "дня", "дней")], Sim.LVL_INFO)
+	sim.notify(L.t("Директор взялся за «%s» (%s): %d %s.") % [sname(sd), L.dt("develop.branch.%s.name" % str(branch_of(id).get("id", "")), str(branch_of(id).get("name", ""))).to_lower(), int(sd.get("days", 1)), Defs.plural(int(sd.get("days", 1)), "день", "дня", "дней")], Sim.LVL_INFO)
 	return ""
 
 
@@ -226,7 +231,7 @@ func cancel() -> void:
 	var back := roundf(cost_of(cur) * 0.5)
 	if back > 0.0:
 		sim.earn(back, "Развитие: отмена «%s»" % str(sd["name"]))
-	sim.notify("«%s» отложено. Вернули половину денег." % str(sd["name"]), Sim.LVL_INFO)
+	sim.notify(L.t("«%s» отложено. Вернули половину денег.") % sname(sd), Sim.LVL_INFO)
 	cur = ""
 
 
@@ -245,15 +250,15 @@ func _finish(id: String) -> void:
 	if not done.has(id):
 		done.append(id)
 	sim.thing_rev += 1
-	sim.story.info("Открыто: «%s»" % str(sd["name"]), str(sd.get("desc", "")), "stage_up", Sim.LVL_GOOD)
-	sim.paper.add("Развитие", "На заводе — «%s»" % str(sd["name"]).to_lower(), str(sd.get("desc", "")))
+	sim.story.info(L.t("Открыто: «%s»") % sname(sd), L.dt("develop.%s.desc" % str(sd.get("id", "")), str(sd.get("desc", ""))), "stage_up", Sim.LVL_GOOD)
+	sim.paper.add(L.t("Развитие"), L.t("На заводе — «%s»") % sname(sd).to_lower(), L.dt("develop.%s.desc" % str(sd.get("id", "")), str(sd.get("desc", ""))))
 	if id == "city1" and not sim.crew.union_on():
 		sim.crew.found_union()
 	if sd.has("lot"):
 		sim.buy_lot(int(sd["lot"]))
 	var holder := str(sd.get("holder", ""))
 	if holder != "" and not sim.office.active(holder):
-		sim.notify("«%s» открыто, но не работает: нет человека в отделе «%s»." % [str(sd["name"]), str(Defs.departments.get(holder, {}).get("name", holder))], Sim.LVL_WARN)
+		sim.notify(L.t("«%s» открыто, но не работает: нет человека в отделе «%s».") % [sname(sd), Defs.dept_name(holder)], Sim.LVL_WARN)
 
 
 # ================================================================ сохранение

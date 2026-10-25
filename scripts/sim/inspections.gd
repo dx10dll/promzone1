@@ -35,7 +35,12 @@ func tdef(t: String) -> Dictionary:
 
 
 func type_name(t: String) -> String:
-	return str(tdef(t).get("name", t))
+	return L.dt("insp.%s.name" % t, str(tdef(t).get("name", t)))
+
+
+## Кто приходит с проверкой («Инспектор пожарного надзора») — на языке игры.
+func who_name(t: String) -> String:
+	return L.dt("insp.%s.who" % t, str(tdef(t).get("who", "Инспектор")))
 
 
 func busy() -> bool:
@@ -95,22 +100,22 @@ func schedule(t: String, at: float, announced: bool, why: String = "", repeat: A
 	queue.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["at"]) < float(b["at"]))
 	if announced:
 		var dd := int(at2 / 1440.0) + 1
-		var txt := "%s: %s, %s" % [type_name(t), sim.season.date_str(dd), "в " + ("%02d:%02d" % [int(fmod(at2, 1440.0) / 60.0), int(fmod(at2, 60.0))])]
+		var txt := L.t("%s: %s, в %s") % [type_name(t), sim.season.date_str(dd), "%02d:%02d" % [int(fmod(at2, 1440.0) / 60.0), int(fmod(at2, 60.0))]]
 		if why != "":
 			txt += " (%s)" % why
-		sim.notify("Объявлена проверка. " + txt + ". Подготовьтесь — список требований в окне «События».", Sim.LVL_WARN)
+		sim.notify(L.t("Объявлена проверка. %s. Подготовьтесь — список требований в окне «События».") % txt, Sim.LVL_WARN)
 
 
 func announce_visit(kind: String) -> void:
 	var at := sim.minute + 2.0 * 1440.0
 	schedule(kind, at, false, "")
-	var who := "губернатор области" if kind == "governor" else "корреспондент областной газеты"
-	var txt := "Через два дня завод посетит %s. Наведите порядок: уберите грузы с пола, почините станки, оборудуйте помещения, позаботьтесь о настроении людей." % who
+	var who := L.t("губернатор области") if kind == "governor" else L.t("корреспондент областной газеты")
+	var txt := L.t("Через два дня завод посетит %s. Наведите порядок: уберите грузы с пола, почините станки, оборудуйте помещения, позаботьтесь о настроении людей.") % who
 	if kind == "governor":
-		txt += " Если понравится — будет областная поддержка."
+		txt += L.t(" Если понравится — будет областная поддержка.")
 	else:
-		txt += " От статьи зависит репутация завода."
-	sim.story.info(str(VISIT_KINDS[kind]["name"]), txt, "goals" if kind == "governor" else "press", Sim.LVL_INFO, Vector2i(-1, -1), true)
+		txt += L.t(" От статьи зависит репутация завода.")
+	sim.story.info(type_name(kind), txt, "goals" if kind == "governor" else "press", Sim.LVL_INFO, Vector2i(-1, -1), true)
 
 
 ## Утро: плановые проверки, внезапные, проверки исполнения предписаний.
@@ -126,7 +131,7 @@ func morning() -> void:
 		var every := float(td.get("every", 30)) / freq_k()
 		next_due[t] = d + int(every * sim.rng.randf_range(0.8, 1.25))
 		if bool(td.get("planned", true)):
-			schedule(str(t), sim.minute + 3.0 * 1440.0, true, "плановая")
+			schedule(str(t), sim.minute + 3.0 * 1440.0, true, L.t("плановая"))
 		else:
 			schedule(str(t), sim.minute + sim.rng.randf_range(0.0, 2.0) * 1440.0, false, "")
 	# внезапная
@@ -136,12 +141,12 @@ func morning() -> void:
 			if _applicable(t2):
 				opts.append(t2)
 		if not opts.is_empty():
-			schedule(str(opts[sim.rng.randi_range(0, opts.size() - 1)]), sim.minute + 120.0, false, "внеплановая")
+			schedule(str(opts[sim.rng.randi_range(0, opts.size() - 1)]), sim.minute + 120.0, false, L.t("внеплановая"))
 	# предписания
 	for p: Dictionary in prescriptions.duplicate():
 		if d >= int(p["due"]):
 			prescriptions.erase(p)
-			schedule(str(p["type"]), sim.minute + 60.0, false, "проверка исполнения предписания", p["keys"])
+			schedule(str(p["type"]), sim.minute + 60.0, false, L.t("проверка исполнения предписания"), p["keys"])
 	for m: Dictionary in marks.duplicate():
 		if float(m["until"]) <= sim.minute:
 			marks.erase(m)
@@ -209,16 +214,16 @@ func _start(q: Dictionary) -> void:
 		gate = sim.world.nearest_passable(gate)
 	v.pos = Vector2(gate) + Vector2(0.5, 0.5)
 	v.exit_cell = gate
-	v.activity = str(td.get("who", "Инспектор"))
+	v.activity = who_name(t)
 	sim.visitors.append(v)
 	visit = {"type": t, "vid": v.id, "stops": _route(t), "i": 0, "wait": 0.0, "phase": "walk",
 		"found": [], "why": str(q.get("why", "")), "repeat": q.get("repeat", []), "started": sim.minute}
-	var who := str(td.get("who", "Инспектор"))
+	var who := who_name(t)
 	sim.sfx.emit("doorbell", gate)
 	if VISIT_KINDS.has(t):
-		sim.notify(Nicks.gendered("%s приехал{|а} на завод.", v.female) % who, Sim.LVL_INFO, gate)
+		sim.notify(Nicks.gendered(L.t("%s приехал{|а} на завод."), v.female) % who, Sim.LVL_INFO, gate)
 	else:
-		sim.notify("На завод пришёл %s. %s" % [who.to_lower(), "Проверка внезапная!" if not bool(q.get("announced", false)) else "Плановая проверка."], Sim.LVL_WARN, gate)
+		sim.notify(L.t("На завод пришёл %s. %s") % [who.to_lower(), L.t("Проверка внезапная!") if not bool(q.get("announced", false)) else L.t("Плановая проверка.")], Sim.LVL_WARN, gate)
 
 
 func visitor() -> Worker:
@@ -238,7 +243,7 @@ func _route(t: String) -> Array:
 		if th.built and th.def_id == "checkpoint":
 			var acc := sim.brain.best_access(th, th.cell)
 			if acc.x >= 0:
-				stops.append({"cell": [acc.x, acc.y], "room": -1, "what": "Отмечается на проходной", "dur": 4.0})
+				stops.append({"cell": [acc.x, acc.y], "room": -1, "what": L.t("Отмечается на проходной"), "dur": 4.0})
 			break
 	var rooms_left: Array = []
 	for r in sim.rooms.list:
@@ -256,7 +261,7 @@ func _route(t: String) -> Array:
 		var c := _stand_cell(best)
 		if c.x < 0:
 			continue
-		stops.append({"cell": [c.x, c.y], "room": best.id, "what": "Осматривает: " + best.title().to_lower(), "dur": sim.rng.randf_range(3.0, 5.0)})
+		stops.append({"cell": [c.x, c.y], "room": best.id, "what": L.t("Осматривает: ") + best.title().to_lower(), "dur": sim.rng.randf_range(3.0, 5.0)})
 		cur = c
 	# уличные нарушения (захламление, лом)
 	var office_r: Rooms.Room = null
@@ -266,7 +271,7 @@ func _route(t: String) -> Array:
 			break
 	var oc := _stand_cell(office_r) if office_r else Vector2i(sim.gate_x, w.plot.end.y - 2)
 	oc = w.nearest_passable(oc)
-	stops.append({"cell": [oc.x, oc.y], "room": -2, "what": "Оформляет акт" if not VISIT_KINDS.has(t) else "Беседует с руководством", "dur": 10.0})
+	stops.append({"cell": [oc.x, oc.y], "room": -2, "what": L.t("Оформляет акт") if not VISIT_KINDS.has(t) else L.t("Беседует с руководством"), "dur": 10.0})
 	return stops
 
 
@@ -299,7 +304,7 @@ func _step(dt: float) -> void:
 	var i := int(visit["i"])
 	if str(visit["phase"]) == "leave":
 		var r := sim.brain.move_to(v, v.exit_cell, dt)
-		v.activity = "Уходит"
+		v.activity = L.t("Уходит")
 		if r != 0:
 			_finish()
 		return
@@ -309,7 +314,7 @@ func _step(dt: float) -> void:
 	var st: Dictionary = stops[i]
 	var target := Vector2i(int(st["cell"][0]), int(st["cell"][1]))
 	if str(visit["phase"]) == "walk":
-		v.activity = "Идёт по заводу"
+		v.activity = L.t("Идёт по заводу")
 		var res := sim.brain.move_to(v, target, dt)
 		if res == 1:
 			visit["phase"] = "look"
@@ -354,7 +359,7 @@ func _check_stop(room_id: int) -> void:
 		var cell := Vector2i(int(c[0]), int(c[1]))
 		if cell.x >= 0:
 			marks.append({"cell": [cell.x, cell.y], "text": str(vi["text"]), "until": sim.minute + 6.0 * 1440.0, "type": t})
-		sim.notify("Инспектор записал нарушение: %s." % str(vi["text"]), Sim.LVL_WARN, cell)
+		sim.notify(L.t("Инспектор записал нарушение: %s.") % str(vi["text"]), Sim.LVL_WARN, cell)
 
 
 func _finish() -> void:
@@ -385,8 +390,8 @@ func _desk_audit(t: String) -> void:
 		for wk: Dictionary in sim.office.weeks.slice(0, 4):
 			sales += float(wk["cats"].get("sales", 0.0))
 		var fine := maxf(20000.0, sales * 0.03) * (0.4 if acc else 1.0)
-		found.append({"key": "books", "text": str(Defs.inspections["texts"]["books"]), "fine": fine, "global": true})
-	_act(t, found, [], "камеральная")
+		found.append({"key": "books", "text": L.dt("insp.text.books", str(Defs.inspections["texts"]["books"])), "fine": fine, "global": true})
+	_act(t, found, [], L.t("камеральная"))
 
 
 ## Малый бизнес (до «Малого предприятия» включительно): за первое нарушение — предупреждение
@@ -415,7 +420,7 @@ func _act(t: String, found: Array, repeat: Array, why: String) -> void:
 		if small_business() and vkey != "n1_unfiled" and not repeat.has(vkey) and not wl.has(vkey):
 			wl.append(vkey)
 			warns += 1
-			lines.append("• %s — предупреждение" % str(vi["text"]))
+			lines.append(L.t("• %s — предупреждение") % str(vi["text"]))
 			if not rep_keys.has(vkey):
 				rep_keys.append(vkey)
 			continue
@@ -441,8 +446,8 @@ func _act(t: String, found: Array, repeat: Array, why: String) -> void:
 		sim.reputation = minf(100.0, sim.reputation + 3.0)
 		for w in sim.workers:
 			Mood.add(sim, w, "inspection_ok")
-		sim.story.info("Проверка без замечаний", "%s: нарушений не выявлено. Репутация завода растёт." % name, "inspect", Sim.LVL_GOOD, Vector2i(-1, -1), true)
-		sim.paper.add("Проверки", "%s: без замечаний" % name, "Инспектор пожал руку и сказал: «Побольше бы таких предприятий». Молодцы!")
+		sim.story.info(L.t("Проверка без замечаний"), L.t("%s: нарушений не выявлено. Репутация завода растёт.") % name, "inspect", Sim.LVL_GOOD, Vector2i(-1, -1), true)
+		sim.paper.add(L.t("Проверки"), L.t("%s: без замечаний") % name, L.t("Инспектор пожал руку и сказал: «Побольше бы таких предприятий». Молодцы!"))
 		return
 	sim.reputation = maxf(0.0, sim.reputation - minf(5.0, float(found.size())))
 	var due := sim.day() + int(Defs.inspections.get("prescription_days", 5))
@@ -456,31 +461,31 @@ func _act(t: String, found: Array, repeat: Array, why: String) -> void:
 		var ft := fix_text(str(vf["key"]))
 		if ft != "" and not fixes.has("• " + ft):
 			fixes.append("• " + ft)
-	var txt := "Выявлено %d %s:\n%s\n\nИтого штраф: %s. Предписание: устранить до %s, потом придут проверить снова. Повторное нарушение — двойной штраф и остановка участка." % [found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений"), "\n".join(lines), Defs.money_str(fine), sim.season.date_str(due)]
+	var txt := L.t("Выявлено %d %s:\n%s\n\nИтого штраф: %s. Предписание: устранить до %s, потом придут проверить снова. Повторное нарушение — двойной штраф и остановка участка.") % [found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений"), "\n".join(lines), Defs.money_str(fine), sim.season.date_str(due)]
 	if fine <= 0.0:
-		txt = "Выявлено %d %s:\n%s\n\nШтрафа нет: малому предприятию за впервые выявленное нарушение — предупреждение (ст. 4.1.1 КоАП). Предписание: устранить до %s, потом придут проверить снова. Не исправите — штраф вдвойне и остановка участка." % [found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений"), "\n".join(lines), sim.season.date_str(due)]
+		txt = L.t("Выявлено %d %s:\n%s\n\nШтрафа нет: малому предприятию за впервые выявленное нарушение — предупреждение (ст. 4.1.1 КоАП). Предписание: устранить до %s, потом придут проверить снова. Не исправите — штраф вдвойне и остановка участка.") % [found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений"), "\n".join(lines), sim.season.date_str(due)]
 	elif warns > 0:
-		txt += "\n\nЗа впервые выявленные нарушения — предупреждение вместо штрафа (ст. 4.1.1 КоАП): малое предприятие."
+		txt += L.t("\n\nЗа впервые выявленные нарушения — предупреждение вместо штрафа (ст. 4.1.1 КоАП): малое предприятие.")
 	if not fixes.is_empty():
-		txt += "\n\nКак исправить:\n" + "\n".join(fixes.slice(0, 5))
+		txt += L.t("\n\nКак исправить:\n") + "\n".join(fixes.slice(0, 5))
 	if esc:
-		txt += "\n\nИнспектора сопровождал%s %s (%s)%s." % ["а" if esc.female else "", esc.full_name(), esc.prof_lc(), " — штраф меньше на 15%" if esc.prof == "safety_engineer" else ""]
+		txt += Nicks.gendered(L.t("\n\nИнспектора сопровождал{|а} %s (%s)%s."), esc.female) % [esc.full_name(), esc.prof_lc(), L.t(" — штраф меньше на 15%") if esc.prof == "safety_engineer" else ""]
 	if worst_cell.x >= 0:
 		_suspend_room(worst_cell)
-		txt += "\n\nНарушения повторились — участок остановлен на сутки."
+		txt += L.t("\n\nНарушения повторились — участок остановлен на сутки.")
 	if fine <= 0.0:
-		sim.story.letter("inspection_act", "Акт проверки: " + name, txt, str(tdef(t).get("icon", "inspect")), Sim.LVL_WARN,
-			[{"text": "Понятно, устраним", "hint": ""}], 0, {"fine": 0.0, "type": t})
-		sim.paper.add("Проверки", "%s: предупреждение" % name, "Инспектор нашёл %d %s, но на первый раз ограничился предупреждением. Срок исправить — до %s." % [found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений"), sim.season.date_str(due)])
+		sim.story.letter("inspection_act", L.t("Акт проверки: ") + name, txt, str(tdef(t).get("icon", "inspect")), Sim.LVL_WARN,
+			[{"text": L.t("Понятно, устраним"), "hint": ""}], 0, {"fine": 0.0, "type": t})
+		sim.paper.add(L.t("Проверки"), L.t("%s: предупреждение") % name, L.t("Инспектор нашёл %d %s, но на первый раз ограничился предупреждением. Срок исправить — до %s.") % [found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений"), sim.season.date_str(due)])
 		return
 	var appeal := float(Defs.inspections.get("appeal_cost", 15000))
-	var ch: Array = [{"text": "Оплатить штраф (%s)" % Defs.money_str(fine), "hint": ""}]
+	var ch: Array = [{"text": L.t("Оплатить штраф (%s)") % Defs.money_str(fine), "hint": ""}]
 	if sim.office.active("legal"):
-		ch.append({"text": "Обжаловать в суде (%s, шанс %d%%)" % [Defs.money_str(float(appeal)), int(appeal_chance() * 100.0)], "hint": "Проиграете — штраф больше на 20%"})
+		ch.append({"text": L.t("Обжаловать в суде (%s, шанс %d%%)") % [Defs.money_str(float(appeal)), int(appeal_chance() * 100.0)], "hint": L.t("Проиграете — штраф больше на 20%")})
 	else:
-		txt += "\n\nОбжаловать штраф может только юрист (Управление → Развитие → Юротдел)."
-	sim.story.letter("inspection_act", "Акт проверки: " + name, txt, str(tdef(t).get("icon", "inspect")), Sim.LVL_BAD, ch, 0, {"fine": fine, "type": t})
-	sim.paper.add("Проверки", "%s: %d %s" % [name, found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений")], "Штраф %s. Руководство обещает всё исправить до %s." % [Defs.money_str(fine), sim.season.date_str(due)])
+		txt += L.t("\n\nОбжаловать штраф может только юрист (Управление → Развитие → Юротдел).")
+	sim.story.letter("inspection_act", L.t("Акт проверки: ") + name, txt, str(tdef(t).get("icon", "inspect")), Sim.LVL_BAD, ch, 0, {"fine": fine, "type": t})
+	sim.paper.add(L.t("Проверки"), "%s: %d %s" % [name, found.size(), Defs.plural(found.size(), "нарушение", "нарушения", "нарушений")], L.t("Штраф %s. Руководство обещает всё исправить до %s.") % [Defs.money_str(fine), sim.season.date_str(due)])
 
 
 ## Шанс выиграть суд: со своим юристом выше (1.10).
@@ -498,10 +503,10 @@ func on_act_choice(d: Dictionary, choice: int) -> void:
 		return
 	sim.spend(float(Defs.inspections.get("appeal_cost", 15000)), "Юристы: обжалование штрафа")
 	if sim.rng.randf() < appeal_chance():
-		sim.story.info("Суд отменил штраф", "Юристы нашли ошибки в акте: %s, штраф %s отменён." % [name, Defs.money_str(fine)], "court", Sim.LVL_GOOD)
+		sim.story.info(L.t("Суд отменил штраф"), L.t("Юристы нашли ошибки в акте: %s, штраф %s отменён.") % [name, Defs.money_str(fine)], "court", Sim.LVL_GOOD)
 	else:
 		sim.spend(fine * 1.2, "Штраф: %s (с судебными издержками)" % name)
-		sim.story.info("Суд проигран", "Суд оставил штраф в силе и добавил издержки: %s." % Defs.money_str(fine * 1.2), "court", Sim.LVL_BAD)
+		sim.story.info(L.t("Суд проигран"), L.t("Суд оставил штраф в силе и добавил издержки: %s.") % Defs.money_str(fine * 1.2), "court", Sim.LVL_BAD)
 
 
 func _suspend_room(c: Vector2i) -> void:
@@ -530,30 +535,30 @@ func order_score() -> Dictionary:
 	var ground := sim.ground_items.size()
 	if ground > 6:
 		score -= minf(20.0, ground * 0.8)
-		notes.append("грузы валяются на полу")
+		notes.append(L.t("грузы валяются на полу"))
 	var broken := 0
 	for m in sim.things_of("machine"):
 		if m.broken:
 			broken += 1
 	if broken > 0:
 		score -= broken * 7.0
-		notes.append("стоят сломанные станки")
+		notes.append(L.t("стоят сломанные станки"))
 	var ms := 0.0
 	for w in sim.workers:
 		ms += w.mood
 	var avg := ms / maxf(1.0, sim.workers.size())
 	score += (avg - 50.0) * 0.4
 	if avg < 35.0:
-		notes.append("люди хмурые")
+		notes.append(L.t("люди хмурые"))
 	if not marks.is_empty():
 		score -= 8.0
-		notes.append("не устранены нарушения")
+		notes.append(L.t("не устранены нарушения"))
 	if sim.story.strike.get("active", false):
 		score -= 30.0
-		notes.append("бастуют")
+		notes.append(L.t("бастуют"))
 	if sim.season.snow_avg > 80.0:
 		score -= 6.0
-		notes.append("территория в сугробах")
+		notes.append(L.t("территория в сугробах"))
 	if not sim.rooms.of_type("canteen").is_empty():
 		score += 5.0
 	return {"score": score, "notes": notes, "mood": avg}
@@ -571,29 +576,29 @@ func _visit_result(kind: String) -> void:
 			sim.reputation = minf(100.0, sim.reputation + 5.0)
 			for w in sim.workers:
 				Mood.add(sim, w, "governor_visit")
-			sim.story.info("Губернатор доволен", "«Вот на таких предприятиях держится область!» Выделена субсидия %s, репутация выросла." % Defs.money_str(grant), "goals", Sim.LVL_GOOD, Vector2i(-1, -1), true)
-			sim.paper.add("Главное", "Губернатор посетил наш завод", "Глава области осмотрел цеха, пообщался с рабочими и пообещал поддержку. Субсидия уже на счёте!")
+			sim.story.info(L.t("Губернатор доволен"), L.t("«Вот на таких предприятиях держится область!» Выделена субсидия %s, репутация выросла.") % Defs.money_str(grant), "goals", Sim.LVL_GOOD, Vector2i(-1, -1), true)
+			sim.paper.add(L.t("Главное"), L.t("Губернатор посетил наш завод"), L.t("Глава области осмотрел цеха, пообщался с рабочими и пообещал поддержку. Субсидия уже на счёте!"))
 		elif sc >= 42.0:
 			sim.reputation = minf(100.0, sim.reputation + 1.0)
-			sim.story.info("Губернатор уехал", "«Работайте, развивайтесь». Без восторгов, но и без претензий%s." % ((" — заметил, что " + bad) if bad != "" else ""), "goals", Sim.LVL_INFO, Vector2i(-1, -1), true)
+			sim.story.info(L.t("Губернатор уехал"), L.t("«Работайте, развивайтесь». Без восторгов, но и без претензий%s.") % ((L.t(" — заметил, что %s") % bad) if bad != "" else ""), "goals", Sim.LVL_INFO, Vector2i(-1, -1), true)
 		else:
 			sim.reputation = maxf(0.0, sim.reputation - 4.0)
-			sim.story.info("Губернатор недоволен", "«Бардак!» Губернатор заметил, что %s. Репутация упала." % (bad if bad != "" else "всё не так"), "goals", Sim.LVL_BAD, Vector2i(-1, -1), true)
+			sim.story.info(L.t("Губернатор недоволен"), L.t("«Бардак!» Губернатор заметил, что %s. Репутация упала.") % (bad if bad != "" else L.t("всё не так")), "goals", Sim.LVL_BAD, Vector2i(-1, -1), true)
 	else:
 		if sc >= 55.0:
 			sim.reputation = minf(100.0, sim.reputation + 4.0)
-			sim.story.info("Хорошая статья", "В областной газете вышел очерк «Гаражный цех растёт»: о людях, станках и заказах. Репутация выросла, работники охотнее идут к вам.", "press", Sim.LVL_GOOD, Vector2i(-1, -1), true)
-			sim.paper.add("Пресса о нас", "О нас написали в области", "Перепечатываем с гордостью: «Здесь работают с огоньком и без брака».")
+			sim.story.info(L.t("Хорошая статья"), L.t("В областной газете вышел очерк «Гаражный цех растёт»: о людях, станках и заказах. Репутация выросла, работники охотнее идут к вам."), "press", Sim.LVL_GOOD, Vector2i(-1, -1), true)
+			sim.paper.add(L.t("Пресса о нас"), L.t("О нас написали в области"), L.t("Перепечатываем с гордостью: «Здесь работают с огоньком и без брака»."))
 		else:
 			sim.reputation = maxf(0.0, sim.reputation - 3.0)
-			sim.story.info("Разгромная статья", "Журналист написал фельетон «Промзона без прикрас»: %s. Репутация упала." % (bad if bad != "" else "порядка нет"), "press", Sim.LVL_BAD, Vector2i(-1, -1), true)
+			sim.story.info(L.t("Разгромная статья"), L.t("Журналист написал фельетон «Промзона без прикрас»: %s. Репутация упала.") % (bad if bad != "" else L.t("порядка нет")), "press", Sim.LVL_BAD, Vector2i(-1, -1), true)
 
 
 # ================================================================ правила
 
 func _v(t: String, key: String, cell: Vector2i, room: int, fmt_args: Array = [], global := false, fine_mul := 1.0) -> Dictionary:
 	var texts: Dictionary = Defs.inspections.get("texts", {})
-	var tx := str(texts.get(key, key))
+	var tx := L.dt("insp.text." + key, str(texts.get(key, key)))
 	if not fmt_args.is_empty() and tx.contains("%"):
 		tx = tx % fmt_args
 	var rules: Dictionary = tdef(t).get("rules", {})
@@ -602,7 +607,8 @@ func _v(t: String, key: String, cell: Vector2i, room: int, fmt_args: Array = [],
 
 ## 1.20: что сделать, чтобы нарушение ушло — простыми словами, с путём по меню.
 static func fix_text(key: String) -> String:
-	return str((Defs.inspections.get("fix", {}) as Dictionary).get(key, ""))
+	var s := str((Defs.inspections.get("fix", {}) as Dictionary).get(key, ""))
+	return L.dt("insp.fix." + key, s) if s != "" else s
 
 
 ## 1.16: построенные станки передела (печи ТВЧ не дымят — smoke = false).
@@ -847,20 +853,20 @@ func violations(t: String) -> Array:
 func checklist(t: String) -> Array:
 	match t:
 		"fire":
-			return ["Огнетушитель в каждом помещении от 6 клеток", "В горячих цехах (печь, покраска, сварка) — два огнетушителя", "В помещениях от 60 клеток — минимум два выхода", "Сеть без выбитых автоматов", "Не больше 12 грузов на полу"]
+			return [L.t("Огнетушитель в каждом помещении от 6 клеток"), L.t("В горячих цехах (печь, покраска, сварка) — два огнетушителя"), L.t("В помещениях от 60 клеток — минимум два выхода"), L.t("Сеть без выбитых автоматов"), L.t("Не больше 12 грузов на полу")]
 		"labor":
-			return ["Ставка не ниже %s за смену" % Defs.money_str(float(Defs.inspections.get("min_wage_shift", 1900))), "Шкафчики для спецовки (хотя бы один на двоих)", "Аптечка на заводе", "Без авралов и сверхурочных", "Не больше одной травмы за месяц", "Туалет с раковиной", "Инструктаж по охране труда не реже раза в %d дней (если рабочих 6 и больше)" % Training.TB_DAYS,
-				"СОУТ на всех рабочих местах (если рабочих 4 и больше)", "Молоко тем, у кого место вредное по СОУТ", "У всех рабочих целые СИЗ (шкаф СИЗ и комплекты)"]
+			return [L.t("Ставка не ниже %s за смену") % Defs.money_str(float(Defs.inspections.get("min_wage_shift", 1900))), L.t("Шкафчики для спецовки (хотя бы один на двоих)"), L.t("Аптечка на заводе"), L.t("Без авралов и сверхурочных"), L.t("Не больше одной травмы за месяц"), L.t("Туалет с раковиной"), L.t("Инструктаж по охране труда не реже раза в %d дней (если рабочих 6 и больше)") % Training.TB_DAYS,
+				L.t("СОУТ на всех рабочих местах (если рабочих 4 и больше)"), L.t("Молоко тем, у кого место вредное по СОУТ"), L.t("У всех рабочих целые СИЗ (шкаф СИЗ и комплекты)")]
 		"sanitary":
-			return ["Туалет и раковина", "Столовая, если людей 8 и больше", "Один туалет на 12 человек", "Территория без мусора и брака", "В помещениях убрана стружка (уборщица или разнорабочие)", "Вентиляция там, где сварка, покраска или печь: воздух не хуже 40%"]
+			return [L.t("Туалет и раковина"), L.t("Столовая, если людей 8 и больше"), L.t("Один туалет на 12 человек"), L.t("Территория без мусора и брака"), L.t("В помещениях убрана стружка (уборщица или разнорабочие)"), L.t("Вентиляция там, где сварка, покраска или печь: воздух не хуже 40%")]
 		"tech":
-			return ["Нет сломанных станков", "Нет станков в работе с износом ниже 25%", "Для кран-балки — стропальщик (погрузка 4+)", "Для погрузчика — водитель (погрузка 3+)", "При своей подстанции или повышенной мощности — электрик в штате"]
+			return [L.t("Нет сломанных станков"), L.t("Нет станков в работе с износом ниже 25%"), L.t("Для кран-балки — стропальщик (погрузка 4+)"), L.t("Для погрузчика — водитель (погрузка 3+)"), L.t("При своей подстанции или повышенной мощности — электрик в штате")]
 		"ecology":
-			return ["Брак не копится: тара не переполнена, на полу не больше 5 бракованных деталей", "Покрасочная камера — в отдельном помещении", "У печи — окна или вентиляция"]
+			return [L.t("Брак не копится: тара не переполнена, на полу не больше 5 бракованных деталей"), L.t("Покрасочная камера — в отдельном помещении"), L.t("У печи — окна или вентиляция")]
 		"tax":
-			return ["Бухгалтерия (отдел) снижает риск штрафа в 4 раза"]
+			return [L.t("Бухгалтерия (отдел) снижает риск штрафа в 4 раза")]
 		"military":
-			return ["Режим: проходная с вахтой", "Стол ОТК", "Испытательный стенд", "Брак не больше 8% за две недели"]
+			return [L.t("Режим: проходная с вахтой"), L.t("Стол ОТК"), L.t("Испытательный стенд"), L.t("Брак не больше 8% за две недели")]
 	return []
 
 

@@ -9,20 +9,43 @@ const TOGGLES := [
 	["edge_scroll", "Двигать камеру, когда курсор у края экрана"],
 	["names_on_map", "Фамилии под людьми на карте"],
 	["fullscreen", "Полноэкранный режим"],
+	["intro", "Показывать интро"],   # 1.39
 ]
 const VOLUMES := [["vol_master", "Общая громкость"], ["vol_music", "Музыка"], ["vol_sfx", "Станки и инструмент"],
 	["vol_env", "Звуки окружения"], ["vol_ui", "Интерфейс"]]   # 1.29: цех, быт, голоса и город — одним ползунком
 
 
 ## on_toggle(key, value) — для того, что нужно применить в текущей сцене (камера, снабжение).
-static func build(v: VBoxContainer, on_toggle: Callable = Callable()) -> void:
+## on_lang() — язык сменился (надписи сами переводятся сразу; окно настроек можно пересобрать).
+## Надписи здесь — русские ключи перевода: Label/CheckBox/OptionButton переводит сам Godot (L).
+static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: Callable = Callable()) -> void:
+	# 1.39: язык — первым пунктом, двуязычной подписью (её прочтёт и тот, кто случайно переключил)
+	var lh := UITheme.hbox(10)
+	var ll := UITheme.label("Язык / Language", 14)
+	ll.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	ll.custom_minimum_size = Vector2(150, 0)
+	lh.add_child(ll)
+	var lob := OptionButton.new()
+	lob.name = "LangSelect"
+	lob.focus_mode = Control.FOCUS_NONE
+	lob.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	for i in L.LANGS.size():
+		lob.add_item(str(L.LANGS[i][1]))
+		if str(L.LANGS[i][0]) == L.lang():
+			lob.select(i)
+	lob.item_selected.connect(func(i: int) -> void:
+		Game.set_lang(str(L.LANGS[i][0]))
+		if on_lang.is_valid():
+			on_lang.call())
+	lh.add_child(lob)
+	v.add_child(lh)
 	v.add_child(UITheme.label("Игра", 16, UITheme.TEXT, UITheme.f_semi))
 	for o in TOGGLES:
 		var key := str(o[0])
 		var cb := CheckBox.new()
 		cb.text = str(o[1])
 		cb.focus_mode = Control.FOCUS_NONE
-		cb.button_pressed = bool(Game.settings.get(key, false))
+		cb.button_pressed = bool(Game.settings.get(key, key == "intro"))
 		cb.toggled.connect(func(val: bool) -> void:
 			Game.settings[key] = val
 			Game.save_settings()

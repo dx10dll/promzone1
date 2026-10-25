@@ -126,16 +126,16 @@ func _desk_score(w: Worker, t: Thing) -> float:
 func room_status(d: String) -> Array:
 	var room := str(Defs.departments.get(d, {}).get("room", ""))
 	if not sim.rooms.of_type(room).is_empty():
-		return [1, "✓ " + str(Defs.rooms.get(room, {}).get("name", room))]
+		return [1, "✓ " + Defs.room_name(room)]
 	if not sim.rooms.of_type("office").is_empty():
-		return [0, "в общей конторе (на 30% хуже)"]
+		return [0, L.t("в общей конторе (на 30% хуже)")]
 	var rd: Dictionary = Defs.rooms.get(room, {})
 	var needs: Array[String] = []
 	for n: Dictionary in rd.get("needs", []):
-		needs.append(str(n.get("text", "")))
+		needs.append(L.t(str(n.get("text", ""))))
 	if not (rd.get("floors", []) as Array).is_empty():
-		needs.append("линолеум")
-	return [-1, "✗ нет: постройте помещение «%s» (%s)" % [str(rd.get("name", room)), ", ".join(needs)]]
+		needs.append(L.t("линолеум"))
+	return [-1, L.t("✗ нет: постройте помещение «%s» (%s)") % [Defs.room_name(room), ", ".join(needs)]]
 
 
 # ---------------------------------------------------------------- исследования
@@ -228,7 +228,7 @@ func _add_research(pts: float) -> void:
 				break
 		if research_cur == "":
 			return
-		sim.notify("Техотдел сам взялся за разработку: «%s». Выбрать другое — в окне «Разработки»." % str(Defs.research[research_cur]["name"]), Sim.LVL_INFO)
+		sim.notify(L.t("Техотдел сам взялся за разработку: «%s». Выбрать другое — в окне «Разработки».") % Defs.research_name(research_cur), Sim.LVL_INFO)
 	var cur := research_cur
 	research_pts[cur] = float(research_pts.get(cur, 0.0)) + pts
 	var cost := float(Defs.research[cur]["cost"])
@@ -237,7 +237,7 @@ func _add_research(pts: float) -> void:
 		research_pts.erase(cur)
 		research_cur = ""
 		sim.thing_rev += 1
-		sim.notify("Техотдел закончил разработку: «%s»! %s" % [str(Defs.research[cur]["name"]), str(Defs.research[cur]["desc"])], Sim.LVL_GOOD)
+		sim.notify(L.t("Техотдел закончил разработку: «%s»! %s") % [Defs.research_name(cur), Defs.research_desc(cur)], Sim.LVL_GOOD)
 
 
 ## Специалист поработал за столом dt минут.
@@ -344,6 +344,13 @@ func carry_cap() -> int:
 	return 9 if has_tech("kanban") else 6
 
 
+## 1.39: название текущего поставщика на языке игры.
+func supplier_name() -> String:
+	var key := supplier if active("supply") else "base"
+	var nm := str(supplier_def().get("name", ""))
+	return L.dt("supplier.%s.name" % key, nm, {"name": L.translit(nm)})
+
+
 func supplier_def() -> Dictionary:
 	var key := supplier if active("supply") else "base"
 	return Defs.suppliers.get(key, Defs.suppliers.get("base", {}))
@@ -390,17 +397,17 @@ func week_no() -> int:
 
 static func cat_of(reason: String) -> String:
 	var r := reason.to_lower()
-	var map := [["развитие:", "capex"], ["страхов", "insurance"], ["оплата", "sales"], ["металл", "materials"], ["расходники", "consumables"],
-		["зарплата", "wages"], ["расчёт при увольнении", "wages"], ["сверхурочн", "wages"], ["стипендия", "wages"],
-		["обучение", "hr"], ["инструктаж", "hr"], ["договор с пту", "hr"],
-		["премия", "hr"], ["объявление", "hr"], ["электроэнергия", "energy"],
-		["аренда", "rent"], ["отопление", "energy"], ["охрана", "other"], ["песок", "other"], ["юрист", "other"], ["обслуживание", "maintenance"], ["ремонт", "maintenance"],
-		["рекламац", "claims"], ["неустойк", "claims"], ["срыв госзаказа", "claims"], ["срыв партии", "claims"], ["перенос срока", "claims"],
-		["пени", "fines"], ["штраф", "fines"], ["налог", "taxes"],
-		["лизинг", "finance"], ["реклама в", "other"],
-		["кредит", "finance"], ["процент", "finance"], ["погашение", "finance"],
-		["стройка", "capex"], ["покупка", "capex"], ["электромонтаж", "capex"], ["отмена", "capex"],
-		["возврат", "capex"], ["снос", "capex"], ["демонтаж", "capex"], ["техприсоединение", "capex"]]
+	var map := [[L.t("развитие:"), "capex"], [L.t("страхов"), "insurance"], [L.t("оплата"), "sales"], [L.t("металл"), "materials"], [L.t("расходники"), "consumables"],
+		[L.t("зарплата"), "wages"], [L.t("расчёт при увольнении"), "wages"], [L.t("сверхурочн"), "wages"], [L.t("стипендия"), "wages"],
+		[L.t("обучение"), "hr"], [L.t("инструктаж"), "hr"], [L.t("договор с пту"), "hr"],
+		[L.t("премия"), "hr"], [L.t("объявление"), "hr"], [L.t("электроэнергия"), "energy"],
+		[L.t("аренда"), "rent"], [L.t("отопление"), "energy"], [L.t("охрана"), "other"], [L.t("песок"), "other"], [L.t("юрист"), "other"], [L.t("обслуживание"), "maintenance"], [L.t("ремонт"), "maintenance"],
+		[L.t("рекламац"), "claims"], [L.t("неустойк"), "claims"], [L.t("срыв госзаказа"), "claims"], [L.t("срыв партии"), "claims"], [L.t("перенос срока"), "claims"],
+		[L.t("пени"), "fines"], [L.t("штраф"), "fines"], [L.t("налог"), "taxes"],
+		[L.t("лизинг"), "finance"], [L.t("реклама в"), "other"],
+		[L.t("кредит"), "finance"], [L.t("процент"), "finance"], [L.t("погашение"), "finance"],
+		[L.t("стройка"), "capex"], [L.t("покупка"), "capex"], [L.t("электромонтаж"), "capex"], [L.t("отмена"), "capex"],
+		[L.t("возврат"), "capex"], [L.t("снос"), "capex"], [L.t("демонтаж"), "capex"], [L.t("техприсоединение"), "capex"]]
 	for pair in map:
 		if r.contains(str(pair[0])):
 			return str(pair[1])
@@ -445,7 +452,7 @@ func _payroll_check() -> void:
 		return
 	var sh := payroll_share(4)
 	if sh > 0.7:
-		sim.notify("Бухгалтер: зарплаты съедают %d%% выручки за последние недели. Посмотрите, кто простаивает (Производство → Станки), или возьмите больше заказов." % int(round(sh * 100.0)), Sim.LVL_WARN)
+		sim.notify(L.t("Бухгалтер: зарплаты съедают %d%% выручки за последние недели. Посмотрите, кто простаивает (Производство → Станки), или возьмите больше заказов.") % int(round(sh * 100.0)), Sim.LVL_WARN)
 
 
 ## Пятница, после зарплаты: налог с выручки недели, штрафы без бухгалтерии.
@@ -462,9 +469,9 @@ func on_payday() -> void:
 		if sim.rng.randf() < Defs.b("tax_penalty_chance"):
 			var pen := Defs.b("tax_penalty_base") + tax * 0.5
 			sim.spend(pen, "Пени и штраф налоговой: учёт «на коленке»")
-			sim.notify("Налоговая выписала штраф %s: на заводе больше %d человек, а бухгалтерии нет. Постройте бухгалтерию и наймите бухгалтера." % [Defs.money_str(pen), int(Defs.b("staff_needs_accounting"))], Sim.LVL_BAD)
+			sim.notify(L.t("Налоговая выписала штраф %s: на заводе больше %d человек, а бухгалтерии нет. Постройте бухгалтерию и наймите бухгалтера.") % [Defs.money_str(pen), int(Defs.b("staff_needs_accounting"))], Sim.LVL_BAD)
 		else:
-			sim.notify("Учёт ведётся «на коленке»: в штате больше %d человек, нужна бухгалтерия, иначе налоговая будет штрафовать." % int(Defs.b("staff_needs_accounting")), Sim.LVL_WARN)
+			sim.notify(L.t("Учёт ведётся «на коленке»: в штате больше %d человек, нужна бухгалтерия, иначе налоговая будет штрафовать.") % int(Defs.b("staff_needs_accounting")), Sim.LVL_WARN)
 
 
 func loan_options() -> Array:
@@ -483,18 +490,18 @@ func loan_payment(amount: float, weeks_n: int, rate: float) -> float:
 
 func take_loan(amount: float, weeks_n: int) -> String:
 	if sim.progress.stage < 2:
-		return "Банки кредитуют предприятия от этапа «Мастерская». Пока — гранты и программы поддержки"
+		return L.t("Банки кредитуют предприятия от этапа «Мастерская». Пока — гранты и программы поддержки")
 	if loans.size() >= 2:
-		return "Банк не даст больше двух кредитов одновременно"
+		return L.t("Банк не даст больше двух кредитов одновременно")
 	if not loan_ok(amount):
-		return "Кредит больше 800 тыс. ₽ — после ступени «Банк и лизинг» (Управление → Развитие)"
+		return L.t("Кредит больше 800 тыс. ₽ — после ступени «Банк и лизинг» (Управление → Развитие)")
 	if sim.reputation < 30.0:
-		return "Банк отказал: слишком низкая репутация"
+		return L.t("Банк отказал: слишком низкая репутация")
 	var rate := loan_rate()
 	var pay := loan_payment(amount, weeks_n, rate)
 	loans.append({"amount": amount, "payment": pay, "left": weeks_n, "rate": rate})
 	sim.earn(amount, "Кредит получен: %s на %d нед." % [Defs.money_str(amount), weeks_n])
-	sim.notify("Банк выдал кредит %s под %d%% годовых. Платёж %s каждый понедельник." % [Defs.money_str(amount), int(round(rate * 100.0)), Defs.money_str(pay)], Sim.LVL_GOOD)
+	sim.notify(L.t("Банк выдал кредит %s под %d%% годовых. Платёж %s каждый понедельник.") % [Defs.money_str(amount), int(round(rate * 100.0)), Defs.money_str(pay)], Sim.LVL_GOOD)
 	return ""
 
 
@@ -503,7 +510,7 @@ func add_loan(amount: float, weeks_n: int, rate: float, title: String) -> void:
 	var pay := loan_payment(amount, weeks_n, rate)
 	loans.append({"amount": amount, "payment": pay, "left": weeks_n, "rate": rate})
 	sim.earn(amount, "Кредит получен: %s" % title)
-	sim.notify("%s: %s под %d%% годовых, платёж %s по понедельникам." % [title, Defs.money_str(amount), int(round(rate * 100.0)), Defs.money_str(pay)], Sim.LVL_GOOD)
+	sim.notify(L.t("%s: %s под %d%% годовых, платёж %s по понедельникам.") % [L.tx(title), Defs.money_str(amount), int(round(rate * 100.0)), Defs.money_str(pay)], Sim.LVL_GOOD)
 
 
 ## Долг без получения денег (например, налоги прежнего владельца).
@@ -526,7 +533,7 @@ func on_monday() -> void:
 	var before := loans.size()
 	loans = loans.filter(func(l: Dictionary) -> bool: return int(l["left"]) > 0)
 	if loans.size() < before:
-		sim.notify("Кредит полностью погашен.", Sim.LVL_GOOD)
+		sim.notify(L.t("Кредит полностью погашен."), Sim.LVL_GOOD)
 
 
 # ---------------------------------------------------------------- себестоимость
@@ -588,7 +595,7 @@ func tick(dt: float) -> void:
 		if bool(_shift_info(sh)["chaos"]):
 			chaos = true
 	if chaos:
-		sim.notify_once("no_master", "Смена больше %d человек без мастера: бардак, работа идёт на 10%% медленнее. Наймите мастера участка и поставьте ему стол (конторка мастера или контора)." % int(Defs.b("no_master_from")), Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("no_master", L.t("Смена больше %d человек без мастера: бардак, работа идёт на 10%% медленнее. Наймите мастера участка и поставьте ему стол (конторка мастера или контора).") % int(Defs.b("no_master_from")), Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
 
 
 ## Утро: кадровик закрывает вакансии (заказы берёт отдел сбыта — см. Sales).
@@ -755,7 +762,7 @@ func _auto_hire() -> void:
 	if best >= 0:
 		var nm := "%s %s" % [str(sim.candidates[best].get("first", "")), str(sim.candidates[best].get("last", ""))]
 		sim.hire(best)
-		sim.notify("Кадровик нашёл замену: %s, %s." % [nm, Worker.lc(str(Worker.PROF_NAMES.get(prof, prof)))], Sim.LVL_GOOD)
+		sim.notify(L.t("Кадровик нашёл замену: %s, %s.") % [nm, Worker.lc(L.t(str(Worker.PROF_NAMES.get(prof, prof))))], Sim.LVL_GOOD)
 
 
 # ---------------------------------------------------------------- сохранение

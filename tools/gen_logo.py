@@ -1,6 +1,7 @@
 """1.17: логотип «ПРОМЗОНА» — контуры букв шрифта IBM Plex Sans SemiBold в SVG (assets/vec/logo.json).
-В игре SVG растеризуется под точный размер экрана — заголовок чёткий при любом масштабе окна."""
-import json, os
+В игре SVG растеризуется под точный размер экрана — заголовок чёткий при любом масштабе окна.
+1.39: python3 tools/gen_logo.py PROMZONA logo_en.json — английский логотип (assets/vec/logo_en.json)."""
+import json, os, sys
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
@@ -10,7 +11,8 @@ font = TTFont(os.path.join(ROOT, "assets/fonts/IBMPlexSans-SemiBold.ttf"))
 gs = font.getGlyphSet()
 cmap = font.getBestCmap()
 upm = font["head"].unitsPerEm
-TEXT = "ПРОМЗОНА"
+TEXT = sys.argv[1] if len(sys.argv) > 1 else "ПРОМЗОНА"
+OUT = sys.argv[2] if len(sys.argv) > 2 else "logo.json"
 SIZE = 100.0            # кегль, px
 TRACK = 6.0             # разрядка, px
 k = SIZE / upm
@@ -35,6 +37,6 @@ svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W + 8:.0f}" height="{H 
        f'<path d="{d}" fill="url(#g)" stroke="#2a2620" stroke-width="1.2" stroke-opacity="0.5"/>'
        f'</svg>')
 os.makedirs(os.path.join(ROOT, "assets/vec"), exist_ok=True)
-with open(os.path.join(ROOT, "assets/vec/logo.json"), "w", encoding="utf-8") as f:
+with open(os.path.join(ROOT, "assets/vec", OUT), "w", encoding="utf-8") as f:
     json.dump({"svg": svg, "w": W + 8, "h": H - top + 10}, f, ensure_ascii=False)
 print("logo", round(W), "x", round(H - top), len(svg), "bytes")

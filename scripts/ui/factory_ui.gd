@@ -31,7 +31,7 @@ static func plate(text: String, icon: String = "", font_px: int = 15) -> PanelCo
 		ic.modulate = Color.WHITE if mt != null else CREAM
 		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(ic)
-	var l := UITheme.label(text.to_upper(), font_px, CREAM, UITheme.f_caps)
+	var l := UITheme.label(L.t(text).to_upper(), font_px, CREAM, UITheme.f_caps)   # 1.39: перевод до заглавных
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(l)
 	return p

@@ -171,7 +171,7 @@ func _on_release(c: Vector2i) -> void:
 			for y in range(r.position.y, r.end.y):
 				for x in range(r.position.x, r.end.x):
 					sim.cancel_all_at(Vector2i(x, y))
-			message.emit("Чертежи отменены, деньги возвращены.", true)
+			message.emit(L.t("Чертежи отменены, деньги возвращены."), true)
 		"cable":
 			var n := 0
 			var broke := false
@@ -182,19 +182,19 @@ func _on_release(c: Vector2i) -> void:
 				if sim.place_cable(cc):
 					n += 1
 			if n > 0:
-				message.emit("Чертёж кабеля: %d кл. (%s). Проложит электрик или строитель." % [n, Defs.money_str(n * Defs.b("cable_cost"))], true)
+				message.emit(L.t("Чертёж кабеля: %d кл. (%s). Проложит электрик или строитель.") % [n, Defs.money_str(n * Defs.b("cable_cost"))], true)
 			elif broke:
-				message.emit("Не хватает денег на кабель.", false)
+				message.emit(L.t("Не хватает денег на кабель."), false)
 		"zone":
 			var nz := sim.set_area(r, int(arg))
 			if nz < 0:
 				message.emit(sim.area_refusal, false)   # 1.29: последнюю клетку обязательной зоны не стереть
 			elif int(arg) == Logistics.A_UNLOAD:
-				message.emit("Зона разгрузки: %d кл. Сюда будут разгружать металл (на поддоны заготовок) и ящики с оборудованием." % nz if nz > 0 else "Здесь нельзя отметить зону.", nz > 0)
+				message.emit(L.t("Зона разгрузки: %d кл. Сюда будут разгружать металл (на поддоны заготовок) и ящики с оборудованием.") % nz if nz > 0 else L.t("Здесь нельзя отметить зону."), nz > 0)
 			elif int(arg) == Logistics.A_SHIP:
-				message.emit("Зона отгрузки: %d кл. Сюда понесут готовые заказы — машина клиента грузит только отсюда." % nz if nz > 0 else "Здесь нельзя отметить зону.", nz > 0)
+				message.emit(L.t("Зона отгрузки: %d кл. Сюда понесут готовые заказы — машина клиента грузит только отсюда.") % nz if nz > 0 else L.t("Здесь нельзя отметить зону."), nz > 0)
 			else:
-				message.emit("Зона убрана: %d кл." % nz if nz > 0 else "Здесь нет зоны.", nz > 0)
+				message.emit(L.t("Зона убрана: %d кл.") % nz if nz > 0 else L.t("Здесь нет зоны."), nz > 0)
 		"pipe":
 			var np := 0
 			var brokep := false
@@ -205,9 +205,9 @@ func _on_release(c: Vector2i) -> void:
 				if sim.place_pipe(cc):
 					np += 1
 			if np > 0:
-				message.emit("Чертёж трубы: %d кл. (%s). Проложат строители." % [np, Defs.money_str(np * Defs.b("pipe_cost"))], true)
+				message.emit(L.t("Чертёж трубы: %d кл. (%s). Проложат строители.") % [np, Defs.money_str(np * Defs.b("pipe_cost"))], true)
 			elif brokep:
-				message.emit("Не хватает денег на трубы.", false)
+				message.emit(L.t("Не хватает денег на трубы."), false)
 		"duct", "air":
 			var lay := mode
 			var nl := 0
@@ -218,11 +218,11 @@ func _on_release(c: Vector2i) -> void:
 					break
 				if sim.place_line(lay, cc):
 					nl += 1
-			var lname := "воздуховода" if lay == "duct" else "пневмомагистрали"
+			var lname := L.t("воздуховода") if lay == "duct" else L.t("пневмомагистрали")
 			if nl > 0:
-				message.emit("Чертёж %s: %d кл. (%s). Проложат строители." % [lname, nl, Defs.money_str(nl * Defs.b(lay + "_cost"))], true)
+				message.emit(L.t("Чертёж %s: %d кл. (%s). Проложат строители.") % [lname, nl, Defs.money_str(nl * Defs.b(lay + "_cost"))], true)
 			elif brokel:
-				message.emit("Не хватает денег.", false)
+				message.emit(L.t("Не хватает денег."), false)
 		"unduct", "unair":
 			var lay2 := "duct" if mode == "unduct" else "air"
 			var nr := 0
@@ -230,21 +230,21 @@ func _on_release(c: Vector2i) -> void:
 				for x in range(r.position.x, r.end.x):
 					if sim.remove_line(lay2, Vector2i(x, y)):
 						nr += 1
-			message.emit("Снято: %d кл." % nr if nr > 0 else "Здесь ничего нет.", nr > 0)
+			message.emit(L.t("Снято: %d кл.") % nr if nr > 0 else L.t("Здесь ничего нет."), nr > 0)
 		"unpipe":
 			var nu := 0
 			for y in range(r.position.y, r.end.y):
 				for x in range(r.position.x, r.end.x):
 					if sim.remove_pipe(Vector2i(x, y)):
 						nu += 1
-			message.emit("Снято трубы: %d кл." % nu if nu > 0 else "Здесь нет трубы.", nu > 0)
+			message.emit(L.t("Снято трубы: %d кл.") % nu if nu > 0 else L.t("Здесь нет трубы."), nu > 0)
 		"uncable":
 			var n2 := 0
 			for y in range(r.position.y, r.end.y):
 				for x in range(r.position.x, r.end.x):
 					if sim.remove_cable(Vector2i(x, y)):
 						n2 += 1
-			message.emit("Снято кабеля: %d кл." % n2 if n2 > 0 else "Здесь нет кабеля.", n2 > 0)
+			message.emit(L.t("Снято кабеля: %d кл.") % n2 if n2 > 0 else L.t("Здесь нет кабеля."), n2 > 0)
 	queue_redraw()
 
 
@@ -268,7 +268,7 @@ func _plan_release(r: Rect2i, c: Vector2i) -> bool:
 					n += 1
 		"roomframe":
 			if r.size.x < 3 or r.size.y < 3:
-				message.emit("Помещение — от 3×3 клеток вместе со стенами.", false)
+				message.emit(L.t("Помещение — от 3×3 клеток вместе со стенами."), false)
 				return true
 			for y2 in range(r.position.y + 1, r.end.y - 1):
 				for x2 in range(r.position.x + 1, r.end.x - 1):
@@ -282,10 +282,10 @@ func _plan_release(r: Rect2i, c: Vector2i) -> bool:
 			n = pl.paint_zone(r, type)
 		"demolish", "cancel":
 			n = pl.erase(r)
-			message.emit("Стёрто с плана: %d." % n if n > 0 else "Здесь на плане ничего нет.", n > 0)
+			message.emit(L.t("Стёрто с плана: %d.") % n if n > 0 else L.t("Здесь на плане ничего нет."), n > 0)
 			return true
 		"cable", "pipe", "duct", "air", "uncable", "unpipe", "unduct", "unair", "zone":
-			message.emit("Сети и уличные зоны на плане не рисуются — проложите их, когда начнёте строить.", false)
+			message.emit(L.t("Сети и уличные зоны на плане не рисуются — проложите их, когда начнёте строить."), false)
 			return true
 		_:
 			return false
@@ -355,7 +355,7 @@ func _apply_floor(r: Rect2i) -> void:
 				continue
 			if sim.place_floor_bp(c, fid):
 				n += 1
-	_report(n, broke, "пола")
+	_report(n, broke, L.t("пола"))
 
 
 ## Зона (1.12): протянули прямоугольник — разметить клетки; просто щёлкнули — залить помещение, как ведром.
@@ -369,20 +369,20 @@ func _apply_zone(r: Rect2i, c: Vector2i) -> void:
 		n = sim.rooms.paint(r, type)
 	if n <= 0:
 		if sim.rooms.room_at(c) == null and type != "":
-			message.emit("Зоны рисуют внутри помещения: на полу, обнесённом стенами с дверью. Разгрузку и отгрузку — в «Стройке», на улице.", false)
+			message.emit(L.t("Зоны рисуют внутри помещения: на полу, обнесённом стенами с дверью. Разгрузку и отгрузку — в «Стройке», на улице."), false)
 		return
 	Snd.play("place", -8.0)
 	if type == "":
-		message.emit("Разметка снята: %d кл." % n, true)
+		message.emit(L.t("Разметка снята: %d кл.") % n, true)
 		return
 	var rr := sim.rooms.room_at(c) if r.size == Vector2i.ONE else sim.rooms.room_at(r.get_center())
-	var nm := str(Defs.rooms.get(type, {}).get("name", ""))
+	var nm := L.t(str(Defs.rooms.get(type, {}).get("name", "")))
 	if rr and rr.type == type and rr.valid:
-		message.emit("Зона «%s»: %d кл. Всё нужное на месте." % [nm, rr.area()], true)
+		message.emit(L.t("Зона «%s»: %d кл. Всё нужное на месте.") % [nm, rr.area()], true)
 	elif rr and rr.type == type:
-		message.emit("Зона «%s»: %d кл. Не хватает: %s." % [nm, rr.area(), ", ".join(rr.missing)], false)
+		message.emit(L.t("Зона «%s»: %d кл. Не хватает: %s.") % [nm, rr.area(), ", ".join(rr.missing.map(func(x: String) -> String: return L.tx(x)))], false)
 	else:
-		message.emit("Зона «%s» размечена: %d кл." % [nm, n], true)
+		message.emit(L.t("Зона «%s» размечена: %d кл.") % [nm, n], true)
 
 
 ## Помещение одной рамкой (сама логика — в Sim.place_room_bp).
@@ -391,7 +391,7 @@ func _apply_room(r: Rect2i) -> void:
 	if err != "":
 		message.emit(err, false)
 		return
-	message.emit("Чертёж помещения %d×%d: пол, стены и дверь. Назначение выберите после постройки (Помещения)." % [r.size.x, r.size.y], true)
+	message.emit(L.t("Чертёж помещения %d×%d: пол, стены и дверь. Назначение выберите после постройки (Помещения).") % [r.size.x, r.size.y], true)
 
 
 func _apply_wall(r: Rect2i) -> void:
@@ -405,7 +405,7 @@ func _apply_wall(r: Rect2i) -> void:
 			continue
 		if sim.place_wall_bp(c, int(arg)):
 			n += 1
-	_report(n, broke, "стены")
+	_report(n, broke, L.t("стены"))
 
 
 func _apply_openings(r: Rect2i) -> void:
@@ -419,7 +419,7 @@ func _apply_openings(r: Rect2i) -> void:
 			continue
 		if sim.place_wall_bp(c, int(arg)):
 			n += 1
-	_report(n, broke, "проёмов")
+	_report(n, broke, L.t("проёмов"))
 
 
 func _apply_demolish(r: Rect2i) -> void:
@@ -436,18 +436,18 @@ func _apply_demolish(r: Rect2i) -> void:
 			if sim.place_demolish(c):
 				n += 1
 	if n > 0:
-		message.emit("Отмечено под снос: %d. Стены и полы разберут, объекты — упакуют в ящики и унесут на склад оборудования." % n, true)
+		message.emit(L.t("Отмечено под снос: %d. Стены и полы разберут, объекты — упакуют в ящики и унесут на склад оборудования.") % n, true)
 	else:
-		message.emit("Здесь нечего сносить.", false)
+		message.emit(L.t("Здесь нечего сносить."), false)
 
 
 func _report(n: int, broke: bool, what: String) -> void:
 	if n > 0:
-		message.emit("Чертёж %s: %d кл. Рабочие построят, когда освободятся." % [what, n], true)
+		message.emit(L.t("Чертёж %s: %d кл. Рабочие построят, когда освободятся.") % [what, n], true)
 	if broke:
-		message.emit("Не хватает денег на весь чертёж.", false)
+		message.emit(L.t("Не хватает денег на весь чертёж."), false)
 	elif n == 0:
-		message.emit("Здесь строить нельзя или уже построено.", false)
+		message.emit(L.t("Здесь строить нельзя или уже построено."), false)
 
 
 ## Повернуть объект, который сейчас ставим (клавиша R).
@@ -474,11 +474,11 @@ func _place_object(c: Vector2i) -> void:
 		return
 	var cost := sim.thing_cost(def_id)
 	if not sim.can_afford(cost):
-		message.emit("Не хватает денег: нужно " + Defs.money_str(cost), false)
+		message.emit(L.t("Не хватает денег: нужно %s") % Defs.money_str(cost), false)
 		return
 	sim.place_thing(def_id, c, false, true, place_rot)
 	Snd.play("place", -6.0)
-	message.emit("Заказано: %s. Рабочие смонтируют." % str(Defs.objects[def_id]["name"]), true)
+	message.emit(L.t("Заказано: %s. Рабочие смонтируют.") % L.t(str(Defs.objects[def_id]["name"])), true)
 
 
 ## 1.17: готовое помещение — центр под курсором.
@@ -494,11 +494,11 @@ func _place_template(c: Vector2i) -> void:
 		message.emit(err, false)
 		return
 	Snd.play("place", -6.0)
-	var nm := str(Templates.def(id).get("name", ""))
+	var nm := L.t(str(Templates.def(id).get("name", "")))
 	if plan_mode:
-		message.emit("«%s» — на плане." % nm, true)
+		message.emit(L.t("«%s» — на плане.") % nm, true)
 	else:
-		message.emit("Заказано помещение «%s»: строители начнут с пола и стен, мебель и зону поставят, когда достроят." % nm, true)
+		message.emit(L.t("Заказано помещение «%s»: строители начнут с пола и стен, мебель и зону поставят, когда достроят.") % nm, true)
 
 
 func _draw_template_ghost() -> void:
@@ -536,12 +536,12 @@ func _draw_template_ghost() -> void:
 			draw_texture_rect(tex, Rect2(pos, tex.get_size() * 0.5), false, col)
 	draw_rect(Rect2(Vector2(o) * T, Vector2(s) * T), Color(col.r, col.g, col.b, 0.95), false, 2.0)
 	var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
-	var nm := str(Templates.def(id).get("name", ""))
+	var nm := L.t(str(Templates.def(id).get("name", "")))
 	var nsh := 0
 	for c2 in wc.keys():
 		if Templates.shared(sim, c2):
 			nsh += 1
-	var lbl := (nm + ("  · общая стена: %d кл." % nsh if nsh > 0 else "")) if ok else err
+	var lbl := (nm + (L.t("  · общая стена: %d кл.") % nsh if nsh > 0 else "")) if ok else err
 	draw_string(f, Vector2(o.x * T, o.y * T - 6), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1, 1, 1, 0.95) if ok else Color(1.0, 0.6, 0.55))
 	if not plan_mode:
 		preview_cost = Templates.cost(sim, id, o)

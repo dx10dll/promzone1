@@ -1,0 +1,1850 @@
+keys,en
+Токарный 1К62,Lathe 1K62
+Станки,Machines
+"Старый советский токарно-винторезный станок: мелкие и средние детали. Медленный, но неубиваемый. Нужен токарь.",An old Soviet screw-cutting lathe for small and medium parts. Slow but indestructible. Needs a turner.
+Токарный ТВ-4,Lathe TV-4
+"Настольный токарный станок из ПТУ. Только мелочь: пальцы, втулки, штуцеры. Дёшев и почти не ест ток.","A benchtop lathe from a vocational school. Small stuff only: pins, bushings, fittings. Cheap and barely uses power."
+Токарный 1А616,Lathe 1A616
+Компактный токарно-винторезный станок для мелких деталей: на них он шустрее 1К62.,A compact screw-cutting lathe for small parts: on those it's quicker than the 1K62.
+Токарный 16К20,Lathe 16K20
+"Самый массовый токарный станок страны: мелкие и средние детали, быстрее и точнее 1К62.","The most common lathe in the country: small and medium parts, faster and more precise than the 1K62."
+Токарный 1М63,Lathe 1M63
+Тяжёлый токарный станок с длинной станиной: вагонные оси и крупные валы. Нужен токарь от 2-го разряда.,A heavy lathe with a long bed: railcar axles and big shafts. Needs a grade 2+ turner.
+Фрезерный 6Т80,Mill 6T80
+"Горизонтально-фрезерный станок для мелких деталей: пазы, лыски, диски.","A horizontal milling machine for small parts: slots, flats, discs."
+Фрезерный 6Р10,Mill 6R10
+Вертикально-фрезерный станок для мелких деталей: на мелочи быстрее 6Р12.,A vertical milling machine for small parts: faster than the 6R12 on small work.
+Фрезерный 6Р12,Mill 6R12
+"Вертикально-фрезерный станок: плоскости, пазы, шлицы на мелких и средних деталях. Нужен фрезеровщик.","A vertical milling machine: faces, slots and splines on small and medium parts. Needs a miller."
+Фрезерный 6Р82,Mill 6R82
+Горизонтально-фрезерный станок с поворотным столом: шлицы и зубья на средних деталях.,A horizontal milling machine with a rotary table: splines and teeth on medium parts.
+Фрезерный 6Р13,Mill 6R13
+Тяжёлый вертикально-фрезерный станок с большим столом для крупных деталей.,A heavy vertical mill with a big table for large parts.
+Сверлильный НС-12,Drill NS-12
+Настольная сверлилка до 12 мм: мелкие отверстия в мелких деталях.,A benchtop drill up to 12 mm: small holes in small parts.
+Сверлильный 2Н118,Drill 2N118
+Вертикально-сверлильный станок до 18 мм — для мелких деталей.,"A pillar drill up to 18 mm, for small parts."
+Сверлильный 2Н135,Drill 2N135
+Вертикально-сверлильный станок для отверстий и резьбы. Работает фрезеровщик или любой станочник.,A pillar drill for holes and threads. Run by a miller or any machinist.
+Сверлильный 2Н150,Drill 2N150
+Мощный вертикально-сверлильный станок до 50 мм: быстрее 2Н135 на средних деталях.,A powerful pillar drill up to 50 mm: faster than the 2N135 on medium parts.
+Радиальный 2М55,Radial drill 2M55
+Радиально-сверлильный станок: шпиндель на поворотной траверсе достаёт до любой точки крупной детали.,A radial drill: the spindle on a swinging arm reaches any spot on a large part.
+Слесарный верстак,Fitter's workbench
+"Слесарный верстак с тисками — рабочее место слесаря: дорабатывает здесь брак (часть деталей спасает и несёт на ОТК), режет заготовки ножовкой, пока нет ленточной пилы. Делает помещение цехом.","A fitter's bench with a vise, the fitter's workplace: reworks rejects here (saves some parts and takes them to QC) and hacksaws blanks until you have a band saw. Makes a room a workshop."
+Ленточнопильный станок,Band saw
+Заготовительный участок: режет пруток на мерные заготовки впрок. Первая операция из готовой заготовки на 20% быстрее — станочнику не нужно отрезать самому. Режет разнорабочий или станочник.,"Blank cutting: saws bar stock into blanks in advance. The first operation on a ready blank is 20% faster, since the machinist doesn't cut it himself. Run by a laborer or a machinist."
+Стеллаж для металла,Metal rack
+Склад,Storage
+Две полки по 12 прутков. Сюда разгружают металл.,Two shelves of 12 bars each. Metal gets unloaded here.
+Поддон для готовой продукции,Finished goods pallet
+"Деревянный поддон на 16 деталей, прошедших ОТК, — склад готовой продукции. Когда заказ готов, детали отсюда несут в зону отгрузки.","A wooden pallet for 16 parts that passed QC: your finished goods store. When an order is ready, parts go from here to the shipping zone."
+Поддон заготовок,Stock pallet
+"Поддон на 12 прутков металла и заготовок для производства. Ставьте в зону разгрузки: фургон сгружает металл сначала сюда, а отсюда его разносят к станкам и на стеллажи.","A pallet for 12 bars of metal and blanks. Put it in the unloading zone: the van unloads metal here first, then it's carried to machines and racks."
+Тара для брака,Reject bin
+Сюда ОТК складывает забракованные детали. Брак потом сдают в металлолом.,QC puts rejected parts here. Rejects are later sold for scrap.
+Стол ОТК,QC table
+ОТК,QC
+"Поверочная плита, штангенциркуль и микрометр. Контролёр проверяет каждую деталь.","A surface plate, calipers and a micrometer. The inspector checks every part."
+Туалетная кабинка,Toilet stall
+Быт,Amenities
+"Без туалета люди мучаются, а работа стоит. Нужна вода: протяните трубу водопровода к кабинке.",Without a toilet people suffer and work stops. Needs water: run a water pipe to the stall.
+Обеденный стол,Dining table
+Поставь рядом стулья — будет где пообедать.,Put chairs next to it and there's a place to eat.
+Стул,Chair
+Ставь вплотную к столу.,Place it right next to a table.
+Скамейка,Bench
+Посидеть в перерыв и перевести дух.,Sit down on a break and catch your breath.
+Тумба с чайником,Kettle stand
+Электрочайник на тумбе. Чай в перерыв — святое.,An electric kettle on a cabinet. Tea on a break is sacred.
+Урна-курилка,Smoking bin
+"Место, где решаются все важные вопросы завода.",Where all the plant's important questions get settled.
+Фикус в кадке,Potted ficus
+Декор,Decor
+Живой уголок.,A bit of green.
+Огнетушитель,Fire extinguisher
+Безопасность,Safety
+"Огнетушитель ОП-4. С ним пожар тушат в несколько раз быстрее. Пожарный надзор требует хотя бы один в каждом помещении (кроме туалета и душевой), а в горячих цехах — два.","An OP-4 extinguisher. With it, fires are put out several times faster. The fire inspectors want at least one in every room (except toilets and showers), and two in hot shops."
+Трансформаторная подстанция,Transformer substation
+Электрика,Electrical
+"Единственный источник тока: поставили в техпомещении — от неё питается весь завод. Сама даёт 40 кВт; вплотную к ней ставят аккумуляторные шкафы — каждый добавляет 20 кВт (до 9 шкафов, всего до 220 кВт). Мало и этого — вторая подстанция в техпомещении, соединённая кабелем.","The only power source: put it in a utility room and it powers the whole plant. Gives 40 kW by itself; battery cabinets placed right next to it add 20 kW each (up to 9, 220 kW total). Still not enough? A second substation in a utility room, linked by cable."
+Трансформатор ТМ-25,Transformer TM-25
+Малый трансформатор: поставили — и от него пошёл ток. Тяните кабель к станкам и приборам. Не хватает мощности — поставьте ещё один или трансформатор побольше.,A small transformer: place it and power flows. Run cable to machines and appliances. Not enough capacity? Add another one or a bigger transformer.
+Трансформатор ТМ-63,Transformer TM-63
+"Трансформатор побольше, с расширительным бачком и радиаторами: даёт ток сам, без всяких договоров. Хватит на небольшой цех.","A bigger transformer with an expansion tank and radiators: makes power on its own, no contracts needed. Enough for a small shop."
+Шкафчик для одежды,Clothes locker
+Двухстворчатый металлический шкафчик. Здесь переодеваются в спецовку до и после смены.,A two-door metal locker. People change into overalls here before and after a shift.
+Шкафчик на двоих,Double locker
+Две узкие секции со своими дверцами: переодеваются двое. Считается за два шкафчика — ставить приходится вдвое меньше.,"Two narrow sections with their own doors: two people change here. Counts as two lockers, so you need half as many."
+Раковина,Sink
+Помыть руки после туалета и перед обедом. Без раковины туалет не считается туалетом. Нужна вода из водопровода.,Wash your hands after the toilet and before lunch. Without a sink a toilet isn't a toilet. Needs water from the mains.
+Холодильник,Fridge
+Хранить обеды из дома. Нужен для нормальной столовой. Потребляет электричество.,Keeps lunches from home. Needed for a proper canteen. Uses electricity.
+Микроволновка на тумбе,Microwave stand
+Разогреть обед. Подходит для столовой.,Heat up lunch. Good for a canteen.
+Кулер с водой,Water cooler
+Холодная и горячая вода. Делает комнату отдыха комнатой отдыха.,Cold and hot water. Turns a break room into a break room.
+Диван,Sofa
+"Продавленный, но мягкий. Отдых на диване восстанавливает силы быстрее.",Saggy but soft. Resting on a sofa restores energy faster.
+Доска почёта,Board of Honor
+"Каждый понедельник сюда вешают фото лучшего работника недели. Ему приятно, остальным есть к чему стремиться.","Every Monday the photo of the week's best worker goes up here. He's pleased, and the rest have something to aim for."
+Трансформаторная подстанция (КТП),Transformer substation (KTP)
+Своя подстанция на 160 кВт — хватит на целый завод. Ставится в техпомещении (электрощитовой); вплотную к ней — до 9 аккумуляторных шкафов на случай перегруза.,"Your own 160 kW substation, enough for a whole plant. Goes in a utility room (switchgear room); up to 9 battery cabinets right next to it for overloads."
+Сварочный пост,Welding station
+Сварка и сборка,Welding & assembly
+Сварочный стол и полуавтомат. Мощный потребитель тока — подумайте о сети. Нужен сварщик и сварочная проволока.,"A welding table and a MIG welder. A big power user, so mind your grid. Needs a welder and welding wire."
+Сборочный верстак,Assembly bench
+Стол слесаря-сборщика с гайковёртом и прессом. Собирает узлы из ваших деталей. Со сжатым воздухом (пневмогайковёрт) собирают на 20% быстрее.,An assembler's bench with an impact wrench and a press. Builds assemblies from your parts. With compressed air (pneumatic wrench) assembly is 20% faster.
+Ручная сварка ВД-306,Stick welder VD-306
+"Выпрямитель ВД-306 и стол для ручной дуговой сварки: дёшево, но медленнее полуавтомата. Средние сварные изделия.","A VD-306 rectifier and a table for stick welding: cheap, but slower than MIG. Medium welded items."
+Полуавтомат ПДГ-251,MIG welder PDG-251
+Сварочный полуавтомат с подачей проволоки: средние рамы и секции варит быстрее поста.,A wire-feed MIG welder: welds medium frames and sections faster than a station.
+Точечная МТ-1928,Spot welder MT-1928
+"Контактная точечная сварка: очень быстро, но шов слабее — брака чуть больше. Ест много тока.","Resistance spot welding: very fast, but the seam is weaker, so a few more rejects. Uses a lot of power."
+Сварочный стенд с кантователем,Welding rig with positioner
+Стенд с поворотным кантователем: балки и фермы варят без перекладки краном.,A rig with a rotating positioner: beams and trusses are welded without moving them by crane.
+Верстак сборщика,Assembler's bench
+"Простой верстак с тисками и ключами: собирают медленнее, зато дёшево и места мало.","A plain bench with a vise and wrenches: slower assembly, but cheap and compact."
+Сборочный пресс П-6326,Assembly press P-6326
+Гидравлический пресс для запрессовки подшипников и втулок: средние узлы собирают быстрее.,A hydraulic press for pressing in bearings and bushings: medium assemblies go faster.
+Сборочный стенд,Assembly rig
+"Стенд с поворотной плитой для крупных изделий: насосы, станки.","A rig with a rotating plate for large items: pumps, machine tools."
+Сборочный конвейер,Assembly line
+"Тележечный конвейер: изделие едет от поста к посту, сборка идёт почти вдвое быстрее.","A cart conveyor: the item rides from post to post, assembly is almost twice as fast."
+Камерная печь,Chamber furnace
+Термо и покраска,Heat & paint
+"Печь для закалки и отпуска. Греет партию до 6 деталей, работает без присмотра. Ест 25 кВт — нужна своя подстанция или большая мощность.","A furnace for hardening and tempering. Heats a batch of up to 6 parts, runs unattended. Draws 25 kW, so it needs its own substation or plenty of capacity."
+Покрасочная камера,Paint booth
+"Камера с фильтрами: грунт и эмаль краскопультом. Нужен маляр, краска и сжатый воздух от компрессора (без него красят кистью — в полтора раза дольше). Пары краски выводят вытяжкой.","A booth with filters: primer and enamel by spray gun. Needs a painter, paint and compressed air from a compressor (without it they use a brush, 1.5× slower). Fumes are removed by exhaust."
+Муфельная печь СНОЛ,Muffle furnace SNOL
+"Лабораторная печь на три мелкие детали: быстро греется, ест немного.","A lab furnace for three small parts: heats quickly, uses little."
+Установка ТВЧ,Induction hardener
+"Закалка токами высокой частоты: по две детали за раз, но в три раза быстрее печи. Без дыма, зато очень много тока.","High-frequency induction hardening: two parts at a time, but three times faster than a furnace. No smoke, but a lot of power."
+Шахтная печь,Pit furnace
+"Глубокая печь в полу: длинные валы и оси калят стоя, партия до 8 штук.","A deep furnace in the floor: long shafts and axles are hardened standing up, batches of up to 8."
+Выкатная печь,Bogie furnace
+"Печь с выкатным подом: под выезжает на рельсах, крупные детали грузят краном, партия до 12 штук.","A furnace with a rolling hearth: the hearth rolls out on rails, big parts are loaded by crane, batches of up to 12."
+Стол окраски,Paint table
+Решётчатый стол с вытяжным зонтом: мелкие детали красят краскопультом.,A grated table under an exhaust hood: small parts are spray-painted.
+Малая камера окраски,Small paint booth
+Тупиковая камера с водяной завесой для средних деталей.,A dead-end booth with a water curtain for medium parts.
+Порошковая камера,Powder coating booth
+"Камера порошковой окраски: порошок напыляют и запекают — краски уходит на 40% меньше, покрытие крепче.","Powder is sprayed and baked on: 40% less paint, a tougher finish."
+Окрасочная линия,Paint line
+Подвесной конвейер через камеру и сушку: крупные изделия красят потоком.,An overhead conveyor through the booth and dryer: large items are painted in a flow.
+Стеллаж НЗП,WIP rack
+Незавершённое производство: детали между операциями ждут своего станка здесь.,Work in progress: parts wait here between operations for their machine.
+Шкаф с инструментом,Tool cabinet
+Логистика,Logistics
+Инструментальная кладовая: в оборудованной кладовой инструмент расходуется на четверть меньше.,"A tool crib: in an equipped tool crib, tools wear out a quarter slower."
+Грузовая тележка,Hand cart
+"Разнорабочий берёт её, если везти много: 12 единиц за ходку вместо 6.",A laborer takes it for big loads: 12 units a trip instead of 6.
+Электропогрузчик,Electric forklift
+Возит до 24 единиц и на треть быстрее. Водит только опытный грузчик (погрузка от 6).,Carries up to 24 units and a third faster. Only an experienced loader drives it (loading 6+).
+"Кран-балка 3,2 т",Overhead crane 3.2 t
+"Мостовой кран-балка 3,2 т. Щёлкните внутри цеха: подкрановые пути встанут вдоль стен, балка — от стены до стены. Мост ездит вдоль помещения, тележка с талью — вдоль балки к станку, где обрабатывают тяжёлую деталь. С краном тяжёлые детали (валы, корпуса, рамы, узлы) делают без потерь, без крана — на 30% медленнее. Пролёт — до 26 клеток.","A 3.2 t overhead bridge crane. Click inside a workshop: the runways go along the walls, the beam from wall to wall. The bridge travels along the room, the hoist trolley along the beam to the machine working on a heavy part. With a crane heavy parts (shafts, housings, frames, assemblies) are made with no penalty; without one, 30% slower. Span up to 26 cells."
+Стол ИТР,Office desk
+Офис,Office
+"Письменный стол с компьютером, телефоном и лампой. Рабочее место специалиста: мастера, бухгалтера, снабженца, диспетчера, кадровика, технолога.","A desk with a computer, phone and lamp. A specialist's workplace: foreman, accountant, buyer, dispatcher, HR officer, process engineer."
+Шкаф для документов,Filing cabinet
+"Папки с договорами, накладными и личными делами. Нужен снабжению, кадрам и начальнику цеха.","Folders of contracts, waybills and personnel files. Needed by supply, HR and the shop manager."
+Сейф,Safe
+Несгораемый сейф для кассы и печати. Без него бухгалтерия не бухгалтерия.,A fireproof safe for the cash and the company seal. Without it accounting isn't accounting.
+Доска планирования,Planning board
+Магнитная доска с графиком загрузки станков. Сердце ПДО.,A magnetic board with the machine load schedule. The heart of the planning office.
+Кульман,Drafting board
+Чертёжный прибор. Технологи и конструкторы разрабатывают на нём новые изделия и техпроцессы.,A drafting machine. Engineers design new products and processes on it.
+Токарный с ЧПУ 16А20Ф3,CNC lathe 16A20F3
+ЧПУ,CNC
+"Советский токарный станок с ЧПУ: шестипозиционная револьверная головка, прозрачный щиток, отдельный шкаф с пультом. Почти вдвое быстрее и точнее 1К62, мелкие и средние детали. Нужен опытный токарь — оператор ЧПУ (токарное дело от 4).","A Soviet CNC lathe: six-station turret, clear guard, separate control cabinet. Almost twice as fast and more precise than the 1K62, small and medium parts. Needs an experienced turner as CNC operator (turning 4+)."
+Обрабатывающий центр 65А60,Machining center 65A60
+"Советский вертикальный обрабатывающий центр: колонна, крестовый стол, цепной магазин инструментов и шкафы электроавтоматики. Фрезерует средние детали почти вдвое быстрее. Нужен фрезеровщик-наладчик (фрезерное дело от 4).","A Soviet vertical machining center: column, cross table, chain tool magazine and control cabinets. Mills medium parts almost twice as fast. Needs a miller-setter (milling 4+)."
+Сайдвей ВМ-2215,Sidway VM-2215
+"Фрезерный станок с ЧПУ на станине: колонна, голова с мотором, стол с гармошками. Мелкие фрезерные детали — быстро и недорого.","A bed-type CNC mill: column, motor head, table with bellows. Small milled parts, fast and cheap."
+Пантера-2600,Panthera-2600
+"Длинный токарный центр в кожухе: раздвижные двери, транспортёр стружки, пульт на кронштейне. Быстрее и точнее 16А20Ф3 на средних деталях.","A long enclosed turning center: sliding doors, chip conveyor, pendant control. Faster and more precise than the 16A20F3 on medium parts."
+Ханган HL-1600,Hangan HL-1600
+"Тяжёлый токарный станок с ЧПУ: огромный патрон, люнет, щиток на рельсе. Оси и крупные валы вдвое быстрее 1М63.","A heavy CNC lathe: huge chuck, steady rest, guard on a rail. Axles and big shafts twice as fast as the 1M63."
+Хартвуд VMC-3260,Hartwood VMC-3260
+"Портальный обрабатывающий центр: две стойки, траверса, длинный стол и лесенка к площадке. Крупные корпуса и плиты за один установ.","A gantry machining center: two columns, a crossbeam, a long table and a ladder to the platform. Large housings and plates in one setup."
+Мингер VM-540,Minger VM-540
+"Обрабатывающий центр в кожухе: две двери с окнами, магазин инструментов сбоку, пульт справа. Быстрый и точный, занимает мало места.","An enclosed machining center: two windowed doors, side tool magazine, control on the right. Fast, precise, takes little space."
+Майдэй МБЛ-400,Mayday MBL-400
+"Компактный токарный станок с ЧПУ в кожухе: наклонная станина, большая дверь с окном, пульт на кожухе. Мелкие токарные детали — быстрее всех.","A compact enclosed CNC lathe: slant bed, big windowed door, control on the enclosure. The fastest for small turned parts."
+Батарея отопления,Radiator
+"Чугунная батарея отопления. Одна прогревает около 22 клеток помещения. Греет, только если рядом с насосной станцией стоит электрокотёл под током (или есть своя газовая котельная). Зимой без отопления мёрзнут, работают медленнее и злятся.","A cast-iron radiator. One heats about 22 cells of a room. Only works if an electric boiler with power stands next to the pump station (or you have your own gas boiler room). In winter, without heating people freeze, work slower and get angry."
+Аптечка,First aid kit
+"Бинты, йод, нашатырь. Если рядом есть аптечка, травмы легче и больничный короче. Трудовая инспекция проверяет её наличие.","Bandages, iodine, smelling salts. With a first aid kit nearby, injuries are milder and sick leave shorter. The labor inspectorate checks for it."
+Проходная с турникетами,Gatehouse with turnstiles
+"Будка охранника и два турникета. Ставится прямо в забор у въезда (или рядом с воротами): люди приходят на смену и уходят домой через турникеты. Если нанят охранник и он на смене, он сидит в будке — тогда работает досмотр на проходной, и «несуны» почти перестают таскать металл. Без охранника турникеты просто пропускают людей. Инспекторы отмечаются здесь.","A guard booth and two turnstiles. Goes right into the fence at the entrance (or next to the gate): people come to work and go home through the turnstiles. If a guard is hired and on shift, he sits in the booth and checks bags, and pilferers nearly stop carrying off metal. Without a guard the turnstiles just let people through. Inspectors sign in here."
+Испытательный стенд,Test rig
+"Гидравлический стенд с манометрами и ультразвуковым дефектоскопом. Насосы, задвижки, оси и изделия по госзаказу проходят испытания. Работает контролёр ОТК.","A hydraulic rig with pressure gauges and an ultrasonic flaw detector. Pumps, valves, axles and state-order items are tested here. Run by a QC inspector."
+Лампа накаливания,Light bulb
+Освещение,Lighting
+"Простой патрон с плафоном под потолком. Светит на 3 клетки вокруг. Подключается к кабелю, проложенному не дальше 3 клеток — провод тянут сами.",A simple socket with a shade under the ceiling. Lights 3 cells around. Connects to a cable no more than 3 cells away; the wire runs itself.
+Светильник ЛПО (лампы дневного света),Fluorescent fixture
+"Две люминесцентные трубки: светит на 4–5 клеток, экономный. Подключается к кабелю не дальше 3 клеток.","Two fluorescent tubes: lights 4–5 cells, economical. Connects to a cable no more than 3 cells away."
+Промышленный светильник ДРЛ,Industrial high-bay lamp
+"Колокол под высоким потолком цеха: светит на 7 клеток вокруг, но потребляет больше. Подключается к кабелю не дальше 3 клеток.",A bell under the high shop ceiling: lights 7 cells around but uses more. Connects to a cable no more than 3 cells away.
+Уличный фонарь,Street lamp
+"Фонарь на столбе для двора, проходной и зоны разгрузки: ночью не скользко и не страшно. Подключается к кабелю не дальше 3 клеток.","A lamp post for the yard, gatehouse and unloading zone: at night it's neither slippery nor scary. Connects to a cable no more than 3 cells away."
+Насосная станция,Pump station
+Водопровод,Plumbing
+"Источник воды: два насоса и гидробак. Одна на завод — даёт воду всем приборам, сколько бы их ни было. Ставится в техпомещении, нужен ток — кабель от подстанции. От неё тяните трубы в клетки туалетов, раковин, душевых, котла и стенда. Рядом поставьте электрокотёл — тогда заработают батареи.","The water source: two pumps and a pressure tank. One per plant supplies all fixtures, however many. Goes in a utility room and needs power (cable from a substation). Run pipes from it to the cells of toilets, sinks, showers, the boiler and the test rig. Put an electric boiler next to it and the radiators will work."
+Электрокотёл отопления «Теплон-12»,Electric heating boiler Teplon-12
+"Греет воду для всех батарей отопления на заводе. Ставится вплотную к насосной станции (не дальше одной клетки), нужен ток — кабель от подстанции. Без него батареи холодные.",Heats water for every radiator in the plant. Goes right next to the pump station (no more than one cell away) and needs power (cable from a substation). Without it the radiators are cold.
+Скважинный насос,Borehole pump
+"Поставили насос — пошла вода. От него тяните трубы к туалетам, раковинам, душевым, котлу и стенду. Тянет 10 приборов; больше — ставьте ещё насос или насосную станцию.","Place a pump and water flows. Run pipes from it to toilets, sinks, showers, the boiler and the test rig. Serves 10 fixtures; for more, add another pump or a pump station."
+Парта,School desk
+Двухместная парта со стульями. Ставьте в учебный класс: одно место — один человек на курсах.,"A two-seat desk with chairs. Put it in a classroom: one seat, one person on a course."
+Школьная доска,Chalkboard
+Зелёная доска с мелом и указкой. Без неё учебный класс — просто комната с партами.,A green board with chalk and a pointer. Without it a classroom is just a room with desks.
+Контейнер для стружки,Chip bin
+"Металлический ящик на колёсах на 300 кг. Сюда сметают стружку; по пятницам приезжает ломовоз и платит за металлолом — и за стружку, и за брак из тары.",A 300 kg metal bin on wheels. Chips are swept in here; on Fridays the scrap truck comes and pays for both chips and the rejects from the bin.
+Стенд «Охрана труда»,Safety notice stand
+"Для кабинета охраны труда: плакаты, знаки, журнал инструктажей.","For the safety office: posters, signs, the briefing log."
+Пальма в кадке,Potted palm
+Большая раскидистая пальма. Кабинет сразу выглядит солиднее.,"A big, spreading palm. The office instantly looks more respectable."
+Аквариум,Aquarium
+"Гуппи, сомики и пузырьки. В комнате отдыха на рыбок смотрят часами.","Guppies, catfish and bubbles. In the break room people watch the fish for hours."
+Ковёр,Rug
+Красный ковёр с узором. Уютнее в кабинете и комнате отдыха.,A red patterned rug. Cozier in an office or break room.
+Книжный шкаф,Bookcase
+"Справочники, ГОСТы и подшивка «Техники — молодёжи».","Handbooks, GOST standards and a stack of old tech magazines."
+Телевизор на тумбе,TV stand
+В перерыв — новости и футбол. Хорош в комнате отдыха и столовой.,News and football on a break. Good in a break room or canteen.
+Переходящее знамя,Challenge banner
+Бархатное знамя «Лучшему коллективу» с бахромой. Гордость цеха.,A velvet “Best Team” banner with fringe. The shop's pride.
+Вытяжной вентилятор,Exhaust fan
+Инженерия,Engineering
+"Осевой вентилятор в кожухе: вытягивает воздух из своего помещения, а через воздуховоды — и из других (всего до 80 клеток площади). Без вентиляции в сварочном и покрасочном участке не продохнуть. Нужен кабель.","An axial fan in a housing: pulls air out of its room and, through ducts, out of others (up to 80 cells of floor in total). Without ventilation you can't breathe in welding and paint areas. Needs a cable."
+Вытяжной зонт,Exhaust hood
+"Местный отсос над сварочным постом, покрасочной камерой или печью: подвесьте над станком или рядом с ним и подведите воздуховод к сети с работающим вентилятором — дым и пары уходят на 75% меньше в помещение.","Local extraction over a welding station, paint booth or furnace: hang it over or next to the machine and run a duct to a network with a working fan, and 75% less smoke and fumes reach the room."
+Винтовой компрессор,Screw compressor
+Сжатый воздух 8 атм для четырёх потребителей разом: покрасочной камеры (без воздуха красят кистью — в полтора раза дольше) и сборочных столов (пневмогайковёрт — на 20% быстрее). Шумит под 90 дБ — лучше поставить в отдельную компрессорную. Тяните пневмомагистраль.,"8 atm compressed air for four users at once: the paint booth (without air they paint by brush, 1.5× slower) and assembly benches (pneumatic wrench, 20% faster). Roars at 90 dB, so a separate compressor room is best. Run an air line."
+Газовый котёл,Gas boiler
+"Своя котельная: греет до 16 батарей, подключённых трубой к его сети водопровода. Газ вдвое дешевле городского тепла, а авария на теплотрассе не страшна. Ставят только в отдельной котельной; нужны вода и кабель.","Your own boiler room: heats up to 16 radiators piped into its water network. Gas is half the price of city heat, and heating-main failures don't matter. Only in a separate boiler room; needs water and a cable."
+Шкаф СИЗ,PPE cabinet
+"Склад средств индивидуальной защиты: каски, очки, наушники, перчатки, респираторы. Рабочие сами берут новый комплект, когда старый износился (примерно за 20 смен). Комплекты закупаются как расходники (Снабжение).","A store of personal protective equipment: hard hats, goggles, earmuffs, gloves, respirators. Workers take a new kit when the old one wears out (about 20 shifts). Kits are bought as consumables (Supply)."
+Видеокамера,Security camera
+"Купольная камера под потолком: смотрит за всем помещением. Несуны реже решаются красть там, где камера, а запись помогает поймать тех, кто всё же вынес. Нужен ток (кабель не дальше 3 клеток).","A dome camera under the ceiling watching the whole room. Pilferers steal less where there's a camera, and the footage helps catch those who still do. Needs power (cable within 3 cells)."
+Доска профкома,Union board
+"Объявления профсоюзного комитета: путёвки, взносы, график дежурств. Вместе со столом делает помещение профкомом.","Trade union notices: holiday vouchers, dues, duty rota. Together with a desk it makes a room the union office."
+Табло «Дней без травм»,“Days without injury” board
+Счётчик дней без несчастных случаев. Каждое утро цифра растёт — и никто не хочет её обнулить: в помещении с табло травм на 5% меньше.,"A counter of days without accidents. Every morning the number grows, and nobody wants to reset it: 5% fewer injuries in a room with the board."
+Двухъярусная кровать,Bunk bed
+"Две койки для иногородних рабочих. Поставьте в отдельную комнату со шкафчиком и назначьте её «Общежитием»: приедут люди из других городов, а жильцы не опаздывают.","Two bunks for workers from out of town. Put it in a separate room with a locker and make it a “Dormitory”: people from other towns will come, and residents are never late."
+Электроплита промышленная,Industrial electric stove
+"Шесть конфорок и духовка. В столовой с плитой, линией раздачи и поваром — горячие обеды: суп, второе, компот.","Six burners and an oven. A canteen with a stove, a serving line and a cook serves hot meals: soup, a main and kompot."
+Линия раздачи,Serving line
+Мармит с подогревом. Нужен вместе с плитой — без раздачи горячее не подать.,"A heated bain-marie. Needed together with a stove: no serving line, no hot food."
+Медицинская кушетка,Medical couch
+"Для медпункта: кушетка, шкаф с лекарствами и раковина. С фельдшером больничные после травм короче, гриппом болеют реже.","For the first aid post: a couch, a medicine cabinet and a sink. With a paramedic, sick leave after injuries is shorter and flu is rarer."
+Шкаф с лекарствами,Medicine cabinet
+"Бинты, йод, жаропонижающее и тонометр. Рабочее место фельдшера.","Bandages, iodine, fever pills and a blood pressure monitor. The paramedic's workplace."
+Радиоузел,Radio room
+"Заводское радио: новости, производственная гимнастика и музыка в обед. Слышно там, где висят громкоговорители.","Plant radio: news, morning exercises and music at lunch. Heard wherever loudspeakers hang."
+Громкоговоритель,Loudspeaker
+Рупор под потолком: в этом помещении слышно заводское радио. Нужен ток (кабель не дальше 3 клеток) и радиоузел.,A horn under the ceiling: plant radio can be heard in this room. Needs power (cable within 3 cells) and a radio room.
+Миска для кота,Cat bowl
+Корм и вода для заводского кота. Без миски кот уйдёт.,Food and water for the plant cat. Without a bowl the cat will leave.
+Телефон на тумбе,Phone stand
+Для отдела сбыта: менеджер обзванивает заказчиков.,For the sales office: the manager calls customers.
+Шкаф с кодексами,Law bookcase
+"Для юротдела: кодексы, договоры, судебная практика.","For the legal office: codes, contracts, case law."
+Стол директора,Director's desk
+Большой стол с зелёной лампой и телефоном. Нужен для кабинета директора — без него не исследуются ступени «Развития».,A big desk with a green lamp and a phone. Needed for the director's office; without it Development steps can't be researched.
+Аккумуляторный шкаф,Battery cabinet
+Аккумуляторный шкаф ставят вплотную к подстанции (в том числе по углам): каждый добавляет ей 20 кВт мощности. У одной подстанции — до 9 шкафов. Работает в техпомещении.,Battery cabinets go right next to a substation (corners count too): each adds 20 kW of capacity. Up to 9 per substation. Works in a utility room.
+"Большой насос на 24 прибора (туалеты, раковины, души, стенды, котёл). Ставится в техпомещении, нужен ток — кабель от трансформатора. Трубы от неё тяните, как от простого насоса.","A big pump for 24 fixtures (toilets, sinks, showers, test rigs, boiler). Goes in a utility room and needs power (cable from a transformer). Run pipes from it like from a simple pump."
+Душевая кабина,Shower stall
+"Помыться после смены: станочник в масле и стружке, сварщик в копоти. Кто помылся — уходит домой довольным, без душа к концу недели ворчат. Нужна вода; ставится в душевой.","A wash after the shift: the machinist covered in oil and chips, the welder in soot. Those who washed go home happy; without a shower they grumble by the end of the week. Needs water; goes in a shower room."
+Вывеска завода,Plant sign
+"Табличка с эмблемой и названием завода — на проходную, в цех или у кабинета директора. Название и эмблему меняют в паспорте завода (щелчок по эмблеме в шапке).","A sign with the plant's emblem and name, for the gatehouse, a shop or the director's office. Change the name and emblem in the plant passport (click the emblem in the header)."
+Кактус в горшке,Potted cactus
+"Колючий, неприхотливый и, говорят, впитывает излучение от мониторов. Цветёт раз в год.","Prickly, undemanding and, they say, absorbs radiation from monitors. Blooms once a year."
+Монстера,Monstera
+Огромные резные листья. Уголок сразу похож на приёмную министерства.,Huge cut leaves. The corner instantly looks like a ministry waiting room.
+Клумба,Flower bed
+"Кирпичный бордюр, бархатцы и петунии. Ставится на улице у проходной или у конторы.","A brick border, marigolds and petunias. Goes outside by the gatehouse or the office."
+Бюст основателя,Founder's bust
+Бронзовый бюст основателя завода на постаменте. Внушает уважение посетителям и проверяющим.,A bronze bust of the plant's founder on a pedestal. Impresses visitors and inspectors.
+Напольные часы,Grandfather clock
+Старинные часы с маятником. Идут точно — стрелки показывают игровое время.,An antique pendulum clock. Keeps exact time: the hands show the game time.
+Холодная и горячая вода. У кулера всегда кто-нибудь обсуждает новости.,Cold and hot water. There's always someone at the cooler discussing the news.
+Вешалка,Coat rack
+"Напольная вешалка для курток и шапок. В кабинет, контору или комнату отдыха.",A floor stand for jackets and hats. For an office or break room.
+Радиоприёмник,Radio set
+"Ламповый приёмник на тумбе. Шкала светится, пока играет музыка.",A tube radio on a stand. The dial glows while music plays.
+Самовар,Samovar
+Пузатый латунный самовар на столике. Чай в перерыв — как дома.,"A pot-bellied brass samovar on a little table. Tea on a break, just like home."
+Шкаф с кубками,Trophy case
+"Кубки за спартакиады, грамоты и вымпелы. Гордость коллектива за стеклом.","Cups from sports days, certificates and pennants. The team's pride behind glass."
+Глобус,Globe
+"Большой глобус на деревянной ножке — для кабинета, где решают про экспорт.","A big globe on a wooden stand, for the office where export gets decided."
+Новогодняя ёлка,New Year tree
+"Ёлка с гирляндой и звездой. Огоньки мигают, настроение праздничное.","A tree with garlands and a star. The lights blink, the mood is festive."
+Флагшток,Flagpole
+Флаг завода на высоком флагштоке у проходной. Развевается на ветру.,The plant flag on a tall pole by the gatehouse. Flutters in the wind.
+Скульптура «Рабочий»,“Worker” statue
+Рабочий с молотом на постаменте. Для заводского двора или сквера у проходной.,A worker with a hammer on a pedestal. For the plant yard or the square by the gatehouse.
+Доска объявлений,Notice board
+"Приказы, график отпусков и «Продам гараж». Ставят у проходной, в бытовке или в коридоре.","Orders, the vacation schedule and “Garage for sale”. Goes by the gatehouse, in the locker room or a corridor."
+"Индукционная печь ИСТ-0,16",Induction furnace IST-0.16
+Литьё и штамповка,Casting & stamping
+"Плавит шихту в тигле токами высокой частоты, литейщик разливает металл по опокам. Даёт заготовки сложной формы, которых не выточить из прутка. Очень много тока, жарко, нужна вытяжка.","Melts the charge in a crucible with high-frequency current, and the caster pours metal into flasks. Gives complex-shaped blanks you can't turn from bar. A lot of power, hot, needs extraction."
+Литейный участок ЛУ-2,Casting line LU-2
+"Печь, ковш на тельфере и рольганг с опоками: льют быстрее и крупнее, но и тока надо как на целый цех.","A furnace, a ladle on a hoist and a roller table with flasks: casts faster and bigger, but draws as much power as a whole shop."
+Пресс кривошипный КД2126,Crank press KD2126
+"Пресс на 16 тонн: вырубает и гнёт мелкие детали из полосы за один удар. Быстро и дёшево, но очень громко — нужны беруши.","A 16-ton press: blanks and bends small parts from strip in one stroke. Fast and cheap, but very loud, so earplugs are needed."
+Пресс листоштамповочный КБ235,Stamping press KB235
+Пресс двойного действия на 100 тонн: штампует средние детали почти вдвое быстрее малого.,A 100-ton double-action press: stamps medium parts almost twice as fast as the small one.
+Цех,Workshop
+станок или верстак,machine or workbench
+Здесь стоят станки. Нужен бетонный пол и свет: в темноте работа идёт медленнее и людям не нравится.,Machines go here. Needs a concrete floor and light: in the dark work is slower and people don't like it.
+"стеллаж, поддон или тара","rack, pallet or bin"
+Металл и готовая продукция. Рабочие охотнее разгружают металл на склад.,Metal and finished goods. Workers are keener to unload metal into a storeroom.
+Бытовка,Locker room
+2 места в шкафчиках,2 locker places
+скамейка,bench
+Переодеться в спецовку до смены и обратно после. Один шкафчик — на одного человека.,Change into overalls before the shift and back after it. One locker per person.
+Столовая,Canteen
+обеденный стол,dining table
+2 стула,2 chairs
+холодильник или микроволновка,fridge or microwave
+Нормальный обед поднимает настроение на полдня. Еда в цеху и на ходу — наоборот.,A proper lunch lifts the mood for half a day. Eating in the shop or on the go does the opposite.
+Туалет,Toilet
+унитаз,toilet
+раковина,sink
+Отдельный туалет с раковиной. Кафельный пол — плюс к впечатлению.,A separate toilet with a sink. A tiled floor improves the impression.
+Комната отдыха,Break room
+скамейка или диван,bench or sofa
+кулер или чайник,cooler or kettle
+Перевести дух в тишине. Отдых здесь восстанавливает силы и поднимает настроение.,Catch your breath in peace. Resting here restores energy and lifts the mood.
+Инструментальная кладовая,Tool crib
+шкаф с инструментом,tool cabinet
+Кладовщица выдаёт и точит инструмент: режущий инструмент расходуется на 25% меньше.,The storekeeper issues and sharpens tools: cutting tools wear 25% less.
+Инструмент. кладовая,Tool crib
+Контора,Office
+стол ИТР,office desk
+"Общий кабинет на всех: здесь могут работать любые специалисты, но в тесноте и шуме — на 30% хуже, чем в своём отделе.","A shared office for everyone: any specialist can work here, but cramped and noisy, 30% worse than in their own department."
+Конторка мастера,Foreman's booth
+Будка мастера прямо у участка: отсюда он раздаёт сменные задания и ходит по цеху.,The foreman's booth right by the floor: he hands out shift tasks from here and walks the shop.
+Кабинет начальника цеха,Shop manager's office
+шкаф для документов,filing cabinet
+"Начальник цеха вводит политики: аврал, сверхурочные.","The shop manager sets policies: rush jobs, overtime."
+Начальник цеха,Shop manager
+Бухгалтерия,Accounting
+сейф,safe
+"Учёт, налоги, отчёты. Без бухгалтерии у большого предприятия копятся пени и штрафы.","Books, taxes, reports. Without accounting a large company piles up penalties and fines."
+Отдел снабжения,Supply department
+Снабженец находит поставщиков дешевле розничной металлобазы.,The buyer finds suppliers cheaper than the retail metal depot.
+Снабжение,Supply
+ПДО,Planning office
+доска планирования,planning board
+"Планово-диспетчерский отдел: план производства, приоритеты заказов, меньше переналадок.","Production planning and dispatch: the production plan, order priorities, fewer changeovers."
+Отдел кадров,HR department
+"Кадровик ищет людей: больше кандидатов, видно их характер, сам находит замену уволившимся.","The HR officer finds people: more candidates, you see their character, and they replace leavers on their own."
+Техотдел,Engineering office
+кульман,drafting board
+"Технологи разрабатывают новые изделия, техпроцессы и станки — это ваши исследования.","Engineers develop new products, processes and machines: this is your research."
+Учебный класс,Classroom
+две парты,two school desks
+школьная доска,chalkboard
+"Здесь учатся на курсах повышения разряда и смежной профессии и проходят инструктаж по охране труда. Своё обучение вдвое-втрое дешевле учебного центра, и человек не пропадает на несколько дней.","Grade-up and second-trade courses and safety briefings happen here. Your own training is two to three times cheaper than a training center, and the person isn't away for days."
+Компрессорная,Compressor room
+компрессор,compressor
+Компрессор гудит под 90 дБ: в отдельной комнате за стеной он никому не мешает. Бетонный пол.,The compressor roars at 90 dB: in a separate room behind a wall it bothers no one. Concrete floor.
+Котельная,Boiler room
+газовый котёл,gas boiler
+"Газовый котёл работает только в отдельной котельной с бетонным полом. Он греет батареи, подключённые к его трубе: тепло вдвое дешевле городского и не зависит от аварий на теплотрассе.","A gas boiler only works in a separate boiler room with a concrete floor. It heats the radiators connected to its pipe: heat at half the city price, independent of heating-main failures."
+Профком,Union office
+доска профкома,union board
+Общежитие,Dormitory
+двухъярусная кровать,bunk bed
+шкафчик,locker
+"Жильё для иногородних: по две койки на кровать. Приезжают люди из других городов, жильцы не опаздывают; уютное общежитие (окна, свет, декор) поднимает настроение. Плата — 100 ₽ в день с жильца.","Housing for out-of-towners: two bunks per bed. People from other towns come, residents are never late; a cozy dorm (windows, light, decor) lifts the mood. Rent: 100 ₽ a day per resident."
+Медпункт,First aid post
+кушетка,medical couch
+шкаф с лекарствами,medicine cabinet
+"С фельдшером на смене больничные после травм на 40% короче, грипп реже и легче, прививки дешевле.","With a paramedic on shift, sick leave after injuries is 40% shorter, flu is rarer and milder, vaccinations cheaper."
+Отдел сбыта,Sales department
+телефон,phone
+Менеджер по сбыту обзванивает заказчиков и следит за конкурентами.,The sales manager calls customers and watches the competition.
+Кабинет охраны труда,Safety office
+стенд по охране труда,safety notice stand
+"Инженер по ОТ: инструктажи, СОУТ, расследования несчастных случаев.","The safety engineer: briefings, workplace assessments, accident investigations."
+Кабинет главного инженера,Chief engineer's office
+"Главный инженер: станки, сети, планово-предупредительные ремонты.","The chief engineer: machines, utilities, scheduled preventive maintenance."
+Юротдел,Legal department
+шкаф с кодексами,law bookcase
+"Юрист ведёт договоры, претензии и суды.","The lawyer handles contracts, claims and lawsuits."
+Кабинет директора,Director's office
+стол директора,director's desk
+Отсюда директор ведёт развитие завода: без кабинета ступени «Развития» не исследуются.,The director runs the plant's development from here: without this office Development steps can't be researched.
+Техпомещение,Utility room
+подстанция или насосная станция,substation or pump station
+Электрощитовая и насосная: здесь стоят трансформаторная подстанция с аккумуляторами и насосная станция. Вне техпомещения они не работают. Бетонный или наливной пол.,Switchgear and pumps: the transformer substation with batteries and the pump station stand here. Outside a utility room they don't work. Concrete or epoxy floor.
+Душевая,Shower room
+душевая кабина,shower stall
+"Душевые кабины и раковина, кафель на полу. После смены рабочие моются, прежде чем переодеться: настроение лучше, домой уходят чистыми. Лучше рядом с бытовкой.","Shower stalls and a sink, tiles on the floor. After the shift workers wash before changing: better mood, they go home clean. Best next to the locker room."
+Производство,Production
+Склад и отгрузка,Storage & shipping
+Быт и здоровье,Amenities & health
+Кабинеты,Offices
+Учёба и профком,Training & union
+Бетонный пол,Concrete floor
+Основа любого цеха. Дёшево и сердито.,The basis of any workshop. Cheap and cheerful.
+Кафельная плитка,Ceramic tile
+"Для бытовок, туалетов и столовой.","For locker rooms, toilets and the canteen."
+Линолеум,Linoleum
+Для кабинетов и комнат отдыха.,For offices and break rooms.
+Наливной пол,Epoxy floor
+Гладкий полимерный пол для цеха: стружка и грязь копятся на треть медленнее.,A smooth polymer floor for a shop: chips and dirt build up a third slower.
+Голубая плитка,Blue tile
+"Кафель для душевых, медпункта и столовой.","Tiles for showers, the first aid post and the canteen."
+Паркет,Parquet
+Для кабинета директора и контор: уютнее линолеума.,For the director's office and offices: cozier than linoleum.
+Кирпичная стена,Brick wall
+Тёплая и надёжная стена.,"A warm, solid wall."
+Окно,Window
+Стена с окном: даёт дневной свет.,A wall with a window: lets in daylight.
+Дверь,Door
+Проход для людей.,A way through for people.
+Ворота,Gate
+Широкие рольворота для грузов.,A wide roller gate for goods.
+Забор,Fence
+Граница участка.,The lot boundary.
+Въезд,Entrance
+Въезд на территорию.,The way onto the grounds.
+Бетонная стена,Concrete wall
+Панели из бетона: дешевле кирпича и быстро строится.,Concrete panels: cheaper than brick and quick to build.
+Сэндвич-панель,Sandwich panel
+"Лёгкая металлическая панель с утеплителем — для цехов и складов, строится вдвое быстрее кирпича.",A light insulated metal panel for shops and warehouses; builds twice as fast as brick.
+Перегородка,Partition
+Гипсокартон на профиле: дёшево делить большой зал на кабинеты.,Drywall on studs: a cheap way to split a big hall into offices.
+Металлическая дверь,Metal door
+"Крепкая стальная дверь — для склада, кассы и проходной.","A sturdy steel door for the storeroom, the cash office and the gatehouse."
+Силикатный кирпич,Sand-lime brick
+"Белый кирпич: тёплый, светлый и аккуратный — для контор и бытовок. Чуть дороже красного.","White brick: warm, bright and neat, for offices and locker rooms. A bit pricier than red."
+Газобетон,Aerated concrete
+"Крупные лёгкие блоки: строятся быстро, держат тепло лучше бетона. Хороши для складов и цехов.","Large light blocks: quick to build, hold heat better than concrete. Good for warehouses and shops."
+Остеклённая дверь,Glass door
+"Алюминиевая дверь со стеклом — светло и солидно: для конторы, кабинетов и столовой.","An aluminum door with glass, bright and respectable: for the office, cabinets and the canteen."
+Ворота синие,Blue gate
+"Такие же рольворота для грузов, но с синими утеплёнными секциями — для нарядного фасада и склада.","The same roller gate for goods, but with blue insulated sections, for a smart facade and storeroom."
+Цех 10×6,Workshop 10×6
+"Бетонный пол, кирпичные стены, ворота, дверь, четыре окна, свет и огнетушитель. Зона «Цех» — останется поставить станки и протянуть кабель.","Concrete floor, brick walls, a gate, a door, four windows, lights and an extinguisher. A “Workshop” zone: just add machines and run a cable."
+Склад 6×4,Storage 6×4
+"Три стеллажа, два поддона, ворота для тележки и свет. Зона «Склад».","Three racks, two pallets, a gate for the cart and lights. A “Storage” zone."
+Кабинет 4×3,Office 4×3
+"Линолеум, окно, стол ИТР со стулом, цветок и лампа. Зона «Контора».","Linoleum, a window, an office desk with a chair, a plant and a lamp. An “Office” zone."
+Туалет 3×2,Toilet 3×2
+"Плитка, две кабинки и раковина. Зона «Туалет» — протяните трубу от насоса.","Tiles, two stalls and a sink. A “Toilet” zone: run a pipe from the pump."
+Столовая 5×4,Canteen 5×4
+"Обеденный стол на четверых, холодильник, чайник, окна и свет. Зона «Столовая».","A dining table for four, a fridge, a kettle, windows and lights. A “Canteen” zone."
+Раздевалка 4×3,Locker room 4×3
+Три шкафчика на двоих (шесть мест) и скамейка. Зона «Бытовка».,Three double lockers (six places) and a bench. A “Locker room” zone.
+Техпомещение 5×3,Utility room 5×3
+"Бетонный пол, стальная дверь, трансформаторная подстанция и насосная станция. Зона «Техпомещение» — от него тянут кабель и трубы.","Concrete floor, a steel door, a transformer substation and a pump station. A “Utility room” zone: cable and pipes run from it."
+Кирпич,Brick
+поддон кирпича,pallet of bricks
+Бетонные блоки,Concrete blocks
+блоки,blocks
+Сэндвич-панели,Sandwich panels
+панели,panels
+Гипсокартон и профиль,Drywall and studs
+листы,sheets
+Оконные блоки,Window units
+окно,window
+Дверные блоки,Door units
+дверь,door
+Секции ворот,Gate sections
+секция,section
+Цемент и щебень,Cement and gravel
+мешки,bags
+Плитка,Tile
+коробки,boxes
+рулон,roll
+вёдра,buckets
+пачки,packs
+Скоростное резание,High-speed cutting
+Техпроцессы,Processes
+"Твердосплавные пластины и новые режимы: токарные, фрезерные и сверлильные операции на 15% быстрее.","Carbide inserts and new cutting modes: turning, milling and drilling are 15% faster."
+Режимы термообработки,Heat treatment modes
+Отработанные режимы закалки: печь греет партию на 25% быстрее.,Proven hardening modes: the furnace heats a batch 25% faster.
+Режимы закалки,Hardening modes
+Рациональный раскрой,Efficient nesting
+Карты раскроя металла: металл обходится на 8% дешевле.,Metal cutting layouts: metal costs 8% less.
+Карты раскроя,Nesting layouts
+Сварочные кондукторы,Welding jigs
+"Оснастка для сборки под сварку: сварка на 20% быстрее, брака на 30% меньше.","Fixtures for fit-up before welding: welding is 20% faster, 30% fewer rejects."
+Токарный с ЧПУ,CNC lathe
+Автоматизация,Automation
+"Открывает токарный станок с ЧПУ 16А20Ф3: почти вдвое быстрее, брака вдвое меньше. Нужен оператор (токарное дело от 4).","Unlocks the 16A20F3 CNC lathe: almost twice as fast, half the rejects. Needs an operator (turning 4+)."
+Обрабатывающий центр,Machining center
+Открывает вертикальный обрабатывающий центр 65А60: фрезерует средние детали почти вдвое быстрее. Нужен фрезеровщик от 4-го разряда.,Unlocks the 65A60 vertical machining center: mills medium parts almost twice as fast. Needs a grade 4+ miller.
+Обраб. центр,Mach. center
+Импортное ЧПУ,Imported CNC
+"Связи с поставщиками импортного оборудования: открывает станки Сайдвей, Майдэй, Пантера, Ханган, Хартвуд и Мингер — быстрее и точнее советских.","Ties with imported equipment suppliers: unlocks Sidway, Mayday, Panthera, Hangan, Hartwood and Minger machines, faster and more precise than Soviet ones."
+Импорт ЧПУ,Import CNC
+Карты доработки брака,Rework cards
+Слесарное дело,Fitting
+Типовые приёмы исправления брака у слесарного верстака: слесарь спасает деталь на 15% чаще.,Standard ways to fix rejects at the fitter's bench: the fitter saves a part 15% more often.
+Слесарная оснастка,Fitter's tooling
+"Мерные упоры, кондукторы и хороший инструмент: слесарь режет заготовки ножовкой вдвое больше за раз и ремонтирует станки на 20% быстрее.","Length stops, jigs and good tools: the fitter hacksaws twice as many blanks at a time and repairs machines 20% faster."
+Фланец,Flange
+Изделия,Products
+Новое изделие: фланец из поковки — токарная и сверлильная операции. Хороший спрос у трубников.,"New product: a forged flange, turning and drilling. Good demand from pipe makers."
+Шестерня цилиндрическая,Spur gear
+"Новое изделие: шестерня — точение, зубофрезерование, закалка. Дорогая, нужен опытный фрезеровщик.","New product: a gear, turning, gear hobbing, hardening. Expensive, needs an experienced miller."
+Редуктор,Gearbox
+"Новый узел: редуктор из шлицевого вала, двух шестерён, корпуса и втулок, с покраской. Самый дорогой заказ.","New assembly: a gearbox from a splined shaft, two gears, a housing and bushings, painted. The most expensive order."
+5S на рабочих местах,5S at workplaces
+Управление,Management
+"Сортировка, порядок, чистота: все работают на 5% быстрее, людям нравится порядок.","Sort, set in order, shine: everyone works 5% faster, and people like the order."
+Канбан,Kanban
+"Тянущая система: грузчики носят пачки на 50% больше, детали меньше лежат.","A pull system: loaders carry 50% bigger batches, parts sit around less."
+Статистический контроль,Statistical process control
+"Контрольные карты и выборочный контроль: брака на 25% меньше, ОТК ловит на 10% больше.","Control charts and sampling: 25% fewer rejects, QC catches 10% more."
+Статконтроль,SPC
+Бережливое производство,Lean production
+"Быстрая переналадка (SMED) и поток: переналадка вдвое короче, все работают ещё на 5% быстрее.","Quick changeover (SMED) and flow: changeovers twice as short, everyone works another 5% faster."
+Производственная гимнастика,Workplace exercises
+Социальное,Social
+Пятиминутка размятки: люди устают на 15% медленнее.,A five-minute warm-up: people tire 15% slower.
+Комплексные обеды,Set lunches
+Договор с комбинатом питания: обед в столовой радует сильнее и надолго.,A contract with a catering plant: lunch in the canteen pleases more and for longer.
+Программа наставничества: навыки растут вдвое быстрее.,A mentoring program: skills grow twice as fast.
+Наставники,Mentors
+Литейный участок,Casting shop
+"Открывает индукционную печь и литейный участок, профессию литейщика и литые изделия: крышки и корпуса редукторов. Нужен ток и вытяжка.","Unlocks the induction furnace and casting line, the caster trade and cast products: gearbox covers and housings. Needs power and extraction."
+Штамповка,Stamping
+"Открывает кривошипные и листоштамповочные прессы, профессию штамповщика и штампованные изделия: шайбы, хомуты, кронштейны — дёшево и сотнями.","Unlocks crank and sheet stamping presses, the press operator trade and stamped products: washers, clamps, brackets, cheap and by the hundred."
+Финансы,Finance
+Бухучёт,Bookkeeping
+"Отчёт по неделям и статьям, налог 5% вместо 6%, кредит под 17% вместо 22%, нет штрафов налоговой.","Reports by week and item, 5% tax instead of 6%, loans at 17% instead of 22%, no tax fines."
+Себестоимость,Cost accounting
+"Себестоимость и маржа в каждой заявке и на «Рынке», прогноз кассы на две недели.","Cost and margin in every request and on the Market, a two-week cash forecast."
+Банк и лизинг,Bank & leasing
+"Кредит до 3 млн ₽ под 14%, лизинг станков, страхование имущества и ответственности.","Loans up to 3 million ₽ at 14%, machine leasing, property and liability insurance."
+Кадры,HR
+"6 кандидатов вместо 4, объявления вдвое дешевле, настроение людей числами и разбор мыслей.","6 candidates instead of 4, job ads half price, people's mood in numbers and a breakdown of their thoughts."
+Связь с ПТУ,Vocational school link
+"Договор с ПТУ о практикантах; иногородние в найме, если есть свободные койки в общежитии.",A contract with a vocational school for trainees; out-of-towners can be hired if there are free dorm bunks.
+Кадровый резерв,Talent pool
+Флажок «риск ухода» в карточке человека; кадровик сам нанимает замену уволившимся.,A “may quit” flag on a person's card; the HR officer hires replacements for leavers on their own.
+Мастер участка,Section foreman
+"Бригады и бригадиры, свой график смены, мастер ускоряет смену и держит дисциплину.","Crews and crew leaders, your own shift schedule; the foreman speeds up the shift and keeps discipline."
+"Политики «Аврал» и «Сверхурочные», +скорость всего цеха.","“Rush job” and “Overtime” policies, +speed for the whole shop."
+Соцсоревнование,Socialist competition
+Доска почёта и соцсоревнование бригад; рабочие вдвое чаще приносят рацпредложения.,The Board of Honor and crew competitions; workers bring improvement proposals twice as often.
+Планирование,Planning
+"План и приоритеты, оценка «успеваем?» на рынке, оверлей загрузки, переналадка вдвое быстрее.","Plan and priorities, an “on time?” estimate on the market, a load overlay, changeovers twice as fast."
+Партии,Batches
+"ПДО собирает одинаковые операции в партии: переналадок меньше, каждая ещё на 30% быстрее.","Planning groups identical operations into batches: fewer changeovers, each another 30% faster."
+Впритык,Tight scheduling
+Сбыт может брать заказы впритык: больше заказов на той же мощности (Заказы → «Брать заказы»).,Sales can take orders with tight deadlines: more orders on the same capacity (Orders → “Take orders”).
+Рынок,Market
+"Выбор поставщика и опт, график и прогноз цены металла, закупка впрок.","Supplier choice and bulk buying, a metal price chart and forecast, buying ahead."
+"Таблица конкурентов, ценовая политика (демпинг или премиум), +10% заявок.","A competitor table, pricing policy (dumping or premium), +10% requests."
+Контракты,Contracts
+Долгие контракты с крупными заказчиками и экспортные заказы (при репутации от 60).,Long contracts with big customers and export orders (reputation 60+).
+Техника,Engineering
+"Технолог разрабатывает новые изделия, оснастку и станок с ЧПУ.","The process engineer develops new products, tooling and a CNC machine."
+Главный инженер,Chief engineer
+"Советы, ППР станков без отдельной политики, сводка по сетям.","Advice, preventive maintenance without a separate policy, a utilities summary."
+"Можно пройти сертификацию ISO 9001: больше заявок и контрактов, премиальные цены.","ISO 9001 certification becomes possible: more requests and contracts, premium prices."
+Право и охрана,Law & safety
+Охрана труда,Workplace safety
+"Инженер по ОТ: −15% травм, штраф по акту Н-1 вдвое меньше.","Safety engineer: −15% injuries, half the fine under an N-1 accident report."
+Юрист обжалует штрафы проверок и спорит по рекламациям.,The lawyer appeals inspection fines and argues complaints.
+Тендеры,Tenders
+Госзаказ с военной приёмкой: аванс 50% и цена на треть выше. Нужны ООО и проходная с вахтой.,State orders with military acceptance: 50% advance and a third higher price. Needs an LLC and a staffed gatehouse.
+Город,Town
+Завод сам создаёт профсоюз с председателем из лучших рабочих; через пару дней — колдоговор.,The plant sets up a trade union chaired by one of the best workers; a collective agreement in a couple of days.
+Соцсфера,Social services
+"Плита и линия раздачи, медкабинет, двухъярусные кровати: горячие обеды, фельдшер, общежитие.","A stove and serving line, a medical room, bunk beds: hot meals, a paramedic, a dormitory."
+Шефство,Patronage
+"Заводской детсад, Дом культуры на балансе, заводское радио.","A plant kindergarten, a House of Culture on the books, plant radio."
+Земля,Land
+Пустырь справа,East lot
+"Купить пустырь справа от забора. Свой участок станет шире: старый забор можно снести, деревья — спилить, а на новой земле — строить.","Buy the empty lot to the right of the fence. Your lot gets wider: the old fence can be torn down, the trees cut, and you can build on the new land."
+Пустырь слева,West lot
+"Участок слева от забора — под склад, второй цех или стоянку.","The lot to the left of the fence, for a storeroom, a second shop or parking."
+Задний двор,Back yard
+"Широкая полоса земли за заводом, во всю длину участков: места хватит на большой завод.","A wide strip of land behind the plant, the full length of the lots: room for a big plant."
+"ПЛАН: всё ставится на кальку — бесплатно, рабочие не строят, пока не утвердите","PLAN: everything goes on tracing paper, free; workers won't build until you approve"
+ — закрыто: %s., — locked: %s.
+Стройматериалы едут: %s · %s,Building materials on the way: %s · %s
+Стройка ждёт материал: %d кл. — заказ уйдёт сам,"Construction is waiting for materials: %d cells, the order will go out by itself"
+Материал на площадке — строят,"Materials on site, building"
+лизинг %s,lease %s
+бесплатно,free
+Стройка в приоритете,Construction first
+"Все, кто не стоит у станка и не на ОТК, бросают переноску и строят.
+Производство может просесть — включайте на время.","Everyone not at a machine or at QC drops hauling and builds.
+Production may dip, so turn it on for a while."
+как задумано,as designed
+%s · %s/кл.,%s · %s/cell
+Из чего строить готовое помещение. Цена в плитках пересчитается.,What to build the ready-made room from. Tile prices will be recalculated.
+Помещения,Rooms
+Полы,Floors
+Стены,Walls
+Окна и двери,Windows & doors
+Зоны на улице,Outdoor zones
+"Готовые помещения — щёлкните, где поставить: пол, стены, двери, мебель и зона разом. Можно вплотную к готовой стене — она станет общей и не оплачивается.","Ready-made rooms: click where to place one, with floor, walls, doors, furniture and zone at once. You can build against an existing wall: it becomes shared and isn't paid for."
+Пол:,Floor:
+Стены:,Walls:
+"%s Внутри %d×%d клеток, снаружи со стенами %d×%d.","%s Inside %d×%d cells, with walls %d×%d outside."
+Цех рамкой,Workshop frame
+Бытовка рамкой,Locker room frame
+Кабинет рамкой,Office frame
+"пол «%s» по всей площади, стены по контуру (общие с соседями не дублируются) и дверь посередине нижней стены. Цена — за клетку пола, плюс стены и дверь.","%s over the whole area, walls along the outline (shared walls aren't doubled) and a door in the middle of the bottom wall. Price per floor cell, plus walls and door."
+"Протяните прямоугольник. Цех — бетон или наливной пол, быт — плитка, кабинеты — линолеум или паркет.",Drag a rectangle. Workshop: concrete or epoxy; amenities: tile; offices: linoleum or parquet.
+Стены — контуром прямоугольника. Перегородкой удобно делить большой зал на кабинеты.,Walls go along a rectangle's outline. Partitions are handy for splitting a big hall into offices.
+"Окна, двери и ворота ставят в стену: протяните вдоль неё.","Windows, doors and gates go into a wall: drag along it."
+"Зоны на улице рисуют прямоугольником у ворот. Разгрузка и отгрузка обязательны — их можно расширить или перенести, но не убрать. Внутренние зоны — в меню «Зоны».","Outdoor zones are drawn as a rectangle by the gate. Unloading and shipping are required: they can be extended or moved, but not removed. Indoor zones are in the Zones menu."
+%s/кл.,%s/cell
+Разгрузка,Unloading
+"Зона разгрузки — сюда фургоны сгружают металл и ящики с оборудованием. Металл кладут на поддоны заготовок (Объекты → Склад), а нет места — на пол зоны; оттуда его разносят к станкам и на стеллажи, ящики — к местам установки. Зона обязательна: последнюю клетку не стереть.","Unloading zone: vans drop metal and equipment crates here. Metal goes on stock pallets (Objects → Storage), or on the zone floor if there's no room; from there it's carried to machines and racks, and crates to their install spots. The zone is required: the last cell can't be erased."
+Отгрузка,Shipping
+"Зона отгрузки — сюда приносят готовый заказ, отсюда грузит машина клиента. Готовые детали после ОТК лежат на поддонах готовой продукции; когда заказ готов, рабочие (или погрузчик) переносят их сюда. Зона обязательна: последнюю клетку не стереть.","Shipping zone: finished orders are brought here and the customer's truck loads them. Finished parts lie on finished goods pallets after QC; when an order is ready, workers (or a forklift) carry them here. The zone is required: the last cell can't be erased."
+Убрать зону на улице,Remove outdoor zone
+"выделите область — разгрузка или отгрузка снимется. Обе зоны обязательны: целиком убрать нельзя, только перенести — сначала отметьте новую.","select an area and unloading or shipping is removed. Both zones are required: you can't remove one entirely, only move it, so mark the new one first."
+Станки в лизинг,Lease machines
+"Лизинг открывает ступень «Банк и лизинг» (Управление → Развитие), её держит бухгалтер.","Leasing is unlocked by the “Bank & leasing” step (Management → Development), held by the accountant."
+"Станки от %s: %d%% сразу, остальное +%d%% платежами %d недель (Финансы → Кредиты и лизинг)","Machines from %s: %d%% up front, the rest +%d%% in payments over %d weeks (Finance → Loans & leasing)"
+R — повернуть перед установкой.,R rotates before placing.
+%s Размер %d×%d.,%s Size %d×%d.
+ Мощность %s кВт., Power %s kW.
+Протяните прямоугольник — разметить клетки; щёлкните по помещению — залить его целиком. Соседние клетки одной зоны сливаются.,Drag a rectangle to mark cells; click a room to fill it entirely. Adjacent cells of one zone merge.
+есть: %d,built: %d
+нужно: %s. %s,needs: %s. %s
+Стереть разметку,Erase zoning
+протяните или щёлкните — клетки станут неразмеченными.,drag or click and the cells become unzoned.
+Электричество,Electricity
+Водопровод и тепло,Water & heating
+Вентиляция,Ventilation
+Сжатый воздух,Compressed air
+Подстанции (%d): %d кВт · нагрузка %.1f кВт. Мало — аккумуляторы вплотную к подстанции.,Substations (%d): %d kW · load %.1f kW. Not enough? Batteries right next to a substation.
+Тока нет: поставьте подстанцию в техпомещении и заведите кабель в её клетку.,No power: place a substation in a utility room and run a cable into its cell.
+Кабель,Cable
+"протяните мышью — ляжет уголком. Прибор подключён, если кабель заведён прямо в клетку его розетки (жёлтый значок), подстанция — в любую её клетку.","drag with the mouse and it lays at a right angle. A device is connected if the cable runs right into its socket cell (yellow icon); a substation, into any of its cells."
+Снять кабель,Remove cable
+выделите область — вернётся 30% стоимости.,select an area and 30% of the cost is refunded.
+ Мощность %d кВт., Power %d kW.
+"Насосная станция — в техпомещении; трубы тяните от неё прямо в клетки туалетов, раковин и котла (синий кружок).","The pump station goes in a utility room; run pipes from it right into the cells of toilets, sinks and the boiler (blue circle)."
+Труба,Pipe
+протяните мышью — ляжет уголком.,drag with the mouse and it lays at a right angle.
+Снять трубу,Remove pipe
+"Воздуховод — от вытяжного вентилятора по помещениям со сваркой, покраской и печью.","Ducts run from the exhaust fan through rooms with welding, painting and furnaces."
+Пневмомагистраль — от компрессора к покрасочной камере и сборочным столам.,The air line runs from the compressor to the paint booth and assembly benches.
+Воздуховод,Duct
+Пневмомагистраль,Air line
+протяните мышью — линия ляжет уголком.,drag with the mouse and the line lays at a right angle.
+Снять,Remove
+"Чертежи отменены, деньги возвращены.","Blueprints canceled, money refunded."
+Чертёж кабеля: %d кл. (%s). Проложит электрик или строитель.,Cable blueprint: %d cells (%s). An electrician or builder will lay it.
+Не хватает денег на кабель.,Not enough money for the cable.
+Зона разгрузки: %d кл. Сюда будут разгружать металл (на поддоны заготовок) и ящики с оборудованием.,Unloading zone: %d cells. Metal (onto stock pallets) and equipment crates will be unloaded here.
+Здесь нельзя отметить зону.,You can't mark a zone here.
+Зона отгрузки: %d кл. Сюда понесут готовые заказы — машина клиента грузит только отсюда.,Shipping zone: %d cells. Finished orders will be brought here; the customer's truck loads only from here.
+Зона убрана: %d кл.,Zone removed: %d cells.
+Здесь нет зоны.,There's no zone here.
+Чертёж трубы: %d кл. (%s). Проложат строители.,Pipe blueprint: %d cells (%s). Builders will lay it.
+Не хватает денег на трубы.,Not enough money for the pipes.
+воздуховода,duct
+пневмомагистрали,air line
+Чертёж %s: %d кл. (%s). Проложат строители.,Blueprint for the %s: %d cells (%s). Builders will lay it.
+Не хватает денег.,Not enough money.
+Снято: %d кл.,Removed: %d cells.
+Здесь ничего нет.,There's nothing here.
+Снято трубы: %d кл.,Pipe removed: %d cells.
+Здесь нет трубы.,There's no pipe here.
+Снято кабеля: %d кл.,Cable removed: %d cells.
+Здесь нет кабеля.,There's no cable here.
+Помещение — от 3×3 клеток вместе со стенами.,A room must be at least 3×3 cells including walls.
+Стёрто с плана: %d.,Erased from the plan: %d.
+Здесь на плане ничего нет.,There's nothing on the plan here.
+"Сети и уличные зоны на плане не рисуются — проложите их, когда начнёте строить.",Utilities and outdoor zones aren't drawn on the plan; lay them when you start building.
+пола,floor
+"Зоны рисуют внутри помещения: на полу, обнесённом стенами с дверью. Разгрузку и отгрузку — в «Стройке», на улице.","Zones are drawn inside a room: on a floor enclosed by walls with a door. Unloading and shipping go outdoors, in Build."
+Разметка снята: %d кл.,Zoning removed: %d cells.
+Зона «%s»: %d кл. Всё нужное на месте.,Zone “%s”: %d cells. Everything needed is in place.
+Зона «%s»: %d кл. Не хватает: %s.,Zone “%s”: %d cells. Missing: %s.
+Зона «%s» размечена: %d кл.,Zone “%s” marked: %d cells.
+"Чертёж помещения %d×%d: пол, стены и дверь. Назначение выберите после постройки (Помещения).","Room blueprint %d×%d: floor, walls and a door. Choose its purpose after it's built (Rooms)."
+стены,walls
+проёмов,openings
+"Отмечено под снос: %d. Стены и полы разберут, объекты — упакуют в ящики и унесут на склад оборудования.",Marked for demolition: %d. Walls and floors will be taken down; objects packed into crates and taken to the equipment store.
+Здесь нечего сносить.,Nothing to demolish here.
+"Чертёж %s: %d кл. Рабочие построят, когда освободятся.",Blueprint for the %s: %d cells. Workers will build it when they're free.
+Не хватает денег на весь чертёж.,Not enough money for the whole blueprint.
+Здесь строить нельзя или уже построено.,"You can't build here, or it's already built."
+Не хватает денег: нужно %s,Not enough money: you need %s
+Заказано: %s. Рабочие смонтируют.,Ordered: %s. Workers will install it.
+«%s» — на плане.,“%s” is on the plan.
+"Заказано помещение «%s»: строители начнут с пола и стен, мебель и зону поставят, когда достроят.","Ordered room “%s”: builders will start with the floor and walls, then furniture and the zone once it's done."
+  · общая стена: %d кл.,  · shared wall: %d cells
+Механический цех,Machine Shop
+Литейный цех,Foundry
+Цех №2,Shop No. 2
+Инструментальный цех,Tool Shop
+Кузнечный цех,Forge Shop
+Сборочный цех,Assembly Shop
+Цех металлоконструкций,Steel Structures Shop
+Склад №3,Warehouse No. 3
+Склад готовой продукции,Finished Goods Warehouse
+Оптовая база,Wholesale Depot
+Склад металла,Metal Warehouse
+Логистический терминал,Logistics Terminal
+Заводоуправление,Plant Administration
+Проектный институт,Design Institute
+Конструкторское бюро,Design Bureau
+Учебный комбинат,Training Center
+Нефтебаза,Oil Depot
+Склад ГСМ,Fuel Depot
+Водоочистные,Water Treatment
+Котельная №4,Boiler House No. 4
+Котельная №2,Boiler House No. 2
+АТП-2,Motor Depot 2
+Автобаза,Truck Depot
+Стоянка фур,Truck Parking
+Контейнерная площадка,Container Yard
+Терминал,Terminal
+ГСК «Мотор»,“Motor” Garage Co-op
+ГСК «Колесо»,“Koleso” Garage Co-op
+Гаражи,Garages
+Подстанция 110 кВ,110 kV Substation
+Подстанция,Substation
+Металлобаза,Metal Depot
+Вторчермет,Vtorchermet Scrap
+ул. Рылеева,Ryleeva St.
+б-р Энтузиастов,Entuziastov Blvd.
+Моршанское ш.,Morshanskoe Hwy
+ул. Московская,Moskovskaya St.
+ул. Монтажников,Montazhnikov St.
+ул. Мичуринская,Michurinskaya St.
+пр. Энергетиков,Energetikov Ave.
+Рассказовское ш.,Rasskazovskoe Hwy
+Моршанское шоссе,Morshanskoe Highway
+р. Цна,Tsna River
+ул. Советская,Sovetskaya St.
+Студенецкая наб.,Studenetskaya Emb.
+ул. Коммунальная,Kommunalnaya St.
+ул. Интернациональная,Internatsionalnaya St.
+ул. М. Горького,M. Gorky St.
+ул. Набережная,Naberezhnaya St.
+Студенецкая набережная,Studenetskaya Embankment
+ул. Максима Горького,Maxim Gorky St.
+Коммунальная — пешеходная,"Kommunalnaya, pedestrian"
+Мост через Цну,Bridge over the Tsna
+ул. Московская → Рассказовское ш.,Moskovskaya St. → Rasskazovskoe Hwy
+Телебашня,TV Tower
+180 м · ул. Мичуринская,180 m · Michurinskaya St.
+Северный автовокзал,North Bus Station
+МиГ‑21,MiG-21
+Парк Победы,Victory Park
+ТЭЦ‑Север,North CHP Plant
+Химкомбинат «Цна‑Колор»,Chemical Plant “Tsna-Color”
+Ледовый дворец «Кристалл»,Ice Palace “Kristall”
+Т‑34 «Тамбовский колхозник»,T-34 “Tambov Collective Farmer”
+Вознесенский монастырь,Ascension Convent
+Спасо‑Преображенский собор,Transfiguration Cathedral
+Соборная площадь · Вечный огонь,Cathedral Square · Eternal Flame
+Картинная галерея,Art Gallery
+Вокзал Тамбов‑1,Tambov-1 Station
+ТГУ им. Державина,Derzhavin Tambov State University
+Драмтеатр,Drama Theater
+Площадь Ленина,Lenin Square
+Казанский монастырь,Kazan Monastery
+колокольня 107 м,bell tower 107 m
+Усадьба Асеевых,Aseev Estate
+Рахманинов,Rachmaninoff
+«Русский мужик»,“Russian Muzhik”
+Мост влюблённых,Lovers' Bridge
+Набережная Цны,Tsna Embankment
+Тамбовский волк,Tambov Wolf
+Школа №%d,School No. %d
+ООО,LLC
+МАСТЕРСКАЯ,WORKSHOP
+открыто ступеней: %d из %d · работают %d из %d отделов,steps open: %d of %d · departments working: %d of %d
+"Первую ступень ветки открывает найм специалиста. Остальные директор исследует из своего кабинета — по одной, за деньги и время. Этап разрешает ступень, а не дарит её; ступень держат люди. Щёлкните по ступени — внизу подробности.","The first step of a branch opens when you hire a specialist. The director researches the rest from his office, one at a time, for money and time. A stage permits a step but doesn't grant it; steps are held by people. Click a step for details below."
+Приказы директора,Director's orders
+"Аврал: +25% к скорости, брака больше","Rush job: +25% speed, more rejects"
+Сверхурочные: +2 часа за полуторную оплату,Overtime: +2 hours at time and a half
+Нужен начальник цеха (ветка «Производство»),Needs a shop manager (“Production” branch)
+Автонайм замены,Auto-hire replacements
+Кадровик сам нанимает замену,HR hires replacements by itself
+Уволился человек — кадровик сам найдёт такого же,"When someone quits, HR finds a similar person by itself"
+Нужна ступень «Кадровый резерв» (ветка «Кадры»),Needs the “Talent pool” step (“HR” branch)
+Кабинет директора: отсюда исследуются ступени,Director's office: steps are researched from here
+занят: «%s» · %.1f дн.,busy: “%s” · %.1f d
+✓ свободен — можно исследовать,"✓ free, ready to research"
+нет кабинета — ступени не исследуются,"no office, steps can't be researched"
+✓ работает,✓ working
+этап «%s»,stage “%s”
+нанять: %s,hire: %s
+нет человека,no one on staff
+идёт · %.1f дн.,in progress · %.1f d
+%d тыс. · %d дн.,%dk · %d d
+нет на карте,not on this map
+"
+Разработки технолога: изучено %d из %d — выберите ступень, они внизу.","
+Engineer's research: %d of %d done; select the step, it's below."
+"Корень дерева. Директор исследует ступени по одной: деньги списываются сразу, ступень открывается через несколько дней. Кабинет — комната с линолеумом, столом директора (Объекты → Офис), назначенная «Кабинетом директора».","The root of the tree. The director researches steps one at a time: the money is charged at once, the step opens in a few days. The office is a room with linoleum and a director's desk (Objects → Office), zoned as “Director's office”."
+✓ кабинет есть,✓ office built
+Построить кабинет директора,Build a director's office
+Откроется каталог помещений с этим типом,Opens the room catalog at this type
+Сейчас: «%s» — осталось %.1f дн.,"Now: “%s”, %.1f d left"
+Отложить (вернут половину),Postpone (half refunded)
+ветка «%s» · ступень %d,branch “%s” · step %d
+работает,working
+"открыто, не работает","open, not working"
+исследуется,researching
+можно начать,can start
+закрыто,locked
+кабинет: %s,office: %s
+специалист: %s,specialist: %s
+Найти: %s · %s,Find: %s · %s
+Объявление по профессии — откроется найм,A job ad for the trade; hiring will open
+Построить кабинет,Build an office
+предыдущая ступень «%s» работает,previous step “%s” is working
+отдел «%s» работает — он держит ступень,department “%s” is working: it holds the step
+свой кабинет «%s» (общей конторы мало),its own office “%s” (a shared office isn't enough)
+%d человек в штате,%d people on staff
+участок %s: %d×%d клеток,lot %s: %d×%d cells
+на этой карте такого участка нет,this map has no such lot
+кабинет директора,director's office
+директор свободен,director is free
+ (занят: «%s»), (busy: “%s”)
+деньги: %s,money: %s
+Купить · %s · %d %s,Buy · %s · %d %s
+Начать · %s · %d %s,Start · %s · %d %s
+Деньги спишутся сразу,The money is charged at once
+осталось %.1f дн.,%.1f d left
+"Ступень открыта, но не работает, пока в отделе «%s» нет человека.",The step is open but won't work until department “%s” has someone.
+день|дня|дней,day|days
+%d FPS · кадр %.1f мс (макс %.0f) · узлов %d · сирот %d · объектов %d · текстуры %.0f МБ · видео %.0f МБ · ОЗУ %s,%d FPS · frame %.1f ms (max %.0f) · nodes %d · orphans %d · objects %d · textures %.0f MB · video %.0f MB · RAM %s
+%.0f МБ,%.0f MB
+ПРОДАЁТСЯ,FOR SALE
+щёлкните — купить,click to buy
+Добро пожаловать в «Промзону»,Welcome to Promzona
+Справочник «Промзоны»,Promzona Handbook
+игра на паузе,game paused
+"Поиск: поддон, кредит, пожар…","Search: pallet, loan, fire…"
+Закрыть (Esc или F1),Close (Esc or F1)
+См. также,See also
+‹ Предыдущая,‹ Previous
+Следующая ›,Next ›
+"Esc или F1 — закрыть, игра продолжится с той же скоростью",Esc or F1 closes; the game resumes at the same speed
+"Понятно, за работу!","Got it, let's get to work!"
+Найдено: %d,Found: %d
+"Ничего не найдено. Попробуйте другое слово: «ток», «зарплата», «склад».","Nothing found. Try another word: “power”, “wages”, “storage”."
+%d разделов · %d статей,%d sections · %d articles
+ · без окон, · no windows
+лампы %d%%%s,lamps %d%%%s
+нет тока,no power
+"Освещение: жёлтым — светят лампы, голубым — свет из окон днём, синим — темно","Lighting: yellow is lamp light, light blue is window daylight, blue is dark"
+Ночью и в помещениях без окон лампы должны покрывать 60%% площади. %s,"At night and in rooms without windows, lamps must cover 60%% of the floor. %s"
+Сейчас день.,It's daytime now.
+Сейчас темно — работают только лампы.,It's dark now: only lamps work.
+%d дБ,%d dB
+стоит,idle
+"Шум работающих станков: жёлтым — до 70 дБ, оранжевым — до 80, красным — выше 80 дБ","Noise of running machines: yellow up to 70 dB, orange up to 80, red above 80 dB"
+"Стены гасят шум. Рядом с шумными станками не ставьте столовую, контору и комнату отдыха","Walls dampen noise. Don't put the canteen, office or break room next to noisy machines"
+%s · чисто %d%%,%s · clean %d%%
+"Чистота и обустройство: стружка и грязь на полу, звёзды — уровень помещения",Cleanliness and comfort: chips and dirt on the floor; stars are the room level
+Стружку сметают уборщицы (Люди → Найм) в контейнеры для стружки; лом сдают по пятницам,Cleaners (People → Hiring) sweep chips into chip bins; scrap is sold on Fridays
+"Уровень поднимают окна, хороший пол, свет, растения и декор; грязь его снижает","The level rises with windows, a good floor, light, plants and decor; dirt lowers it"
+Потоки людей: данных пока нет — пусть поработают,"Foot traffic: no data yet, let them work a while"
+"Потоки людей: где чаще ходят (синим — редко, красным — тропа)","Foot traffic: where people walk most (blue is rare, red is a beaten path)"
+"Длинные красные дорожки — лишние шаги: ставьте склады, шкафчики и туалет ближе к рабочим местам","Long red paths are wasted steps: put storage, lockers and the toilet closer to workplaces"
+сломан,broken
+выключен,off
+%d шт.,%d pcs
+ · брак %d%%, · rejects %d%%
+"Заказы: ~%.1f раб. дн., проблемный участок — %s","Orders: ~%.1f work days, bottleneck: %s"
+"Загрузка станков в рабочее время: зелёным — от 60%, жёлтым — 25–60%, красным — простаивает","Machine load in working hours: green 60%+, yellow 25–60%, red idle"
+Принятых заказов нет — станки ждут работы,No accepted orders: machines are waiting for work
+%d кл.,%d cells
+✓ оборудовано · %s,✓ equipped · %s
+темно,dark
+ · темно, · dark
+Помещений пока нет: обнесите пол стенами с дверью,No rooms yet: enclose a floor with walls and a door
+"Цвет — группа зон: оранжевый — производство, жёлтый — склад, зелёный — быт, синий — кабинеты, фиолетовый — учёба и профком.","Color is the zone group: orange production, yellow storage, green amenities, blue offices, purple training & union."
+Пунктир — граница двух зон в одном зале. Серым — помещение без разметки.,Dashed line: the border of two zones in one hall. Gray: a room with no zoning.
+"Зон, которым чего-то не хватает: %d — жёлтый треугольник в углу зоны.","Zones missing something: %d, marked by a yellow triangle in the zone's corner."
+свет есть,lit
+нет подключения,not connected
+%s · нет кабеля ближе %d клеток,%s · no cable within %d cells
+%d кВт · не подключён,%d kW · not connected
+%.1f / %d кВт,%.1f / %d kW
+ВЫБИТ АВТОМАТ,BREAKER TRIPPED
+%s · %s кВт,%s · %s kW
+ · нет кабеля, · no cable
+ · без тока, · no power
+насос,pump
+батарея · ,radiator · 
+от своего котла,from own boiler
+от городской теплосети,from city heating
+котёл · ,boiler · 
+греет %d из %d батарей,heats %d of %d radiators
+вода есть,has water
+в сети нет насоса,no pump on the network
+труба не подведена,no pipe connected
+Нет насоса: поставьте его (Сети → Водопровод) и тяните от него трубы,No pump: place one (Utilities → Water) and run pipes from it
+Улица: %+d °C,Outside: %+d °C
+воздух: %s,air: %s
+чисто,clean
+душно %d%%,stuffy %d%%
+дым %d%%,smoke %d%%
+вентиляция ×%.1f,ventilation ×%.1f
+нужна вентиляция,needs ventilation
+без вентиляции,no ventilation
+вентилятор · ,fan · 
+зонт · ,hood · 
+тянет,pulling
+не подключён к вентилятору,not connected to a fan
+"Вентиляция: зелёный — чистый воздух, жёлтый — душно, бурый — дым","Ventilation: green is clean air, yellow is stuffy, brown is smoke"
+Вытяжной вентилятор (под током) тянет воздух из помещений по своему воздуховоду,A powered exhaust fan pulls air from rooms through its duct
+"Зонт над сварочным постом, камерой или печью — три четверти дыма уходит сразу","A hood over a welding station, booth or furnace removes three quarters of the smoke at once"
+%d чел.%s,%d people%s
+ · бригадир , · leader 
+ · нет бригадира, · no crew leader
+под камерой,on camera
+камера · нет тока,camera · no power
+проходная · ,gatehouse · 
+охрана на посту,guard on duty
+без охраны,no guard
+"Бригады: участки и люди цветом бригады, бригадир — с ободком","Crews: areas and people in crew colors, the crew leader with a ring"
+"Охрана: камеры (зелёные — пишут), проходная, охранники — жёлтый ободок","Security: cameras (green are recording), the gatehouse, guards with a yellow ring"
+Шанс поймать несуна на выходе: %d%%,Chance to catch a pilferer at the exit: %d%%
+ · нет тока, · no power
+ · выключен, · off
+ · магистраль не подведена, · no air line connected
+воздух есть,has air
+давления не хватает,not enough pressure
+компрессор не работает,compressor not working
+магистраль не подведена,no air line connected
+" — красят кистью, в 1,5 раза дольше",": painting by brush, 1.5× slower"
+Нет компрессора: поставьте его (Сети → Сжатый воздух) и тяните пневмомагистраль,No compressor: place one (Utilities → Compressed air) and run an air line
+свет не подключён,light not connected
+%d кВт · кабель не проложен,%d kW · no cable laid
+насосная,pump station
+ · не подключён, · not connected
+ток,power
+вода,water
+воздух,air
+ есть, ok
+ — нет,: none
+"Жёлтый — кабель (оранжевый — перегруз, красный — выбит автомат)","Yellow is cable (orange overload, red tripped breaker)"
+Синий — водопровод (серый — нет воды в трубе),Blue is plumbing (gray: no water in the pipe)
+Оранжевый пунктир — сжатый воздух,Orange dashes: compressed air
+Широкий серый — воздуховод вентиляции,Wide gray: ventilation duct
+Значки в углу объекта — что ему нужно; красный — этого нет,Icons in an object's corner show what it needs; red means it's missing
+ · ждёт стен, · waiting for walls
+ · план, · plan
+изучено %d из %d,researched %d of %d
+ · ~%.1f очка за смену, · ~%.1f pts per shift
+"Разработки ведёт технолог в техотделе — дерево открывается, когда он появится. Изученное открывает новые изделия, станки и улучшения. Щёлкните по разработке — внизу подробности.","Research is run by a process engineer in the engineering office; the tree opens once you have one. Research unlocks new products, machines and upgrades. Click an item for details below."
+Техотдел: здесь технолог ведёт разработки,Engineering office: the process engineer runs research here
+нет технолога — дерево закрыто,"no process engineer, tree locked"
+разрабатывает: «%s» · %d%%,researching: “%s” · %d%%
+✓ свободен — выберите разработку,"✓ free, pick a project"
+%d очков,%d pts
+✓ изучено,✓ researched
+идёт · %d%%,in progress · %d%%
+ · начато, · started
+после «%s»,after “%s”
+"Корень дерева разработок. Очки дают технологи за столами техотдела (стол ИТР, кульман, линолеум — или общая контора). Пока технолога нет, дерево закрыто: видно, что впереди, но разрабатывать некому.","The root of the research tree. Points come from process engineers at engineering office desks (office desk, drafting board, linoleum, or a shared office). Until you have one, the tree is locked: you can see what's ahead, but nobody to research it."
+технолог: %s,engineer: %s
+технолог в штате,a process engineer on staff
+Найти технолога · %s,Find an engineer · %s
+ветка «%s» · %d очков,branch “%s” · %d pts
+изучено,researched
+в работе,in progress
+технолог в техотделе,a process engineer in the engineering office
+сначала: «%s»,first: “%s”
+Разрабатывать,Research
+ (%.0f из %d), (%.0f of %d)
+Технолог переключится на эту разработку; набранные очки прежней сохранятся,The engineer will switch to this project; points on the previous one are kept
+%.1f из %d очков,%.1f of %d pts
+«%s»,“%s”
+город %s · отношения %d из 100,the town %s · relations %d of 100
+"Город смотрит, как завод заботится о людях: общежитие, горячие обеды, медпункт, детсад, Дом культуры, радио. Отношения от 60 — больше кандидатов, от 75 — льгота: налог с выручки на 1% ниже. Увольнения город не любит.","The town watches how the plant cares for its people: a dormitory, hot meals, a first aid post, a kindergarten, a House of Culture, radio. Relations 60+ bring more candidates; 75+ a tax break, 1% lower tax on revenue. The town dislikes layoffs."
+Отношения с городом,Town relations
+жильцов / коек,residents / bunks
+Горячих обедов,Hot meals
+сегодня · всего %d,today · total %d
+Детсад,Kindergarten
+мест получили / родителей,places given / parents
+"Койки для иногородних: новые кандидаты, жильцы не опаздывают.","Bunks for out-of-towners: new candidates, residents are never late."
+Комната с двухъярусной кроватью и шкафчиком → «Общежитие»,A room with a bunk bed and a locker → “Dormitory”
+Кухня и повар,Kitchen & cook
+Горячие обеды: +9 к настроению вместо +6.,Hot meals: +9 to mood instead of +6.
+"Плита и линия раздачи в столовой, повар в штате","A stove and serving line in the canteen, a cook on staff"
+"Больничные короче на 40%, гриппа меньше.","Sick leave 40% shorter, less flu."
+"Кушетка, шкаф с лекарствами, раковина и фельдшер","A couch, a medicine cabinet, a sink and a paramedic"
+Детсад «Шестерёнка»,Kindergarten “Little Gear”
+"Родителям спокойнее, прогулов меньше.","Parents worry less, fewer absences."
+С этапа «Малое предприятие»,From the “Small business” stage
+ДК «Машиностроитель»,House of Culture “Machine Builder”
+Кружки и концерты к праздникам.,Clubs and holiday concerts.
+С этапа «Среднее предприятие»,From the “Medium business” stage
+Заводское радио,Plant radio
+"Новости, гимнастика и музыка в обед.","News, exercises and music at lunch."
+Радиоузел и громкоговорители (Объекты → Офис),A radio room and loudspeakers (Objects → Office)
+нет,none
+Подробнее →,More →
+жильцов %d · свободно коек %d,residents %d · free bunks %d
+"Общежитие — комната с двухъярусной кроватью (две койки) и шкафчиком, назначенная «Общежитием». Пока есть свободные койки, по понедельникам приходят иногородние кандидаты: они чуть дешевле и никогда не опаздывают. Уютная комната (окна, свет, декор) — им веселее. Плата — %s в день с жильца.","A dormitory is a room with a bunk bed (two bunks) and a locker, zoned as “Dormitory”. While there are free bunks, out-of-town candidates come on Mondays: they're a bit cheaper and never late. A cozy room (windows, light, decor) cheers them up. Rent: %s a day per resident."
+Комнат,Rooms
+оборудованных общежитий,equipped dormitories
+Коек,Bunks
+занято / всего,taken / total
+Плата в день,Daily rent
+с жильцов,from residents
+Приглашать иногородних кандидатов,Invite out-of-town candidates
+"По понедельникам — до трёх кандидатов из других городов, если в общежитии есть свободные койки","On Mondays, up to three candidates from other towns, if the dormitory has free bunks"
+иногородних зовёт кадровик после ступени «Связь с ПТУ»,HR invites out-of-towners after the “Vocational school link” step
+на следующей неделе приедут: %d,coming next week: %d
+"Общежития нет. Постройте комнату, поставьте двухъярусную кровать и шкафчик (Объекты → Быт) и назначьте её «Общежитием».","No dormitory. Build a room, put in a bunk bed and a locker (Objects → Amenities) and zone it as “Dormitory”."
+Пока никто не живёт. Наймите иногороднего кандидата в «Люди → Найм» — у него пометка «иногородний».,Nobody lives here yet. Hire an out-of-town candidate in People → Hiring; they're marked “out-of-town”.
+Жилец,Resident
+Профессия,Trade
+Комната,Room
+иногородняя,out-of-town
+иногородний,out-of-town
+местная,local
+местный,local
+Показать на заводе,Show at the plant
+горячих обедов сегодня %d · порций готово %d,hot meals today %d · portions ready %d
+Кухня,Kitchen
+"Повар у плиты готовит порции на всех, кто сегодня обедает (продукты — %s за порцию). Обед в столовой с горячим: +9 к настроению вместо +6, и человек отдыхает.","The cook at the stove makes portions for everyone eating today (food costs %s per portion). A hot lunch in the canteen: +9 to mood instead of +6, and the person rests."
+Плита в столовой,Stove in the canteen
+Объекты → Быт → Электроплита промышленная (6 кВт),Objects → Amenities → Industrial electric stove (6 kW)
+Плита под током,Stove powered
+Объекты → Быт → Линия раздачи,Objects → Amenities → Serving line
+Повар в штате,Cook on staff
+Люди → Найм: повар,People → Hiring: cook
+Найти повара →,Find a cook →
+"Сегодня: %d горячих обедов, готово ещё %d порций. Всего накормили: %d.","Today: %d hot meals, %d more portions ready. Fed in total: %d."
+"Комната с кушеткой, шкафом с лекарствами и раковиной, назначенная «Медпунктом», и фельдшер на смене: больничные после травм на 40% короче, грипп реже и легче, прививки дешевле.","A room with a medical couch, a medicine cabinet and a sink, zoned as “First aid post”, plus a paramedic on shift: sick leave after injuries 40% shorter, flu rarer and milder, vaccinations cheaper."
+Медпункт оборудован,First aid post equipped
+"Кушетка, шкаф с лекарствами (Объекты → Безопасность), раковина","Couch, medicine cabinet (Objects → Safety), sink"
+Фельдшер в штате,Paramedic on staff
+Люди → Найм: фельдшер,People → Hiring: paramedic
+Найти фельдшера →,Find a paramedic →
+Грипп,Flu
+Сезон гриппа — с ноября по февраль. ,Flu season runs from November to February. 
+Сейчас сезон гриппа! ,It's flu season! 
+Коллектив привит до дня %d.,The staff is vaccinated until day %d.
+Прививка — в четыре раза меньше заболевших.,Vaccination means four times fewer cases.
+ Болели в этом году: %d., Cases this year: %d.
+Сделать прививки · %s,Vaccinate · %s
+%s на человека%s,%s per person%s
+", с фельдшером на 30% дешевле",", 30% cheaper with a paramedic"
+родителей %d · мест в садике %d,parents %d · kindergarten places %d
+Детсад «%s»,Kindergarten “%s”
+"Завод содержит группы в городском саду. Работникам с детьми дают места (сначала мамам, потом по стажу): «Ребёнок в заводском садике» +5. Без садика родители иногда сидят с ребёнком и не выходят на смену.","The plant funds groups at the town kindergarten. Workers with children get places (mothers first, then by seniority): “Child in the plant kindergarten” +5. Without one, parents sometimes stay home with the child and miss a shift."
+%d мест,%d places
+своего садика нет,no kindergarten of our own
+содержание %s в неделю,upkeep %s a week
+Открыть группы на %d мест · %s,Open groups for %d places · %s
+Расширить до %d мест · %s,Expand to %d places · %s
+Потом — %s в неделю на содержание,Then %s a week upkeep
+Откроется со ступенью «Шефство» (Управление → Развитие).,Opens with the “Patronage” step (Management → Development).
+"Завод берёт на баланс городской Дом культуры: каждую неделю кто-то из работников ходит в кружки (+4), к Новому году и Дню машиностроителя — концерт (+6 всем). Город очень доволен.","The plant takes over the town House of Culture: every week some workers go to clubs (+4), and at New Year and Machine Builders' Day there's a concert (+6 for all). The town is very pleased."
+на балансе завода с дня %d,on the plant's books since day %d
+пока городской,still the town's
+Взять на баланс · %s,Take it over · %s
+Потом — %s в неделю,Then %s a week
+Работников с маленькими детьми пока нет.,No workers with small children yet.
+Родитель,Parent
+Детей,Kids
+Садик,Kindergarten
+место есть,has a place
+нет места,no place
+садика нет,no kindergarten
+радио «Заводская волна» · %s,radio “Factory Wave” · %s
+в эфире,on air
+молчит,silent
+"Радиоузел (Объекты → Офис) под током и громкоговорители под потолком: радио слышно в помещениях, где висит рупор. Программы — по рабочим дням.",A powered radio room (Objects → Office) and loudspeakers under the ceiling: the radio is heard in rooms with a speaker. Programs run on working days.
+Эфир,On air
+Объекты → Офис → Радиоузел (этап «Малое предприятие»),Objects → Office → Radio room (“Small business” stage)
+Радиоузел под током,Radio room powered
+Громкоговорители: %d,Loudspeakers: %d
+"Объекты → Офис → Громкоговоритель, кабель не дальше 3 клеток","Objects → Office → Loudspeaker, cable within 3 cells"
+Слышно: %s,Heard in: %s
+нигде,nowhere
+Программы,Programs
+кота нет,no cat
+"Кот ушёл: без миски на заводе голодно. Может, прибьётся другой…",The cat left: with no bowl the plant is a hungry place. Maybe another one will turn up…
+Кот отказался от предложения — ну и ладно.,"The cat declined the offer. Fine, then."
+"Кот ещё не прибился. Обычно это случается, когда на заводе есть столовая: запах котлет слышно издалека.",No cat has turned up yet. It usually happens once the plant has a canteen: you can smell the cutlets from afar.
+"Заводской кот гуляет по цехам, спит у тёплого, ест из миски дважды в день (корм — 40 ₽ в день) и ловит крыс: с ним крысы не портят расходники на складе. Кто проходит мимо в перерыв, гладит его: +3 к настроению.","The plant cat roams the shops, sleeps somewhere warm, eats from its bowl twice a day (food is 40 ₽ a day) and catches rats: with it around, rats don't spoil consumables in storage. Anyone passing by on a break pets it: +3 to mood."
+"Щёлкните, чтобы переименовать",Click to rename
+%s %s · на заводе с %d-го дня,%s %s · at the plant since day %d
+кошка,cat
+кот,cat
+поймано крыс: %d,rats caught: %d
+миска есть,has a bowl
+нет миски — уйдёт!,"no bowl, it will leave!"
+Гладили сегодня,Petted today
+Пока никого. Кот выходит к людям в обед и в перерывы.,Nobody yet. The cat comes out to people at lunch and on breaks.
+Что мы делаем,What we're doing
+"Вы — директор маленькой мастерской в гаражном боксе. Завод работает по кругу: заказ → металл → станок → проверка ОТК → отгрузка → деньги. Люди всё делают сами — вы решаете, что построить, кого нанять и какие заказы брать.","You're the director of a small workshop in a garage. The plant runs in a loop: order → metal → machine → QC check → shipping → money. People do everything themselves; you decide what to build, whom to hire and which orders to take."
+Цель сценария — вырасти до малого предприятия. Обучение займёт пару минут: покажем главные кнопки и окна. Игра пока на паузе.,The scenario goal is to grow into a small business. The tutorial takes a couple of minutes: we'll show the main buttons and windows. The game is paused for now.
+Осмотритесь,Look around
+"Это ваш гараж: станок, стеллажи, бытовка и трое работников. Почти всё на карте можно выбрать щелчком.","This is your garage: a machine, racks, a locker room and three workers. Almost everything on the map can be selected with a click."
+Подвигайте камеру: WASD или стрелки. Колесо мыши — ближе и дальше.,Move the camera: WASD or the arrow keys. Mouse wheel zooms in and out.
+Время,Time
+"Здесь — часы завода. Игра идёт сама, как настоящий рабочий день. На паузе время стоит, а строить и читать можно спокойно.","This is the plant clock. The game runs by itself, like a real working day. When paused, time stands still, and you can build and read calmly."
+"Пробел — пауза, клавиши 1, 2, 3 — скорость. Или эти кнопки.","Space pauses, keys 1, 2, 3 set the speed. Or use these buttons."
+Ваши люди,Your people
+"В рамке — ваш работник. Каждый человек живой: работает, ест, устаёт, обижается на низкую зарплату.","In the frame is your worker. Every person is alive: works, eats, gets tired, takes offense at low pay."
+Щёлкните по человеку в рамке — откроется его меню.,Click the person in the frame to open their menu.
+Меню человека,Person menu
+"Здесь — кто он и кем работает, чем занят прямо сейчас и полоска настроения. Зелёная — доволен, жёлтая и красная — пора разобраться, что не так.","Here: who they are and their job, what they're doing right now and a mood bar. Green means happy; yellow and red mean it's time to find out what's wrong."
+Посмотрите и нажмите «Далее».,Take a look and press “Next”.
+Взять под управление,Take control
+"Жёлтая кнопка — «Взять под управление». Человек бросит своё и сразу сделает то, что вы покажете щелчком: построит чертёж, встанет за станок, отнесёт груз.","The yellow button is “Take Control”. The person drops what they're doing and does whatever you show with a click: builds a blueprint, takes a machine, carries a load."
+"Пригодится, когда что-то нужно срочно. Сейчас — просто «Далее».","Handy when something's urgent. For now, just “Next”."
+Карточка человека,Person card
+"«Открыть карточку» — всё о человеке: что ему важно (быт, деньги, работа, коллектив, дом), что он умеет, его черты характера.","“Open Card” shows everything about the person: what matters to them (living conditions, money, work, team, home), what they can do, their character traits."
+Можно открыть её сейчас или потом. Дальше — «Далее».,You can open it now or later. Then “Next”.
+Закрыть меню,Close the menu
+Меню и окна в игре закрываются крестиком в углу — или клавишей Esc.,"Menus and windows close with the cross in the corner, or the Esc key."
+Нажмите × и закройте меню.,Press × to close the menu.
+Заказы,Orders
+"Заказы — это ваши деньги. Отдел сбыта берёт их сам, и только те, что завод успеет сделать.","Orders are your money. The sales department takes them by itself, and only those the plant can make in time."
+Откройте «Заказы» кнопкой внизу.,Open “Orders” with the button at the bottom.
+Заказы в работе,Orders in progress
+"Здесь — всё, что завод делает сейчас: готовность, срок и сумма. Срок краснеет — заказ горит: поднимите ему приоритет, и станки займутся им первым. Пусто — сбыт возьмёт заказы утром.","Here is everything the plant is making now: progress, deadline and amount. A deadline turning red means the order is on fire: raise its priority and the machines will take it first. Empty? Sales will take orders in the morning."
+Посмотрите список и нажмите «Далее».,Look at the list and press “Next”.
+Разделы окна,Window sections
+Слева — разделы окна. «Рынок» — какие заявки есть у клиентов и почему сбыт от каких-то отказался. «Архив» — выполненные и сорванные заказы.,On the left are the window's sections. “Market” shows customers' requests and why sales turned some down. “Archive” holds completed and failed orders.
+Можно пощёлкать разделы. Потом — «Далее».,Feel free to click through them. Then “Next”.
+Закройте окно,Close the window
+Посмотрели — закрывайте. Открыть снова можно той же кнопкой внизу.,Done looking? Close it. You can reopen it with the same button at the bottom.
+Нажмите × справа вверху (или Esc).,Press × at the top right (or Esc).
+Деньги и этап,Money and stage
+"Здесь — главные цифры. Деньги приходят, когда клиент забирает заказ. Рядом — этап завода: выполните цели этапа, и откроются новые станки и отделы.",These are the key numbers. Money comes in when a customer picks up an order. Next to it is the plant's stage: complete its goals and new machines and departments open up.
+Поглядывайте сюда. Дальше — «Далее».,Keep an eye on these. Then “Next”.
+Металл и готовые детали лежат на стеллажах. Места мало — поставим ещё один.,"Metal and finished parts are kept on racks. There's little room, so let's add one."
+"«Объекты» → «Склад» → «Стеллаж», затем щёлкните по свободному полу в гараже.","“Objects” → “Storage” → “Metal rack”, then click free floor in the garage."
+Стеллаж заказан,Rack ordered
+Готово! Строитель сам принесёт материал и соберёт стеллаж. Меню «Объекты» ещё открыто — можно поставить что-нибудь ещё.,"Done! A builder will bring the materials and assemble the rack. The Objects menu is still open, so you can place something else."
+Закройте меню: Esc или ещё раз кнопка «Объекты».,Close the menu: Esc or the “Objects” button again.
+Стройка,Build
+"Цеху тесно. Проще всего — готовое помещение: стены, пол, двери, мебель и зона разом. Строители всё сделают сами.","The shop is cramped. The easiest way is a ready-made room: walls, floor, doors, furniture and zone at once. Builders do it all themselves."
+"«Стройка» → «Помещения» → «Склад 6×4», затем щёлкните по свободной земле рядом с гаражом.","“Build” → “Rooms” → “Storage 6×4”, then click free ground next to the garage."
+Чертёж на месте,Blueprint placed
+"Помещение начерчено — строители возьмутся за него сами, когда освободятся. Пока стройка идёт, можно заниматься другим.","The room is drawn; builders will start on it when they're free. While it's being built, you can do other things."
+Закройте меню: Esc или ещё раз кнопка «Стройка».,Close the menu: Esc or the “Build” button again.
+Ток и вода,Power and water
+"Станкам нужен ток от подстанции, туалету — вода от насосной (обе — в техпомещении). Кабель и трубы тянут в «Сетях» прямо в клетку прибора.","Machines need power from a substation, the toilet needs water from the pump station (both in a utility room). Cables and pipes are laid in “Utilities” right into the device's cell."
+"Включите слой «Коммуникации» справа — так видно, что куда подключено.",Turn on the “Utilities” layer on the right to see what's connected where.
+Легенда слоя,Layer legend
+"Здесь — легенда: что значит каждый цвет на карте. Так сразу видно, где прибор без тока или воды.",This is the legend: what each color on the map means. You can see at once which device lacks power or water.
+Посмотрите на карту и нажмите «Далее».,Look at the map and press “Next”.
+Выключить слой,Turn off the layer
+"Слой выключается той же кнопкой. Включайте его, когда что-то не работает.",The layer turns off with the same button. Turn it on when something doesn't work.
+Нажмите кнопку слоя ещё раз.,Press the layer button again.
+Найм,Hiring
+"Рук не хватает: строить, носить металл, стоять у станков. Наймём ещё одного человека.","You're short of hands: building, hauling metal, running machines. Let's hire one more person."
+"«Люди» → «Найм»: выберите профессию, потом человека — и «Нанять».","“People” → “Hiring”: choose a trade, then a person, and “Hire”."
+Новичок в команде,New on the team
+"Готово! Новый человек уже в «Сотрудниках» — там весь ваш коллектив: зарплаты, навыки, настроение.","Done! The new person is already in “Staff”, where your whole team is: wages, skills, mood."
+Можно заглянуть туда. Потом — «Далее».,You can look in there. Then “Next”.
+Окно «Люди» больше не нужно — закрывайте.,"You don't need the People window anymore, close it."
+Список задач,Task list
+"Слева сверху — что сейчас важно: срочные письма, заказы, цели этапа. Щёлкните по строке — откроется нужное окно.","Top left is what matters now: urgent letters, orders, stage goals. Click a line to open the right window."
+"Заглядывайте сюда, когда не знаете, что делать дальше.",Look here when you don't know what to do next.
+Цели,Goals
+Куда расти — написано в «Целях». Первая цель — 10 заказов и миллион оборота.,Where to grow is written in “Goals”. The first goal is 10 orders and a million in turnover.
+Откройте «Цели» кнопкой внизу.,Open “Goals” with the button at the bottom.
+Цели этапа,Stage goals
+Здесь — цели текущего этапа и прогресс по каждой. Выполните все — завод перейдёт на новый этап.,Here are the goals of the current stage and progress on each. Complete them all and the plant moves to a new stage.
+Рейтинг,Rating
+«Рейтинг» — звёзды завода. Они складываются из пяти показателей и пересчитываются каждое утро; этапы и сценарии требуют определённого числа звёзд.,“Rating” is the plant's stars. They're made up of five indicators and recalculated every morning; stages and scenarios require a certain number of stars.
+Можно открыть раздел. Потом — «Далее».,You can open the section. Then “Next”.
+"Всё, окно можно закрыть.","That's it, you can close the window."
+Готово!,All set!
+"Теперь вы знаете главное. Остальное подскажут список задач и письма. Полный справочник по разделам — F1, кнопка «?» вверху или меню паузы.","Now you know the essentials. The task list and letters will help with the rest. The full handbook: F1, the “?” button at the top, or the pause menu."
+"Удачи, директор!","Good luck, director!"
+Пропустить обучение,Skip tutorial
+Понятно  →,Got it  →
+"Обучение пройдено! Справка — F1, цели — G.","Tutorial complete! Handbook: F1, goals: G."
+ОБУЧЕНИЕ · ШАГ %d ИЗ %d,TUTORIAL · STEP %d OF %d
+Начать обучение  →,Start tutorial  →
+Играть,Play
+Далее  →,Next  →
+заказ,order
+металл,metal
+станок,machine
+отгрузка,shipping
+деньги,money
+ЛОМ · %s,SCRAP · %s
+Приём металлолома %s  →,%s scrap yard  →
+Пожарная часть № 7  →,Fire Station No. 7  →
+РАЗГРУЗКА,UNLOADING
+ОТГРУЗКА,SHIPPING
+Нужно:,Needs:
+стены и дверь — зона только в помещении,walls and a door: zones only work inside a room
+зона %s,zone %s
+"Не работает, нужна:","Not working, needs:"
+Не размечено — не работают:,"Not zoned, not working:"
+ПЕРЕГРУЗ %.0f/%d кВт,OVERLOAD %.0f/%d kW
+%.0f / %d кВт,%.0f / %d kW
+help.sec.start,Getting started
+help.welcome.title,Welcome to Promzona
+help.welcome.text,"You're the director of a small plant. Take orders, make parts, deliver on time, and grow from a garage box into a town-forming enterprise.
+
+[b]How the production loop works[/b]
+• [b]Order[/b]: the sales department accepts requests by itself, the ones the plant can make on time and at a profit.
+• [b]Metal[/b]: supply buys it for the order, a truck brings it to the unloading zone, workers carry it to the racks.
+• [b]Machine[/b]: a machinist makes the part following its route of operations.
+• [b]QC[/b]: an inspector checks the part: good ones go on the pallet, rejects into the bin.
+• [b]Shipping[/b]: the finished batch is carried to the shipping zone, and the customer's truck arrives.
+• [b]Money[/b]: after loading. Late? You pay a penalty.
+
+Your job isn't to turn parts yourself but to build, hire, answer letters and choose a strategy. This book opens with [b]F1[/b] or the [b]“?”[/b] button at the top; while it's open, the game is paused."
+help.scenarios.title,Scenarios and plant profiles
+help.scenarios.text,"[b]Scenarios[/b]
+• [b]Garage[/b]: a box in the industrial zone, an old lathe, three workers and 600,000 ₽ (more on easy, less on hardcore). Teaches the basics with step-by-step hints.
+• [b]Greenfield[/b]: a bare lot, a site trailer, a crew of three builders and 1.3 million ₽. The “Shop from scratch”, “Sanitary facilities” and “Job creation” grants help pay for construction.
+• [b]Sandbox[/b]: an empty lot, your own money and difficulty, everything open at once, no goals.
+In Greenfield and Sandbox the first week is for building: there are no requests. Ready earlier? Use “Start production early” in the task list.
+
+The [b]profile[/b] sets what you get ordered:
+• Machine works: many small orders, steady growth.
+• Farm machinery: twice the orders in spring; in winter, build up stock.
+• Steel structures: huge heavy items, cramped without a crane.
+• Pumps and valves: every item goes through the test rig.
+• Railway components: pay well, never forgive rejects.
+• Machine-tool building: needs almost the whole plant and an engineering office.
+• Restricted enterprise: state orders with an advance and military acceptance."
+help.company.title,Your plant: name and emblem
+help.company.text,"The name (up to 24 characters) and emblem are chosen when you start a new game: 6 shapes, 12 symbols, colors for the background, symbol and border.
+
+• Where it shows: the header at the top, the arch sign over the gate (lit at night), the “Plant sign” (Objects → Decor), the plant newspaper, the stamp on drawings, saves.
+• Before registering an LLC the plant is called “Workshop «…»”, after that “LLC «…»”.
+• To change it, click the emblem in the header: the plant passport opens."
+help.first_steps.title,First steps
+help.first_steps.text,"What to do in the first days:
+1. Look at the [b]“What to do” task list[/b] on the left: it suggests the next step.
+2. Mark an [b]unloading zone[/b] and a [b]shipping zone[/b] outdoors (Build → Outdoor zones) and put pallets in them: without them there's nowhere to put metal and finished orders.
+3. Check that the machine is in a “Workshop” zone and powered, and that there's a [b]rack[/b] for metal, a [b]QC table[/b], a [b]pallet[/b] and a [b]reject bin[/b].
+4. Hire the missing people (People → Hiring): a turner, an inspector, a laborer.
+5. After that, orders will come by themselves: watch the deadlines in the Orders window and people's mood.
+
+Tip: spend your first money on whatever holds back output the most. The Market shows missed profit, and Production → Downtime shows why machines stand idle."
+help.todo.title,"Task list, banners and notifications"
+help.todo.text,"• [b]“What to do”[/b] (left): task cards. A [color=#e0675a]red[/color] stripe means urgent, [color=#e0aa48]amber[/color] means decide, [color=#7fb6d8]blue[/color] is advice. A click takes you where to deal with it.
+• The [b]red banner[/b] under the top bar is the main trouble (wage arrears, negative cash, no tools). Clicking it opens the right window.
+• [b]Notifications[/b] at the bottom are clickable: the camera flies to the spot, or a window opens (Finance, Supply, Orders…). Everything is kept in the log (Events → Log).
+• Red banners over objects (“No power”, “Broken”, “Not heating”) tell you what to do.
+• The production bottleneck is shown by the chief engineer and the “Downtime” tab."
+help.tutorial.title,Tutorial
+help.tutorial.text,"In the Garage, the 14-step tutorial walks you through the basics: the screen dims, exactly what to press lights up, and a pulsing frame leads to the target. The camera moves to whatever is being discussed.
+• The yellow panel says why and what to do; explanations close with “Got it”.
+• First comes the “What we're doing” card with the “order → metal → machine → QC → shipping → money” diagram.
+• Missed something? It's all described in this book."
+help.sec.build,Building and rooms
+help.blueprints.title,Blueprints and builders
+help.blueprints.text,"Everything is placed as a [b]blueprint[/b]: you pay first, then workers build it themselves when they're free.
+• A blueprint can be canceled (the “Cancel” button) and the money comes back.
+• “Construction first” pulls people off hauling and onto building.
+• Walls and floors are built from [b]building materials[/b]: bricks, blocks, panels, bags of cement, boxes of tile, rolls of linoleum. The material price is included in the blueprint price; a flatbed truck brings pallets to the unloading zone, and builders carry off as much as they can lift.
+• What's coming and when is shown as a line in the Build menu."
+help.walls.title,"Walls, floors, doors and windows"
+help.walls.text,"[b]Walls[/b]: brick, sand-lime brick, aerated concrete, concrete (cheaper), sandwich panel (builds twice as fast), partition (a cheap way to split a hall into offices).
+[b]Floors[/b]: concrete and epoxy (dirt builds up a third slower) for shops; ceramic and blue tile for amenities; linoleum and parquet for offices.
+[b]Openings[/b]: windows, wooden, steel and glass doors, gates. Drag them along a wall: several cells in a row become one window, a double door or a sectional gate.
+• [b]Room frame[/b] (Build): drag a rectangle and get the floor, walls and door at once."
+help.rooms.title,Rooms and zones
+help.rooms.text,"A room is a floor enclosed by walls with a door. Inside it you draw [b]zones[/b] (the “Zones” button, R): drag a rectangle, or click to fill the whole room. One hall can hold several zones.
+• The zone color is its group: orange production, yellow storage and shipping, green amenities, blue offices, purple training and union.
+• What's missing is shown by a yellow triangle in the middle of the zone.
+• Heat, light, noise, ventilation, the overhead crane, cameras and the extinguisher are shared by the whole hall.
+• [b]Zones are required[/b]: machines only work in a “Workshop”, toilets in a “Toilet”, lockers in a “Locker room”, people eat in a “Canteen”, and the substation and pump station only work in a “Utility room”. An object outside its zone is marked with a triangle, and its card has a “Zone it” button."
+help.zone_list.title,Zones and what they need
+help.zone_list.text,"• [b]Workshop[/b]: a machine or workbench.
+• [b]Storage[/b]: a rack, pallet or bin.
+• [b]Locker room[/b]: 2 locker places and a bench.
+• [b]Canteen[/b]: a dining table, 2 chairs, a fridge or microwave.
+• [b]Toilet[/b]: a toilet and a sink (and water). [b]Shower room[/b]: a shower stall and a sink.
+• [b]Break room[/b]: a bench or sofa, a cooler or kettle.
+• [b]Tool crib[/b]: a tool cabinet.
+• [b]Utility room[/b]: a substation or pump station. [b]Compressor room[/b]: a compressor. [b]Boiler room[/b]: a gas boiler.
+• [b]Office[/b] and department offices: an office desk (+ their own item: a safe, a drafting board, a planning board…).
+• [b]Classroom[/b]: two school desks and a chalkboard. [b]Union office[/b]: a desk and a union board.
+• [b]Dormitory[/b]: a bunk bed and a locker. [b]First aid post[/b]: a couch, a medicine cabinet, a sink.
+• [b]Director's office[/b]: a director's desk.
+Outdoors: an [b]unloading zone[/b] and a [b]shipping zone[/b]."
+help.templates.title,Ready-made rooms
+help.templates.text,"Build → Rooms: workshop 10×6, storage 6×4, office 4×3, toilet 3×2, canteen 5×4, locker room 4×3, utility room 5×3 (with a substation and a pump station).
+• Click the ground and the floor, walls, doors, furniture and lights are ordered; the zone is marked automatically once it's built. Sizes are interior, without walls.
+• You can place one right against another room: the [b]shared wall[/b] isn't built or paid for.
+• Floor and walls are chosen in the menu (“Floor: …”, “Walls: …”), and the price is recalculated."
+help.plan.title,Planning mode
+help.plan.text,"The “Plan” button (V): draw your future plant on tracing paper: walls, floors, zones, machines, ready-made rooms. Free, and workers don't touch the plan.
+• The bar at the top shows the estimate, “Approve plan”, “Erase plan”, “Done”.
+• “Approve” turns the plan into blueprints; trees in the way are marked for felling, zones and furniture appear by themselves once the walls are built.
+• Demolition in plan mode erases the plan. Outside plan mode the plan is shown faintly."
+help.comfort.title,Comfort and cleanliness
+help.comfort.text,"A room has a [b]comfort level[/b] of 1–5 stars: windows, a good floor, electric light, plants and decor (palm, aquarium, rug, bookcase, TV, banner, safety stand…). A higher level means better mood. A big shop needs more decor.
+• Machines shed [b]chips[/b] and people track in dirt: mood drops, people slip on chips, sanitary inspectors fine you.
+• [b]Cleaners[/b] tidy up, and laborers too if it gets really dirty.
+• Chips are swept into a [b]chip bin[/b] (4,000 ₽, 300 kg); on Fridays the scrap truck pays for chips and rejects.
+• The “Cleanliness” overlay shows dirt and room stars."
+help.demolish.title,"Demolition, rotation, equipment store"
+help.demolish.text,"• [b]Demolish[/b] (X): walls, floors, objects. The starting fence can be demolished too.
+• [b]R[/b] rotates an object while placing it; a placed one with the “Rotate” button on its card.
+• Dismantled items are carried in crates to the equipment store. Place the same object again and it's taken from there for free; extras can be sold (Production → Equipment store).
+• Clicking any structure opens its card with a description and a demolish button."
+help.trees.title,Trees and bushes
+help.trees.text,"Trees and bushes get in the way of placing objects.
+• Demolish → tree: a builder cuts it down.
+• You can draw a floor or wall where a tree stands right away; it will be cut down first.
+• Trees sway in the wind, turn yellow in autumn and stand bare with snow in winter."
+help.sec.nets,"Utilities: power, water, heat"
+help.power.title,Electricity
+help.power.text,"A 2×2 [b]transformer substation[/b] (120,000 ₽) in a [b]utility room[/b] is the only power source: 40 kW for the whole plant, no contracts.
+• Up to 9 [b]battery cabinets[/b] (40,000 ₽) go right next to it (corners count too): each adds +20 kW, up to 220 kW total.
+• Cable (150 ₽ per cell) runs right [b]into the socket cell[/b] of an object (the yellow icon on the layer), and into any cell of the substation.
+• Cable is laid as a blueprint by an electrician (or a builder or laborer). Until a cell is laid, no power flows through it.
+• A load bar sits over the substation. Overload trips the breaker; an electrician or worker resets it.
+• Electricity costs 7.5 ₽ per kWh. In the Garage and Greenfield the utility room is already built."
+help.light.title,Lighting
+help.light.text,"Fixtures under the ceiling: a light bulb (small warm circle), a fluorescent fixture (bigger, cool), an industrial high-bay lamp (the biggest), a street lamp.
+• A fixture connects by itself if a cable runs within 3 cells.
+• Windows also give light in the daytime.
+• In the dark people work slower and get injured more often. The “Lighting” overlay shows dark spots."
+help.water.title,Plumbing
+help.water.text,"A 2×2 [b]pump station[/b] (90,000 ₽) in a utility room, powered: one per plant supplies water to every fixture, however many.
+• Pipes (120 ₽ per cell) run into the cells of toilets, sinks, showers and the test rig.
+• Without water a toilet and sink can't be used.
+• Builders lay pipes from a blueprint."
+help.heat.title,Heating and the boiler room
+help.heat.text,"• A [b]radiator[/b] (6,500 ₽) heats about 22 cells of a room.
+• Radiators only heat if an [b]electric heating boiler[/b] (48,000 ₽) is working: it goes right next to the pump station (no more than one cell away) and needs power.
+• Or your own [b]boiler room[/b]: a gas boiler (260,000 ₽) in a separate room heats up to 16 radiators connected by pipe. Heat at half the price, and heating-main failures don't matter.
+• Heating is needed when it's below +10 °C outside. People are comfortable at about +21 °C; below +15 it's cold.
+• Heat-treatment furnaces warm the shop by themselves. The “Temperature” overlay shows heat by room."
+help.vent.title,Ventilation
+help.vent.text,"Welding, painting, furnaces and casting give off smoke: without extraction a room is stuffy, people get angry and work slower, and sanitary inspectors fine you.
+• An [b]exhaust fan[/b] (32,000 ₽, powered) pulls air from its own room and, through ducts (650 ₽ per cell), from others, up to 80 cells in total.
+• An [b]exhaust hood[/b] over a welding station or booth removes three quarters of the smoke at the source.
+• The “Utilities” overlay shows the air in rooms."
+help.air.title,Compressed air
+help.air.text,"A [b]screw compressor[/b] (96,000 ₽, 7.5 kW) gives 8 atm to four users at once.
+• A paint booth without air paints by brush, 1.5× slower.
+• Assembly benches with pneumatic tools are 20% faster.
+• Air line: 380 ₽ per cell. The compressor is noisy, so put it in a separate compressor room."
+help.net_accidents.title,Utility failures
+help.net_accidents.text,"• [b]Broken wire[/b]: the cable sparks, and there's no power further down the line.
+• [b]Burst pipe[/b]: a puddle, and toilets and sinks past the burst are dry.
+A letter offers a choice: an [b]emergency crew[/b] (9,000 ₽ for a wire, 12,000 ₽ for a pipe, fixed within an hour) or your own people: the damaged piece appears among the blueprints, and any free worker replaces it out of turn.
+Clicking the failure spot opens a card with an “Emergency crew” button."
+help.overlays.title,Layers (overlays)
+help.overlays.text,"The column of icons on the right edge:
+• Zones: what's where and what's missing.
+• Utilities: cable, plumbing, air, ventilation.
+• Lighting, Temperature, Cleanliness.
+• Foot traffic: where people walk most; put storage and lockers closer there.
+• Machine load: working, idle, rejects (needs a planning office).
+• Crews and security: crew areas, cameras and posts.
+Click to turn on, again to turn off; the legend is a card at the bottom left."
+help.sec.prod,Machines and production
+help.machines.title,Processes and specialists
+help.machines.text,"Each machine does its own process, and each needs its own specialist:
+• Turning: a turner; milling and drilling: a miller.
+• Welding: a welder; assembly: an assembler.
+• Heat treatment: a heat treater; painting: a painter.
+• Casting: a caster; stamping: a press operator.
+• Rig testing: an inspector.
+• CNC machines: a CNC operator.
+The machine passport (its card and the tooltip in the Objects menu): part size, speed, rejects, batch, consumption, required grade. Machines only work in a “Workshop” zone and when powered."
+help.sizes.title,Part sizes
+help.sizes.text,"Products come [b]small[/b] (pins, bushings, brackets, bolts), [b]medium[/b] (shafts, housings, gears, flanges) and [b]large[/b] (railcar axles, beams, trusses, pumps).
+• A machine takes parts up to its size: benchtop and small machines only small stuff; 1K62/16K20/6R12 small and medium; heavy ones (1M63, 6R13, 2M55, pit and bogie furnaces, the paint line) any size.
+• A large machine does large parts first.
+• No machine of the right size? Sales writes “turning (for large parts)” in the refusal.
+• Heavy parts are carried one at a time; in a hall with an overhead crane, the crane moves them."
+help.lathes.title,Lathes
+help.lathes.text,"• [b]TV-4[/b]: 65,000 ₽, benchtop, small stuff only, barely uses power.
+• [b]1A616[/b]: small parts faster than the 1K62.
+• [b]1K62[/b]: 160,000 ₽, old and indestructible: small and medium parts.
+• [b]16K20[/b]: 240,000 ₽, the most common: faster and more precise than the 1K62.
+• [b]1M63[/b]: 460,000 ₽, heavy 4×1: railcar axles and big shafts, needs a grade 2+ turner.
+Small fasteners (M16 bolt, nut, stud) run on any lathe, even the TV-4."
+help.mill_drill.title,Mills and drills
+help.mill_drill.text,"[b]Mills[/b]: 6T80 and 6R10 (small), 6R12, 6R82 (horizontal), 6R13 (heavy): housings, brackets, gear teeth.
+[b]Drills[/b]: NS-12, 2N118, 2N135, 2N150, radial 2M55 (2×2, for large parts).
+Both processes are run by a miller; cutting tools wear 1.5× faster on milling and twice as slowly on drilling as on turning."
+help.weld_asm.title,Welding and assembly
+help.weld_asm.text,"[b]Welding[/b] (consumes welding wire and gas): stick welder VD-306 (cheap, slow), MIG welder PDG-251, spot welder MT-1928 (fast, more rejects), welding station, rig with positioner. Frames, trusses, beams. Needs extraction.
+[b]Assembly[/b]: assembler's bench, press P-6326, assembly bench, assembly rig, assembly line (almost twice as fast). Assemblies are built from your own parts; with compressed air, 20% faster."
+help.heat_paint.title,Heat treatment and painting
+help.heat_paint.text,"[b]Heat[/b]: SNOL muffle furnace (3 small parts), induction hardener (two at a time, three times faster, no smoke), chamber furnace (batch of up to 6), pit furnace (8 large), bogie furnace (12). A furnace hardens a batch by itself and warms the shop.
+[b]Painting[/b] (consumes primer and paint): paint table, small booth, powder booth (−40% paint, fewer rejects), paint booth, paint line. A booth needs compressed air, otherwise they paint by brush."
+help.cast_stamp.title,Casting and stamping
+help.cast_stamp.text,"[b]Casting[/b]: the “Casting shop” research (after “Flange”). Induction furnace IST-0.16 (2×2) and casting line LU-2 (3×2, from “Medium business”): they melt the charge (140 ₽), the caster pours it into flasks; consumes molding sand. A lot of power, hot and smoky.
+[b]Stamping[/b]: the “Stamping” research. Crank press KD2126 and stamping press KB235: from 2 mm strip in one stroke. The loudest area: without earplugs people get angry.
+Products: cast cover, cast gearbox housing, spring washer (by the hundred), mounting clamp, bent bracket."
+help.cnc.title,CNC machines
+help.cnc.text,"A separate section of the Objects menu.
+• Domestic: the [b]16A20F3[/b] lathe (1.6 million ₽) and the [b]65A60[/b] machining center, from the “CNC lathe” and “Machining center” research.
+• Imported: Sidway, Mayday, Panthera, Hangan, Hartwood, Minger, from the “Imported CNC” research.
+• 1.7–2.2× faster and more precise than conventional machines, and quieter. Needs a [b]CNC operator[/b] (skill 4+); they come to interviews as soon as the plant has such a machine.
+• The signal tower glows green while the machine works."
+help.routes.title,"Routes, WIP and changeovers"
+help.routes.text,"Complex products follow a route of several operations: turning → milling → drilling → heat treatment or painting → assembly.
+• Between operations parts are [b]work in progress[/b]: put up a WIP rack (9,000 ₽).
+• Every product's route: Production → Product routes.
+• A machine needs a [b]changeover[/b] (about 20 minutes) when it switches product or operation. A planning office halves changeovers, and “Batches” and “Lean production” cut them further."
+help.wear.title,"Wear, maintenance and repair"
+help.wear.text,"• Machines wear out with use. A worn one is serviced by a turner, fitter or handy worker: about 40 minutes and 3,500 ₽ for cutters and spare parts.
+• Below 30% condition a machine may break down: repair takes about 3 hours and 22,000 ₽ (property insurance returns 80%).
+• [b]Preventive maintenance[/b] (Production → Machines): service earlier, from 75%. With a chief engineer it turns on by itself for new machines.
+• Fitters repair fastest of all; the “machine care” improvement proposal slows wear by 25%."
+help.saw_setup.title,"Blanks, setter, fitter"
+help.saw_setup.text,"• A [b]band saw[/b] (85,000 ₽) cuts bar stock into blanks in advance: the first operation on a ready blank is 20% faster.
+• A [b]setter[/b] sets machines up ahead of the next operation and services them, so machinists don't stand idle.
+• A [b]fitter[/b] at the fitter's bench reworks rejects, hacksaws blanks until you have a saw and repairs machines quickly."
+help.consumables.title,Consumables
+help.consumables.text,"Supply restocks consumables by itself:
+• Cutting tools: 6,000 ₽ per set for 40 operations (turning, milling, drilling).
+• Welding wire and gas: 3,500 ₽ (12 units).
+• Primer and paint: 4,500 ₽ (30 units).
+• Molding sand: 2,400 ₽ for 20 flasks.
+• PPE: 7,500 ₽ for 5 kits.
+In a [b]tool crib[/b] (a zone with a tool cabinet) cutters wear a quarter slower. No tools and no money: machines stop, people get angry."
+help.stall.title,Machine downtime
+help.stall.text,"Production → [b]Downtime[/b]: every machine that isn't working right now and the reason in plain words: broken, no power or cable, sealed, worn, outside a workshop, no water, no task, no consumable, no one to run it, machinist off shift, output full, no metal, waiting for blanks.
+• Three groups: “Needs your attention”, “Will stop soon”, “Normal waiting”.
+• Clicking a line shows the machine and opens its card.
+• The [b]bottleneck[/b] is the process holding back output the most; the chief engineer points it out."
+help.sec.qc,QC and rejects
+help.qc_table.title,QC inspection
+help.qc_table.text,"A [b]QC table[/b] (26,000 ₽): the inspector checks every part. Good ones go on the pallet, rejects into the reject bin.
+• Rejects are born at the machine: fewer with an experienced worker, on a precise machine, under a foreman's eye.
+• QC catches some of the rejects, more the higher the inspector's skill.
+• A missed reject goes to the customer: a [b]complaint[/b] means a refund and a reputation hit. A lawyer can dispute a complaint."
+help.scrap.title,Rejects and rework
+help.scrap.text,"• Rejected parts sit in the [b]reject bin[/b] (2,500 ₽).
+• A [b]fitter[/b] takes a part from the bin, fixes it (chance depends on skill) and takes it back to QC. “Rework cards” save 15% more.
+• On Fridays the scrap truck takes rejects and chips and pays for the scrap.
+• A reject has to be made again: the order waits, more metal is bought."
+help.test_stand.title,Test rig
+help.test_stand.text,"A hydraulic rig (180,000 ₽) with pressure gauges and a flaw detector. Pumps, valves, axles and state-order items are tested here; run by an inspector, needs water.
+The “Pumps and valves” profile can't deliver a single item without a rig."
+help.quality.title,How to reduce rejects
+help.quality.text,"• Experienced machinists and the grade exam.
+• A section foreman: 15% fewer rejects.
+• “Statistical process control”: 25% fewer rejects, QC catches 10% more.
+• The “inspection gauge” improvement proposal: 20% fewer rejects for that part.
+• CNC machines, the powder booth, “Welding jigs”.
+• Don't overuse rush jobs: 1.5× more rejects. Worn machines, fatigue and bad mood also cause rejects."
+help.iso.title,ISO 9001
+help.iso.text,"Management → ISO 9001 (after the “ISO 9001” step in Development). Requirements: QC, quality of 65%+, an engineering office, a workplace assessment, a safety briefing and two weeks without complaints.
+• The audit costs 120,000 ₽, the certificate lasts half a year (84 game days), then a surveillance audit.
+• With the certificate you get more requests and contracts, and customers hardly leave even at premium prices."
+help.sec.orders,Orders and sales
+help.sales_auto.title,How orders come in
+help.sales_auto.text,"Orders are taken by the [b]sales department[/b] by itself: requests arrive every morning, and sales accepts those the plant can make on time and at a profit, judging by the busiest process (turning, milling, QC…), and buys the metal itself.
+• Requests without free capacity wait a day and a half: when a machine frees up, sales takes them.
+• Orders → In progress → New orders: Take / Don't take pauses intake.
+• Each order has a [b]priority[/b] (urgent ones are made first) and a GOST [b]drawing[/b] of the part."
+help.strategy.title,Strategy and the market
+help.strategy.text,"The Orders window: how much to risk deadlines (“With margin”, “Normal”, “Tight”, the last with the “Tight scheduling” step), from what margin to take orders (5, 15 or 25%), what to keep in your range.
+The Market tab: what customers ask for, this week's prices, your capacity and [b]missed profit[/b], how much you lose without the right machine or person. It's a hint for what to build next. With an accountant you see margins; with a planning office, whether you'll make it in time."
+help.deadlines.title,"Deadlines, penalties and extensions"
+help.deadlines.text,"• Lateness costs a 5% penalty per day (up to 30% of the amount); after 3 days the order fails.
+• Every overdue day lowers reputation; after 2 days the customer comes to sort it out: a 10% penalty and +4 days, a promise to deliver within 2 days, or cancellation.
+• [b]Extension[/b]: “+2 d” in Orders → In progress is a call to the customer: the deadline moves two working days later for a 12% discount and a little reputation. Once per order; state orders can't be extended."
+help.trial.title,Trial batch
+help.trial.text,"The first order for a new complex product (several operations or assembly) is small, with double the time and no penalty. The shop masters the product risk-free; a failed trial batch hits reputation three times more gently."
+help.contracts.title,Contracts and the annual agreement
+help.contracts.text,"[b]Contracts[/b] (the “Contracts” step): big customers offer supplies for 4–8 weeks at a 10–25% markup once every week or two. Often for a product you have no equipment for: you get a week or two before it starts. Miss a weekly batch and you're fined; miss two and the contract is terminated.
+[b]Annual agreement[/b] (from “Medium business”, reputation 55+): 24 weeks, bigger batches, a 6–13% markup, a 10% advance. It tolerates two misses; the third means termination, a 10% penalty on the undelivered part and −15 reputation. Fulfilled: an 8% bonus and +12 reputation."
+help.tenders.title,"Tenders, export and state orders"
+help.tenders.text,"• From the “Medium business” stage, export orders and state orders arrive.
+• The “Tenders” step (legal department): state orders with [b]military acceptance[/b], a 50% advance and a third higher price. Needs an LLC and a staffed gatehouse.
+• Military acceptance inspects regularly, and items go through the test rig.
+• “Hot” orders and tenders are decided by the director, by letter."
+help.competitors.title,Competitors and pricing policy
+help.competitors.text,"Orders → Competitors (needs a sales manager). Our [b]market share[/b] depends on capacity, quality, deadlines, reputation, prices and ISO 9001.
+• [b]Dumping[/b]: prices 10% lower, a third more requests, thinner margins.
+• [b]Market[/b]: normal prices.
+• [b]Premium[/b]: prices 12% higher, fewer requests.
+Competitors start price wars, expand, poach experienced workers and sometimes go bankrupt; their equipment can be bought at auction for 40% of the price."
+help.metal.title,Metal and suppliers
+help.metal.text,"Production → Metal & consumables. Materials: St45 round bar (260 ₽), S27 hex bar (450 ₽), 40Kh round bar (780 ₽), 8 mm plate (520 ₽), housing forging (1,400 ₽), 40×40 profile (380 ₽), charge (140 ₽), 2 mm strip (160 ₽).
+• The metal price shifts every day, sometimes in jumps: cheap, buy ahead; expensive, buy only for orders.
+• Stock: “Orders only”, “Small” (+20%), “Large” (+50%).
+• With a buyer: supplier choice (bulk 10–23% cheaper) and a price chart.
+• Short of money? The supplier ships on credit with two weeks' deferral (+5%), within a limit."
+help.sec.logistics,Storage and logistics
+help.unload_zone.title,Unloading zone
+help.unload_zone.text,"[b]Required[/b]: Build → Outdoor zones → “Unloading”. Trucks bring metal, building materials and equipment crates here, and workers carry them from here to racks and install spots.
+• Metal and blanks go on [b]stock pallets[/b] (about 300 ₽) in the unloading zone; put several there right away.
+• Mark the zone by the gate, close to storage: a shorter path means faster unloading.
+• If you remove or move the zone, goods on the floor are carried to the new one.
+• If the driver didn't wait for unloading, the cargo is left in numbered stacks; clicking a stack opens the “Cargo on the ground” card."
+help.ship_zone.title,Shipping zone
+help.ship_zone.text,"[b]Required[/b]: Build → Outdoor zones → “Shipping”. Finished parts of an order are brought here while the customer's truck is on its way; money comes after loading.
+• Put [b]finished goods pallets[/b] (300 ₽ each) in the zone: good parts are stacked on them.
+• Parts go to shipping right away, without waiting for the whole batch.
+• If the zone is full you'll get a notification: extend it, or orders will wait in storage."
+help.storage.title,"Racks, pallets, bins"
+help.storage.text,"• [b]Metal rack[/b] (9,000 ₽): two shelves of 12 bars.
+• [b]WIP rack[/b] (9,000 ₽): parts between operations.
+• [b]Finished goods pallet[/b]: 16 parts that passed QC; orders are loaded from here.
+• [b]Reject bin[/b]: QC puts rejects here.
+• [b]Chip bin[/b]: 300 kg of chips.
+• [b]Storage[/b]: a room with racks; removed equipment is kept there too."
+help.transport.title,"Cart, forklift, overhead crane"
+help.transport.text,"• A [b]hand cart[/b] (15,000 ₽): a laborer carries 12 units a trip instead of 6.
+• An [b]electric forklift[/b] (950,000 ₽): 24 units and a third faster. Only an experienced loader drives it (loading 6+).
+• An [b]overhead crane 3.2 t[/b] (380,000 ₽): click inside a shop and the runways go along the walls, the bridge from wall to wall. The crane carries a heavy part, a person drives it with a pendant; without a crane it's dragged, 40% slower.
+• “Kanban”: loaders carry 50% bigger batches."
+help.vehicles.title,Vehicles and deliveries
+help.vehicles.text,"• [b]Van[/b]: small deliveries and crates.
+• [b]Truck[/b]: big batches of metal (18+ units).
+• [b]Semi[/b]: machines, substations and export.
+• [b]Flatbed[/b]: pallets of building materials.
+• [b]Scrap collector's truck[/b]: takes scrap metal on Fridays.
+Cargo is visible in the truck bed; deliveries go to the unloading zone."
+help.equipment_delivery.title,Equipment delivery
+help.equipment_delivery.text,"A bought machine or furniture comes by van: big items in several crates (one person carries each), small things (a chair, a plant, a kettle) are carried by hand. When all the crates are at the spot, the object is assembled.
+A machine from 40,000 ₽ can be leased (the toggle in Objects)."
+help.sec.people,People: hiring and mood
+help.hire.title,Hiring
+help.hire.text,"People → Hiring. “Who are we looking for?”: search trades by text and by group (at machines, workers, services and security, engineers and office), each with its number of candidates.
+• “Find: Turner · 3,500 ₽”: a job ad for the trade brings new candidates.
+• Hire for your orders: wages are paid for every shift, even with nothing to do.
+• With an HR department: 6 candidates instead of 4, all traits and mood shown in numbers, ads half price.
+• Out-of-towners arrive on Mondays if the dormitory has free bunks."
+help.shifts.title,Shifts and wages
+help.shifts.text,"• Two shifts: 1st from 8:00 to 17:00, 2nd from 17:00 to 02:00 (night hours +20%).
+• Shift, wage and bonus are changed on the person's card.
+• “Bonus for all” (3,000 ₽), “Wages +5%” and “Market wages” are in People → Staff.
+• Staff: search by name, trade, grade, traits; filters “Unhappy”, “Idle”, “Newcomers”, “Absent”."
+help.needs.title,Needs and amenities
+help.needs.text,"• People come in their own clothes and change into overalls at a locker (a double locker counts as two places).
+• They have lunch 4 hours into the shift, for 45 minutes; they use the toilet; smokers take smoke breaks.
+• Tired people rest in the break room.
+• After the shift machinists, welders, painters and laborers take a [b]shower[/b]; with no shower or all stalls busy, they leave dirty and unhappy."
+help.mood.title,Mood and thoughts
+help.mood.text,"Mood is made of [b]thoughts[/b]: where they had lunch, where they changed, what the toilet is like, enough light, warmth, what the pay is, who they work with.
+• Good mood means faster work; bad means slower; below 22 they skip work, below 12 for several days they quit.
+• [b]What matters[/b] (card → Overview): five bars: living conditions, money, work, team, home. Hover to see what makes them up.
+• Icons over their heads show needs and emotions."
+help.traits.title,Character traits
+help.traits.text,"Everyone has 1–2 traits: Workaholic, Lazybones, Smoker, Grumbler, Joker, Neat Freak, Handy, Early Bird, Night Owl, Drinker, Foodie, Tireless, Penny-Pincher, Old School, Curious, Born Mentor, Life of the Party, Quarrelsome, Innovator, Quiet One, Trainee, Pilferer, Activist.
+Without an HR department you don't see all of a candidate's traits."
+help.skills.title,"Skills, grades and exams"
+help.skills.text,"• Everyone has skills by trade; a skill grows with work.
+• Courses raise a skill, while a [b]grade[/b] comes from an exam (card → “Exam”): on shift the person makes a test part and takes it to the foreman. The chance depends on skill, the foreman and mood.
+• Pass: a grade and a request for a raise; fail: a retake in a week.
+• Engineers have a category (II, I, lead) instead of a grade."
+help.training.title,"Training, mentors, vocational school"
+help.training.text,"People → Training: grade-up courses (+2 to a skill) and second-trade courses (access to other machines).
+• In your own [b]classroom[/b] (two desks, a board) it's cheap and the person studies during their shift; at a training center it's pricier and they're away for several days.
+• A [b]mentor[/b] triples a trainee's growth at the machine but works a bit slower himself.
+• [b]Vocational school[/b] (the “Vocational school link” step): trainees are cheap and learn twice as fast; take the best onto the staff."
+help.relations.title,"Relationships, chats, fights"
+help.relations.text,"• People who work side by side and chat on smoke breaks and at lunch make friends. A friend on shift makes work more fun, a foe makes it worse.
+• Those who don't get along quarrel; a quarrel sometimes ends in a fight: onlookers gather, and a guard or the foreman breaks it up.
+• After a fight the director gets a letter: reprimand both, fire the instigator or move them to different shifts."
+help.life.title,"Indexation, seniority and retirement"
+help.life.text,"• [b]Indexation[/b]: once a quarter prices rise by 4%, and so do market wages. A letter: index for everyone, only for workers, or for no one, and then “they pay less than anywhere else”.
+• [b]Age[/b]: once a year everyone gets older; after 50 they tire faster.
+• A year at the plant makes a “plant veteran”, respected by all.
+• [b]Retirement[/b]: women from 55, men from 60; you can persuade them to stay or see them off with honors."
+help.control.title,Orders and controlling a person
+help.control.text,"• Select a person and [b]right-click[/b] a machine and they go work there; right-click a cell and they go there. When done, they return to their usual work.
+• Click a person for the menu above them; “Take Control” makes them drop everything and wait for commands. Click a blueprint, machine, cargo or spot and choose “Do it now”. Right-click does the same without the menu.
+• “Release” or Esc returns them to their usual work. You can control one person at a time."
+help.workplaces.title,Assigned workplaces
+help.workplaces.text,"Machines, QC tables, band saws and benches are assigned to people (in the morning free places go to those who have none).
+• The owner works first; if they're off shift, on sick leave or busy, anyone qualified steps in.
+• To change the owner: object card → “Change…”."
+help.rational.title,Improvement proposals
+help.rational.text,"Experienced workers propose improvements for their machine and part:
+• a fixture: the operation is 12% faster;
+• an inspection gauge: 20% fewer rejects for the part;
+• machine care: wear is 25% slower.
+Implement it and pay the author, or reject it. With “Socialist competition” proposals come twice as often."
+help.fire_worker.title,Dismissal
+help.fire_worker.text,"“Dismiss” opens a choice of reason: by mutual agreement (compensation), redundancy (severance pay), for absenteeism, for theft, “can't cope”, no reason.
+• Each one is marked “lawful” or “no grounds” with an explanation.
+• Without grounds: a lawsuit (after a week ≈15 wages, half that with a lawyer), a complaint to the labor inspectorate, and reputation and everyone else's mood drop."
+help.sec.crew,Crews and foremen
+help.brigades.title,Crews
+help.brigades.text,"People → Crews (K). A crew leader gets +10% pay and speeds up their crew by 3–6%.
+• Assign a shop to a crew and people take work on their own machines first.
+• “Form automatically” splits everyone up by shop.
+• The “Crews and security” overlay shows the areas."
+help.foreman.title,Section foreman
+help.foreman.text,"A foreman hands out shift tasks and keeps discipline; he leads up to 12 people of his shift.
+• The shift works 8–15% faster, with 15% fewer rejects and half the absences.
+• Without a foreman, a shift of more than 10 people works 10% worse.
+• Needs a foreman's booth with an office desk."
+help.chief_shop.title,Shop manager: rush jobs and overtime
+help.chief_shop.text,"A shop manager: +5% speed for all workers and the director's orders:
+• [b]Rush job[/b]: +25% speed, but more rejects (×1.5) and fatigue.
+• [b]Overtime[/b]: the shift is 2 hours longer at time and a half.
+The orders are a line above the Development tree."
+help.schedule.title,Shift schedule
+help.schedule.text,"People → Shift schedule, in 15-minute slots: a planning meeting (+3% speed for the shift), lunch (at least 30 minutes, otherwise a fine), a tea break, cleanup at the end of the shift.
+Crews can get their own schedule, meaning shorter canteen queues."
+help.competition.title,Socialist competition and the Board of Honor
+help.competition.text,"The “Socialist competition” step: on Fridays the best crew (operations per person) gets a pennant, +mood and +3% speed for a week. The Board of Honor shows the leading workers of the month."
+help.union.title,Trade union
+help.union.text,"A trade union appears once you have 8 or more workers (or with the “Union” step, 40,000 ₽).
+• The union committee proposes a collective agreement, warns about strikes in advance and gives people more patience.
+• A broken collective agreement angers everyone."
+help.strike.title,Strike
+help.strike.text,"If people stay unhappy for a long time, they strike: all workers go to the gatehouse with placards and make a demand. Meet it, bargain or wait: you decide by letter. Raise the mood in advance: market wages, amenities, lunches."
+help.security.title,Security and pilferers
+help.security.text,"Pilferers carry off metal and consumables when leaving the shift.
+• A [b]gatehouse with turnstiles[/b] (45,000 ₽) goes right into the fence: everyone comes and goes through the turnstiles. A guard on shift sits in the booth: with him more than half are caught, and bag checks only work with him.
+• [b]Security cameras[/b] (14,000 ₽) deter and record.
+• On Fridays there's a stocktake. Someone who's caught can be lawfully fired for theft."
+help.sec.office,Office and departments
+help.itr.title,Engineers and offices
+help.itr.text,"Every specialist needs an [b]office desk[/b] (18,000 ₽) in their department's office (with the right item: a safe for accounting, a drafting board for engineering, a planning board for the planning office…) or in a shared office, where they work 30% worse.
+The second Development steps need the department's own office."
+help.depts.title,Departments
+help.depts.text,"• [b]Section foreman[/b]: shift speed and discipline.
+• [b]Shop manager[/b]: rush jobs and overtime.
+• [b]Accounting[/b]: 5% tax instead of 6%, reports, loans at 17%; required once you have more than 8 people.
+• [b]Supply[/b]: suppliers, bulk 10–23% cheaper.
+• [b]Planning office[/b]: plan, priorities, half the changeovers, “on time?”.
+• [b]HR department[/b]: more candidates, traits and mood in numbers.
+• [b]Engineering office[/b]: research.
+• [b]Sales department[/b]: competitors, pricing policy, +10% requests.
+• [b]Workplace safety[/b]: −15% injuries, your own N-1 report.
+• [b]Chief engineer[/b]: advice, preventive maintenance, utilities summary.
+• [b]Legal department[/b]: appealing fines (60% instead of 40%), complaints, tenders."
+help.locks.title,"No person, no function"
+help.locks.text,"Window sections a department is responsible for are locked until you have it. Without an accountant, only money and recent transactions; without an HR officer, mood is shown in words; without a buyer, no metal price chart and no buying ahead; without a planning office, no plan and no “on time?”.
+The lock says which office to build and whom to hire, and “What to do” says which department is next."
+help.director.title,Director's office
+help.director.text,"A room with linoleum and a [b]director's desk[/b] (35,000 ₽). Without it Development steps can't be researched: the director studies them from here, one at a time, for money and a few days."
+help.advisor.title,Chief engineer
+help.advisor.text,"Management → Chief engineer suggests what matters most right now: bottlenecks, deadlines, breakdowns, mood, money, metal.
+• Preventive maintenance turns on by itself for new machines; a utilities summary: power, air, water.
+• When wages eat more than 70% of revenue, he'll point out which machinists stand idle."
+help.sec.develop,Development and land
+help.stages.title,Growth stages
+help.stages.text,"Six stages: [b]Garage[/b] (2–5 people) → [b]Workshop[/b] (5–20) → [b]Small business[/b] (20–100) → [b]Medium[/b] (100–300) → [b]Large plant[/b] (300–1000) → [b]Town-forming[/b] (1000+).
+• Each opens new machines, shops and departments; goals are in the Goals window (G).
+• From “Workshop”, the next stage needs two mandatory goals and any two of four roads: volume (turnover 2 → 5 → 12 → 30 million ₽), quality, people or town."
+help.rating.title,Star rating
+help.rating.text,"The 1–5 star rating is made up of output and deadlines, quality, safety, people's mood and finances. Goals → Rating shows what each star is made of. “Large plant” on the quality road needs 4 stars."
+help.develop_tree.title,The Development tree
+help.develop_tree.text,"Management → Development & departments: eight branches of three steps each: finance, HR, production, planning, market, engineering, law & safety, town (plus land).
+• The first step of a branch opens when you hire a specialist.
+• The director researches the rest from the director's office, one at a time, for money and a few days.
+• “Workshop” permits second steps, “Small business” third steps.
+• Steps are held by people: fire the holder and the step goes dark until a new one is hired."
+help.develop_list.title,Development steps
+help.develop_list.text,"• Cost accounting: 120,000 ₽, 3 days: margins and cash forecast.
+• Bank & leasing: 300,000 ₽: loans up to 3 million at 14%, leasing, insurance.
+• Vocational school link: 100,000 ₽: trainees and out-of-towners.
+• Talent pool: 250,000 ₽: “may quit” flag, auto-replacement.
+• Socialist competition: 250,000 ₽: the Board of Honor, twice the improvement proposals.
+• Batches: 120,000 ₽: operations 30% faster. Tight scheduling: 300,000 ₽.
+• Contracts: 350,000 ₽: contracts and export (reputation 60+).
+• ISO 9001: 300,000 ₽. Tenders: 400,000 ₽.
+• Union: 40,000 ₽. Social services: 150,000 ₽: stove, serving line, medical room, dormitory. Patronage: 350,000 ₽: kindergarten, House of Culture, radio."
+help.land.title,Land and neighboring lots
+help.land.text,"The neighboring lots beyond the fence are for sale: a [b]“For sale”[/b] sign hangs over them in a light haze. Click the sign to open Development → “Land”.
+• The east lot (from “Workshop”), the west lot (from “Small business”), the back yard (from “Medium”). Price: 1,200 ₽ per cell.
+• A bought lot becomes yours: the old fence can be torn down.
+• The lots have old buildings on them, a warehouse, a former sawmill, a row of garages: walls and floor are already there, it's dirty inside, and light and water are up to you."
+help.achievements.title,Achievements
+help.achievements.text,Achievements are shared across all games: the list is in the Goals window and in the main menu. They don't count in Sandbox.
+help.sec.research,Research
+help.tech_dept.title,Engineering office and research
+help.tech_dept.text,"Management → Research (T). The tree opens when you have a [b]process engineer[/b] on staff (an “Engineering office”: an office desk and a drafting board).
+• The engineer earns research points during working hours; the chosen project opens once there are enough points.
+• Branches: processes, automation, fitting, products, management, social. Lines show what must be researched first."
+help.research_tech.title,Processes and automation
+help.research_tech.text,"• High-speed cutting: turning, milling and drilling operations 15% faster.
+• Heat treatment modes: the furnace heats a batch 25% faster.
+• Efficient nesting: metal 8% cheaper.
+• Welding jigs: welding 20% faster, 30% fewer rejects.
+• CNC lathe → Machining center → Imported CNC.
+• Fitting: rework cards, fitter's tooling."
+help.research_products.title,New products
+help.research_products.text,"• Flange: from a forging, turning and drilling, good demand.
+• Spur gear: turning, gear hobbing, hardening.
+• Gearbox: an assembly of a splined shaft, two gears, a housing and bushings, painted. The most expensive.
+• Casting shop and Stamping: new processes and products.
+The first order for a new complex product is a trial batch."
+help.research_mgmt.title,Management and social
+help.research_mgmt.text,"• 5S: everyone 5% faster, people like the order.
+• Kanban: loaders carry 50% more.
+• Statistical process control: 25% fewer rejects.
+• Lean production: changeovers twice as short, another +5% speed.
+• Workplace exercises: people tire 15% slower.
+• Set lunches: lunch pleases more.
+• Classroom: skills grow twice as fast."
+help.sec.money,Money and loans
+help.finance.title,Income and expenses
+help.finance.text,"• Income: payment for orders after loading, contracts, scrap metal.
+• Expenses: wages for every shift, metal and consumables, electricity (7.5 ₽ per kWh), heating, construction, inspections and fines.
+• [b]Tax[/b]: 6% of revenue every Friday (5% with accounting). With more than 8 people on staff and no accounting, the tax office fines you.
+• The Garage start is 600,000 ₽ (the calm five-year plan +30%, the wild nineties −15%). For the first two weeks regular customers pay a 30% advance."
+help.loans.title,Loans and leasing
+help.loans.text,"Finance → Loans & leasing. The bank gives loans from the “Workshop” stage: at 22%, at 17% with accounting, and up to 3 million ₽ at 14% with the “Bank & leasing” step.
+[b]Leasing[/b]: a machine from 40,000 ₽: 20% up front, the rest in payments over 12 weeks (+18%)."
+help.insurance.title,Insurance
+help.insurance.text,"Finance → Insurance (the “Bank & leasing” step). Premiums are paid on Mondays.
+• [b]Property[/b]: 80% of machine repair costs and fire damage.
+• [b]Liability[/b]: half of penalties, complaints and contract fines.
+• [b]Accident[/b]: the whole compensation under an N-1 report."
+help.grants.title,Grants
+help.grants.text,"Finance → Grants are mini-quests: apply for a support program, meet the conditions (equip a shop or canteen, create jobs), and after an inspection your expenses are reimbursed.
+Programs appear depending on your situation: have a canteen, “A bigger canteen”; cash in the red, “Crisis support”; smoky welding and painting, “Clean air in the shop”. You'll be notified about a new suitable program."
+help.crisis.title,Debts and crisis
+help.crisis.text,"• Not enough for wages? They're paid on credit (cash goes negative), but only once every 3 months. The next time wages are [b]delayed[/b]: people get angry, and a letter offers to take a loan or ask them to be patient.
+• From the 3rd day of delay the unhappiest person leaves. Three gone within two weeks and the labor inspectorate [b]shuts the plant[/b] (game over).
+• Cash negative for two days or more lowers reputation; sales won't take new orders while you're in debt.
+• No tools and no money: a letter offers to buy from the supplier on credit (+10%) or wait."
+help.reports.title,Reports and charts
+help.reports.text,"• Finance → Summary: money and recent transactions.
+• By week: a report by item, product cost and margin, a two-week cash forecast (needs an accountant and “Cost accounting”).
+• Charts: money, revenue and expenses, market share, mood and reputation by day."
+help.sec.safety,Inspections and safety
+help.inspections.title,Inspections
+help.inspections.text,"Fire safety, the labor inspectorate, sanitary inspectors, technical supervision, ecologists, the tax office and (for state orders) military acceptance.
+• Scheduled ones are announced three days ahead. The inspector walks around the plant and records violations on entering a room, so while he walks you can still fix things.
+• The list of requirements is in Events → Inspections; violations are marked red on the map.
+• Small businesses (before “Small business”) get a warning instead of a fine for a first violation. Not fixed by the deadline in the order? A double fine."
+help.inspection_fix.title,How to fix a violation
+help.inspection_fix.text,"• In Events → Inspections a red line has “→ how to fix?”: a “What's wrong / How to fix” box with a “Show the spot” button.
+• The inspection report has a “How to fix” section.
+• The inspector is accompanied by an escort: a safety engineer (15% smaller fines), the shop manager or a foreman.
+• A fine can be appealed: a 40% chance, 60% with a lawyer."
+help.sout.title,Workplace assessment
+help.sout.text,"A special assessment of working conditions: a lab measures noise, air, light and microclimate at every machine and assigns a class: 2 is acceptable, 3.1–3.3 are hazardous.
+• Hazardous workplaces are owed a 4–12% wage supplement and milk.
+• The labor inspectorate fines you if no assessment was done.
+• Improved the conditions? Order new measurements and the class goes down."
+help.ppe.title,PPE and milk
+help.ppe.text,"• [b]PPE[/b]: hard hats, goggles, earmuffs, respirators. Newcomers arrive without them, and a kit wears out in about 20 shifts. Put up a [b]PPE cabinet[/b] (Objects → Safety) and supply will restock kits by itself. Without PPE there are 1.5× more injuries.
+• With earmuffs noise doesn't irritate; with a respirator, less smoke.
+• [b]Hazard milk[/b]: 70 ₽ per person per shift (People → Safety). Not given? Resentment and a fine."
+help.briefing.title,Safety briefing
+help.briefing.text,"Once every two months: 30% fewer injuries, and the labor inspectorate checks the log if you have 6 or more workers.
+It's run by the safety engineer, the shop manager or a foreman, at a board, a safety stand or the “Days without injury” board; people stand in a semicircle."
+help.n1.title,N-1 report
+help.n1.text,"After every injury a commission finds the causes within three working days.
+• If the company is at fault: compensation for the victim and a fine (half with a safety engineer).
+• “Blame the worker” is cheaper, but people and the union will remember, and the labor inspectorate will find a hidden injury.
+• The “Days without injury” board cuts injuries by 5%."
+help.sec.accidents,"Fires, accidents, injuries"
+help.fire.title,Fire
+help.fire.text,"Free workers run to put it out, many times faster with an extinguisher.
+• A [b]fire extinguisher[/b] (2,400 ₽) is needed in every room except toilets and showers; two in hot shops. Fire safety requires it.
+• Property insurance covers fire damage."
+help.injuries.title,Injuries and sick leave
+help.injuries.text,"Injuries come from fatigue, rush jobs, worn machines, darkness, cold and slippery chips or ice.
+• The injured person goes on sick leave; a first aid kit nearby shortens it.
+• Fewer injuries: PPE, briefings (−30%), a safety engineer (−15%), the “Days without injury” board, light and order."
+help.breakdowns.title,Machine breakdowns
+help.breakdowns.text,"A completely worn machine breaks down, and the repair is expensive and long. Turn on preventive maintenance, keep a fitter and a setter. A broken machine is listed in Production → Downtime with the reason."
+help.medbay.title,First aid post and flu
+help.medbay.text,"A first aid post: a couch, a medicine cabinet and a sink + a paramedic (the “Social services” step).
+• Sick leave after injuries 40% shorter, flu (November to February) rarer.
+• Vaccinating the whole staff (600 ₽ per person) means four times fewer cases."
+help.pests.title,"Mice, pigeons and the cat"
+help.pests.text,"• [b]Mice[/b] appear in very dirty rooms: people are unhappy and the sanitary inspection fines you. Clean up and the mice leave.
+• [b]Pigeons[/b] stroll in the yard during the day and sometimes fly into the shop through an open gate.
+• The [b]cat[/b] hunts mice and scares pigeons."
+help.sec.world,"Town, competitors, events"
+help.storyteller.title,The storyteller and letters
+help.storyteller.text,"The storyteller throws in events: fires, injuries, thefts, defective metal, price jumps, “hot” orders, improvement proposals, weddings, poaching, barter, visits from the governor and a journalist.
+• Where a choice is needed, a [b]letter[/b] with options arrives; the game pauses (can be turned off in settings).
+• Not decided within the given hours? The default option is chosen."
+help.town_rel.title,Town relations
+help.town_rel.text,"Town → Overview. Relations grow with care for people (dormitory, lunches, first aid post, kindergarten, House of Culture) and fall with layoffs.
+• 60+ brings more candidates, 75+ a 1% lower tax on revenue.
+• It's one of the growth roads to the next stage."
+help.dorm.title,Dormitory
+help.dorm.text,"A room with bunk beds (two bunks each) and a locker → a “Dormitory” zone. While there are free bunks, out-of-town candidates arrive on Mondays: a bit cheaper, never late, they go “home” to the dorm. Rent: 100 ₽ a day per resident."
+help.canteen_hot.title,Hot meals
+help.canteen_hot.text,"The canteen has an industrial stove (powered) and a serving line, and there's a cook on staff. The cook makes portions for everyone (food costs 85 ₽ per portion); a hot lunch gives +9 to mood instead of +6."
+help.kg_dk.title,Kindergarten and House of Culture
+help.kg_dk.text,"• [b]Kindergarten “Little Gear”[/b] (the “Patronage” step): places for workers' children, 6, 12 or 24. Parents are pleased and don't stay home with the child.
+• [b]House of Culture “Machine Builder”[/b]: 600,000 ₽ and 15,000 ₽ a week: clubs and holiday concerts."
+help.radio.title,Plant radio
+help.radio.text,"A radio room and loudspeakers under the ceiling:
+• 8:15, morning plant news;
+• 10:00, workplace exercises, people tire less;
+• music at lunch, lunch is more fun."
+help.cat.title,The cat
+help.cat.text,"A cat turns up by itself (sooner if you have a canteen). Put out a [b]bowl[/b] and it stays: petting it is pleasant, and rats stop spoiling consumables. Town → Cat."
+help.paper.title,Plant newspaper
+help.paper.text,"On Mondays the plant newspaper comes out (N): plant news, leading workers, veterans, fights and inspections, weather. The “Newspaper” button stays highlighted until the issue is read."
+help.sec.seasons,Seasons
+help.calendar.title,Calendar
+help.calendar.text,"The calendar is compressed: [b]a month is two weeks[/b] (14 days). The game starts in September. There are holidays, summer vacations and a monthly plan. Events → Calendar shows what's ahead."
+help.winter.title,"Winter, snow and cold"
+help.winter.text,"In winter, frosts down to −15 °C and snow.
+• Put up [b]radiators[/b] and a boiler, or the shops get cold: below +15 °C people are chilly, below +6 very cold, work is slower and injuries more common.
+• Laborers clear snow with shovels; people slip on ice.
+• Flu runs from November to February."
+help.summer.title,"Summer, heat and rain"
+help.summer.text,"In summer up to +21 °C on average, higher in a heat wave. Above +29 °C indoors people are hot: ventilation helps. Summer is vacation time. In spring farm machinery has twice the orders. Rain and wind are visible on the map."
+help.holidays.title,Holidays
+help.holidays.text,"• The New Year party and New Year holidays (3 days off).
+• February 23 and March 8.
+• A community cleanup day in April.
+• Spring and Labor Day (a day off).
+• Machine Builders' Day in September.
+With a House of Culture, holiday concerts."
+help.sec.keys,Controls and hotkeys
+help.camera.title,Camera and mouse
+help.camera.text,"• Camera: WASD or the arrows, the wheel zooms, the middle button drags (and the screen edge, if enabled in settings).
+• Left-click selects a person or object; clicking a structure opens its card.
+• Right-click or Esc cancels a tool or selection; right-click with a person selected gives an order.
+• A person's menu stays above them until it's closed."
+help.keys.title,Hotkeys
+help.keys.text,"• [b]Space[/b]: pause, [b]1/2/3[/b]: speed ×1/×2/×4.
+• [b]B[/b]: build, [b]O[/b]: objects, [b]R[/b]: zones (rotates while placing an object), [b]E[/b]: utilities, [b]V[/b]: plan, [b]X[/b]: demolish.
+• [b]P[/b]: production, [b]L[/b]: people, [b]K[/b]: crews, [b]F[/b]: finance, [b]M[/b]: management, [b]T[/b]: research.
+• [b]G[/b]: goals, [b]C[/b]: events, [b]N[/b]: newspaper, [b]H[/b]: town.
+• [b]F1[/b]: this handbook, [b]F3[/b]: frame counter, [b]F5[/b]: quick save, [b]F9[/b]: quick load, [b]Esc[/b]: close or menu."
+help.save.title,Saves
+help.save.text,"• F5: quick save, F9: quick load.
+• Menu (Esc) → “Save game” / “Load game”: slots with the computer's date and time.
+• Each plant has its own autosave; the game saves by itself when you quit."
+help.settings.title,Settings
+help.settings.text,"Menu (Esc) → Settings:
+• Volume by category: master, music, machines and tools, ambient sounds, interface.
+• [b]Music selection[/b]: by time of day / everything / waltzes only.
+• Effects quality (sparks, steam, leaves), frame limit and V-Sync.
+• Edge scrolling, pause on an event letter.
+• Language: Russian / English."
+help.music.title,Music
+help.music.text,"The music follows the situation; each time of day has several pieces of its own:
+• morning (6–10 h): “First Shift”, “Path to the Gatehouse”, “Morning Bus”;
+• day: “The Quota”, “Avenue Lights”, “Second-Floor Buffet”, “Foundry”, “Quiet Shop”;
+• rush (less than 30 hours to an order's deadline): “Counter-Plan”, “Shock Shift”, “Foundry”;
+• evening (18–22 h): “Shift Change”, “Over the Factory River”, “Factory Waltz”, “Second-Floor Buffet”;
+• night: “Night Shift”, “Night Broadcast”, “Quiet Shop”.
+In winter “First Snow” plays first, in the rain “Rain on the Shop Roof”. In the main menu, “The Gatehouse”.
+A track doesn't cut off: it plays to the end of the musical phrase and flows smoothly into the next; the same piece never plays twice in a row. Under the pause menu the music is quieter. The mode is “Music selection” in settings."
+help.fps.title,Frame counter (F3)
+help.fps.text,"F3 shows the frames per second in the corner, the frame time, how much of it went to the simulation and how many people are at the plant. Press F3 again to hide it. Lagging? Lower the effects quality in settings.
+In the main menu and in “Create a Worker”, F3 shows a diagnostics line: frames per second, frame time (average and worst), nodes, “orphans”, objects, texture memory and video memory. If the menu starts lagging, send a screenshot with this line."

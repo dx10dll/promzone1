@@ -38,8 +38,8 @@ func publish(force: bool = false) -> void:
 			best = w
 	if best and best.week_score > 0:
 		var pct := 100 + mini(80, best.week_score * 2)
-		items.append({"rubric": "Передовик", "title": "%s %s выполнил%s норму на %d%%!" % [best.prof_name(), best.last, "а" if best.female else "", pct],
-			"text": "%s, %d лет. «Главное — не торопиться и не опаздывать», — делится секретом передовик." % [best.formal_name(), best.age], "lead": true})
+		items.append({"rubric": L.t("Передовик"), "title": Nicks.gendered(L.t("%s %s выполнил{|а} норму на %d%%!"), best.female) % [best.prof_name(), L.name(best.last), pct],
+			"text": L.t("%s, %d лет. «Главное — не торопиться и не опаздывать», — делится секретом передовик.") % [best.formal_name(), best.age], "lead": true})
 	# итоги недели
 	var sales := 0.0
 	for wk: Dictionary in sim.office.weeks:
@@ -50,8 +50,8 @@ func publish(force: bool = false) -> void:
 	made0 = int(sim.stats.get("made", 0))
 	scrap0 = int(sim.stats.get("scrap", 0))
 	if sales > 0.0 or made > 0:
-		items.append({"rubric": "Итоги недели", "title": "Выручка недели — %s" % Defs.money_str(sales),
-			"text": "За неделю выпущено %d %s, в брак ушло %d. Заказов в работе: %d." % [made, Defs.plural(made, "изделие", "изделия", "изделий"), scrap, sim.orders.active_count()]})
+		items.append({"rubric": L.t("Итоги недели"), "title": L.t("Выручка недели — %s") % Defs.money_str(sales),
+			"text": L.t("За неделю выпущено %d %s, в брак ушло %d. Заказов в работе: %d.") % [made, Defs.plural(made, "изделие", "изделия", "изделий"), scrap, sim.orders.active_count()]})
 	# новости недели
 	var news := pending.duplicate()
 	news.reverse()
@@ -65,36 +65,46 @@ func publish(force: bool = false) -> void:
 	# мелочи
 	var fillers: Array = Defs.paper.get("fillers", [])
 	if not fillers.is_empty():
-		var f: Array = fillers[(number * 7 + sim.day()) % fillers.size()]
-		items.append({"rubric": str(f[0]), "title": "", "text": str(f[1])})
+		var fi := (number * 7 + sim.day()) % fillers.size()
+		var f: Array = fillers[fi]
+		items.append({"rubric": L.dt("paper.filler.%d.rubric" % fi, str(f[0])), "title": "", "text": L.dt("paper.filler.%d.text" % fi, str(f[1]))})
 	issues.push_front({"no": number, "day": sim.day(), "date": sim.season.long_date(), "items": items})
 	if issues.size() > 12:
 		issues.resize(12)
 	unread = true
-	sim.notify("Вышел свежий номер многотиражки «%s» № %d — газета коллектива %s." % [str(Defs.paper.get("title", "Трудовая смена")), number, Company.title(sim)], Sim.LVL_INFO)
+	sim.notify(L.t("Вышел свежий номер многотиражки «%s» № %d — газета коллектива %s.") % [title_str(), number, Company.title(sim)], Sim.LVL_INFO)
+
+
+## Название газеты и подзаголовок (data/paper.json) — на языке игры.
+static func title_str() -> String:
+	return L.dt("paper.title", str(Defs.paper.get("title", "Трудовая смена")))
+
+
+static func subtitle_str() -> String:
+	return L.dt("paper.subtitle", str(Defs.paper.get("subtitle", "")))
 
 
 func _life_item() -> Dictionary:
 	if sim.rooms.of_type("canteen").is_empty():
-		return {"rubric": "Письма читателей", "title": "Когда будет столовая?", "text": "«Обедаем на скамейке, бутерброды в промасленной газете. Нельзя ли по-человечески?» — пишет группа рабочих."}
-	var lines := ["В столовой снова закончился компот. Буфетчица обещает разобраться.", "Новое блюдо в столовой — котлета по-заводски. Отзывы сдержанно положительные.",
-		"Столовая просит не уносить ложки. Ложек осталось одиннадцать."]
-	return {"rubric": "Столовая", "title": "", "text": lines[number % lines.size()]}
+		return {"rubric": L.t("Письма читателей"), "title": L.t("Когда будет столовая?"), "text": L.t("«Обедаем на скамейке, бутерброды в промасленной газете. Нельзя ли по-человечески?» — пишет группа рабочих.")}
+	var lines := [L.t("В столовой снова закончился компот. Буфетчица обещает разобраться."), L.t("Новое блюдо в столовой — котлета по-заводски. Отзывы сдержанно положительные."),
+		L.t("Столовая просит не уносить ложки. Ложек осталось одиннадцать.")]
+	return {"rubric": L.t("Столовая"), "title": "", "text": lines[number % lines.size()]}
 
 
 func _weather_item() -> Dictionary:
 	var s := sim.season
 	var t := int(round(s.temp_day))
-	var txt := "%s. Днём около %+d °C." % [s.season_name(), t]
+	var txt := L.t("%s. Днём около %+d °C.") % [s.season_name(), t]
 	if s.season_id() == "winter":
 		var cold := s.cold_rooms()
 		if not cold.is_empty():
-			txt += " В помещении «%s» холодно — администрация, где батареи?" % (cold[0] as Rooms.Room).title()
+			txt += L.t(" В помещении «%s» холодно — администрация, где батареи?") % (cold[0] as Rooms.Room).title()
 		else:
-			txt += " В цехах тепло — спасибо отоплению."
+			txt += L.t(" В цехах тепло — спасибо отоплению.")
 	elif s.season_id() == "summer":
-		txt += " Пейте воду и не стойте на солнцепёке."
-	return {"rubric": "Погода", "title": "", "text": txt}
+		txt += L.t(" Пейте воду и не стойте на солнцепёке.")
+	return {"rubric": L.t("Погода"), "title": "", "text": txt}
 
 
 func to_dict() -> Dictionary:

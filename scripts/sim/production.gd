@@ -202,7 +202,7 @@ static func need_rank(p: String, pr: String) -> int:
 func missing_name(p: String, pr: String, avail: Dictionary) -> String:
 	var nm := Defs.process_name(pr).to_lower()
 	if avail.has(pr):
-		nm += " (для %s деталей)" % Defs.SIZE_GEN[clampi(need_rank(p, pr), 0, 2)]
+		nm += L.t(" (для %s деталей)") % L.t(Defs.SIZE_GEN[clampi(need_rank(p, pr), 0, 2)])
 	return nm
 
 

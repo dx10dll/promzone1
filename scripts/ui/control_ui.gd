@@ -71,7 +71,7 @@ func release() -> void:
 	var w := _w()
 	if w:
 		hud.sim.brain.release_control(w)
-		hud.toast("%s вернулся к обычной работе." % w.full_name() if not w.female else "%s вернулась к обычной работе." % w.full_name(), Sim.LVL_INFO, 3.0)
+		hud.toast(tr("%s вернулся к обычной работе.") % w.full_name() if not w.female else tr("%s вернулась к обычной работе.") % w.full_name(), Sim.LVL_INFO, 3.0)
 	close_menu()
 	_refresh()
 
@@ -90,7 +90,7 @@ func _process(delta: float) -> void:
 	var w := _w()
 	if w and hud.sim.brain.order_block(w) != "":
 		# ушёл домой, заболел — управление снимается само
-		hud.toast("%s: %s — управление снято." % [w.full_name(), hud.sim.brain.order_block(w)], Sim.LVL_INFO, 4.0)
+		hud.toast(tr("%s: %s — управление снято.") % [w.full_name(), hud.sim.brain.order_block(w)], Sim.LVL_INFO, 4.0)
 		hud.sim.brain.release_control(w)
 	_refresh()
 
@@ -102,8 +102,8 @@ func _refresh() -> void:
 		close_menu()
 		_last_id = -1
 		return
-	b_name.text = "Под управлением: %s · %s" % [w.full_name(), w.prof_name()]
-	b_act.text = "Сейчас: " + (w.activity if w.activity != "" else "ждёт команды")
+	b_name.text = tr("Под управлением: %s · %s") % [w.full_name(), w.prof_name()]
+	b_act.text = tr("Сейчас: %s") % (tr(w.activity) if w.activity != "" else tr("ждёт команды"))
 	_last_id = w.id
 
 
@@ -115,12 +115,12 @@ func on_map_click(c: Vector2i, screen: Vector2) -> void:
 	close_menu()
 	var opts := hud.sim.brain.order_options(w, c)
 	if opts.is_empty():
-		hud.toast("Сюда %s не пройти и делать здесь нечего." % w.first, Sim.LVL_WARN, 3.0)
+		hud.toast(tr("Сюда %s не пройти и делать здесь нечего.") % L.name(w.first), Sim.LVL_WARN, 3.0)
 		return
 	menu = PanelContainer.new()
 	menu.add_theme_stylebox_override("panel", UITheme.sbs(UITheme.BG, UITheme.ACCENT, 1, 8, 10, 8, 12, 0.5, 4))
 	var col := UITheme.vbox(6)
-	col.add_child(UITheme.label("%s — что сделать?" % w.short_name(), 13, UITheme.MUTED, UITheme.f_semi))
+	col.add_child(UITheme.label(tr("%s — что сделать?") % L.name(w.short_name()), 13, UITheme.MUTED, UITheme.f_semi))
 	var first := true
 	for o: Dictionary in opts:
 		var key := str(o["key"])
@@ -130,15 +130,15 @@ func on_map_click(c: Vector2i, screen: Vector2) -> void:
 			close_menu()
 		var b: Button
 		if bool(o["ok"]) and first and key != "go":
-			b = UITheme.primary(str(o["label"]), cb)
+			b = UITheme.primary(tr(str(o["label"])), cb)
 			first = false
 		else:
-			b = UITheme.button(str(o["label"]), cb)
+			b = UITheme.button(tr(str(o["label"])), cb)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.disabled = not bool(o["ok"])
 		col.add_child(b)
 		if not bool(o["ok"]) and str(o["why"]) != "":
-			var why := UITheme.label("   " + str(o["why"]), 11, UITheme.WARN)
+			var why := UITheme.label("   " + L.tx(str(o["why"])), 11, UITheme.WARN)
 			col.add_child(why)
 	col.add_child(UITheme.ghost("Отмена", close_menu, "", UITheme.MUTED))
 	menu.add_child(col)

@@ -321,7 +321,7 @@ static func card(pad: int = 12, bg: Color = BG2, border: Color = LINE) -> PanelC
 
 ## Заголовок раздела: КАПСОМ, мелко, приглушённо — как в современных панелях.
 static func caption(text: String, col: Color = MUTED) -> Label:
-	var l := label(text.to_upper(), 11, col, f_caps if f_caps else f_semi)
+	var l := label(L.t(text).to_upper(), 11, col, f_caps if f_caps else f_semi)   # 1.39: перевод до заглавных
 	return l
 
 

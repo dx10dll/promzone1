@@ -37,8 +37,13 @@ func def() -> Dictionary:
 	return Defs.objects.get(def_id, {})
 
 
-func title() -> String:
+## 1.39: название по-русски, как в данных (для журнала денег).
+func title_ru() -> String:
 	return str(def().get("name", def_id))
+
+
+func title() -> String:
+	return L.dt("object.%s.name" % def_id, str(def().get("name", def_id)))   # 1.39: на языке игры
 
 
 func base_size() -> Vector2i:

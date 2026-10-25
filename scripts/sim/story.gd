@@ -128,7 +128,7 @@ func letter(ev: String, title: String, text: String, icon: String, level: int, c
 func info(title: String, text: String, icon: String, level: int, cell: Vector2i = Vector2i(-1, -1), popup: bool = false) -> void:
 	if popup:
 		var l := {"id": _next_letter_id, "ev": "info", "title": title, "text": text, "icon": icon, "level": level,
-			"choices": [{"text": "Понятно"}], "def": 0, "data": {"cx": cell.x, "cy": cell.y}, "day": sim.day(),
+			"choices": [{"text": L.t("Понятно")}], "def": 0, "data": {"cx": cell.x, "cy": cell.y}, "day": sim.day(),
 			"deadline": sim.minute + Defs.ev("decision_hours") * 60.0}
 		_next_letter_id += 1
 		letters.append(l)
@@ -189,7 +189,7 @@ func resolve(id: int, choice: int) -> void:
 					o["prio"] = 1
 					var err := sim.orders.accept(int(o["id"]), true)
 					if err != "":
-						sim.notify("«Горящий» заказ не принят: " + err, Sim.LVL_WARN)
+						sim.notify(L.t("«Горящий» заказ не принят: ") + err, Sim.LVL_WARN)
 				else:
 					sim.orders.decline(int(o["id"]))
 		"contract":
@@ -209,7 +209,7 @@ func resolve(id: int, choice: int) -> void:
 		"theft":
 			if choice == 0 and has_checkpoint():
 				guard = true
-				sim.notify("На проходной ввели досмотр: охрана %s в день." % Defs.money_str(Defs.ev("guard_cost_day")), Sim.LVL_INFO)
+				sim.notify(L.t("На проходной ввели досмотр: охрана %s в день.") % Defs.money_str(Defs.ev("guard_cost_day")), Sim.LVL_INFO)
 		"drinking":
 			_res_drinking(d, choice)
 		"fight":
@@ -218,7 +218,7 @@ func resolve(id: int, choice: int) -> void:
 			_res_rumor(choice)
 		"shift_conflict":
 			if choice == 0:
-				_pay_or_warn(5000.0, "Журнал передачи смены")
+				_pay_or_warn(5000.0, L.t("Журнал передачи смены"))
 				perks["shift_log"] = 1.0
 				for w in sim.workers:
 					_remove_thought(w, "shift_mess")
@@ -247,8 +247,8 @@ func resolve(id: int, choice: int) -> void:
 		"month_end":
 			if choice == 0:
 				var left := float(sim.season.dpm() - sim.season.dom() + 1) * 1440.0
-				add_mod("rush", 1.0, left, "Аврал до конца месяца")
-				sim.notify("Объявлен аврал до конца месяца: работа быстрее, но брака и усталости больше.", Sim.LVL_WARN)
+				add_mod("rush", 1.0, left, L.t("Аврал до конца месяца"))
+				sim.notify(L.t("Объявлен аврал до конца месяца: работа быстрее, но брака и усталости больше."), Sim.LVL_WARN)
 		"vacation":
 			_res_vacation(d, choice)
 		"inspection_act":
@@ -260,10 +260,10 @@ func resolve(id: int, choice: int) -> void:
 				0:
 					sim.spend(20000.0, "Отлов бродячих собак")
 					sim.progress.dogs.clear()
-					sim.notify("Собак увезли. На территории стало тихо — и как-то пусто.", Sim.LVL_INFO)
+					sim.notify(L.t("Собак увезли. На территории стало тихо — и как-то пусто."), Sim.LVL_INFO)
 				1:
 					sim.progress.dogs_tame = true
-					sim.notify("У проходной поставили будки. Собаки теперь заводские: лают на чужих.", Sim.LVL_GOOD)
+					sim.notify(L.t("У проходной поставили будки. Собаки теперь заводские: лают на чужих."), Sim.LVL_GOOD)
 		"feud":
 			sim.training.resolve_feud(d, choice)
 		"practice_end":
@@ -333,9 +333,9 @@ func tick(dt: float) -> void:
 func _mod_ended(key: String) -> void:
 	match key:
 		"outage":
-			sim.notify("Электричество дали: горсети устранили аварию.", Sim.LVL_GOOD)
+			sim.notify(L.t("Электричество дали: горсети устранили аварию."), Sim.LVL_GOOD)
 		"metal_price":
-			sim.notify("Цены на металл вернулись к обычным.", Sim.LVL_INFO)
+			sim.notify(L.t("Цены на металл вернулись к обычным."), Sim.LVL_INFO)
 
 
 ## Утро (6:00): праздники, план, забастовка, бросок рассказчика на день.
@@ -345,7 +345,7 @@ func morning() -> void:
 	var d := sim.day()
 	if guard and has_checkpoint() and sim.crew.guards().is_empty():
 		guard = false   # 1.30: досматривать некому — без охранника досмотр не работает
-		sim.notify("Досмотр на проходной отменён: нет охранника. Наймите охранника (Люди → Найм) и включите досмотр снова.", Sim.LVL_WARN)
+		sim.notify(L.t("Досмотр на проходной отменён: нет охранника. Наймите охранника (Люди → Найм) и включите досмотр снова."), Sim.LVL_WARN)
 	if guard and has_checkpoint():
 		sim.spend(Defs.ev("guard_cost_day"), "Охрана на проходной")
 		if sim.is_workday():
@@ -517,7 +517,7 @@ func _start(ev: String, delayed: bool) -> void:
 		"fire":
 			var c := _fire_spot()
 			if c.x >= 0:
-				ignite(c, "Загорелась проводка")
+				ignite(c, L.t("Загорелась проводка"))
 		"injury":
 			var ps := _present_staff()
 			if not ps.is_empty():
@@ -526,17 +526,17 @@ func _start(ev: String, delayed: bool) -> void:
 			_ev_bad_metal()
 		"metal_up":
 			var k := sim.rng.randf_range(1.2, 1.35) if mode != "wild" else sim.rng.randf_range(1.3, 1.6)
-			add_mod("metal_price", k, sim.rng.randf_range(9.0, 14.0) * 1440.0, "Металл подорожал на %d%%" % int(round((k - 1.0) * 100.0)))
-			info("Металл подорожал", "Металлобазы подняли цены на %d%%: виноваты курс и «сложная ситуация на рынке». Дорого продержится недели две. Покупайте только под заказы." % int(round((k - 1.0) * 100.0)), "chart_up", Sim.LVL_WARN)
-			sim.paper.add("Экономика", "Металл подорожал на %d%%" % int(round((k - 1.0) * 100.0)), "Снабженцы хватаются за голову: прутки дорожают. Бухгалтерия просит не точить лишнего.")
+			add_mod("metal_price", k, sim.rng.randf_range(9.0, 14.0) * 1440.0, L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)))
+			info(L.t("Металл подорожал"), L.t("Металлобазы подняли цены на %d%%: виноваты курс и «сложная ситуация на рынке». Дорого продержится недели две. Покупайте только под заказы.") % int(round((k - 1.0) * 100.0)), "chart_up", Sim.LVL_WARN)
+			sim.paper.add(L.t("Экономика"), L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)), L.t("Снабженцы хватаются за голову: прутки дорожают. Бухгалтерия просит не точить лишнего."))
 		"metal_down":
-			add_mod("metal_price", 0.85, 10.0 * 1440.0, "Металл подешевел на 15%")
-			info("Металл подешевел", "На рынке избыток проката: металлобазы снизили цены на 15% на ближайшие полторы недели. Хорошее время запастись.", "chart_down", Sim.LVL_GOOD)
+			add_mod("metal_price", 0.85, 10.0 * 1440.0, L.t("Металл подешевел на 15%"))
+			info(L.t("Металл подешевел"), L.t("На рынке избыток проката: металлобазы снизили цены на 15% на ближайшие полторы недели. Хорошее время запастись."), "chart_down", Sim.LVL_GOOD)
 		"outage":
 			var mins := sim.rng.randf_range(90.0, 240.0)
-			add_mod("outage", 1.0, mins, "Авария в городской сети")
-			info("Авария в горсетях", "Электричество пропало по всему району. Обещают дать через %d ч. Станки стоят, свет только из окон." % int(ceil(mins / 60.0)), "bolt_off", Sim.LVL_BAD)
-			sim.paper.add("Происшествия", "Свет отключили всему району", "Станки стоят, чайник холодный. Энергетики горсетей ищут виноватого экскаваторщика.")
+			add_mod("outage", 1.0, mins, L.t("Авария в городской сети"))
+			info(L.t("Авария в горсетях"), L.t("Электричество пропало по всему району. Обещают дать через %d ч. Станки стоят, свет только из окон.") % int(ceil(mins / 60.0)), "bolt_off", Sim.LVL_BAD)
+			sim.paper.add(L.t("Происшествия"), L.t("Свет отключили всему району"), L.t("Станки стоят, чайник холодный. Энергетики горсетей ищут виноватого экскаваторщика."))
 		"pipe_burst":
 			_ev_pipe()
 		"wire_break":
@@ -545,32 +545,32 @@ func _start(ev: String, delayed: bool) -> void:
 			_ev_fault("pipe")
 		"heat_off":
 			var hm := sim.rng.randf_range(1.0, 2.0) * 1440.0
-			add_mod("heat_off", 1.0, hm, "Авария на теплотрассе: батареи от теплосети холодные")
+			add_mod("heat_off", 1.0, hm, L.t("Авария на теплотрассе: батареи от теплосети холодные"))
 			var own := sim.eng.boiler_rads.size()
-			info("Авария на теплотрассе", "Городская теплосеть отключила район на %d %s: батареи от неё холодные. %s" % [int(ceil(hm / 1440.0)), Defs.plural(int(ceil(hm / 1440.0)), "день", "дня", "дней"),
-				("Своя котельная греет %d %s как ни в чём не бывало." % [own, Defs.plural(own, "батарею", "батареи", "батарей")]) if own > 0 else "Своя котельная (газовый котёл) от таких аварий не зависит."], "heat", Sim.LVL_BAD)
-			sim.paper.add("Происшествия", "Район без тепла", "Теплосеть меняет трубу на перекрёстке. Мастера советуют поддеть тёплое под спецовку.")
+			info(L.t("Авария на теплотрассе"), L.t("Городская теплосеть отключила район на %d %s: батареи от неё холодные. %s") % [int(ceil(hm / 1440.0)), Defs.plural(int(ceil(hm / 1440.0)), "день", "дня", "дней"),
+				(L.t("Своя котельная греет %d %s как ни в чём не бывало.") % [own, Defs.plural(own, "батарею", "батареи", "батарей")]) if own > 0 else L.t("Своя котельная (газовый котёл) от таких аварий не зависит.")], "heat", Sim.LVL_BAD)
+			sim.paper.add(L.t("Происшествия"), L.t("Район без тепла"), L.t("Теплосеть меняет трубу на перекрёстке. Мастера советуют поддеть тёплое под спецовку."))
 		"cold_snap":
 			sim.season.snap = -sim.rng.randf_range(12.0, 18.0)
 			sim.season.snap_until = sim.minute + sim.rng.randf_range(2.0, 4.0) * 1440.0
 			var t := int(round(sim.season.outside_temp()))
-			info("Ударили морозы", "Синоптики обещают до %d °C на несколько дней. Счёт за отопление вырастет, в неотапливаемых помещениях работать невозможно." % mini(t, -25), "snow", Sim.LVL_WARN)
-			sim.paper.add("Погода", "Мороз и солнце", "До %d °C! Не забудьте шапку-ушанку и тёплые портянки." % mini(t, -25))
+			info(L.t("Ударили морозы"), L.t("Синоптики обещают до %d °C на несколько дней. Счёт за отопление вырастет, в неотапливаемых помещениях работать невозможно.") % mini(t, -25), "snow", Sim.LVL_WARN)
+			sim.paper.add(L.t("Погода"), L.t("Мороз и солнце"), L.t("До %d °C! Не забудьте шапку-ушанку и тёплые портянки.") % mini(t, -25))
 		"heatwave":
 			sim.season.snap = sim.rng.randf_range(7.0, 10.0)
 			sim.season.snap_until = sim.minute + sim.rng.randf_range(2.0, 4.0) * 1440.0
-			info("Жара", "На улице за +30. В горячих цехах тяжело: помогут окна и кулер с водой.", "thermo", Sim.LVL_WARN)
-			sim.paper.add("Погода", "Жара!", "Термисты просят выдать им мороженое за вредность. Профсоюз изучает вопрос.")
+			info(L.t("Жара"), L.t("На улице за +30. В горячих цехах тяжело: помогут окна и кулер с водой."), "thermo", Sim.LVL_WARN)
+			sim.paper.add(L.t("Погода"), L.t("Жара!"), L.t("Термисты просят выдать им мороженое за вредность. Профсоюз изучает вопрос."))
 		"flood":
 			for s: Dictionary in sim.supply:
 				s["eta"] = float(s["eta"]) + 1440.0
-			add_mod("roads", 1.0, 3.0 * 1440.0, "Паводок размыл дорогу")
-			info("Паводок", "Талые воды размыли подъездную дорогу: поставки задержатся на сутки, новые — тоже, пока не просохнет.", "supply", Sim.LVL_WARN)
+			add_mod("roads", 1.0, 3.0 * 1440.0, L.t("Паводок размыл дорогу"))
+			info(L.t("Паводок"), L.t("Талые воды размыли подъездную дорогу: поставки задержатся на сутки, новые — тоже, пока не просохнет."), "supply", Sim.LVL_WARN)
 		"supply_delay":
 			var extra := sim.rng.randf_range(1.0, 2.0) * 1440.0
 			for s2: Dictionary in sim.supply:
 				s2["eta"] = float(s2["eta"]) + extra
-			info("Поставка задерживается", "Машина с металлом сломалась под Тверью. Поставка опоздает на %d %s." % [int(round(extra / 1440.0)), Defs.plural(int(round(extra / 1440.0)), "день", "дня", "дней")], "supply", Sim.LVL_WARN)
+			info(L.t("Поставка задерживается"), L.t("Машина с металлом сломалась под Тверью. Поставка опоздает на %d %s.") % [int(round(extra / 1440.0)), Defs.plural(int(round(extra / 1440.0)), "день", "дня", "дней")], "supply", Sim.LVL_WARN)
 		"hot_order":
 			_ev_hot_order()
 		"theft":
@@ -580,14 +580,14 @@ func _start(ev: String, delayed: bool) -> void:
 		"rumor":
 			for w in sim.workers:
 				Mood.add(sim, w, "layoff_rumor")
-			letter("rumor", "Слухи о сокращении", "В курилке говорят, что завод закрывают, а всех сократят. Люди нервничают и работают спустя рукава.", "staff", Sim.LVL_WARN,
-				[{"text": "Собрать коллектив и всё объяснить", "hint": "Слухи развеются"}, {"text": "Не обращать внимания", "hint": "Настроение будет плохим ещё три дня"}], 1)
+			letter("rumor", L.t("Слухи о сокращении"), L.t("В курилке говорят, что завод закрывают, а всех сократят. Люди нервничают и работают спустя рукава."), "staff", Sim.LVL_WARN,
+				[{"text": L.t("Собрать коллектив и всё объяснить"), "hint": L.t("Слухи развеются")}, {"text": L.t("Не обращать внимания"), "hint": L.t("Настроение будет плохим ещё три дня")}], 1)
 		"shift_conflict":
 			for w2 in sim.workers:
 				if w2.shift == 0:
 					Mood.add(sim, w2, "shift_mess")
-			letter("shift_conflict", "Конфликт смен", "Первая смена жалуется: вторая оставляет станки грязными, а заготовки — где попало. Дело идёт к скандалу.", "staff", Sim.LVL_WARN,
-				[{"text": "Завести журнал передачи смены (5 000 ₽)", "hint": "Конфликты прекратятся"}, {"text": "Пусть разбираются сами", "hint": "Может повториться"}], 1)
+			letter("shift_conflict", L.t("Конфликт смен"), L.t("Первая смена жалуется: вторая оставляет станки грязными, а заготовки — где попало. Дело идёт к скандалу."), "staff", Sim.LVL_WARN,
+				[{"text": L.t("Завести журнал передачи смены (5 000 ₽)"), "hint": L.t("Конфликты прекратятся")}, {"text": L.t("Пусть разбираются сами"), "hint": L.t("Может повториться")}], 1)
 		"retire":
 			_ev_retire()
 		"poach":
@@ -603,17 +603,17 @@ func _start(ev: String, delayed: bool) -> void:
 		"journalist":
 			sim.inspect.announce_visit("press")
 		"grant":
-			letter("grant", "Фонд «Промразвитие»", "Областной фонд поддержки промышленности предлагает помощь молодым производствам. Можно выбрать одно.", "money", Sim.LVL_GOOD,
-				[{"text": "Льготный заём 1 500 000 ₽ под 5% на 26 недель", "hint": "Платёж каждый понедельник"},
-				 {"text": "Субсидия 30% на следующий станок", "hint": "Действует месяц"},
-				 {"text": "Отказаться", "hint": ""}], 2)
+			letter("grant", L.t("Фонд «Промразвитие»"), L.t("Областной фонд поддержки промышленности предлагает помощь молодым производствам. Можно выбрать одно."), "money", Sim.LVL_GOOD,
+				[{"text": L.t("Льготный заём 1 500 000 ₽ под 5% на 26 недель"), "hint": L.t("Платёж каждый понедельник")},
+				 {"text": L.t("Субсидия 30% на следующий станок"), "hint": L.t("Действует месяц")},
+				 {"text": L.t("Отказаться"), "hint": ""}], 2)
 		"competitor_sale":
 			_ev_sale()
 		"raid":
-			letter("raid", "Рейдерская попытка", "Неизвестные принесли в налоговую поддельный протокол собрания учредителей и пытаются переоформить завод на себя. Нужно отбиваться.", "court", Sim.LVL_BAD,
-				[{"text": "Нанять юристов (80 000 ₽, шанс 85%)", "hint": ""},
-				 {"text": "Отбиваться самим (шанс 40%)", "hint": "При неудаче — потеря четверти денег"},
-				 {"text": "Откупиться (20% денег на счёте)", "hint": "Наверняка"}], 0)
+			letter("raid", L.t("Рейдерская попытка"), L.t("Неизвестные принесли в налоговую поддельный протокол собрания учредителей и пытаются переоформить завод на себя. Нужно отбиваться."), "court", Sim.LVL_BAD,
+				[{"text": L.t("Нанять юристов (80 000 ₽, шанс 85%)"), "hint": ""},
+				 {"text": L.t("Отбиваться самим (шанс 40%)"), "hint": L.t("При неудаче — потеря четверти денег")},
+				 {"text": L.t("Откупиться (20% денег на счёте)"), "hint": L.t("Наверняка")}], 0)
 
 
 # ================================================================ пожар
@@ -666,9 +666,9 @@ func ignite(c: Vector2i, why: String) -> void:
 		brigade_at = -1.0
 		fires_total += 1
 		var r := sim.rooms.room_at(c)
-		var where := r.title() if r else "на территории"
-		info("Пожар!", "%s: огонь %s. Все свободные бегут тушить. С огнетушителем — в разы быстрее; если огонь разойдётся, приедут пожарные — и будет проверка." % [why, ("в помещении «%s»" % where) if r else where], "fire", Sim.LVL_BAD, c, true)
-		sim.paper.add("Происшествия", "Пожар на заводе", "%s. Коллектив бросился тушить, кто с огнетушителем, кто с ведром." % why)
+		var where := r.title() if r else L.t("на территории")
+		info(L.t("Пожар!"), L.t("%s: огонь %s. Все свободные бегут тушить. С огнетушителем — в разы быстрее; если огонь разойдётся, приедут пожарные — и будет проверка.") % [why, (L.t("в помещении «%s»") % where) if r else where], "fire", Sim.LVL_BAD, c, true)
+		sim.paper.add(L.t("Происшествия"), L.t("Пожар на заводе"), L.t("%s. Коллектив бросился тушить, кто с огнетушителем, кто с ведром.") % why)
 
 
 func extinguish(i: int, amount: float) -> void:
@@ -695,14 +695,14 @@ func _fire_out(brigade: bool) -> void:
 	sim.sfx.emit("extinguish", Vector2i(-1, -1))
 	if brigade:
 		sim.reputation = maxf(0.0, sim.reputation - 3.0)
-		info("Пожар потушен пожарными", "Расчёт пожарной охраны потушил огонь, пожар шёл %d мин. Будет внеплановая проверка пожарного надзора." % maxi(1, dur), "fire", Sim.LVL_WARN)
-		sim.inspect.schedule("fire", sim.minute + sim.rng.randf_range(1.0, 2.0) * 1440.0, false, "после пожара")
+		info(L.t("Пожар потушен пожарными"), L.t("Расчёт пожарной охраны потушил огонь, пожар шёл %d мин. Будет внеплановая проверка пожарного надзора.") % maxi(1, dur), "fire", Sim.LVL_WARN)
+		sim.inspect.schedule("fire", sim.minute + sim.rng.randf_range(1.0, 2.0) * 1440.0, false, L.t("после пожара"))
 	else:
-		info("Пожар потушен", "Огонь потушили своими силами за %d мин." % maxi(1, dur), "fire", Sim.LVL_GOOD)
-		sim.paper.add("Герои", "Потушили сами", "Пожар потушили за %d минут без пожарных. Коллектив молодец, огнетушители — тоже." % maxi(1, dur))
-	add_mod("fire_recent", 1.0, 10.0 * 1440.0, "Недавний пожар")
+		info(L.t("Пожар потушен"), L.t("Огонь потушили своими силами за %d мин.") % maxi(1, dur), "fire", Sim.LVL_GOOD)
+		sim.paper.add(L.t("Герои"), L.t("Потушили сами"), L.t("Пожар потушили за %d минут без пожарных. Коллектив молодец, огнетушители — тоже.") % maxi(1, dur))
+	add_mod("fire_recent", 1.0, 10.0 * 1440.0, L.t("Недавний пожар"))
 	if sim.rng.randf() < 0.5 and not brigade:
-		sim.inspect.schedule("fire", sim.minute + sim.rng.randf_range(2.0, 4.0) * 1440.0, true, "после пожара")
+		sim.inspect.schedule("fire", sim.minute + sim.rng.randf_range(2.0, 4.0) * 1440.0, true, L.t("после пожара"))
 	while soot.size() > 300:
 		soot.erase(soot.keys()[0])
 
@@ -733,7 +733,7 @@ func _tick_fire(dt: float) -> void:
 				if t.kind() == "machine" and t.condition < 8.0 and not t.broken:
 					t.broken = true
 					t.working = false
-					sim.notify("Огонь повредил станок «%s» — нужен ремонт." % t.title(), Sim.LVL_BAD, t.cell)
+					sim.notify(L.t("Огонь повредил станок «%s» — нужен ремонт.") % t.title(), Sim.LVL_BAD, t.cell)
 		# грузы на полу сгорают
 		if sim.rng.randf() < 0.02 * dt * v:
 			for gid in sim.ground_items.duplicate():
@@ -777,7 +777,7 @@ func _machine_fire_risk() -> void:
 			k *= 1.5
 		if sim.rng.randf() < base * k:
 			var acc := sim.brain.best_access(m, m.cell)
-			ignite(acc if acc.x >= 0 else m.cell, "Загорелось у станка «%s»" % m.title())
+			ignite(acc if acc.x >= 0 else m.cell, L.t("Загорелось у станка «%s»") % m.title())
 			return
 
 
@@ -785,7 +785,7 @@ func _machine_fire_risk() -> void:
 func on_trip(cell: Vector2i) -> void:
 	if cell.x >= 0 and sim.rng.randf() < 0.06 * float(mdef().get("fire_k", 1.0)):
 		var c := sim.world.nearest_passable(cell + Vector2i(0, 1))
-		ignite(c, "Перегруз: загорелась проводка у подстанции")
+		ignite(c, L.t("Перегруз: загорелась проводка у подстанции"))
 
 
 # ================================================================ травмы и больничные
@@ -803,12 +803,12 @@ func injure(w: Worker, cause: String) -> void:
 	var nurse := sim.town.medbay_ready()
 	if nurse:
 		days = maxi(1, int(round(days * 0.6)))
-	var texts := {"event": "получил{|а} травму у станка", "work": "травмировал{|а} руку на работе", "slip": "поскользнул{ся|ась} на льду",
-		"burn": "получил{|а} ожог на пожаре", "fight": "пострадал{|а} в драке"}
-	var what := Nicks.gendered(str(texts.get(cause, "получил{|а} травму")), w.female)
+	var texts := {"event": L.t("получил{|а} травму у станка"), "work": L.t("травмировал{|а} руку на работе"), "slip": L.t("поскользнул{ся|ась} на льду"),
+		"burn": L.t("получил{|а} ожог на пожаре"), "fight": L.t("пострадал{|а} в драке")}
+	var what := Nicks.gendered(str(texts.get(cause, L.t("получил{|а} травму"))), w.female)
 	w.sick_until = float(sim.day() + days - 1) * 1440.0 + 1200.0
 	w.away_why = "на больничном"
-	w.add_history(sim.day(), "Травма: %s. Больничный %d дн." % [what, days])
+	w.add_history(sim.day(), L.t("Травма: %s. Больничный %d дн.") % [what, days])
 	Nicks.count(w, "injury")
 	Mood.add(sim, w, "injured")
 	injuries.append(sim.day())
@@ -819,16 +819,16 @@ func injure(w: Worker, cause: String) -> void:
 			Mood.add(sim, o, "coworker_injured")
 	var cell := w.cell()
 	sim.sfx.emit("injury", cell)
-	sim.brain.send_home(w, "Идёт в травмпункт" if not nurse else "Фельдшер перевязал — домой")
+	sim.brain.send_home(w, L.t("Идёт в травмпункт") if not nurse else L.t("Фельдшер перевязал — домой"))
 	if nurse:
 		Mood.add(sim, w, "nurse_helped")
 	w.bubble = "injury"
-	info("Травма на производстве", "%s %s. Больничный — %d %s%s." % [w.full_name(), what, days, Defs.plural(days, "день", "дня", "дней"), " (аптечка рядом помогла)" if aid else ". С аптечкой рядом было бы легче"], "injury", Sim.LVL_BAD, cell)
-	sim.paper.add("Охрана труда", "Травма: " + w.full_name(), "Напоминаем: спешка, усталость и изношенный станок — главные враги. Берегите себя.")
+	info(L.t("Травма на производстве"), L.t("%s %s. Больничный — %d %s%s.") % [w.full_name(), what, days, Defs.plural(days, "день", "дня", "дней"), L.t(" (аптечка рядом помогла)") if aid else L.t(". С аптечкой рядом было бы легче")], "injury", Sim.LVL_BAD, cell)
+	sim.paper.add(L.t("Охрана труда"), L.t("Травма: ") + w.full_name(), L.t("Напоминаем: спешка, усталость и изношенный станок — главные враги. Берегите себя."))
 	sim.crew.on_injury(w, cause)
 	var lc := 0.4 * float(Defs.inspections.get("freq_k", {}).get(mode, 1.0))
 	if sim.rng.randf() < lc:
-		sim.inspect.schedule("labor", sim.minute + sim.rng.randf_range(2.0, 5.0) * 1440.0, false, "после травмы")
+		sim.inspect.schedule("labor", sim.minute + sim.rng.randf_range(2.0, 5.0) * 1440.0, false, L.t("после травмы"))
 
 
 func _aid_near(c: Vector2i) -> bool:
@@ -916,9 +916,9 @@ func _ev_bad_metal() -> void:
 	if bad.is_empty():
 		return
 	var refund := sim.material_price(best) * bad.size()
-	letter("bad_metal", "Бракованная партия металла", "ОТК обнаружило: в партии «%s» от поставщика %d прутков с трещинами и раковинами. Детали из них пойдут в брак." % [Defs.material_name(best), bad.size()], "inspect", Sim.LVL_WARN,
-		[{"text": "Вернуть брак поставщику", "hint": "Прутки уберут со склада, деньги (%s) вернут через 3 дня" % Defs.money_str(refund)},
-		 {"text": "Пустить в работу", "hint": "Много брака на ОТК"}], 0, {"items": bad, "refund": refund, "mat": best})
+	letter("bad_metal", L.t("Бракованная партия металла"), L.t("ОТК обнаружило: в партии «%s» от поставщика %d прутков с трещинами и раковинами. Детали из них пойдут в брак.") % [Defs.material_name(best), bad.size()], "inspect", Sim.LVL_WARN,
+		[{"text": L.t("Вернуть брак поставщику"), "hint": L.t("Прутки уберут со склада, деньги (%s) вернут через 3 дня") % Defs.money_str(refund)},
+		 {"text": L.t("Пустить в работу"), "hint": L.t("Много брака на ОТК")}], 0, {"items": bad, "refund": refund, "mat": best})
 
 
 func _res_bad_metal(d: Dictionary, choice: int) -> void:
@@ -931,8 +931,8 @@ func _res_bad_metal(d: Dictionary, choice: int) -> void:
 			sim.delete_item(it)
 			n += 1
 	if n > 0:
-		receivables.append({"amount": float(d.get("refund", 0.0)) * n / maxf(1.0, (d.get("items", []) as Array).size()), "due": sim.minute + 3.0 * 1440.0, "client": "Поставщик (возврат за брак)", "risk": 0.0})
-		sim.notify("%d бракованных прутков отправили обратно поставщику." % n, Sim.LVL_INFO)
+		receivables.append({"amount": float(d.get("refund", 0.0)) * n / maxf(1.0, (d.get("items", []) as Array).size()), "due": sim.minute + 3.0 * 1440.0, "client": L.t("Поставщик (возврат за брак)"), "risk": 0.0})
+		sim.notify(L.t("%d бракованных прутков отправили обратно поставщику.") % n, Sim.LVL_INFO)
 
 
 func _ev_pipe() -> void:
@@ -948,8 +948,8 @@ func _ev_pipe() -> void:
 	var r2: Rooms.Room = rooms_r[sim.rng.randi_range(0, rooms_r.size() - 1)]
 	sim.season.burst_cell = r2.cells[0]
 	sim.season.burst_until = sim.minute + 2.0 * 1440.0
-	letter("pipe_burst", "Прорвало трубу отопления", "В помещении «%s» прорвало трубу: батареи холодные, на полу лужа. Без ремонта там будет мороз." % r2.title(), "heat", Sim.LVL_WARN,
-		[{"text": "Вызвать аварийную службу (18 000 ₽)", "hint": "Починят за 3 часа"}, {"text": "Чинить своими силами", "hint": "Бесплатно, но сутки без тепла"}], 1,
+	letter("pipe_burst", L.t("Прорвало трубу отопления"), L.t("В помещении «%s» прорвало трубу: батареи холодные, на полу лужа. Без ремонта там будет мороз.") % r2.title(), "heat", Sim.LVL_WARN,
+		[{"text": L.t("Вызвать аварийную службу (18 000 ₽)"), "hint": L.t("Починят за 3 часа")}, {"text": L.t("Чинить своими силами"), "hint": L.t("Бесплатно, но сутки без тепла")}], 1,
 		{"cx": r2.cells[0].x, "cy": r2.cells[0].y})
 
 
@@ -961,12 +961,12 @@ func _ev_fault(layer: String) -> void:
 	var i := sim.world.idx(c)
 	var cost := int(Faults.CREW_COST.get(layer, 10000.0))
 	if layer == "cable":
-		letter("wire_break", "Обрыв провода", "Перебило кабель — искрит, дальше по линии тока нет: станки и свет за обрывом стоят. Электрик или любой рабочий заменит кусок кабеля, как при прокладке.", "uncable", Sim.LVL_WARN,
-			[{"text": "Вызвать аварийную бригаду (%s)" % Defs.money_str(cost), "hint": "Починят за час"}, {"text": "Чинить своими силами", "hint": "Бесплатно: кусок кабеля появится в чертежах, его проложат рабочие"}], 1,
+		letter("wire_break", L.t("Обрыв провода"), L.t("Перебило кабель — искрит, дальше по линии тока нет: станки и свет за обрывом стоят. Электрик или любой рабочий заменит кусок кабеля, как при прокладке."), "uncable", Sim.LVL_WARN,
+			[{"text": L.t("Вызвать аварийную бригаду (%s)") % Defs.money_str(cost), "hint": L.t("Починят за час")}, {"text": L.t("Чинить своими силами"), "hint": L.t("Бесплатно: кусок кабеля появится в чертежах, его проложат рабочие")}], 1,
 			{"cx": c.x, "cy": c.y, "layer": layer, "i": i})
 	else:
-		letter("leak", "Прорвало водопровод", "Лопнула труба — на полу лужа, дальше по трубе воды нет: туалеты и раковины за прорывом сухие. Рабочие заменят кусок трубы, как при прокладке.", "ov_water", Sim.LVL_WARN,
-			[{"text": "Вызвать аварийную бригаду (%s)" % Defs.money_str(cost), "hint": "Починят за час"}, {"text": "Чинить своими силами", "hint": "Бесплатно: кусок трубы появится в чертежах, его проложат рабочие"}], 1,
+		letter("leak", L.t("Прорвало водопровод"), L.t("Лопнула труба — на полу лужа, дальше по трубе воды нет: туалеты и раковины за прорывом сухие. Рабочие заменят кусок трубы, как при прокладке."), "ov_water", Sim.LVL_WARN,
+			[{"text": L.t("Вызвать аварийную бригаду (%s)") % Defs.money_str(cost), "hint": L.t("Починят за час")}, {"text": L.t("Чинить своими силами"), "hint": L.t("Бесплатно: кусок трубы появится в чертежах, его проложат рабочие")}], 1,
 			{"cx": c.x, "cy": c.y, "layer": layer, "i": i})
 
 
@@ -994,9 +994,9 @@ func _ev_hot_order() -> void:
 	# отдел сбыта оценивает, успеваем ли; решение — за директором
 	var v := sim.sales.verdict(o)
 	var why := str(v[0])
-	var opinion := "Сбыт: успеваем, можно брать." if why == "" else "Сбыт против: %s." % why
-	letter("hot_order", "«Горящий» заказ", "%s срочно нужно %d шт. «%s» за %d %s. Платят на 45%% дороже обычного — %s.\n%s" % [str(o["client"]), int(o["qty"]), Defs.product_name(str(o["product"])), int(o["lead"]), Defs.plural(int(o["lead"]), "рабочий день", "рабочих дня", "рабочих дней"), Defs.money_str(float(o["price"]) * int(o["qty"])), opinion], "orders", Sim.LVL_GOOD,
-		[{"text": "Взять заказ", "hint": "Поставит его первым в очередь" if why == "" else "Рискованно: можно не успеть"}, {"text": "Отказаться", "hint": ""}], 0 if why == "" else 1, {"order": int(o["id"])})
+	var opinion := L.t("Сбыт: успеваем, можно брать.") if why == "" else L.t("Сбыт против: %s.") % L.tx(why)
+	letter("hot_order", L.t("«Горящий» заказ"), L.t("%s срочно нужно %d шт. «%s» за %d %s. Платят на 45%% дороже обычного — %s.\n%s") % [str(o["client"]), int(o["qty"]), Defs.product_name(str(o["product"])), int(o["lead"]), Defs.plural(int(o["lead"]), "рабочий день", "рабочих дня", "рабочих дней"), Defs.money_str(float(o["price"]) * int(o["qty"])), opinion], "orders", Sim.LVL_GOOD,
+		[{"text": L.t("Взять заказ"), "hint": L.t("Поставит его первым в очередь") if why == "" else L.t("Рискованно: можно не успеть")}, {"text": L.t("Отказаться"), "hint": ""}], 0 if why == "" else 1, {"order": int(o["id"])})
 
 
 ## Клиент нашёл пропущенный ОТК брак — рекламация придёт через 2–4 дня.
@@ -1010,15 +1010,15 @@ func _ev_reclamation(d: Dictionary) -> void:
 	var p := str(d.get("product", ""))
 	var bad := int(d.get("bad", 1))
 	var have := sim.ok_in_storage(p) - sim.orders.allocated(p)
-	var ch: Array = [{"text": "Выплатить компенсацию (%s)" % Defs.money_str(float(d.get("comp", 0.0))), "hint": "Репутация почти не пострадает"},
-		{"text": "Отказать: «Брак не наш»", "hint": "Репутация −6"}]
+	var ch: Array = [{"text": L.t("Выплатить компенсацию (%s)") % Defs.money_str(float(d.get("comp", 0.0))), "hint": L.t("Репутация почти не пострадает")},
+		{"text": L.t("Отказать: «Брак не наш»"), "hint": L.t("Репутация −6")}]
 	if sim.office.active("legal"):
-		ch.append({"text": "Оспорить через юриста", "hint": "Экспертиза: шанс 50% снизить компенсацию вдвое, репутация −2"})
+		ch.append({"text": L.t("Оспорить через юриста"), "hint": L.t("Экспертиза: шанс 50% снизить компенсацию вдвое, репутация −2")})
 	if have >= bad:
-		ch.insert(0, {"text": "Заменить детали со склада (%d шт.)" % bad, "hint": "Готовые детали уйдут клиенту"})
-	letter("reclamation", "Рекламация", "%s прислал рекламацию: в партии «%s» нашли %d %s с браком, пропущенных ОТК. Требуют решить вопрос." % [str(d.get("client", "Клиент")), Defs.product_name(p), bad, Defs.plural(bad, "деталь", "детали", "деталей")], "orders", Sim.LVL_WARN,
+		ch.insert(0, {"text": L.t("Заменить детали со склада (%d шт.)") % bad, "hint": L.t("Готовые детали уйдут клиенту")})
+	letter("reclamation", L.t("Рекламация"), L.t("%s прислал рекламацию: в партии «%s» нашли %d %s с браком, пропущенных ОТК. Требуют решить вопрос.") % [str(d.get("client", L.t("Клиент"))), Defs.product_name(p), bad, Defs.plural(bad, "деталь", "детали", "деталей")], "orders", Sim.LVL_WARN,
 		ch, 0, {"client": d.get("client", ""), "product": p, "bad": bad, "comp": d.get("comp", 0.0), "swap": have >= bad})
-	sim.paper.add("Качество", "Рекламация от клиента", "Брак дошёл до заказчика. ОТК, это камень в ваш огород!")
+	sim.paper.add(L.t("Качество"), L.t("Рекламация от клиента"), L.t("Брак дошёл до заказчика. ОТК, это камень в ваш огород!"))
 
 
 func _res_reclamation(d: Dictionary, choice: int) -> void:
@@ -1034,22 +1034,22 @@ func _res_reclamation(d: Dictionary, choice: int) -> void:
 				if it.kind == "part" and it.def_id == p and it.q == "ok" and it.reserved_by < 0 and it.loc == Item.Loc.THING:
 					sim.delete_item(it)
 					left -= 1
-			sim.notify("Бракованные детали заменили со склада. Клиент доволен.", Sim.LVL_INFO)
+			sim.notify(L.t("Бракованные детали заменили со склада. Клиент доволен."), Sim.LVL_INFO)
 		1:
 			sim.spend(float(d.get("comp", 0.0)), "Штраф: компенсация по рекламации")
 			sim.market.claim("liability", float(d.get("comp", 0.0)), "компенсация по рекламации")
 			sim.reputation = maxf(0.0, sim.reputation - 1.0)
 		2:
 			sim.reputation = maxf(0.0, sim.reputation - 6.0)
-			sim.notify("%s обиделся и рассказал всем, что у вас брак. Репутация упала." % str(d.get("client", "Клиент")), Sim.LVL_BAD)
+			sim.notify(L.t("%s обиделся и рассказал всем, что у вас брак. Репутация упала.") % str(d.get("client", L.t("Клиент"))), Sim.LVL_BAD)
 		3:
 			var comp := float(d.get("comp", 0.0))
 			sim.reputation = maxf(0.0, sim.reputation - 2.0)
 			if sim.rng.randf() < 0.5:
 				comp *= 0.5
-				sim.notify("Юрист добился экспертизы: часть брака — от неправильного монтажа у заказчика. Компенсация вдвое меньше: %s." % Defs.money_str(comp), Sim.LVL_GOOD)
+				sim.notify(L.t("Юрист добился экспертизы: часть брака — от неправильного монтажа у заказчика. Компенсация вдвое меньше: %s.") % Defs.money_str(comp), Sim.LVL_GOOD)
 			else:
-				sim.notify("Экспертиза подтвердила брак: компенсацию пришлось выплатить полностью (%s)." % Defs.money_str(comp), Sim.LVL_WARN)
+				sim.notify(L.t("Экспертиза подтвердила брак: компенсацию пришлось выплатить полностью (%s).") % Defs.money_str(comp), Sim.LVL_WARN)
 			sim.spend(comp, "Штраф: компенсация по рекламации")
 
 
@@ -1064,12 +1064,12 @@ func _ev_theft() -> void:
 	if sim.crew.stop_outside_theft():
 		return
 	if sim.progress.dogs_tame and not sim.progress.dogs.is_empty() and sim.rng.randf() < 0.7:
-		info("Собаки подняли лай", "Ночью кто-то лез через забор к складу, но заводские собаки подняли такой лай, что вор сбежал без металла.", "thief", Sim.LVL_GOOD)
-		sim.paper.add("Бдительность", "Жучка на страже", "Заводские собаки отогнали несуна от склада. Профком выделил им по косточке.")
+		info(L.t("Собаки подняли лай"), L.t("Ночью кто-то лез через забор к складу, но заводские собаки подняли такой лай, что вор сбежал без металла."), "thief", Sim.LVL_GOOD)
+		sim.paper.add(L.t("Бдительность"), L.t("Жучка на страже"), L.t("Заводские собаки отогнали несуна от склада. Профком выделил им по косточке."))
 		return
 	if sim.crew.search_on() and sim.rng.randf() < 0.85:
-		info("Вахта задержала несуна", "Охранник на проходной нашёл в сумке у рабочего три прутка. Металл вернули на склад.", "thief", Sim.LVL_GOOD)
-		sim.paper.add("Бдительность", "Вахта не дремлет", "Охрана на проходной снова на посту: несун задержан, металл возвращён. Спасибо за бдительность!")
+		info(L.t("Вахта задержала несуна"), L.t("Охранник на проходной нашёл в сумке у рабочего три прутка. Металл вернули на склад."), "thief", Sim.LVL_GOOD)
+		sim.paper.add(L.t("Бдительность"), L.t("Вахта не дремлет"), L.t("Охрана на проходной снова на посту: несун задержан, металл возвращён. Спасибо за бдительность!"))
 		return
 	var mats := _materials()
 	var n := mini(mats.size(), sim.rng.randi_range(2, 6))
@@ -1080,13 +1080,13 @@ func _ev_theft() -> void:
 		mat_name = Defs.material_name(it.def_id)
 		sim.delete_item(it)
 	var cp := has_checkpoint()
-	var txt := "Со склада пропало %d прутков («%s»). Кто-то вынес через забор или проходную." % [n, mat_name]
+	var txt := L.t("Со склада пропало %d прутков («%s»). Кто-то вынес через забор или проходную.") % [n, mat_name]
 	if cp:
-		letter("theft", "Кража на складе", txt, "thief", Sim.LVL_WARN,
-			[{"text": "Ввести досмотр на проходной (%s в день)" % Defs.money_str(Defs.ev("guard_cost_day")), "hint": "Людям не нравится, но кражи почти прекратятся. Досматривает охранник — без него досмотра нет"}, {"text": "Ничего не делать", "hint": ""}], 1)
+		letter("theft", L.t("Кража на складе"), txt, "thief", Sim.LVL_WARN,
+			[{"text": L.t("Ввести досмотр на проходной (%s в день)") % Defs.money_str(Defs.ev("guard_cost_day")), "hint": L.t("Людям не нравится, но кражи почти прекратятся. Досматривает охранник — без него досмотра нет")}, {"text": L.t("Ничего не делать"), "hint": ""}], 1)
 	else:
-		info("Кража на складе", txt + " Поставьте у въезда проходную с турникетами (Объекты → Безопасность) и наймите охранника — тогда можно ввести досмотр.", "thief", Sim.LVL_WARN, Vector2i(-1, -1), true)
-	sim.paper.add("Происшествия", "Несуны снова в деле", "Со склада ушло %d прутков. Товарищи, металл — народное достояние, а не дачный забор!" % n)
+		info(L.t("Кража на складе"), txt + L.t(" Поставьте у въезда проходную с турникетами (Объекты → Безопасность) и наймите охранника — тогда можно ввести досмотр."), "thief", Sim.LVL_WARN, Vector2i(-1, -1), true)
+	sim.paper.add(L.t("Происшествия"), L.t("Несуны снова в деле"), L.t("Со склада ушло %d прутков. Товарищи, металл — народное достояние, а не дачный забор!") % n)
 
 
 func _ev_drinking() -> void:
@@ -1100,10 +1100,10 @@ func _ev_drinking() -> void:
 	Mood.add(sim, b, "fight")
 	if b.present and sim.rng.randf() < 0.5:
 		injure(b, "fight")
-	letter("drinking", "Пьянка и драка", "%s и %s после обеда «отметили» что-то в бытовке и подрались. Мастера в ступоре, остальные смотрят, что будет." % [a.full_name(), b.full_name()], "staff", Sim.LVL_WARN,
-		[{"text": "Объявить выговор обоим", "hint": "Настроение у них упадёт, но порядок будет"},
-		 {"text": "Уволить зачинщика (%s)" % a.full_name(), "hint": "Остальные запомнят"},
-		 {"text": "Замять", "hint": "Коллектив решит, что можно всё"}], 0, {"a": a.id, "b": b.id})
+	letter("drinking", L.t("Пьянка и драка"), L.t("%s и %s после обеда «отметили» что-то в бытовке и подрались. Мастера в ступоре, остальные смотрят, что будет.") % [a.full_name(), b.full_name()], "staff", Sim.LVL_WARN,
+		[{"text": L.t("Объявить выговор обоим"), "hint": L.t("Настроение у них упадёт, но порядок будет")},
+		 {"text": L.t("Уволить зачинщика (%s)") % a.full_name(), "hint": L.t("Остальные запомнят")},
+		 {"text": L.t("Замять"), "hint": L.t("Коллектив решит, что можно всё")}], 0, {"a": a.id, "b": b.id})
 
 
 func _res_drinking(d: Dictionary, choice: int) -> void:
@@ -1114,7 +1114,7 @@ func _res_drinking(d: Dictionary, choice: int) -> void:
 			for w in [a, b]:
 				if w:
 					Mood.add(sim, w, "reprimand")
-					w.add_history(sim.day(), "Выговор за пьянку на работе")
+					w.add_history(sim.day(), L.t("Выговор за пьянку на работе"))
 		1:
 			if a:
 				sim.fire(a, false)
@@ -1132,7 +1132,7 @@ func _res_fight(d: Dictionary, choice: int) -> void:
 			for w in [a, b]:
 				if w:
 					Mood.add(sim, w, "reprimand")
-					w.add_history(sim.day(), "Выговор за драку на работе")
+					w.add_history(sim.day(), L.t("Выговор за драку на работе"))
 		1:
 			if a:
 				sim.fire(a, false)
@@ -1146,7 +1146,7 @@ func _res_rumor(choice: int) -> void:
 		for w in sim.workers:
 			_remove_thought(w, "layoff_rumor")
 			Mood.add(sim, w, "rumor_cleared")
-		sim.notify("Собрание прошло: слухи развеяны, люди успокоились.", Sim.LVL_GOOD)
+		sim.notify(L.t("Собрание прошло: слухи развеяны, люди успокоились."), Sim.LVL_GOOD)
 
 
 func _retiree() -> Worker:
@@ -1163,11 +1163,11 @@ func _ev_retire() -> void:
 	if w == null:
 		return
 	var student := _student_for(w)
-	var st_txt := (" Опыт можно передать ученику — %s." % student.full_name()) if student else ""
-	letter("retire", "Уход на пенсию", "%s, %s, %d лет, собирается на пенсию: «Хватит, внуки ждут». Уйдёт через два дня.%s" % [w.full_name(), w.prof_lc(), w.age, st_txt], "staff", Sim.LVL_INFO,
-		[{"text": "Уговорить остаться (премия 30 000 ₽)", "hint": "Поработает ещё год"},
-		 {"text": "Проводить с почётом (10 000 ₽ на подарок)", "hint": "Наставник передаст опыт ученику" if student else "Коллективу будет приятно"},
-		 {"text": "Просто проводить", "hint": ""}], 2, {"w": w.id, "s": student.id if student else -1})
+	var st_txt := (L.t(" Опыт можно передать ученику — %s.") % student.full_name()) if student else ""
+	letter("retire", L.t("Уход на пенсию"), L.t("%s, %s, %d лет, собирается на пенсию: «Хватит, внуки ждут». Уйдёт через два дня.%s") % [w.full_name(), w.prof_lc(), w.age, st_txt], "staff", Sim.LVL_INFO,
+		[{"text": L.t("Уговорить остаться (премия 30 000 ₽)"), "hint": L.t("Поработает ещё год")},
+		 {"text": L.t("Проводить с почётом (10 000 ₽ на подарок)"), "hint": L.t("Наставник передаст опыт ученику") if student else L.t("Коллективу будет приятно")},
+		 {"text": L.t("Просто проводить"), "hint": ""}], 2, {"w": w.id, "s": student.id if student else -1})
 
 
 func _student_for(w: Worker) -> Worker:
@@ -1189,21 +1189,21 @@ func _res_retire(d: Dictionary, choice: int) -> void:
 			sim.spend(30000.0, "Премия: " + w.full_name())
 			w.age -= 1
 			Mood.add(sim, w, "bonus")
-			w.add_history(sim.day(), "Уговорили не уходить на пенсию")
+			w.add_history(sim.day(), L.t("Уговорили не уходить на пенсию"))
 		1:
 			sim.spend(10000.0, "Премия: подарок к пенсии")
 			var s := sim.get_worker(int(d.get("s", -1)))
 			if s:
 				var sk := s.main_skill()
 				s.skills[sk] = mini(10, s.skill(sk) + 2)
-				s.add_history(sim.day(), "Наставник %s передал опыт перед пенсией" % w.full_name())
+				s.add_history(sim.day(), L.t("Наставник %s передал опыт перед пенсией") % w.full_name())
 			for o in sim.workers:
 				if o != w:
 					Mood.add(sim, o, "retire_party")
-			departures.append({"wid": w.id, "at": sim.minute + 2880.0, "why": Nicks.gendered("{ушёл|ушла} на заслуженный отдых. Проводили всем коллективом", w.female)})
-			sim.paper.add("Наши ветераны", "Проводили на пенсию: " + w.full_name(), "%d лет у станка. Спасибо за труд! Ученики обещают не подвести." % maxi(10, w.age - 20))
+			departures.append({"wid": w.id, "at": sim.minute + 2880.0, "why": Nicks.gendered(L.t("{ушёл|ушла} на заслуженный отдых. Проводили всем коллективом"), w.female)})
+			sim.paper.add(L.t("Наши ветераны"), L.t("Проводили на пенсию: ") + w.full_name(), L.t("%d лет у станка. Спасибо за труд! Ученики обещают не подвести.") % maxi(10, w.age - 20))
 		2:
-			departures.append({"wid": w.id, "at": sim.minute + 2880.0, "why": Nicks.gendered("{ушёл|ушла} на пенсию", w.female)})
+			departures.append({"wid": w.id, "at": sim.minute + 2880.0, "why": Nicks.gendered(L.t("{ушёл|ушла} на пенсию"), w.female)})
 
 
 func _poach_target() -> Worker:
@@ -1219,8 +1219,8 @@ func _ev_poach() -> void:
 	var w := _poach_target()
 	if w == null:
 		return
-	letter("poach", "Переманивают конкуренты", "%s, %s, получил предложение от «Металлист-Т» — на четверть больше денег. Просит прибавку, иначе уйдёт через день." % [w.full_name(), w.title_lc()], "staff", Sim.LVL_WARN,
-		[{"text": "Поднять ставку на 20%", "hint": "%s → %s за смену" % [Defs.money_str(w.wage), Defs.money_str(w.wage * 1.2)]}, {"text": "Отпустить", "hint": "Уйдёт к конкуренту"}], 0, {"w": w.id})
+	letter("poach", L.t("Переманивают конкуренты"), L.t("%s, %s, получил предложение от «Металлист-Т» — на четверть больше денег. Просит прибавку, иначе уйдёт через день.") % [w.full_name(), w.title_lc()], "staff", Sim.LVL_WARN,
+		[{"text": L.t("Поднять ставку на 20%"), "hint": L.t("%s → %s за смену") % [Defs.money_str(w.wage), Defs.money_str(w.wage * 1.2)]}, {"text": L.t("Отпустить"), "hint": L.t("Уйдёт к конкуренту")}], 0, {"w": w.id})
 
 
 func _res_poach(d: Dictionary, choice: int) -> void:
@@ -1231,7 +1231,7 @@ func _res_poach(d: Dictionary, choice: int) -> void:
 		sim.change_wage(w, 0.2)
 		Mood.add(sim, w, "raise_kept")
 	else:
-		departures.append({"wid": w.id, "at": sim.minute + 1440.0, "why": Nicks.gendered("{ушёл|ушла} к конкурентам за длинным рублём", w.female)})
+		departures.append({"wid": w.id, "at": sim.minute + 1440.0, "why": Nicks.gendered(L.t("{ушёл|ушла} к конкурентам за длинным рублём"), w.female)})
 
 
 func _young() -> Worker:
@@ -1246,10 +1246,10 @@ func _ev_gift(kind: String) -> void:
 	var w := _young()
 	if w == null:
 		return
-	var txt := "%s %s! Коллектив собирает на подарок." % [w.full_name(), "женится" if not w.female else "выходит замуж"] if kind == "wedding" else "У %s родился ребёнок! В курилке уже выбирают имя." % w.full_name()
-	letter(kind, "Свадьба" if kind == "wedding" else "Пополнение в семье", txt, "party", Sim.LVL_GOOD,
-		[{"text": "Подарок от завода (5 000 ₽)", "hint": "Человек будет очень рад"}, {"text": "Ограничиться поздравлением", "hint": ""}], 1, {"w": w.id, "kind": kind})
-	sim.paper.add("Поздравляем!", ("Свадьба: " if kind == "wedding" else "Родился малыш у ") + w.full_name(), "Совет да любовь! Коллектив поздравляет и желает счастья." if kind == "wedding" else "Растёт смена! Поздравляем счастливых родителей.")
+	var txt := Nicks.gendered(L.t("%s {женится|выходит замуж}! Коллектив собирает на подарок."), w.female) % w.full_name() if kind == "wedding" else L.t("У %s родился ребёнок! В курилке уже выбирают имя.") % w.full_name()
+	letter(kind, L.t("Свадьба") if kind == "wedding" else L.t("Пополнение в семье"), txt, "party", Sim.LVL_GOOD,
+		[{"text": L.t("Подарок от завода (5 000 ₽)"), "hint": L.t("Человек будет очень рад")}, {"text": L.t("Ограничиться поздравлением"), "hint": ""}], 1, {"w": w.id, "kind": kind})
+	sim.paper.add(L.t("Поздравляем!"), (L.t("Свадьба: %s") if kind == "wedding" else L.t("Родился малыш у %s")) % w.full_name(), L.t("Совет да любовь! Коллектив поздравляет и желает счастья.") if kind == "wedding" else L.t("Растёт смена! Поздравляем счастливых родителей."))
 
 
 func _res_gift(d: Dictionary, choice: int) -> void:
@@ -1259,7 +1259,7 @@ func _res_gift(d: Dictionary, choice: int) -> void:
 	if choice == 0:
 		sim.spend(5000.0, "Премия: подарок " + w.full_name())
 		Mood.add(sim, w, "gift_given")
-		w.add_history(sim.day(), "Завод поздравил: " + ("свадьба" if str(d.get("kind")) == "wedding" else "рождение ребёнка"))
+		w.add_history(sim.day(), L.t("Завод поздравил: %s") % (L.t("свадьба") if str(d.get("kind")) == "wedding" else L.t("рождение ребёнка")))
 	else:
 		Mood.add(sim, w, "gift_none")
 
@@ -1298,8 +1298,8 @@ func _ev_rational() -> void:
 	if opts.is_empty():
 		return
 	var p: Array = opts[sim.rng.randi_range(0, opts.size() - 1)]
-	letter("rational", "Рацпредложение", "%s предлагает %s: %s. Автор просит вознаграждение." % [w.full_name(), str(p[2]), str(p[3])], "idea", Sim.LVL_GOOD,
-		[{"text": "Внедрить и заплатить автору 12 000 ₽", "hint": "Улучшение навсегда"}, {"text": "Отклонить", "hint": "Автор обидится"}], 1, {"w": w.id, "key": str(p[0]), "v": float(p[1]), "what": str(p[2])})
+	letter("rational", L.t("Рацпредложение"), L.t("%s предлагает %s: %s. Автор просит вознаграждение.") % [w.full_name(), L.t(str(p[2])), L.t(str(p[3]))], "idea", Sim.LVL_GOOD,
+		[{"text": L.t("Внедрить и заплатить автору 12 000 ₽"), "hint": L.t("Улучшение навсегда")}, {"text": L.t("Отклонить"), "hint": L.t("Автор обидится")}], 1, {"w": w.id, "key": str(p[0]), "v": float(p[1]), "what": L.t(str(p[2]))})
 
 
 func _res_rational(d: Dictionary, choice: int) -> void:
@@ -1310,8 +1310,8 @@ func _res_rational(d: Dictionary, choice: int) -> void:
 		perks[key] = perk(key) * float(d["v"])
 		if w:
 			Mood.add(sim, w, "rational_paid")
-			w.add_history(sim.day(), "Рацпредложение внедрено: " + str(d["what"]))
-			sim.paper.add("Новаторы", "Рацпредложение: " + str(d["what"]), "Автор — %s. Внедрено в производство, автору выплачено вознаграждение." % w.full_name())
+			w.add_history(sim.day(), L.t("Рацпредложение внедрено: ") + str(d["what"]))
+			sim.paper.add(L.t("Новаторы"), L.t("Рацпредложение: ") + str(d["what"]), L.t("Автор — %s. Внедрено в производство, автору выплачено вознаграждение.") % w.full_name())
 	elif w:
 		Mood.add(sim, w, "rational_ignored")
 
@@ -1321,8 +1321,8 @@ func _res_grant(_d: Dictionary, choice: int) -> void:
 		0:
 			sim.office.add_loan(1500000.0, 26, 0.05, "Заём фонда «Промразвитие»")
 		1:
-			add_mod("machine_subsidy", 0.7, float(sim.season.dpm()) * 1440.0, "Субсидия 30% на станок")
-			sim.notify("Субсидия оформлена: следующий станок обойдётся на 30% дешевле (месяц).", Sim.LVL_GOOD)
+			add_mod("machine_subsidy", 0.7, float(sim.season.dpm()) * 1440.0, L.t("Субсидия 30% на станок"))
+			sim.notify(L.t("Субсидия оформлена: следующий станок обойдётся на 30% дешевле (месяц)."), Sim.LVL_GOOD)
 
 
 func _ev_sale() -> void:
@@ -1334,15 +1334,15 @@ func _ev_sale() -> void:
 		return
 	var k2: String = opts[sim.rng.randi_range(0, opts.size() - 1)]
 	var price := float(Defs.objects[k2]["cost"]) * 0.4
-	letter("competitor_sale", "Торги конкурента", "Обанкротился «Металлист-Т». На торгах его оборудование: «%s» всего за 40%% цены (%s). Предложение — на неделю." % [str(Defs.objects[k2]["name"]), Defs.money_str(price)], "shop", Sim.LVL_GOOD,
-		[{"text": "Выкупить право (оплата при установке)", "hint": "Ставьте станок из меню «Объекты» — цена будет 40%"}, {"text": "Не нужно", "hint": ""}], 1, {"def": k2})
+	letter("competitor_sale", L.t("Торги конкурента"), L.t("Обанкротился «Металлист-Т». На торгах его оборудование: «%s» всего за 40%% цены (%s). Предложение — на неделю.") % [Defs.obj_name(k2), Defs.money_str(price)], "shop", Sim.LVL_GOOD,
+		[{"text": L.t("Выкупить право (оплата при установке)"), "hint": L.t("Ставьте станок из меню «Объекты» — цена будет 40%")}, {"text": L.t("Не нужно"), "hint": ""}], 1, {"def": k2})
 
 
 func _res_sale(d: Dictionary, choice: int) -> void:
 	if choice == 0:
 		var k := str(d["def"])
-		add_mod("voucher:" + k, 0.4, 7.0 * 1440.0, "Станок с торгов за 40%%: %s" % str(Defs.objects[k]["name"]))
-		sim.notify("Выкуплено право на «%s» с торгов. Поставьте его из «Объектов» в течение недели — цена 40%%." % str(Defs.objects[k]["name"]), Sim.LVL_GOOD)
+		add_mod("voucher:" + k, 0.4, 7.0 * 1440.0, L.t("Станок с торгов за 40%%: %s") % Defs.obj_name(k))
+		sim.notify(L.t("Выкуплено право на «%s» с торгов. Поставьте его из «Объектов» в течение недели — цена 40%%.") % Defs.obj_name(k), Sim.LVL_GOOD)
 
 
 func _res_raid(choice: int) -> void:
@@ -1357,12 +1357,12 @@ func _res_raid(choice: int) -> void:
 			sim.spend(maxf(0.0, sim.money) * 0.2, "Отступные рейдерам")
 			ok = true
 	if ok:
-		info("Рейдеры отступили", "Попытка захвата провалилась, документы признаны поддельными.", "court", Sim.LVL_GOOD)
+		info(L.t("Рейдеры отступили"), L.t("Попытка захвата провалилась, документы признаны поддельными."), "court", Sim.LVL_GOOD)
 	else:
 		var loss := maxf(50000.0, maxf(0.0, sim.money) * 0.25)
 		sim.spend(loss, "Штраф и судебные издержки: рейдеры")
 		sim.reputation = maxf(0.0, sim.reputation - 10.0)
-		info("Рейдеры отсудили своё", "Пока шли суды, счета были арестованы, часть денег списали по поддельным документам: %s. Репутация пострадала." % Defs.money_str(loss), "court", Sim.LVL_BAD, Vector2i(-1, -1), true)
+		info(L.t("Рейдеры отсудили своё"), L.t("Пока шли суды, счета были арестованы, часть денег списали по поддельным документам: %s. Репутация пострадала.") % Defs.money_str(loss), "court", Sim.LVL_BAD, Vector2i(-1, -1), true)
 
 
 # ================================================================ оплаты (лихие девяностые)
@@ -1372,22 +1372,22 @@ func defer_payment(amount: float, client: String, title: String) -> bool:
 	if mode != "wild" or amount <= 0.0 or sim.rng.randf() >= Defs.ev("wild_defer_chance"):
 		return false
 	if sim.rng.randf() < 0.45:
-		letter("barter", "Бартер вместо денег", "%s говорит, что денег нет, и предлагает вместо %s за «%s» вагон сахара на 120%% суммы. Сахар можно продать — за неделю, если повезёт." % [client, Defs.money_str(amount), title], "handshake", Sim.LVL_WARN,
-			[{"text": "Взять сахаром (≈%s через неделю)" % Defs.money_str(amount * 1.2), "hint": "Есть риск продать дешевле"}, {"text": "Требовать деньги", "hint": "Оплата задержится на 5–10 дней"}], 1,
+		letter("barter", L.t("Бартер вместо денег"), L.t("%s говорит, что денег нет, и предлагает вместо %s за «%s» вагон сахара на 120%% суммы. Сахар можно продать — за неделю, если повезёт.") % [client, Defs.money_str(amount), title], "handshake", Sim.LVL_WARN,
+			[{"text": L.t("Взять сахаром (≈%s через неделю)") % Defs.money_str(amount * 1.2), "hint": L.t("Есть риск продать дешевле")}, {"text": L.t("Требовать деньги"), "hint": L.t("Оплата задержится на 5–10 дней")}], 1,
 			{"amount": amount, "client": client})
 	else:
 		var days := sim.rng.randi_range(3, 9)
 		receivables.append({"amount": amount, "due": sim.minute + days * 1440.0, "client": client, "risk": 0.12})
-		info("Задержка оплаты", "%s забрал заказ, но заплатит только через %d %s: «Денег нет, но вы держитесь»." % [client, days, Defs.plural(days, "день", "дня", "дней")], "money", Sim.LVL_WARN)
+		info(L.t("Задержка оплаты"), L.t("%s забрал заказ, но заплатит только через %d %s: «Денег нет, но вы держитесь».") % [client, days, Defs.plural(days, "день", "дня", "дней")], "money", Sim.LVL_WARN)
 	return true
 
 
 func _res_barter(d: Dictionary, choice: int) -> void:
 	var a := float(d.get("amount", 0.0))
 	if choice == 0:
-		receivables.append({"amount": a * 1.2, "due": sim.minute + 7.0 * 1440.0, "client": "Продажа сахара", "risk": 0.25, "barter": true})
+		receivables.append({"amount": a * 1.2, "due": sim.minute + 7.0 * 1440.0, "client": L.t("Продажа сахара"), "risk": 0.25, "barter": true})
 	else:
-		receivables.append({"amount": a, "due": sim.minute + sim.rng.randf_range(5.0, 10.0) * 1440.0, "client": str(d.get("client", "Клиент")), "risk": 0.15})
+		receivables.append({"amount": a, "due": sim.minute + sim.rng.randf_range(5.0, 10.0) * 1440.0, "client": str(d.get("client", L.t("Клиент"))), "risk": 0.15})
 
 
 func _collect(r: Dictionary) -> void:
@@ -1397,19 +1397,19 @@ func _collect(r: Dictionary) -> void:
 		if bool(r.get("barter", false)):
 			a *= 0.6
 			sim.earn(a, "Оплата: бартер продан с убытком")
-			info("Сахар ушёл дёшево", "Рынок завален сахаром, продали только за %s." % Defs.money_str(a), "money", Sim.LVL_WARN)
+			info(L.t("Сахар ушёл дёшево"), L.t("Рынок завален сахаром, продали только за %s.") % Defs.money_str(a), "money", Sim.LVL_WARN)
 		elif int(r.get("delays", 0)) < 1:
 			r["due"] = sim.minute + sim.rng.randf_range(3.0, 6.0) * 1440.0
 			r["delays"] = int(r.get("delays", 0)) + 1
 			receivables.append(r)
-			sim.notify("%s снова переносит оплату (%s). «В понедельник, точно!»" % [who, Defs.money_str(a)], Sim.LVL_WARN)
+			sim.notify(L.t("%s снова переносит оплату (%s). «В понедельник, точно!»") % [who, Defs.money_str(a)], Sim.LVL_WARN)
 		else:
 			a *= 0.5
 			sim.earn(a, "Оплата через суд: " + who)
-			info("Половина долга через суд", "%s обанкротился, по суду удалось взыскать только %s." % [who, Defs.money_str(a)], "court", Sim.LVL_BAD)
+			info(L.t("Половина долга через суд"), L.t("%s обанкротился, по суду удалось взыскать только %s.") % [who, Defs.money_str(a)], "court", Sim.LVL_BAD)
 		return
 	sim.earn(a, "Оплата (долг): " + who)
-	sim.notify("%s наконец заплатил: %s." % [who, Defs.money_str(a)], Sim.LVL_GOOD)
+	sim.notify(L.t("%s наконец заплатил: %s.") % [who, Defs.money_str(a)], Sim.LVL_GOOD)
 
 
 func receivable_total() -> float:
@@ -1485,56 +1485,56 @@ func _start_strike(broken_promise: bool) -> void:
 	strikes_total += 1
 	low_mood_days = 0
 	_strike_letter(broken_promise)
-	sim.paper.add("Профсоюзная жизнь", "Коллектив объявил забастовку", "Требование: %s. Администрация обещает разобраться." % demand_text(demand).to_lower())
+	sim.paper.add(L.t("Профсоюзная жизнь"), L.t("Коллектив объявил забастовку"), L.t("Требование: %s. Администрация обещает разобраться.") % demand_text(demand).to_lower())
 
 
 func demand_text(dm: String) -> String:
 	match dm:
 		"canteen":
-			return "Построить нормальную столовую"
+			return L.t("Построить нормальную столовую")
 		"locker":
-			return "Сделать бытовку для переодевания"
+			return L.t("Сделать бытовку для переодевания")
 		"rush":
-			return "Отменить аврал и сверхурочные"
+			return L.t("Отменить аврал и сверхурочные")
 		"wage":
-			return "Поднять зарплату на 10%"
+			return L.t("Поднять зарплату на 10%")
 		"bonus":
-			return "Выплатить всем премию по 5 000 ₽"
+			return L.t("Выплатить всем премию по 5 000 ₽")
 		"arrears":
-			return "Выплатить долги по зарплате"
+			return L.t("Выплатить долги по зарплате")
 	return dm
 
 
 func _strike_letter(broken: bool) -> void:
 	var dm := str(strike.get("demand", "bonus"))
 	var leader := sim.get_worker(int(strike.get("leader", -1)))
-	var lname := leader.full_name() if leader else "профорг"
-	var txt := "Рабочие бросили станки и вышли к проходной с плакатами. Требование: %s. Во главе — %s." % [demand_text(dm).to_lower(), lname]
+	var lname := leader.full_name() if leader else L.t("профорг")
+	var txt := L.t("Рабочие бросили станки и вышли к проходной с плакатами. Требование: %s. Во главе — %s.") % [demand_text(dm).to_lower(), lname]
 	if broken:
-		txt = "Обещание не выполнено — рабочие снова бастуют. Требование прежнее: %s." % demand_text(dm).to_lower()
+		txt = L.t("Обещание не выполнено — рабочие снова бастуют. Требование прежнее: %s.") % demand_text(dm).to_lower()
 	if int(strike.get("days", 0)) > 0:
-		txt = "Забастовка идёт %d-й день. Требование: %s. Каждый день простоя бьёт по репутации." % [int(strike["days"]) + 1, demand_text(dm).to_lower()]
+		txt = L.t("Забастовка идёт %d-й день. Требование: %s. Каждый день простоя бьёт по репутации.") % [int(strike["days"]) + 1, demand_text(dm).to_lower()]
 	var ch: Array = [
-		{"text": "Выполнить требование", "hint": _demand_cost(dm)},
-		{"text": "Предложить компромисс", "hint": "Могут не согласиться"},
-		{"text": "Уволить зачинщика (%s)" % lname, "hint": "Жёстко. Остальные испугаются — или разозлятся"},
-		{"text": "Ждать", "hint": "Через несколько дней сдадутся сами, но обиду запомнят"}]
-	letter("strike", "Забастовка!", txt, "strike", Sim.LVL_BAD, ch, 3)
+		{"text": L.t("Выполнить требование"), "hint": _demand_cost(dm)},
+		{"text": L.t("Предложить компромисс"), "hint": L.t("Могут не согласиться")},
+		{"text": L.t("Уволить зачинщика (%s)") % lname, "hint": L.t("Жёстко. Остальные испугаются — или разозлятся")},
+		{"text": L.t("Ждать"), "hint": L.t("Через несколько дней сдадутся сами, но обиду запомнят")}]
+	letter("strike", L.t("Забастовка!"), txt, "strike", Sim.LVL_BAD, ch, 3)
 
 
 func _demand_cost(dm: String) -> String:
 	var n := _staff().size()
 	match dm:
 		"canteen", "locker":
-			return "Стройте в течение 5 дней, иначе снова забастуют"
+			return L.t("Стройте в течение 5 дней, иначе снова забастуют")
 		"rush":
-			return "Аврал и сверхурочные отключатся"
+			return L.t("Аврал и сверхурочные отключатся")
 		"wage":
-			return "+10% к ставке всем рабочим"
+			return L.t("+10% к ставке всем рабочим")
 		"bonus":
-			return "%s сразу" % Defs.money_str(5000.0 * n)
+			return L.t("%s сразу") % Defs.money_str(5000.0 * n)
 		"arrears":
-			return "%s сразу" % Defs.money_str(sim.progress.arrears_total())
+			return L.t("%s сразу") % Defs.money_str(sim.progress.arrears_total())
 	return ""
 
 
@@ -1545,34 +1545,34 @@ func _res_strike(choice: int) -> void:
 	match choice:
 		0:
 			_apply_demand(dm, 1.0)
-			_end_strike("strike_won", "Требования выполнены, рабочие вернулись к станкам.")
+			_end_strike("strike_won", L.t("Требования выполнены, рабочие вернулись к станкам."))
 		1:
 			var acc := 0.55 - int(strike.get("offers", 0)) * 0.15 + (0.1 if int(strike.get("days", 0)) >= 2 else 0.0)
 			strike["offers"] = int(strike.get("offers", 0)) + 1
 			if sim.rng.randf() < acc:
 				_apply_demand(dm, 0.5)
-				_end_strike("strike_half", "Договорились на компромиссе. Рабочие вернулись к станкам.")
+				_end_strike("strike_half", L.t("Договорились на компромиссе. Рабочие вернулись к станкам."))
 			else:
 				for w in _staff():
 					Mood.add(sim, w, "chaos")
-				sim.notify("Компромисс отвергли: «Подачки нам не нужны!» Забастовка продолжается.", Sim.LVL_BAD)
+				sim.notify(L.t("Компромисс отвергли: «Подачки нам не нужны!» Забастовка продолжается."), Sim.LVL_BAD)
 		2:
 			var leader := sim.get_worker(int(strike.get("leader", -1)))
 			if leader:
 				sim.fire(leader, false)
 			sim.reputation = maxf(0.0, sim.reputation - 3.0)
 			if sim.rng.randf() < 0.55:
-				_end_strike("strike_crushed", "Зачинщика уволили. Остальные молча вернулись к станкам.")
+				_end_strike("strike_crushed", L.t("Зачинщика уволили. Остальные молча вернулись к станкам."))
 			else:
-				sim.notify("Увольнение зачинщика только разозлило людей. Забастовка продолжается.", Sim.LVL_BAD)
+				sim.notify(L.t("Увольнение зачинщика только разозлило людей. Забастовка продолжается."), Sim.LVL_BAD)
 				for w2 in _staff():
 					Mood.add(sim, w2, "strike_crushed")
 		3:
 			if int(strike.get("days", 0)) >= int(Defs.ev("strike_days")):
 				for w3 in _staff():
 					if w3.mood < 20.0 and sim.rng.randf() < 0.3:
-						departures.append({"wid": w3.id, "at": sim.minute + 600.0, "why": Nicks.gendered("уволил{ся|ась} после проигранной забастовки", w3.female)})
-				_end_strike("strike_lost", "Забастовка выдохлась: люди вернулись к станкам, но обиду затаили.")
+						departures.append({"wid": w3.id, "at": sim.minute + 600.0, "why": Nicks.gendered(L.t("уволил{ся|ась} после проигранной забастовки"), w3.female)})
+				_end_strike("strike_lost", L.t("Забастовка выдохлась: люди вернулись к станкам, но обиду затаили."))
 
 
 func _apply_demand(dm: String, k: float) -> void:
@@ -1593,14 +1593,14 @@ func _apply_demand(dm: String, k: float) -> void:
 			if k >= 1.0:
 				var err := sim.progress.pay_arrears()
 				if err != "":
-					sim.notify("Долги по зарплате погасить не вышло: %s. Забастовка вернётся." % err, Sim.LVL_BAD)
+					sim.notify(L.t("Долги по зарплате погасить не вышло: %s. Забастовка вернётся.") % err, Sim.LVL_BAD)
 					strike["promise_until"] = sim.minute + 3.0 * 1440.0
 			else:
 				strike["promise_until"] = sim.minute + 5.0 * 1440.0
-				sim.notify("Пообещали погасить долги по зарплате за 5 дней. Не забудьте!", Sim.LVL_WARN)
+				sim.notify(L.t("Пообещали погасить долги по зарплате за 5 дней. Не забудьте!"), Sim.LVL_WARN)
 		"canteen", "locker":
 			strike["promise_until"] = sim.minute + (5.0 if k >= 1.0 else 10.0) * 1440.0
-			sim.notify("Пообещали: %s в течение %d дней. Не забудьте!" % [demand_text(dm).to_lower(), 5 if k >= 1.0 else 10], Sim.LVL_WARN)
+			sim.notify(L.t("Пообещали: %s в течение %d дней. Не забудьте!") % [demand_text(dm).to_lower(), 5 if k >= 1.0 else 10], Sim.LVL_WARN)
 
 
 func _end_strike(thought: String, text: String) -> void:
@@ -1611,7 +1611,7 @@ func _end_strike(thought: String, text: String) -> void:
 	for w in _staff():
 		Mood.add(sim, w, thought)
 		_remove_thought(w, "chaos")
-	info("Забастовка окончена", text, "strike", Sim.LVL_INFO)
+	info(L.t("Забастовка окончена"), text, "strike", Sim.LVL_INFO)
 
 
 ## Участвует ли рабочий в забастовке прямо сейчас.
@@ -1645,29 +1645,29 @@ func _holidays() -> void:
 	var n := sim.workers.size()
 	match str(h["id"]):
 		"new_year":
-			letter("holiday", "Новый год на носу", "Последний рабочий день года. Коллектив ждёт корпоратив и премию. Ёлку в бытовке уже нарядили сами.", "party", Sim.LVL_GOOD,
-				[{"text": "Корпоратив и премия (%s)" % Defs.money_str(n * 7000.0), "hint": "Настроение — на все праздники"},
-				 {"text": "Только корпоратив (%s)" % Defs.money_str(n * 2500.0), "hint": ""},
-				 {"text": "Обойдёмся", "hint": "Обидятся"}], 1, {"h": "new_year"})
+			letter("holiday", L.t("Новый год на носу"), L.t("Последний рабочий день года. Коллектив ждёт корпоратив и премию. Ёлку в бытовке уже нарядили сами."), "party", Sim.LVL_GOOD,
+				[{"text": L.t("Корпоратив и премия (%s)") % Defs.money_str(n * 7000.0), "hint": L.t("Настроение — на все праздники")},
+				 {"text": L.t("Только корпоратив (%s)") % Defs.money_str(n * 2500.0), "hint": ""},
+				 {"text": L.t("Обойдёмся"), "hint": L.t("Обидятся")}], 1, {"h": "new_year"})
 		"ny_off":
 			for w in sim.workers:
 				Mood.add(sim, w, "nye_off")
-			info("Новогодние каникулы", "Три дня отдыха: завод стоит, люди с семьями. С Новым годом!", "party", Sim.LVL_GOOD)
-			sim.paper.add("С Новым годом!", "С Новым годом, товарищи!", "Пусть станки не ломаются, заказы не горят, а компот в столовой не кончается!")
+			info(L.t("Новогодние каникулы"), L.t("Три дня отдыха: завод стоит, люди с семьями. С Новым годом!"), "party", Sim.LVL_GOOD)
+			sim.paper.add(L.t("С Новым годом!"), L.t("С Новым годом, товарищи!"), L.t("Пусть станки не ломаются, заказы не горят, а компот в столовой не кончается!"))
 		"feb23":
-			letter("holiday", "23 февраля", "Женская часть коллектива спрашивает, будет ли завод поздравлять мужчин.", "party", Sim.LVL_INFO,
-				[{"text": "Подарки мужчинам (%s)" % Defs.money_str(_count_sex(false) * 1500.0), "hint": ""}, {"text": "Только открытка", "hint": ""}], 1, {"h": "feb23"})
+			letter("holiday", L.t("23 февраля"), L.t("Женская часть коллектива спрашивает, будет ли завод поздравлять мужчин."), "party", Sim.LVL_INFO,
+				[{"text": L.t("Подарки мужчинам (%s)") % Defs.money_str(_count_sex(false) * 1500.0), "hint": ""}, {"text": L.t("Только открытка"), "hint": ""}], 1, {"h": "feb23"})
 		"mar8":
-			letter("holiday", "8 марта", "Мужчины уже скинулись на тюльпаны. А что от завода?", "party", Sim.LVL_INFO,
-				[{"text": "Цветы и премия женщинам (%s)" % Defs.money_str(_count_sex(true) * 2000.0), "hint": ""}, {"text": "Только открытка", "hint": "Женщинам будет обидно"}], 1, {"h": "mar8"})
+			letter("holiday", L.t("8 марта"), L.t("Мужчины уже скинулись на тюльпаны. А что от завода?"), "party", Sim.LVL_INFO,
+				[{"text": L.t("Цветы и премия женщинам (%s)") % Defs.money_str(_count_sex(true) * 2000.0), "hint": ""}, {"text": L.t("Только открытка"), "hint": L.t("Женщинам будет обидно")}], 1, {"h": "mar8"})
 		"may_off":
-			info("Праздник весны и труда", "Выходной день. Мир, труд, май!", "party", Sim.LVL_GOOD)
+			info(L.t("Праздник весны и труда"), L.t("Выходной день. Мир, труд, май!"), "party", Sim.LVL_GOOD)
 		"subbotnik":
-			letter("holiday", "Субботник", "Весна, снег сошёл — территория в мусоре. Профком предлагает завтра выйти на субботник.", "party", Sim.LVL_INFO,
-				[{"text": "Провести субботник", "hint": "Территорию уберут, коллектив сплотится"}, {"text": "Не надо", "hint": ""}], 0, {"h": "subbotnik"})
+			letter("holiday", L.t("Субботник"), L.t("Весна, снег сошёл — территория в мусоре. Профком предлагает завтра выйти на субботник."), "party", Sim.LVL_INFO,
+				[{"text": L.t("Провести субботник"), "hint": L.t("Территорию уберут, коллектив сплотится")}, {"text": L.t("Не надо"), "hint": ""}], 0, {"h": "subbotnik"})
 		"machine_day":
-			letter("holiday", "День машиностроителя", "Профессиональный праздник! Можно провести торжественное собрание и вручить грамоты лучшим.", "party", Sim.LVL_GOOD,
-				[{"text": "Собрание, грамоты и премии (%s)" % Defs.money_str(20000.0 + n * 1500.0), "hint": "+репутация, +настроение"}, {"text": "Просто поздравить", "hint": ""}], 1, {"h": "machine_day"})
+			letter("holiday", L.t("День машиностроителя"), L.t("Профессиональный праздник! Можно провести торжественное собрание и вручить грамоты лучшим."), "party", Sim.LVL_GOOD,
+				[{"text": L.t("Собрание, грамоты и премии (%s)") % Defs.money_str(20000.0 + n * 1500.0), "hint": L.t("+репутация, +настроение")}, {"text": L.t("Просто поздравить"), "hint": ""}], 1, {"h": "machine_day"})
 
 
 func _count_sex(female: bool) -> int:
@@ -1686,7 +1686,7 @@ func _res_holiday(d: Dictionary, choice: int) -> void:
 				sim.spend(n * 2500.0, "Премия: новогодний корпоратив")
 				for w in sim.workers:
 					Mood.add(sim, w, "corporate")
-				sim.paper.add("Праздник", "Корпоратив удался", "Песни под баян, оливье и конкурс «Кто быстрее наточит». Победила дружба.")
+				sim.paper.add(L.t("Праздник"), L.t("Корпоратив удался"), L.t("Песни под баян, оливье и конкурс «Кто быстрее наточит». Победила дружба."))
 				sim.town.dk_concert()
 			if choice == 0:
 				sim.spend(n * 4500.0, "Премия: новогодняя")
@@ -1716,14 +1716,14 @@ func _res_holiday(d: Dictionary, choice: int) -> void:
 				for i in s.snow.size():
 					s.snow[i] = 0
 				s.snow_rev += 1
-				sim.paper.add("Субботник", "Всем коллективом — на уборку", "Вымели территорию, покрасили бордюры, посадили берёзку у проходной.")
+				sim.paper.add(L.t("Субботник"), L.t("Всем коллективом — на уборку"), L.t("Вымели территорию, покрасили бордюры, посадили берёзку у проходной."))
 		"machine_day":
 			if choice == 0:
 				sim.spend(20000.0 + n * 1500.0, "Премия: День машиностроителя")
 				sim.reputation = minf(100.0, sim.reputation + 3.0)
 				for w in sim.workers:
 					Mood.add(sim, w, "machine_day")
-				sim.paper.add("Праздник", "С Днём машиностроителя!", "На торжественном собрании вручили грамоты лучшим. Директор пообещал новые станки.")
+				sim.paper.add(L.t("Праздник"), L.t("С Днём машиностроителя!"), L.t("На торжественном собрании вручили грамоты лучшим. Директор пообещал новые станки."))
 				sim.town.dk_concert()
 
 
@@ -1736,16 +1736,16 @@ func _month_plan() -> void:
 		if not plan.is_empty():
 			var got := shipped - int(plan.get("base", 0))
 			var tgt := int(plan.get("target", 0))
-			var mname: String = Season.MONTHS[int(plan["m"]) % 12]
+			var mname := _month_lc(int(plan["m"]) % 12)
 			if tgt > 0 and got >= tgt:
 				sim.reputation = minf(100.0, sim.reputation + 2.0)
 				for w in sim.workers:
 					Mood.add(sim, w, "plan_done")
-				info("План выполнен", "Итоги месяца (%s): отгружено %d из %d по плану. Репутация растёт, люди довольны." % [mname.to_lower(), got, tgt], "goals", Sim.LVL_GOOD)
-				sim.paper.add("Итоги месяца", "План за %s выполнен!" % Season.MONTHS[int(plan["m"]) % 12].to_lower(), "Отгружено %d изделий при плане %d. Так держать!" % [got, tgt])
+				info(L.t("План выполнен"), L.t("Итоги месяца (%s): отгружено %d из %d по плану. Репутация растёт, люди довольны.") % [mname, got, tgt], "goals", Sim.LVL_GOOD)
+				sim.paper.add(L.t("Итоги месяца"), L.t("План за %s выполнен!") % mname, L.t("Отгружено %d изделий при плане %d. Так держать!") % [got, tgt])
 				sim.stats["plans_done"] = int(sim.stats.get("plans_done", 0)) + 1
 			elif tgt > 0:
-				sim.paper.add("Итоги месяца", "План за %s не выполнен" % mname.to_lower(), "Отгружено %d из %d. Есть над чем поработать." % [got, tgt])
+				sim.paper.add(L.t("Итоги месяца"), L.t("План за %s не выполнен") % mname, L.t("Отгружено %d из %d. Есть над чем поработать.") % [got, tgt])
 		var made_last := shipped - int(plan.get("base", shipped))
 		var target := 0
 		if plan.is_empty() or made_last <= 0:
@@ -1761,12 +1761,17 @@ func _month_plan() -> void:
 	if s.dom() == s.dpm() - 4 and not bool(plan.get("warned", false)) and sim.is_workday():
 		plan["warned"] = true
 		if got2 < int(plan.get("target", 0)) * 0.75:
-			letter("month_end", "План горит!", "Конец месяца, а отгружено %d из %d. Можно объявить аврал до конца месяца: работа быстрее на четверть, но брака и усталости больше." % [got2, int(plan["target"])], "goals", Sim.LVL_WARN,
-				[{"text": "Объявить аврал до конца месяца", "hint": "Штурмовщина, как положено"}, {"text": "Работать спокойно", "hint": ""}], 1)
+			letter("month_end", L.t("План горит!"), L.t("Конец месяца, а отгружено %d из %d. Можно объявить аврал до конца месяца: работа быстрее на четверть, но брака и усталости больше.") % [got2, int(plan["target"])], "goals", Sim.LVL_WARN,
+				[{"text": L.t("Объявить аврал до конца месяца"), "hint": L.t("Штурмовщина, как положено")}, {"text": L.t("Работать спокойно"), "hint": ""}], 1)
 	# летние отпуска
 	if s.month() == 6 and s.dom() == 1 and sim.workers.size() >= 4:
-		letter("vacation", "Сезон отпусков", "Лето! Люди просятся в отпуск. Можно отпустить по очереди — часть людей не будет неделю, зато вернутся отдохнувшими.", "calendar", Sim.LVL_INFO,
-			[{"text": "Отпустить по очереди (четверть людей на неделю)", "hint": "Отпускные — средняя ставка за 5 смен"}, {"text": "Отказать — план важнее", "hint": "Настроение упадёт"}], 0)
+		letter("vacation", L.t("Сезон отпусков"), L.t("Лето! Люди просятся в отпуск. Можно отпустить по очереди — часть людей не будет неделю, зато вернутся отдохнувшими."), "calendar", Sim.LVL_INFO,
+			[{"text": L.t("Отпустить по очереди (четверть людей на неделю)"), "hint": L.t("Отпускные — средняя ставка за 5 смен")}, {"text": L.t("Отказать — план важнее"), "hint": L.t("Настроение упадёт")}], 0)
+
+
+## Месяц для «План за сентябрь»: по-русски — строчными, по-английски — с заглавной.
+func _month_lc(i: int) -> String:
+	return Season.MONTHS_EN[i] if L.is_en() else Season.MONTHS[i].to_lower()
 
 
 func _res_vacation(_d: Dictionary, choice: int) -> void:
@@ -1782,11 +1787,11 @@ func _res_vacation(_d: Dictionary, choice: int) -> void:
 		w2.sick_until = float(sim.day() + 6) * 1440.0 + 1200.0
 		w2.away_why = "в отпуске"
 		if w2.present:
-			sim.brain.send_home(w2, "Уходит в отпуск")
+			sim.brain.send_home(w2, L.t("Уходит в отпуск"))
 		Mood.add(sim, w2, "vacation")
 		sim.spend(float(w2.wage) * 5.0, "Зарплата: отпускные " + w2.full_name())
-		w2.add_history(sim.day(), Nicks.gendered("{Ушёл|Ушла} в отпуск на неделю", w2.female))
-	sim.notify("В отпуск ушли %d %s." % [n, Defs.plural(n, "человек", "человека", "человек")], Sim.LVL_INFO)
+		w2.add_history(sim.day(), Nicks.gendered(L.t("{Ушёл|Ушла} в отпуск на неделю"), w2.female))
+	sim.notify(L.t("В отпуск ушли %d %s.") % [n, Defs.plural(n, "человек", "человека", "человек")], Sim.LVL_INFO)
 
 
 # ================================================================ сохранение

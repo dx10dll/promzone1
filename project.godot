@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Промзона"
 config/description="Симулятор строительства и управления российским заводом"
-config/version="1.38.2"
+config/version="1.39.0"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.png"
@@ -41,6 +41,11 @@ texture={
 "mipmaps/generate": true,
 "svg/scale": 3.0
 }
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://assets/i18n/strings.en.translation", "res://assets/i18n/strings_a.en.translation", "res://assets/i18n/strings_b.en.translation", "res://assets/i18n/strings_c.en.translation", "res://assets/i18n/strings_d1.en.translation", "res://assets/i18n/strings_d2.en.translation", "res://assets/i18n/strings_e.en.translation")
+locale/fallback="ru"
 
 [rendering]
 

@@ -428,7 +428,7 @@ func _trip(net: Net) -> void:
 		var st: Thing = sim.things.get(net.sources[0])
 		if st:
 			cell = st.cell
-	sim.notify("Выбило автомат: перегрузка сети (%.1f из %d кВт). Его сбросят на подстанции, но перегруз повторится — выключите лишний станок в его карточке или прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый)." % [net.load, int(net.capacity)], Sim.LVL_BAD, cell)
+	sim.notify(L.t("Выбило автомат: перегрузка сети (%.1f из %d кВт). Его сбросят на подстанции, но перегруз повторится — выключите лишний станок в его карточке или прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый).") % [net.load, int(net.capacity)], Sim.LVL_BAD, cell)
 	sim.sfx.emit("breaker", cell)
 	sim.story.on_trip(cell)
 	for w in sim.workers:

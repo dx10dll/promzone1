@@ -104,7 +104,7 @@ var path_target := Vector2i(-999, -999)
 var task: Task = null
 var carrying := -1
 var carry_extra: Array[int] = [] ## дополнительные единицы в пачке
-var activity := "Дома"
+var activity := L.t("Дома")
 var ate_today := false
 var arrive_at := 470.0
 var gone_today := false
@@ -155,23 +155,29 @@ var controlled := false          ## 1.19: «под управлением» иг
 
 ## «В. Громов» — коротко, для подписей (1.14).
 func short_name() -> String:
-	return "%s. %s" % [first.left(1), last] if first != "" else last
+	return "%s. %s" % [L.name(first).left(1), L.name(last)] if first != "" else L.name(last)
 
 
+## Имя на языке игры (хранится по-русски; в английском — латиницей).
 func full_name() -> String:
-	return first + " " + last
+	return L.name(first + " " + last)
+
+
+## Прозвище на языке игры: перевод, если есть, иначе латиницей.
+func nick_text() -> String:
+	return L.name(L.t(nick)) if nick != "" else ""
 
 
 ## Имя с прозвищем для карточек и списков: «Виктор „Батя“ Громов». Отчества не используем.
 func formal_name() -> String:
 	if nick == "":
 		return full_name()
-	return "%s «%s» %s" % [first, nick, last]
+	return L.t("%s «%s» %s") % [L.name(first), nick_text(), L.name(last)]
 
 
 ## Как зовут в цеху: прозвище, если есть, иначе по имени.
 func call_name() -> String:
-	return nick if nick != "" else first
+	return nick_text() if nick != "" else L.name(first)
 
 
 func carry_count() -> int:
@@ -186,14 +192,20 @@ func prof_name() -> String:
 	if visitor:
 		return activity
 	if female and prof == "turner":
-		return "Токарь"
+		return L.t("Токарь")
 	if female and prof == "cleaner":
-		return "Уборщица"
-	return str(PROF_NAMES.get(prof, prof))
+		return L.t("Уборщица")
+	return L.t(str(PROF_NAMES.get(prof, prof)))
 
 
 ## Название с маленькой буквы, но аббревиатуры остаются («инженер по ОТ»).
 static func lc(t: String) -> String:
+	if L.is_en():   # «QC Inspector» → «QC inspector», «Section Foreman» → «section foreman»
+		var ws := t.split(" ")
+		for i in ws.size():
+			if ws[i].length() < 2 or ws[i] != ws[i].to_upper():
+				ws[i] = ws[i].to_lower()
+		return " ".join(ws)
 	return t.left(1).to_lower() + t.substr(1) if t != "" else t
 
 
@@ -211,7 +223,7 @@ func idle_now() -> bool:
 func search_key() -> String:
 	var parts: Array[String] = [formal_name(), prof_name(), rank_text(), activity]
 	for t in traits:
-		parts.append(str(Defs.traits.get(t, {}).get("name", t)))
+		parts.append(L.dt("trait.%s.name" % t, str(Defs.traits.get(t, {}).get("name", t))))
 	return " ".join(parts).to_lower()
 
 
@@ -281,14 +293,14 @@ func category() -> int:
 func rank_text() -> String:
 	match rank_kind():
 		"grade":
-			return "%d-й разряд" % grade()
+			return L.t("%d-й разряд") % grade()
 		"category":
 			var c := category()
 			if prof == "nurse":
-				return ["", "вторая категория", "первая категория", "высшая категория"][c]
+				return L.t(["", "вторая категория", "первая категория", "высшая категория"][c]) if c > 0 else ""
 			if c == 3:
-				return "ведущий"
-			return ("%s категория" % CAT_ROMAN[c]) if c > 0 else ""
+				return L.t("ведущий")
+			return (L.t("%s категория") % CAT_ROMAN[c]) if c > 0 else ""
 	return ""
 
 
@@ -297,14 +309,14 @@ func title() -> String:
 	var pn := prof_name()
 	match rank_kind():
 		"grade":
-			return "%s %d-го разряда" % [pn, grade()]
+			return L.t("%s %d-го разряда") % [pn, grade()]
 		"category":
 			var c := category()
 			if prof == "nurse":
-				return pn + ["", " второй категории", " первой категории", " высшей категории"][c]
+				return (L.t(["", "%s второй категории", "%s первой категории", "%s высшей категории"][c]) % pn) if c > 0 else pn
 			if c == 3:
-				return "Ведущий " + lc(pn)
-			return pn + ((" %s категории" % CAT_ROMAN[c]) if c > 0 else "")
+				return L.t("Ведущий %s") % lc(pn)
+			return (L.t("%s %s категории") % [pn, CAT_ROMAN[c]]) if c > 0 else pn
 	return pn
 
 
@@ -321,12 +333,12 @@ func prof_rank() -> String:
 func trait_names() -> Array[String]:
 	var out: Array[String] = []
 	for t in traits:
-		out.append(str(Defs.traits.get(t, {}).get("name", t)))
+		out.append(L.dt("trait.%s.name" % t, str(Defs.traits.get(t, {}).get("name", t))))
 	return out
 
 
 func add_history(day: int, text: String) -> void:
-	history.push_front("День %d: %s" % [day, text])
+	history.push_front(L.t("День %d: %s") % [day, text])
 	if history.size() > 30:
 		history.resize(30)
 
@@ -414,7 +426,7 @@ static func from_dict(d: Dictionary) -> Worker:
 	w.exam_cd = int(d.get("exam_cd", -1))
 	w.order = d.get("ord", {})
 	w.controlled = bool(d.get("ctl", false))
-	w.activity = "На месте" if w.present else "Дома"
+	w.activity = L.t("На месте") if w.present else L.t("Дома")
 	return w
 
 

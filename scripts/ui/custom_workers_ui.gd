@@ -221,7 +221,7 @@ func _build_bar() -> Control:
 ## 1.38.1: строки списка обновляются на месте — не пересобираются (с портретами) на каждое «Сохранить» и выбор.
 func _fill_list() -> void:
 	var ws := workers()
-	list_cap.text = "СПИСОК · %d из %d" % [ws.size(), CustomWorkers.MAX]
+	list_cap.text = tr("СПИСОК · %d из %d") % [ws.size(), CustomWorkers.MAX]
 	var rows: Array[PanelContainer] = []
 	var plain := true
 	for c in list_box.get_children():
@@ -310,12 +310,12 @@ func _sync_row(p: PanelContainer, e: Dictionary, i: int) -> void:
 		p.set_meta("lh", lh)
 		var pw := CustomPeople.preview_worker(e)
 		(p.get_meta("pr") as Portrait).set_look(pw.look, 0.62, {"age": pw.age, "mood": 60.0})
-	var nm := ("%s %s" % [str(e.get("last", "")), str(e.get("first", ""))]).strip_edges()
+	var nm := L.name(("%s %s" % [str(e.get("last", "")), str(e.get("first", ""))]).strip_edges())
 	var l1 := p.get_meta("l1") as Label
-	l1.text = nm if nm != "" else "Без имени"
+	l1.text = nm if nm != "" else tr("Без имени")
 	l1.add_theme_color_override("font_color", UITheme.TEXT if bool(e.get("enabled", true)) else UITheme.MUTED)
 	var l2 := p.get_meta("l2") as Label
-	l2.text = "новый — ещё не в списке" if i < 0 else CustomWorkers.subtitle(e)
+	l2.text = tr("новый — ещё не в списке") if i < 0 else CustomWorkers.subtitle(e)
 	l2.add_theme_color_override("font_color", UITheme.WARN if i < 0 else UITheme.MUTED)
 	var cb := p.get_meta("cb") as CheckBox
 	cb.visible = i >= 0
@@ -338,7 +338,7 @@ func _open(i: int) -> void:
 
 func _new_draft() -> void:
 	if workers().size() >= CustomWorkers.MAX:
-		bar_status.text = "В списке уже %d — больше нельзя. Удалите кого-нибудь." % CustomWorkers.MAX
+		bar_status.text = tr("В списке уже %d — больше нельзя. Удалите кого-нибудь.") % CustomWorkers.MAX
 		bar_status.add_theme_color_override("font_color", UITheme.WARN)
 		return
 	_leave()
@@ -367,7 +367,7 @@ func _save() -> void:
 	var added := sel < 0
 	_commit()
 	_refresh_all()
-	bar_status.text = ("Добавлен%s в список. В новой игре может прийти наниматься." % ("а" if bool(cur.get("female", false)) else "")) if added else "Сохранено."
+	bar_status.text = tr("Добавлена в список. В новой игре может прийти наниматься." if bool(cur.get("female", false)) else "Добавлен в список. В новой игре может прийти наниматься.") if added else tr("Сохранено.")
 	bar_status.add_theme_color_override("font_color", UITheme.GOOD)
 
 
@@ -422,8 +422,8 @@ func _list_texts() -> void:
 		var row := list_box.get_child(idx)
 		var labels := row.find_children("*", "Label", true, false)
 		if labels.size() >= 2:
-			var nm := ("%s %s" % [str(cur.get("last", "")), str(cur.get("first", ""))]).strip_edges()
-			(labels[0] as Label).text = nm if nm != "" else "Без имени"
+			var nm := L.name(("%s %s" % [str(cur.get("last", "")), str(cur.get("first", ""))]).strip_edges())
+			(labels[0] as Label).text = nm if nm != "" else tr("Без имени")
 			if sel >= 0:
 				(labels[1] as Label).text = CustomWorkers.subtitle(cur)
 
@@ -450,7 +450,7 @@ func _preview() -> void:
 	var pw := CustomPeople.preview_worker(cur)
 	pw.mood = 62.0
 	por.set_look(pw.look, POR_Z, {"age": pw.age, "mood": 62.0, "doc": true, "dressed": dressed})   # 1.34: одежда — как у человечка
-	fio_lbl.text = CustomWorkers.fio(cur)
+	fio_lbl.text = L.name(CustomWorkers.fio(cur))
 	sub_lbl.text = CustomWorkers.subtitle(cur)
 	doll_box.show_worker(sim, pw, dressed)
 
@@ -487,7 +487,7 @@ func _sync_form() -> void:
 			le.text = t
 	_check_names()
 	var age := int(cur.get("age", 30))
-	_age_lbl.text = "%d %s" % [age, Defs.plural(age, "год", "года", "лет")]
+	_age_lbl.text = "%d %s" % [age, L.pl(age, "год|года|лет")]
 	_select_prof()
 	for f: Callable in _syncs:
 		f.call()
@@ -563,7 +563,7 @@ func _fill_form() -> void:
 	rn.add_child(UITheme.button("Случайное ФИО", func() -> void:
 		CustomWorkers.random_name(cur, rng)
 		_changed(true), "Подобрать фамилию, имя и отчество"))
-	rn.add_child(UITheme.label("Русские буквы и дефис, от %d до %d знаков. Пол меняет окончания: Петров → Петрова." % [CustomWorkers.NAME_MIN, CustomWorkers.NAME_MAX], 12, UITheme.DIM))
+	rn.add_child(UITheme.label(tr("Русские буквы и дефис, от %d до %d знаков. Пол меняет окончания: Петров → Петрова.") % [CustomWorkers.NAME_MIN, CustomWorkers.NAME_MAX], 12, UITheme.DIM))
 	s1.add_child(rn)
 	_check_names()
 	# --- основное
@@ -582,7 +582,7 @@ func _fill_form() -> void:
 	var av := UITheme.vbox(3)
 	av.add_child(UITheme.label("Возраст", 12, UITheme.MUTED))
 	var age := int(cur.get("age", 30))
-	var stp := _stepper("%d %s" % [age, Defs.plural(age, "год", "года", "лет")], 90, func(d: int) -> void:
+	var stp := _stepper("%d %s" % [age, L.pl(age, "год|года|лет")], 90, func(d: int) -> void:
 		cur["age"] = clampi(int(cur.get("age", 30)) + d, CustomWorkers.AGE_MIN, CustomWorkers.AGE_MAX)
 		cur["traits"] = CustomPeople.clean_traits(cur.get("traits", []), int(cur["age"]))
 		_changed(true))
@@ -602,7 +602,7 @@ func _fill_form() -> void:
 	for grp: Array in CustomWorkers.PROF_GROUPS:
 		ob.add_separator(str(grp[0]))
 		for pk: String in grp[1]:
-			ob.add_item(str(Worker.PROF_NAMES.get(pk, pk)))
+			ob.add_item(str(Worker.PROF_NAMES.get(pk, pk)))   # пункты OptionButton переводит сам Godot
 			ob.set_item_metadata(ob.item_count - 1, pk)
 			if pk == cur_prof:
 				ob.select(ob.item_count - 1)
@@ -645,6 +645,7 @@ func _fill_looks() -> void:
 		var out: Array = []
 		for bk: String in CustomWorkers.BODY_ORDER:
 			var bn := str((People.BODIES[bk]["name"] as Array)[1 if fm else 0])
+			bn = L.t(bn)
 			out.append([bk, bn.left(1).to_upper() + bn.substr(1)])
 		return out
 	g.add_child(_pick("Телосложение", bodies, "look", "body"))
@@ -676,7 +677,7 @@ func _fill_looks() -> void:
 ## Черты характера: заголовок со счётчиком, кнопки (выбранные — янтарные) и описания под человечком.
 func _fill_traits() -> void:
 	var tr: Array = cur.get("traits", [])
-	_trait_title.text = "Черты характера · %d из %d" % [tr.size(), CustomPeople.MAX_TRAITS]
+	_trait_title.text = L.t("Черты характера · %d из %d") % [tr.size(), CustomPeople.MAX_TRAITS]
 	_trait_hint.visible = tr.size() >= CustomPeople.MAX_TRAITS
 	for c in _trait_flow.get_children():
 		_trait_flow.remove_child(c)
@@ -697,8 +698,8 @@ func _fill_char(tr: Array) -> void:
 		char_box.add_child(UITheme.para("Без черт — обычный человек. Выберите до двух справа; несовместимые (трудоголик и лентяй, жаворонок и сова…) вместе не бывают.", 12, UITheme.DIM))
 	for t2: Variant in tr:
 		var d2: Dictionary = Defs.traits.get(str(t2), {})
-		char_box.add_child(UITheme.label(str(d2.get("name", t2)), 14, UITheme.ACCENT, UITheme.f_semi))
-		char_box.add_child(UITheme.para(str(d2.get("desc", "")), 12, UITheme.TEXT))
+		char_box.add_child(UITheme.label(L.dt("trait.%s.name" % str(t2), str(d2.get("name", t2))), 14, UITheme.ACCENT, UITheme.f_semi))
+		char_box.add_child(UITheme.para(L.dt("trait.%s.desc" % str(t2), str(d2.get("desc", ""))), 12, UITheme.TEXT))
 
 
 ## Женщине — женские черты лица по умолчанию не навязываем, но причёска и борода меняются в regender.
@@ -715,7 +716,7 @@ func _trait_btn(tk: String, td: Dictionary, tr: Array) -> Button:
 		if tr.size() >= CustomPeople.MAX_TRAITS:
 			why = "Уже выбраны две черты — снимите одну"
 		elif str(td.get("opp", "")) != "" and tr.has(str(td["opp"])):
-			why = "Не сочетается с «%s»" % str(Defs.traits[str(td["opp"])]["name"])
+			why = L.t("Не сочетается с «%s»") % L.dt("trait.%s.name" % str(td["opp"]), str(Defs.traits[str(td["opp"])]["name"]))
 		elif tk == "veteran" and int(cur.get("age", 30)) < 45:
 			why = "Только с 45 лет"
 	var b: Button
@@ -727,11 +728,12 @@ func _trait_btn(tk: String, td: Dictionary, tr: Array) -> Button:
 			t3.append(tk)
 		cur["traits"] = t3
 		_changed(true)
-	b = UITheme.primary(str(td["name"]), cb) if on else UITheme.small(str(td["name"]), cb)
+	var tn := L.dt("trait.%s.name" % tk, str(td["name"]))
+	b = UITheme.primary(tn, cb) if on else UITheme.small(tn, cb)
 	b.add_theme_font_size_override("font_size", 13)
 	b.custom_minimum_size = Vector2(0, 29)
 	b.disabled = why != ""
-	b.tooltip_text = str(td.get("desc", "")) + (("\n" + why) if why != "" else "")
+	b.tooltip_text = L.dt("trait.%s.desc" % tk, str(td.get("desc", ""))) + (("\n" + L.t(why)) if why != "" else "")
 	return b
 
 

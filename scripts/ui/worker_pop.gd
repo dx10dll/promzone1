@@ -104,14 +104,14 @@ func _refresh() -> void:
 	if w == null or not w.present:
 		close()
 		return
-	_act.text = w.activity if w.activity != "" else "—"
+	_act.text = tr(w.activity) if w.activity != "" else "—"
 	_mood.value = w.mood
 	_mood.add_theme_stylebox_override("fill", UITheme.sb(UITheme.ramp(w.mood / 100.0), UITheme.ramp(w.mood / 100.0), 0, 3, 0, 0))
-	_mood_l.text = "настроение %d" % int(w.mood)
+	_mood_l.text = tr("настроение %d") % int(w.mood)
 	_ctl_b.text = "Отпустить" if w.controlled else "Взять под управление"
 	var blk := hud.sim.brain.order_block(w)
 	_ctl_b.disabled = blk != "" and not w.controlled
-	_ctl_b.tooltip_text = ("Нельзя: " + blk) if _ctl_b.disabled else "Человек бросит своё и сделает то, что вы покажете щелчком"
+	_ctl_b.tooltip_text = (tr("Нельзя: %s") % blk) if _ctl_b.disabled else "Человек бросит своё и сделает то, что вы покажете щелчком"
 
 
 ## Над головой человека; у края экрана — прижимается внутрь.

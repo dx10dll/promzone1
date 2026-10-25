@@ -403,13 +403,13 @@ func boiler_ok(b: Thing) -> bool:
 ## Почему котёл не греет (пустая строка — греет).
 func boiler_problem(b: Thing) -> String:
 	if not sim.rooms.thing_in(b, "boiler_room"):
-		return "котёл стоит не в котельной (отдельное помещение, бетонный пол, назначение «Котельная»)"
+		return L.t("котёл стоит не в котельной (отдельное помещение, бетонный пол, назначение «Котельная»)")
 	if not sim.water.has_water(b):
-		return "нет воды: протяните трубу от насоса"
+		return L.t("нет воды: протяните трубу от насоса")
 	if not sim.power.powered(b):
-		return "нет тока: автоматика горелки без электричества не работает"
+		return L.t("нет тока: автоматика горелки без электричества не работает")
 	if not b.enabled:
-		return "выключен"
+		return L.t("выключен")
 	return ""
 
 
@@ -470,18 +470,18 @@ func heater_ok() -> bool:
 ## Почему электрокотёл не греет ("" — греет).
 func heater_problem(h: Thing) -> String:
 	if not h.built:
-		return "ещё не установлен"
+		return L.t("ещё не установлен")
 	if not h.enabled:
-		return "выключен"
+		return L.t("выключен")
 	if not sim.power.powered(h):
-		return "нет тока — протяните кабель от подстанции"
+		return L.t("нет тока — протяните кабель от подстанции")
 	var pump_ok := false
 	for p in sim.things_of("pump"):
 		if p.built and p.rect().grow(1).intersects(h.rect()):
 			if sim.water.pump_running(p):
 				pump_ok = true
 	if not pump_ok:
-		return "рядом нет работающей насосной (нужна вплотную, под током)"
+		return L.t("рядом нет работающей насосной (нужна вплотную, под током)")
 	return ""
 
 
@@ -503,20 +503,20 @@ func factors(m: Thing) -> Array:
 	var r := sim.rooms.room_of_thing(m)
 	var nz := sim.season.noise_at(c, true)
 	if nz >= 86.0:
-		out.append(["шум", 2, "%d дБ" % int(nz)])
+		out.append([L.t("шум"), 2, L.t("%d дБ") % int(nz)])
 	elif nz >= 80.0:
-		out.append(["шум", 1, "%d дБ" % int(nz)])
+		out.append([L.t("шум"), 1, L.t("%d дБ") % int(nz)])
 	var fu := eq_fumes(r)
 	if m.process() in ["welding", "paint"] and not bool(hooded.get(m.id, false)):
 		fu += LOCAL
 	if fu >= 60.0:
-		out.append(["аэрозоль и пары", 2, "%d%%" % int(fu)])
+		out.append([L.t("аэрозоль и пары"), 2, "%d%%" % int(fu)])
 	elif fu >= 30.0:
-		out.append(["аэрозоль и пары", 1, "%d%%" % int(fu)])
+		out.append([L.t("аэрозоль и пары"), 1, "%d%%" % int(fu)])
 	if m.process() == "heat":
-		out.append(["тепловое излучение", 1, ""])
+		out.append([L.t("тепловое излучение"), 1, ""])
 	if r == null:
-		out.append(["микроклимат", 1, "на улице"])
+		out.append([L.t("микроклимат"), 1, L.t("на улице")])
 	else:
 		var heated := false
 		for tid in r.things:
@@ -526,11 +526,11 @@ func factors(m: Thing) -> Array:
 				break
 		var tc := float(sim.season.room_temp.get(r.id, 18.0))
 		if not heated and not needs_vent(r):
-			out.append(["микроклимат", 1, "нет отопления"])
+			out.append([L.t("микроклимат"), 1, L.t("нет отопления")])
 		elif tc < 14.0 or tc > 28.0:
-			out.append(["микроклимат", 1, "%+d °C" % int(round(tc))])
+			out.append([L.t("микроклимат"), 1, "%+d °C" % int(round(tc))])
 		if not r.powered:
-			out.append(["освещённость", 1, "нет электрического света"])
+			out.append([L.t("освещённость"), 1, L.t("нет электрического света")])
 	return out
 
 
@@ -581,20 +581,20 @@ func sout_price(all: bool) -> float:
 ## Заказать замеры в аккредитованной лаборатории: все места или только новые.
 func start_sout(all: bool) -> String:
 	if sout_busy():
-		return "Лаборатория уже работает"
+		return L.t("Лаборатория уже работает")
 	var ids: Array = []
 	for m in workplaces():
 		if all or not assessed(m):
 			ids.append(m.id)
 	if ids.is_empty():
-		return "Все рабочие места уже оценены"
+		return L.t("Все рабочие места уже оценены")
 	var cost := ids.size() * SOUT_COST
 	if not sim.can_afford(cost):
-		return "Не хватает денег: нужно " + Defs.money_str(cost)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 	sim.spend(cost, "СОУТ: замеры на %d %s" % [ids.size(), Defs.plural(ids.size(), "рабочем месте", "рабочих местах", "рабочих местах")])
 	sout_ids = ids
 	sout_until = sim.orders.deadline_after(SOUT_DAYS)
-	sim.notify("Лаборатория начала спецоценку условий труда: %d %s. Результаты — к концу дня %d. Пока идут замеры, можно улучшить условия: вентиляция, свет, отопление." % [ids.size(), Defs.plural(ids.size(), "место", "места", "мест"), int(sout_until / 1440.0) + 1], Sim.LVL_INFO)
+	sim.notify(L.t("Лаборатория начала спецоценку условий труда: %d %s. Результаты — к концу дня %d. Пока идут замеры, можно улучшить условия: вентиляция, свет, отопление.") % [ids.size(), Defs.plural(ids.size(), "место", "места", "мест"), int(sout_until / 1440.0) + 1], Sim.LVL_INFO)
 	return ""
 
 
@@ -617,12 +617,12 @@ func _finish_sout() -> void:
 	sout_until = -1.0
 	sim.stats["sout_done"] = int(sim.stats.get("sout_done", 0)) + 1
 	var harm := int(n[1]) + int(n[2]) + int(n[3])
-	var txt := "СОУТ завершена: допустимых мест %d, вредных %d." % [n[0], harm]
+	var txt := L.t("СОУТ завершена: допустимых мест %d, вредных %d.") % [n[0], harm]
 	if harm > 0:
-		txt += " На вредных местах положены доплата (4–12%% к ставке) и молоко — включите выдачу молока в «Люди → Охрана труда»."
+		txt += L.t(" На вредных местах положены доплата (4–12%% к ставке) и молоко — включите выдачу молока в «Люди → Охрана труда».")
 	sim.notify(txt, Sim.LVL_GOOD if harm == 0 else Sim.LVL_INFO)
-	sim.paper.add("Охрана труда", "Спецоценка: %d %s проверено" % [n[0] + harm, Defs.plural(n[0] + harm, "место", "места", "мест")],
-		"Лаборатория замерила шум, свет, микроклимат и воздух. Вредных мест — %d. %s" % [harm, "Профком доволен." if harm == 0 else "Будет молоко и доплата."])
+	sim.paper.add(L.t("Охрана труда"), L.t("Спецоценка: %d %s проверено") % [n[0] + harm, Defs.plural(n[0] + harm, "место", "места", "мест")],
+		L.t("Лаборатория замерила шум, свет, микроклимат и воздух. Вредных мест — %d. %s") % [harm, L.t("Профком доволен.") if harm == 0 else L.t("Будет молоко и доплата.")])
 
 
 ## Класс вредности места, где работает человек (по СОУТ; без оценки — 0).
@@ -698,9 +698,9 @@ func on_spawn(w: Worker) -> void:
 	w.ppe = maxf(0.0, w.ppe - PPE_WEAR)
 	if w.ppe <= 0.0:
 		if cabinets().is_empty():
-			sim.notify_once("ppe_cab", "%s без СИЗ (каска, очки, наушники): %s. Поставьте шкаф СИЗ (Объекты → Безопасность) и закупите комплекты — без них травм в полтора раза больше." % [w.full_name(), "новичкам их выдают на заводе" if w.days_worked <= 1 else "старый комплект износился"], Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
+			sim.notify_once("ppe_cab", L.t("%s без СИЗ (каска, очки, наушники): %s. Поставьте шкаф СИЗ (Объекты → Безопасность) и закупите комплекты — без них травм в полтора раза больше.") % [w.full_name(), L.t("новичкам их выдают на заводе") if w.days_worked <= 1 else L.t("старый комплект износился")], Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
 		elif ppe_stock() < 1:
-			sim.notify_once("ppe_stock", "Закончились комплекты СИЗ в шкафу. Закажите в «Люди → Охрана труда» (или включите автозакупку).", Sim.LVL_WARN, Vector2i(-1, -1), 720.0)
+			sim.notify_once("ppe_stock", L.t("Закончились комплекты СИЗ в шкафу. Закажите в «Люди → Охрана труда» (или включите автозакупку)."), Sim.LVL_WARN, Vector2i(-1, -1), 720.0)
 	if entitled_milk(w):
 		if milk_on:
 			milk_due += 1
@@ -737,7 +737,7 @@ func morning() -> void:
 		if not w.is_itr():
 			rab += 1
 	if rab >= 4 and unassessed() > 0 and not sout_busy():
-		sim.notify_once("sout_hint", "Рабочих уже %d, а СОУТ не проведена на %d %s. Трудовая инспекция за это штрафует — закажите замеры в «Люди → Охрана труда»." % [rab, unassessed(), Defs.plural(unassessed(), "месте", "местах", "местах")], Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
+		sim.notify_once("sout_hint", L.t("Рабочих уже %d, а СОУТ не проведена на %d %s. Трудовая инспекция за это штрафует — закажите замеры в «Люди → Охрана труда».") % [rab, unassessed(), Defs.plural(unassessed(), "месте", "местах", "местах")], Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
 	if milk_due > 0:
 		sim.spend(milk_due * MILK_COST, "Молоко за вредность: %d %s" % [milk_due, Defs.plural(milk_due, "бутылка", "бутылки", "бутылок")])
 		milk_due = 0
@@ -751,17 +751,17 @@ func _hints() -> void:
 		return
 	for r in sim.rooms.list:
 		if fumes_of(r) >= STUFFY and vent_k(r) <= 0.0:
-			sim.notify_once("fumes_%d" % r.id, "В помещении «%s» дым и пары (%d%%): людям душно, работают медленнее. Поставьте вытяжной вентилятор и зонт над сварочным постом или камерой (Сети → Вентиляция)." % [r.title(), int(fumes_of(r))], Sim.LVL_WARN, r.cells[0], 1440.0)
+			sim.notify_once("fumes_%d" % r.id, L.t("В помещении «%s» дым и пары (%d%%): людям душно, работают медленнее. Поставьте вытяжной вентилятор и зонт над сварочным постом или камерой (Сети → Вентиляция).") % [r.title(), int(fumes_of(r))], Sim.LVL_WARN, r.cells[0], 1440.0)
 			break
 	for m in sim.things_of("machine"):
 		if air_mode(m) == "need" and m.working and pressure(m) <= 0.0:
-			sim.notify_once("noair", "%s без сжатого воздуха: красят кистью, в полтора раза дольше. Поставьте компрессор и протяните пневмомагистраль (Сети → Сжатый воздух)." % m.title(), Sim.LVL_INFO, m.cell, 2880.0)
+			sim.notify_once("noair", L.t("%s без сжатого воздуха: красят кистью, в полтора раза дольше. Поставьте компрессор и протяните пневмомагистраль (Сети → Сжатый воздух).") % m.title(), Sim.LVL_INFO, m.cell, 2880.0)
 			break
 	if sim.season.heating_season():
 		for b in sim.things_of("boiler"):
 			var bp := boiler_problem(b)
 			if bp != "":
-				sim.notify_once("boiler_%d" % b.id, "Котёл не греет: %s." % bp, Sim.LVL_WARN, b.cell, 1440.0)
+				sim.notify_once("boiler_%d" % b.id, L.t("Котёл не греет: %s.") % bp, Sim.LVL_WARN, b.cell, 1440.0)
 
 
 ## Сварочный пост под зонтом и с вентиляцией в помещении — достижение «Чистый воздух».

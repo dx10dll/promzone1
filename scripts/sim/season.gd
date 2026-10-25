@@ -92,27 +92,35 @@ func season_id(m: int = -1) -> String:
 
 
 func season_name() -> String:
-	return str(SEASON_NAMES[season_id()])
+	return L.t(str(SEASON_NAMES[season_id()]))
 
 
 ## «Пн, 2-я нед. сентября»
 func date_str(d: int = -1) -> String:
 	var dd := sim.day() if d < 0 else d
+	if L.is_en():
+		return "%s, week %d of %s" % [L.t(sim.weekday_name(dd)), week_of_month(dd), MONTHS_EN[month(dd)]]
 	return "%s, %d-я нед. %s" % [sim.weekday_name(dd), week_of_month(dd), MONTHS_GEN[month(dd)]]
 
 
 const MONTHS_SHORT := ["янв.", "февр.", "марта", "апр.", "мая", "июня", "июля", "авг.", "сент.", "окт.", "нояб.", "дек."]
+## 1.39: английские названия месяцев (L.is_en)
+const MONTHS_EN := ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 
 ## «Пн, 2 нед. сент.» — для верхней панели
 func short_date(d: int = -1) -> String:
 	var dd := sim.day() if d < 0 else d
+	if L.is_en():
+		return "%s, wk %d %s" % [L.t(sim.weekday_name(dd)), week_of_month(dd), MONTHS_EN[month(dd)].left(3)]
 	return "%s, %d нед. %s" % [sim.weekday_name(dd), week_of_month(dd), MONTHS_SHORT[month(dd)]]
 
 
 ## «вторник, 2-я неделя сентября, год 1»
 func long_date(d: int = -1) -> String:
 	var dd := sim.day() if d < 0 else d
+	if L.is_en():
+		return "week %d of %s, year %d (day %d)" % [week_of_month(dd), MONTHS_EN[month(dd)], year(dd), dd]
 	return "%d-я неделя %s, год %d (день %d)" % [week_of_month(dd), MONTHS_GEN[month(dd)], year(dd), dd]
 
 
@@ -231,7 +239,7 @@ func on_new_day() -> void:
 	var t_eff := temp_day + (snap if sim.minute < snap_until else 0.0)
 	ice = season_id() != "summer" and ((prev < 0.0 and t_eff > -3.0 and t_eff < 2.5) or (prev > 0.5 and t_eff < -1.0 and snow_avg > 20.0))
 	if ice and not sanding:
-		sim.notify_once("ice", "Гололёд! На улице легко поскользнуться. Включите «Посыпать дорожки песком» в окне «События».", Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("ice", L.t("Гололёд! На улице легко поскользнуться. Включите «Посыпать дорожки песком» в окне «События»."), Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
 	# счета
 	_count_radiators()
 	if heating_season() and radiators > 0:
@@ -241,7 +249,7 @@ func on_new_day() -> void:
 		if city > 0 and not sim.story.has_mod("heat_off") and sim.eng.heater_ok():
 			sim.spend(city * Defs.sea("heat_cost_radiator_day") * k, "Отопление: %d %s от электрокотла" % [city, Defs.plural(city, "батарея", "батареи", "батарей")])
 		elif city > 0 and not sim.eng.heater_ok():
-			sim.notify_once("no_heater", "Батареи холодные: нет работающего электрокотла. Поставьте «Электрокотёл отопления» вплотную к насосной станции (Объекты → Водопровод) и подведите к нему ток.", Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
+			sim.notify_once("no_heater", L.t("Батареи холодные: нет работающего электрокотла. Поставьте «Электрокотёл отопления» вплотную к насосной станции (Объекты → Водопровод) и подведите к нему ток."), Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
 		if own > 0:
 			sim.spend(own * Defs.sea("heat_cost_radiator_day") * k * Eng.BOILER_K, "Газ для котельной: %d %s" % [own, Defs.plural(own, "батарея", "батареи", "батарей")])
 	if sanding and season_id() != "summer" and (snow_avg > 10.0 or ice):
@@ -255,13 +263,13 @@ func _month_note() -> void:
 	var txt := ""
 	match m:
 		11:
-			txt = "Наступила зима. Проверьте отопление: без батарей в цехах будет холодно, люди начнут мёрзнуть и злиться."
+			txt = L.t("Наступила зима. Проверьте отопление: без батарей в цехах будет холодно, люди начнут мёрзнуть и злиться.")
 		2:
-			txt = "Весна! Снег начнёт таять, а с ним — гололёд и лужи."
+			txt = L.t("Весна! Снег начнёт таять, а с ним — гололёд и лужи.")
 		5:
-			txt = "Лето. В горячих цехах будет жарко — пригодятся окна и кулер с водой."
+			txt = L.t("Лето. В горячих цехах будет жарко — пригодятся окна и кулер с водой.")
 		8:
-			txt = "Осень. Скоро отопительный сезон."
+			txt = L.t("Осень. Скоро отопительный сезон.")
 	if txt != "":
 		sim.notify(txt, Sim.LVL_INFO)
 

@@ -153,7 +153,7 @@ func _draw_zone_labels(zones: Dictionary, k: float, approved: bool, f: Font) -> 
 		var ctr := (sum / comp.size() + Vector2(0.5, 0.5)) * T
 		var col2 := Color(str(Defs.rooms.get(t2, {}).get("color", "#88aaff")))
 		var nm := str(Defs.rooms.get(t2, {}).get("name", t2)).to_upper()
-		var sub := "%d×%d%s" % [mx.x - mn.x + 1, mx.y - mn.y + 1, " · ждёт стен" if approved else " · план"]
+		var sub := "%d×%d%s" % [mx.x - mn.x + 1, mx.y - mn.y + 1, L.t(" · ждёт стен") if approved else L.t(" · план")]
 		var fs := 13
 		var tw := f.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 		draw_string(f, ctr + Vector2(-tw * 0.5 + 1, 2), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0, 0, 0, 0.5 * k))

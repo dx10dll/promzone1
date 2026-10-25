@@ -1,0 +1,626 @@
+keys,en
+понедельник,Monday
+вторник,Tuesday
+среда,Wednesday
+четверг,Thursday
+пятница,Friday
+суббота,Saturday
+воскресенье,Sunday
+Пн,Mon
+Вт,Tue
+Ср,Wed
+Чт,Thu
+Пт,Fri
+Сб,Sat
+Вс,Sun
+Симулятор российского завода — от гаража до гиганта,A Russian factory simulator — from a garage to a giant
+Версия,Version
+шрифты IBM Plex Sans (SIL OFL) и DejaVu Sans,fonts: IBM Plex Sans (SIL OFL) and DejaVu Sans
+СЕЙЧАС НА ЗАВОДЕ,NOW AT THE PLANT
+ЧТО НОВОГО,WHAT'S NEW
+Продолжить,Continue
+Новая игра,New Game
+"Профиль, сценарий, сложность","Profile, scenario, difficulty"
+Загрузить,Load
+Создать рабочего,Create a Worker
+В списке: %d · шанс %d%%,On the list: %d · chance %d%%
+Придумайте людей для своего завода,Invent people for your factory
+Достижения,Achievements
+Настройки,Settings
+Выход,Quit
+Завод с высоты,The plant from above
+Механический цех,Machine shop
+Обед в столовой,Lunch in the canteen
+Пересменка у проходной,Shift change at the gate
+Вторая смена,Second shift
+Меню и „Создать рабочего“ не тормозят со временем,The menu and “Create a Worker” no longer slow down over time
+"F3 в меню — строка диагностики (кадры, узлы, память)","F3 in the menu shows a diagnostics line (frames, nodes, memory)"
+„Создать рабочего“ снова без лагов,“Create a Worker” is lag-free again
+%s.%s.%s в %s,"%s.%s.%s, %s"
+"Баланс: больше стартовых денег, дешевле стройка","Balance: more starting money, cheaper construction"
+Первые две недели клиенты платят аванс 30%,For the first two weeks customers pay a 30% advance
+Стартовый капитал зависит от сложности,Starting capital depends on the difficulty
+Интро при запуске и английский язык (Настройки → Язык),Intro on launch and English language (Settings → Language)
+1. Что производим,1. What we make
+Появится в следующих версиях,Coming in future versions
+В сценарии «%s» доступны: %s,Available in the “%s” scenario: %s
+2. С чего начинаем,2. Where we start
+%s · «%s»,%s · “%s”
+Цеха: %s. %s,Shops: %s. %s
+Цели: ,Goals: 
+3. Сложность,3. Difficulty
+Обучение по шагам,Step-by-step tutorial
+Песочница,Sandbox
+Деньги,Money
+300 тыс.,300k ₽
+1 млн,1M ₽
+5 млн,5M ₽
+50 млн,50M ₽
+Участок,Plot
+Малый (48×36),Small (48×36)
+Большой (64×44),Large (64×44)
+Всё открыто сразу,Everything unlocked
+Далее: ваш завод  →,Next: your factory  →
+Новая игра · ваш завод,New Game · your factory
+"Придумайте название и соберите эмблему: они будут в шапке игры, на вывеске у ворот, в заводской многотиражке и на табличках в цехе. Поменять можно потом — щелчком по эмблеме в шапке.","Pick a name and design an emblem: they'll appear in the top bar, on the sign over the gate, in the factory newspaper and on the plaques in the shop. You can change them later by clicking the emblem in the top bar."
+←  Назад,←  Back
+%s · «%s» · сложность: %s,%s · “%s” · difficulty: %s
+Начать,Start
+Прогресс,Progress
+Загрузить игру,Load Game
+Сохранено %s · в игре %s %s · %s,Saved %s · in game %s %s · %s
+Удалить,Delete
+Сохранения и настройки лежат в папке пользователя:,Saves and settings are stored in the user folder:
+Язык / Language,Язык / Language
+Игра,Game
+Автосохранение каждое утро,Autosave every morning
+"Ускорять ночь и выходные, когда на заводе пусто",Speed up nights and weekends when the plant is empty
+"Ставить паузу, когда приходит событие с выбором",Pause when an event with a choice arrives
+"Двигать камеру, когда курсор у края экрана",Scroll the camera when the cursor is at the screen edge
+Фамилии под людьми на карте,Surnames under people on the map
+Полноэкранный режим,Fullscreen
+Показывать интро,Show intro
+Общая громкость,Master volume
+Музыка,Music
+Станки и инструмент,Machines and tools
+Звуки окружения,Ambient sounds
+Интерфейс,Interface
+Игровой час,Game hour
+медленно (45 с),slow (45 s)
+обычно (30 с),normal (30 s)
+быстро (20 с),fast (20 s)
+очень быстро (12 с),very fast (12 s)
+Сколько реальных секунд длится игровой час на обычной скорости,How many real seconds a game hour lasts at normal speed
+Звук,Sound
+Подбор музыки,Music selection
+по времени суток,by time of day
+всё подряд,everything
+только вальсы,waltzes only
+"По времени суток: утром — бодрее, днём — рабочий ритм, в аврал — марш, ночью — тихо","By time of day: livelier in the morning, a working beat by day, a march during a rush job, quiet at night"
+Экран,Display
+Качество эффектов,Effects quality
+низкое — без искр и дыма,low — no sparks or smoke
+среднее,medium
+высокое,high
+"Искры, стружка, пар, дым, листья и облака. На слабых компьютерах поставьте пониже","Sparks, chips, steam, smoke, leaves and clouds. Turn it down on weaker computers"
+Предел кадров,Frame limit
+без предела,unlimited
+Сколько кадров в секунду рисовать. Без предела — сколько потянет компьютер,How many frames per second to draw. Unlimited: as many as your computer can handle
+Синхронизация (V-Sync),V-Sync
+выкл.,off
+вкл. — по частоте монитора,on — match monitor refresh rate
+"Включите, если картинка «рвётся» по горизонтали. Тогда кадров не больше, чем герц у монитора",Turn on if the picture tears horizontally. Frame rate is then capped at your monitor's refresh rate
+Масштаб интерфейса,Interface scale
+Размер кнопок и текста,Size of buttons and text
+Пауза,Paused
+Сохранить игру,Save Game
+Справочник (F1),Handbook (F1)
+Выйти в главное меню,Exit to Main Menu
+Выйти из игры,Quit Game
+При выходе игра сохраняется автоматически.,The game is saved automatically when you exit.
+Название сохранения,Save name
+Сохранить,Save
+Игра сохранена.,Game saved.
+Или перезаписать:,Or overwrite:
+Назад,Back
+Автосохранение,Autosave
+(повреждено),(damaged)
+Сохранений пока нет.,No saves yet.
+Перезаписать,Overwrite
+Удалить сохранение,Delete save
+репутация,reputation
+Пауза (Пробел),Pause (Space)
+Обычная скорость ×1 (клавиша 1),Normal speed ×1 (key 1)
+Быстро ×2 (клавиша 2),Fast ×2 (key 2)
+Очень быстро ×4 (клавиша 3),Very fast ×4 (key 3)
+Справочник: все механики игры по разделам (F1),"Handbook: every game mechanic, by section (F1)"
+Журнал событий,Event log
+Меню игры (Esc),Game menu (Esc)
+%.2f млн,%.2fM
+%d тыс.,%dk
+сегодня %s%s,today %s%s
+сегодня без движения,no movement today
+Деньги на счёте. Последние операции:,Money in the account. Latest transactions:
+Нажмите — «Финансы» (F).,Click for Finance (F).
+%d из 100,%d of 100
+"Репутация %d из 100. Растёт от заказов, сданных вовремя, и падает от опозданий и срывов.
+От неё зависят цены и число заказов.","Reputation %d of 100. Rises with orders delivered on time, falls with delays and failures.
+It affects prices and the number of orders."
+ООО,LLC
+Мастерская,Workshop
+ООО «%s»,%s LLC
+Мастерская «%s»,%s Workshop
+МАСТЕРСКАЯ,WORKSHOP
+"%s — паспорт завода: название и эмблема (нажмите, чтобы изменить).",%s — the factory passport: name and emblem (click to change).
+Этап %d из %d: «%s». Рейтинг завода: %d из 5 звёзд.,Stage %d of %d: “%s”. Factory rating: %d of 5 stars.
+Чтобы перейти на следующий этап:,To reach the next stage:
+И любые %d на выбор (%d выполнено):,And any %d of your choice (%d done):
+"Нажмите, чтобы открыть «Цели» (G).",Click to open Goals (G).
+%d / %d на заводе,%d / %d at the plant
+Нет людей,No staff
+настроение %d — %s,mood %d — %s
+наймите во вкладке «Найм»,hire on the Hiring tab
+"Сейчас на заводе %d из %d. Среднее настроение %d.
+Нажмите — «Люди» (L).","At the plant now: %d of %d. Average mood %d.
+Click for People (L)."
+Отличное,Excellent
+Хорошее,Good
+Нормальное,Okay
+Плохое,Poor
+Ужасное,Terrible
+выходной,day off
+до смены,before shift
+обед,lunch
+перерыв на чай,tea break
+планёрка,briefing
+"уборка, сдача смены","cleanup, shift handover"
+идёт смена,shift in progress
+смена окончена,shift over
+ПАУЗА,PAUSED
+ускорено,fast-forward
+На заводе никого — ночь и выходные проматываются быстро,Nobody at the plant — nights and weekends fast-forward
+АВТОМАТ ВЫБИТ,BREAKER TRIPPED
+%.1f / %d кВт,%.1f / %d kW
+"Электросеть: нагрузка %.1f из %d кВт.
+Нажмите — меню «Сети» (E).","Power grid: load %.1f of %d kW.
+Click for the Utilities menu (E)."
+"%s, %s. На улице %+d °C.","%s, %s. Outside: %+d °C."
+Идёт снег.,It's snowing.
+Гололёд!,Black ice!
+Отопительный сезон: батарей %d.,Heating season: %d radiators.
+Холодно: ,Cold: 
+Нажмите — «События» (C).,Click for Events (C).
+"%s, %s. %s
+Нажмите — календарь и проверки (C).","%s, %s. %s
+Click for the calendar and inspections (C)."
+Выходной,Day off
+Работа,Work
+Обед,Lunch
+Перерыв,Break
+Планёрка,Briefing
+Уборка,Cleanup
+без перерывов,no breaks
+Зима,Winter
+Весна,Spring
+Лето,Summer
+Осень,Autumn
+"Не платим зарплату: долг %s. Люди уходят (%d из %d) — потом завод закроют. Нажмите, чтобы выплатить","We're not paying wages: %s owed. People are quitting (%d of %d), then the plant will be shut down. Click to pay"
+"Нет инструмента и денег на него: станки стоят, люди грозят уволиться. Нажмите — снабжение","No tools and no money for them: machines are idle, people threaten to quit. Click for Supply"
+"Завод в долгах (%s): репутация падает, новых заказов не берём. Нажмите — финансы","The plant is in debt (%s): reputation is falling, no new orders. Click for Finance"
+Стройка,Build
+"Полы, стены, окна, двери, ворота (B)","Floors, walls, windows, doors, gates (B)"
+Объекты,Objects
+"Станки, стеллажи, бытовка (O)","Machines, racks, amenities (O)"
+Зоны,Zones
+"Зоны: цех, склад, бытовка, столовая, кабинеты… Рисуются клетками внутри помещений (R)","Zones: shop floor, storage, locker room, canteen, offices… Painted cell by cell inside rooms (R)"
+План,Plan
+"Планировка: нарисуйте будущий завод на кальке — стены, полы, зоны, станки. Бесплатно, рабочие план не трогают. Потом «Утвердить план» (V)","Layout: sketch your future plant on tracing paper — walls, floors, zones, machines. Free; workers don't touch the plan. Then “Approve plan” (V)"
+Сети,Utilities
+"Электричество, свет, водопровод, вентиляция, сжатый воздух (E)","Electricity, lighting, plumbing, ventilation, compressed air (E)"
+Снос,Demolish
+"Снести стены, полы, объекты (X)","Demolish walls, floors, objects (X)"
+Отмена,Cancel
+Отменить чертежи — деньги вернутся,Cancel blueprints — the money is refunded
+Заказы,Orders
+"Заказы в работе, рынок, контракты, план ПДО","Orders in progress, market, contracts, production plan"
+Производство,Production
+"Станки и ППР, металл и расходники, склад оборудования (P)","Machines and maintenance, metal and consumables, equipment store (P)"
+Люди,People
+"Сотрудники, найм, обучение, охрана труда, бригады, график, профсоюз (L)","Staff, hiring, training, safety, crews, schedule, union (L)"
+Финансы,Finance
+"Сводка, отчёты по неделям, кредиты, гранты (F)","Summary, weekly reports, loans, grants (F)"
+Управление,Management
+"ИТР-отделы, политики и разработки техотдела (M)","Office departments, policies and engineering projects (M)"
+Цели,Goals
+"Этап роста завода, рейтинг в звёздах, цели сценария, достижения (G)","Growth stage, star rating, scenario goals, achievements (G)"
+События,Events
+"Письма, проверки, календарь, многотиражка, журнал (C)","Letters, inspections, calendar, newspaper, log (C)"
+Город,Town
+"Общежитие, столовая и медпункт, детсад и ДК, заводское радио, кот (H)","Dormitory, canteen and first-aid post, kindergarten and culture club, factory radio, the cat (H)"
+Случайная эмблема,Random emblem
+"Подобрать форму, знак и цвета наугад","Pick a random shape, symbol and colors"
+"Эмблема — в шапке, на вывеске у ворот, в многотиражке и на табличках в цехе.","The emblem appears in the top bar, on the gate sign, in the newspaper and on shop plaques."
+Название,Name
+"Например, Прогресс","For example, Progress"
+Случайно,Random
+Случайное название,Random name
+Форма,Shape
+Знак,Symbol
+Буквы на эмблеме,Letters on the emblem
+До трёх букв — для знака «Буквы»,Up to three letters — for the “Letters” symbol
+Фон,Background
+Кайма,Rim
+Так будет на вывеске у ворот,This is how the gate sign will look
+Без названия,Unnamed
+Круг,Circle
+Щит,Shield
+Шестерня,Gear
+Шестигранник,Hexagon
+Ромб,Diamond
+Квадрат,Square
+Молот,Hammer
+Ключ,Wrench
+Молот и шестерня,Hammer and gear
+Молния,Lightning
+Наковальня,Anvil
+Звезда,Star
+Колос,Wheat ear
+Колесо,Wheel
+Капля,Drop
+Ферма,Truss
+Буквы,Letters
+Восход,Voskhod
+Сталевар,Stalevar
+Импульс,Impuls
+Вектор,Vektor
+Заря,Zarya
+Стрела,Strela
+Гранит,Granit
+Рубин,Rubin
+Сокол,Sokol
+Горизонт,Gorizont
+Темп,Temp
+Луч,Luch
+Искра,Iskra
+Рассвет,Rassvet
+Опора,Opora
+Резец,Rezets
+Механик,Mekhanik
+Точмаш,Tochmash
+Прибой,Priboy
+Стальной узел,Stalnoy Uzel
+Красный токарь,Krasny Tokar
+Северный вал,Severny Val
+Уральская шестерня,Uralskaya Shesternya
+Кедр,Kedr
+Сигнал,Signal
+Мастер,Master
+Ось,Os
+Полюс,Polyus
+Станкодеталь,Stankodetal
+Орбита,Orbita
+Буревестник,Burevestnik
+Гвоздика,Gvozdika
+Кристалл,Kristall
+Красный станочник,Krasny Stanochnik
+"Соберите своих людей — ФИО, внешность, черты. В новой игре они могут прийти наниматься: в списке кандидатов отмечены ★.","Put together your own people — name, looks, traits. In a new game they may come looking for a job: they're marked ★ in the candidate list."
+Закрыть (Esc),Close (Esc)
++  Новый рабочий,+  New worker
+Новая запись: случайные имя и внешность — поменяйте как хотите,New entry with a random name and looks — change them as you like
+Шанс появления,Chance to appear
+"Для каждого включённого, кого ещё нет на заводе, — при каждом обновлении кандидатов (по понедельникам и по объявлению). За раз приходит не больше одного.",For each enabled worker not yet at the plant — every time candidates refresh (on Mondays and after a job ad). No more than one arrives at a time.
+В спецовке,In overalls
+Как на работе: одежда по профессии,As at work: clothes for the trade
+Своя одежда,Own clothes
+Как приходит на завод и уходит домой,As when arriving at the plant and going home
+Случайная внешность,Random looks
+Перебрать внешность целиком (ФИО и черты останутся),Re-roll the whole look (name and traits stay)
+Убрать из списка навсегда,Remove from the list for good
+СПИСОК · %d из %d,LIST · %d of %d
+Пока никого. Нажмите «Новый рабочий».,Nobody yet. Click “New worker”.
+Включён: может прийти в новой игре,Enabled: may turn up in a new game
+Без имени,No name
+новый — ещё не в списке,new — not on the list yet
+В списке уже %d — больше нельзя. Удалите кого-нибудь.,The list already has %d — that's the limit. Delete someone.
+Добавлена в список. В новой игре может прийти наниматься.,Added to the list. She may come looking for a job in a new game.
+Добавлен в список. В новой игре может прийти наниматься.,Added to the list. He may come looking for a job in a new game.
+Сохранено.,Saved.
+Добавить в список,Add to list
+Сохранить изменения,Save changes
+Сохранено,Saved
+Проверьте ФИО — ошибки отмечены красным.,Check the name — errors are marked in red.
+Новый рабочий ещё не в списке.,The new worker isn't on the list yet.
+Есть несохранённые изменения.,There are unsaved changes.
+год|года|лет,year|years
+"Фамилия, имя, отчество","Surname, first name, patronymic"
+Фамилия,Surname
+Имя,First name
+Отчество,Patronymic
+Случайное ФИО,Random name
+"Подобрать фамилию, имя и отчество","Pick a surname, first name and patronymic"
+"Русские буквы и дефис, от %d до %d знаков. Пол меняет окончания: Петров → Петрова.","Cyrillic letters and hyphens, %d to %d characters. Gender changes the endings: Petrov → Petrova."
+Кто это,Who they are
+Пол,Gender
+Мужчина,Man
+Женщина,Woman
+Возраст,Age
+Профессия,Trade
+"Любая — по тому, кто нужен заводу",Any — whoever the plant needs
+Любая профессия,Any trade
+Внешность,Appearance
+Черты характера,Character traits
+чтобы выбрать другую — снимите одну,"to pick another, remove one"
+Телосложение,Build
+Рост,Height
+Ниже среднего,Below average
+Средний,Average
+Выше среднего,Above average
+Кожа,Skin
+Причёска,Hairstyle
+Цвет волос,Hair color
+Серьги,Earrings
+Нет,No
+Есть,Yes
+"Борода, усы","Beard, moustache"
+Лицо,Face
+Глаза,Eyes
+Цвет глаз,Eye color
+Брови,Eyebrows
+Нос,Nose
+Рот,Mouth
+Очки,Glasses
+Веснушки,Freckles
+Куртка,Jacket
+Пальто,Coat
+Её цвет,Its color
+Черты характера · %d из %d,Character traits · %d of %d
+Характер,Character
+"Без черт — обычный человек. Выберите до двух справа; несовместимые (трудоголик и лентяй, жаворонок и сова…) вместе не бывают.","No traits — an ordinary person. Pick up to two on the right; incompatible ones (workaholic and lazybones, early bird and night owl…) can't go together."
+Уже выбраны две черты — снимите одну,Two traits already picked — remove one
+Не сочетается с «%s»,Doesn't go with “%s”
+Только с 45 лет,Only from age 45
+нужно заполнить,required
+без пробелов (двойное — через дефис),no spaces (use a hyphen for double names)
+дефис — только между частями,hyphens only between parts
+только русские буквы и дефис,Cyrillic letters and hyphens only
+слишком коротко,too short
+слишком длинно (до %d букв),too long (up to %d letters)
+У станков,At the machines
+Рабочие,Workers
+Быт и охрана,Services and security
+ИТР и офис,Engineers and office
+Короткая,Short
+Ёжик,Crew cut
+На пробор,Side part
+Зачёс назад,Slicked back
+Залысины,Receding
+Лысый,Bald
+Кудри,Curls
+Длинная сзади,Mullet
+Каре,Bob
+Пучок,Bun
+Хвост,Ponytail
+Длинные,Long
+Коса,Braid
+Химзавивка,Perm
+Щетина,Stubble
+Усы,Moustache
+Пышные усы,Bushy moustache
+Эспаньолка,Goatee
+Короткая борода,Short beard
+Борода,Beard
+Чёрные,Black
+Тёмно-каштановые,Dark brown
+Каштановые,Chestnut
+Русые,Light brown
+Светлые,Blond
+Рыжие,Red
+Тёмно-седые,Salt and pepper
+Седые,Grey
+Белые,White
+Очень светлая,Very fair
+Светлая,Fair
+Смуглая,Olive
+Загорелая,Tanned
+Тёмная,Dark
+Очень тёмная,Very dark
+Карие,Brown
+Тёмно-карие,Dark brown
+Серо-голубые,Grey-blue
+Зелёные,Green
+Ореховые,Hazel
+Голубые,Blue
+Графит,Graphite
+Коричневая,Brown
+Тёмно-синяя,Navy
+Хаки,Khaki
+Бордовая,Burgundy
+Серая,Grey
+Бежевая,Beige
+Чёрная,Black
+Овальное,Oval
+Квадратное,Square
+Круглое,Round
+Вытянутое,Long
+Мягкое,Soft
+Миндалевидные,Almond
+Узкие,Narrow
+Круглые,Round
+Тяжёлые веки,Heavy-lidded
+Глубоко посажены,Deep-set
+Прямые,Straight
+Дугой,Arched
+Густые,Thick
+Тонкие,Thin
+С изломом,Angled
+Кустистые,Bushy
+Маленький,Small
+Прямой,Straight
+Длинный,Long
+Широкий,Wide
+С горбинкой,Hooked
+Обычный,Neutral
+Улыбчивый,Smiling
+Тонкие губы,Thin lips
+Полные губы,Full lips
+Уголки вниз,Downturned
+Невысокий,Short
+Высокий,Tall
+очень худой,very thin
+очень худая,very thin
+худощавый,lean
+худощавая,lean
+могучий,mighty
+очень сильная,very strong
+среднего телосложения,average build
+крепкий,sturdy
+крепкая,sturdy
+полный,stout
+полная,stout
+очень полный,very stout
+очень полная,very stout
+Токарь,Turner
+Контролёр ОТК,QC Inspector
+Разнорабочий,Laborer
+Строитель,Builder
+Электрик,Electrician
+Фрезеровщик,Milling Operator
+Сварщик,Welder
+Термист,Heat Treater
+Литейщик,Caster
+Штамповщик,Press Operator
+Маляр,Painter
+Слесарь-сборщик,Assembly Fitter
+Слесарь,Fitter
+Мастер участка,Section Foreman
+Начальник цеха,Shop Manager
+Бухгалтер,Accountant
+Снабженец,Purchaser
+Диспетчер ПДО,Production Dispatcher
+Кадровик,HR Officer
+Технолог,Process Engineer
+Уборщик,Cleaner
+Наладчик,Machine Setter
+Оператор станков с ЧПУ,CNC Operator
+Охранник,Security Guard
+Повар,Cook
+Фельдшер,Paramedic
+Менеджер по сбыту,Sales Manager
+Инженер по ОТ,Safety Engineer
+Главный инженер,Chief Engineer
+Юрист,Lawyer
+profile.mech.name,Machine Works
+profile.mech.prod,"Fasteners, bushings, shafts, spare parts"
+profile.mech.shops,"Blank prep, machining, QC"
+profile.mech.mechanic,"Lots of small, quick orders — the best profile for learning."
+profile.mech.desc,"We turn, mill and drill. Plenty of customers, small orders — you can grow at an easy pace."
+profile.agri.name,Farm Machinery
+profile.agri.prod,"Tractor assemblies, harrows, discs"
+profile.agri.shops,"+ welding, painting, assembly"
+profile.agri.mechanic,"Seasonal demand: orders soar in spring, winter is slack."
+profile.agri.desc,"Machinery for collective farms and farmers. In spring you'll be run off your feet; in winter, stock up the warehouse and repair the machines."
+profile.steel.name,Steel Structures
+profile.steel.prod,"Trusses, beams, frames, skeletons"
+profile.steel.shops,"Welding, painting, large bays"
+profile.steel.mechanic,"Bulky products: it all comes down to the overhead crane and floor space. Few orders, but big ones."
+profile.steel.desc,We weld frames for hangars and workshops. The products are huge and heavy — without a crane and space you won't get far.
+profile.pumps.name,Pumps & Valves
+profile.pumps.prod,"Pumps, gate valves, flanges"
+profile.pumps.shops,"+ heat treatment, test benches"
+profile.pumps.mechanic,Hydrostatic testing and certification of every batch on the test bench.
+profile.pumps.desc,Pumps for water utilities and gate valves for pipelines. Every unit goes under pressure on the bench.
+profile.rail.name,Railway Parts
+profile.rail.prod,"Axles, brake cylinders, bushings"
+profile.rail.shops,"+ forging and pressing, heat treatment, flaw detection"
+profile.rail.mechanic,Big customers and very strict acceptance: any defect in a batch means a claim costing three times as much.
+profile.rail.desc,We work for the railway: they pay well and check everything. Defects are never forgiven.
+profile.tools.name,Machine-Tool Building
+profile.tools.prod,Machine tools and tooling
+profile.tools.shops,All shops + a strong design bureau
+profile.tools.mechanic,"Import substitution: machines for your own plant are 20% cheaper, state programs come more often. Long product cycle."
+profile.tools.desc,"We build machine tools. You need almost the whole plant and an engineering department, but one machine is worth a hundred bushings."
+profile.secret.name,Restricted Facility
+profile.secret.prod,“Products” under state contract
+profile.secret.shops,All shops + security department and military acceptance
+profile.secret.mechanic,"Steady money: a 50% advance on state contracts. But you need a checkpoint, deadlines are tight, inspections frequent, plus military acceptance."
+profile.secret.desc,"Product 7T, assembly 12-K — what they are, you're not supposed to know. The state pays reliably, but it's a demanding customer."
+profile.instr.name,Instrument Making
+profile.instr.prod,"Electronic units, circuit boards"
+profile.instr.shops,"Clean rooms, assembly area"
+profile.instr.mechanic,Dust and static ruin the product; precision is a must.
+profile.instr.desc,Coming in future versions.
+scn.garage.name,Garage
+scn.garage.tag,tutorial
+scn.garage.desc,"A garage box in the industrial zone, an old lathe, three workers and {money}. Teaches the basics with step-by-step hints."
+scn.garage.goal0,Grow into a small enterprise
+scn.garage.goal1,Factory rating: 3 stars
+scn.field.name,Open Field
+scn.field.tag,building from scratch
+scn.field.desc,"A bare plot by the highway, a site trailer, a crew of three builders and {money}. Support programs will help pay for construction — “Workshop from Scratch”, “Decent Amenities”, “Job Creation”: apply for them in Finance."
+scn.field.goal0,Build a workshop of 120+ cells
+scn.field.goal1,Hire 12 people
+scn.field.goal2,Complete 3 support programs
+scn.field.goal3,Rating: 3 stars
+scn.sandbox.name,Sandbox
+scn.sandbox.tag,no goals
+scn.sandbox.desc,"An empty plot, your own money and difficulty. A construction crew, everything unlocked from the start, no goals — build however you like."
+mode.calm.name,Calm Five-Year Plan
+mode.calm.desc,"A gentle mode for building: fewer and milder events, fines halved."
+mode.market.name,Market Economy
+mode.market.desc,Standard: crises alternate with quiet weeks.
+mode.wild.name,The Wild Nineties
+mode.wild.desc,"Hardcore: late payments, barter, corporate raiders, jumping prices, frequent inspections and theft."
+stage.garage.name,Garage
+stage.workshop.name,Workshop
+stage.small.name,Small Enterprise
+stage.medium.name,Medium Enterprise
+stage.large.name,Large Plant
+stage.city.name,Company Town
+trait.workaholic.name,Workaholic
+trait.workaholic.desc,"Works 15% faster, but gets angry when there's nothing to do."
+trait.lazy.name,Lazybones
+trait.lazy.desc,Works 15% slower and likes to linger.
+trait.smoker.name,Smoker
+trait.smoker.desc,Goes for a smoke every couple of hours. Gets cross if there's no ashtray bin.
+trait.grumpy.name,Grump
+trait.grumpy.desc,Always unhappy about something: −8 mood.
+trait.cheerful.name,Joker
+trait.cheerful.desc,Never loses heart: +8 mood.
+trait.neat.name,Perfectionist
+trait.neat.desc,"Makes 40% fewer defects, but poor amenities upset him."
+trait.handy.name,Handy
+trait.handy.desc,Builds and repairs 30% faster.
+trait.early_bird.name,Early Bird
+trait.early_bird.desc,Comes in early. The night shift is torture for him (−10).
+trait.night_owl.name,Night Owl
+trait.night_owl.desc,"Enjoys the second shift (+6), nods off in the morning (−3)."
+trait.drinker.name,Drinks
+trait.drinker.desc,Sometimes doesn't show up on Monday.
+trait.glutton.name,Loves His Food
+trait.glutton.desc,Gets hungry faster; lunch is sacred to him.
+trait.tough.name,Tireless
+trait.tough.desc,Tires 30% slower.
+trait.greedy.name,Counts Every Ruble
+trait.greedy.desc,Worries twice as much about pay and is delighted by bonuses.
+trait.veteran.name,Old School
+trait.veteran.desc,Poor amenities barely bother him.
+trait.curious.name,Curious
+trait.curious.desc,Learns one and a half times faster on courses and enjoys it; gains experience at the machine faster too.
+trait.born_mentor.name,Born Mentor
+trait.born_mentor.desc,"Apprentices grow one and a half times faster under him, and he loses no speed himself. Teaching the young is a joy to him."
+trait.soul.name,Life of the Party
+trait.soul.desc,"Gets on with people quickly: they make friends with him, not enemies."
+trait.squabbler.name,Quarrelsome
+trait.squabbler.desc,Always bickering with someone: makes enemies faster than friends.
+trait.rationalizer.name,Innovator
+trait.rationalizer.desc,Always coming up with something: submits improvement proposals more often and gains experience faster.
+trait.quiet.name,Quiet One
+trait.quiet.desc,Keeps to himself: makes friends and enemies half as fast.
+trait.student.name,Trainee
+trait.student.desc,"A vocational school student on placement: gains experience twice as fast, gets a stipend instead of wages."
+trait.thief.name,Pilferer
+trait.thief.desc,"Carries off anything not nailed down: rod stock for the dacha, welding rods for a neighbour. Caught by the guards at the gate and by cameras."
+trait.activist.name,Activist
+trait.activist.desc,Knows the Labour Code by heart. First to go to the union committee — and he'll lead the others.
+"Игра переведена на английский, язык — в настройках","The game is now in English, language is in Settings"
+Интро перед главным меню,Intro before the main menu

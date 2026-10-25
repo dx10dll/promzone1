@@ -76,9 +76,9 @@ func _tick(v: float) -> String:
 			var a := absf(v)
 			var sg := "−" if v < -0.0001 else ""
 			if a >= 1000000.0 or _step >= 1000000.0:
-				return ("%s%." + str(dec.call(_step / 1000000.0)) + "f млн") % [sg, a / 1000000.0]
+				return tr("%s млн") % (("%s%." + str(dec.call(_step / 1000000.0)) + "f") % [sg, a / 1000000.0])
 			if a >= 1000.0 or _step >= 1000.0:
-				return ("%s%." + str(dec.call(_step / 1000.0)) + "f тыс.") % [sg, a / 1000.0]
+				return tr("%s тыс.") % (("%s%." + str(dec.call(_step / 1000.0)) + "f") % [sg, a / 1000.0])
 			return "%s%d ₽" % [sg, int(roundf(a))]
 		"pct":
 			return ("%." + str(dec.call(_step * 100.0)) + "f%%") % (v * 100.0)
@@ -95,9 +95,9 @@ static func fmt_val(v: float, f: String) -> String:
 			var a := absf(v)
 			var sg := "−" if v < 0.0 else ""
 			if a >= 1000000.0:
-				return "%s%.1f млн" % [sg, a / 1000000.0]
+				return L.t("%s%.1f млн") % [sg, a / 1000000.0]
 			if a >= 1000.0:
-				return "%s%d тыс." % [sg, int(roundf(a / 1000.0))]
+				return L.t("%s%d тыс.") % [sg, int(roundf(a / 1000.0))]
 			return "%s%d ₽" % [sg, int(roundf(a))]
 		"pct":
 			return "%d%%" % int(roundf(v * 100.0))
@@ -120,11 +120,11 @@ func _gui_input(e: InputEvent) -> void:
 			hover = i
 			var parts: Array[String] = []
 			if i < labels.size():
-				parts.append(str(labels[i]))
+				parts.append(tr(str(labels[i])))
 			for s: Dictionary in series:
 				var vals: Array = s["values"]
 				if i < vals.size():
-					parts.append("%s: %s" % [str(s["name"]), fmt_val(float(vals[i]), fmt)])
+					parts.append("%s: %s" % [tr(str(s["name"])), fmt_val(float(vals[i]), fmt)])
 			tooltip_text = "\n".join(parts)
 			queue_redraw()
 
@@ -165,10 +165,10 @@ func _draw() -> void:
 		var y0: float = ys.call(0.0)
 		draw_line(Vector2(r.position.x, y0), Vector2(r.end.x, y0), Color(1, 1, 1, 0.18), 1.0)
 	if n == 0:
-		var e := "Данных пока нет — график появится через пару дней"
+		var e := tr("Данных пока нет — график появится через пару дней")
 		var ew := f.get_string_size(e, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 		if ew > r.size.x + 20.0:
-			e = "Данных пока нет"   # узкая карточка
+			e = tr("Данных пока нет")   # узкая карточка
 			ew = f.get_string_size(e, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 		draw_string(f, Vector2(r.get_center().x - ew * 0.5, r.get_center().y), e, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, UITheme.MUTED)
 		return
@@ -177,7 +177,7 @@ func _draw() -> void:
 		for i in [0, int((n - 1) / 2), n - 1]:
 			if i >= labels.size():
 				continue
-			var lt := str(labels[i])
+			var lt := tr(str(labels[i]))
 			var lw := f.get_string_size(lt, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x
 			var x := _x(i, n, r)
 			x = clampf(x - lw * 0.5, r.position.x - 4.0, r.end.x - lw)

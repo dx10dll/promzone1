@@ -139,7 +139,7 @@ func _is_bed_cell(c: Vector2i) -> bool:
 ## Иногородний кандидат: без места в общежитии не приедет.
 func can_hire(c: Worker) -> String:
 	if c.from_away and free_beds() <= 0:
-		return "Иногороднему нужна койка в общежитии — свободных мест нет"
+		return L.t("Иногороднему нужна койка в общежитии — свободных мест нет")
 	return ""
 
 
@@ -226,15 +226,15 @@ func medbay_ready() -> bool:
 
 func vaccinate() -> String:
 	if sim.workers.is_empty():
-		return "Прививать некого"
+		return L.t("Прививать некого")
 	if vaccinated_until >= sim.day() + 30:
-		return "Коллектив уже привит"
+		return L.t("Коллектив уже привит")
 	var cost := VACCINE * sim.workers.size() * (0.7 if medbay_ready() or not nurses().is_empty() else 1.0)
 	if sim.money < cost:
-		return "Не хватает денег: %s" % Defs.money_str(cost)
+		return L.t("Не хватает денег: %s") % Defs.money_str(cost)
 	sim.spend(cost, "Медицина: прививки от гриппа")
 	vaccinated_until = sim.day() + 84
-	sim.notify("Всем сделали прививку от гриппа: зимой болеть будут в четыре раза реже.", Sim.LVL_GOOD)
+	sim.notify(L.t("Всем сделали прививку от гриппа: зимой болеть будут в четыре раза реже."), Sim.LVL_GOOD)
 	return ""
 
 
@@ -253,9 +253,9 @@ func _flu_morning() -> void:
 		var days := sim.rng.randi_range(2, 5) - (1 if not medbays().is_empty() and not nurses().is_empty() else 0)
 		w.sick_until = float(sim.day() + days - 1) * 1440.0 + 1200.0
 		w.away_why = "на больничном"
-		w.add_history(sim.day(), "Грипп. Больничный %d дн." % days)
+		w.add_history(sim.day(), L.t("Грипп. Больничный %d дн.") % days)
 		flu_cases += 1
-		sim.notify_once("flu", "Грипп: %s на больничном. Прививка всему коллективу — в «Город → Столовая и медпункт»." % w.full_name(), Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("flu", L.t("Грипп: %s на больничном. Прививка всему коллективу — в «Город → Столовая и медпункт».") % w.full_name(), Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
 
 
 # ================================================================ детсад
@@ -306,22 +306,22 @@ func has_kg_place(w: Worker) -> bool:
 
 func kg_upgrade() -> String:
 	if kg_level >= KG_LEVELS.size() - 1:
-		return "Садик уже самый большой"
+		return L.t("Садик уже самый большой")
 	if not sim.dev.on("city3"):
-		return "Детсад открывает ступень «Шефство» (Управление → Развитие)"
+		return L.t("Детсад открывает ступень «Шефство» (Управление → Развитие)")
 	var cost := float(KG_LEVELS[kg_level + 1][1]) - float(KG_LEVELS[kg_level][1])
 	if sim.money < cost:
-		return "Не хватает денег: нужно %s" % Defs.money_str(cost)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 	sim.spend(cost, "Город: детский сад «%s»" % kg_name())
 	kg_level += 1
 	rel = minf(100.0, rel + 6.0)
-	sim.notify("Заводской детсад «%s»: теперь %d мест. Родители спокойнее, прогулов меньше." % [kg_name(), kg_places()], Sim.LVL_GOOD)
-	sim.paper.add("Город", "Детсад «%s» принимает малышей" % kg_name(), "Завод открыл группы на %d мест. Мамы говорят спасибо!" % kg_places())
+	sim.notify(L.t("Заводской детсад «%s»: теперь %d мест. Родители спокойнее, прогулов меньше.") % [kg_name(), kg_places()], Sim.LVL_GOOD)
+	sim.paper.add(L.t("Город"), L.t("Детсад «%s» принимает малышей") % kg_name(), L.t("Завод открыл группы на %d мест. Мамы говорят спасибо!") % kg_places())
 	return ""
 
 
 func kg_name() -> String:
-	return "Шестерёнка"
+	return L.t("Шестерёнка")
 
 
 ## Нет садика — иногда приходится сидеть с ребёнком.
@@ -335,16 +335,16 @@ func kid_absent(w: Worker) -> bool:
 
 func dk_buy() -> String:
 	if dk:
-		return "ДК уже на балансе завода"
+		return L.t("ДК уже на балансе завода")
 	if not sim.dev.on("city3"):
-		return "Дом культуры берёт на баланс завод со ступенью «Шефство» (Управление → Развитие)"
+		return L.t("Дом культуры берёт на баланс завод со ступенью «Шефство» (Управление → Развитие)")
 	if sim.money < DK_COST:
-		return "Не хватает денег: нужно %s" % Defs.money_str(DK_COST)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(DK_COST)
 	sim.spend(DK_COST, "Город: Дом культуры «Машиностроитель»")
 	dk = true
 	dk_since = sim.day()
 	rel = minf(100.0, rel + 12.0)
-	sim.story.info("ДК «Машиностроитель»", "Завод взял на баланс Дом культуры: кружки, ансамбль, концерты к праздникам. Город доволен.", "culture", Sim.LVL_GOOD, Vector2i(-1, -1), true)
+	sim.story.info(L.t("ДК «Машиностроитель»"), L.t("Завод взял на баланс Дом культуры: кружки, ансамбль, концерты к праздникам. Город доволен."), "culture", Sim.LVL_GOOD, Vector2i(-1, -1), true)
 	return ""
 
 
@@ -352,7 +352,7 @@ func _dk_week() -> void:
 	if not dk:
 		return
 	sim.spend(DK_WEEK, "Город: содержание ДК")
-	var clubs := ["хор ветеранов", "секция бокса", "кружок радиолюбителей", "ансамбль «Токарушка»", "шахматный клуб", "фотокружок"]
+	var clubs := [L.t("хор ветеранов"), L.t("секция бокса"), L.t("кружок радиолюбителей"), L.t("ансамбль «Токарушка»"), L.t("шахматный клуб"), L.t("фотокружок")]
 	var n := 0
 	for w in sim.workers:
 		if sim.rng.randf() < 0.3:
@@ -360,7 +360,7 @@ func _dk_week() -> void:
 			n += 1
 	if n > 0 and sim.rng.randf() < 0.4:
 		var c: String = clubs[sim.rng.randi_range(0, clubs.size() - 1)]
-		sim.paper.add("Культура", "В ДК «Машиностроитель» — %s" % c, "Записались %d наших работников. Приходите и вы!" % n)
+		sim.paper.add(L.t("Культура"), L.t("В ДК «Машиностроитель» — %s") % c, L.t("Записались %d наших работников. Приходите и вы!") % n)
 
 
 ## Праздник в ДК: вызывается из праздничных писем.
@@ -436,10 +436,10 @@ func _cat_offer(force: bool = false) -> void:
 		return
 	cat_offered = true
 	var c := Cat.make(sim)
-	var t := "У проходной мяукает %s %s — %s, %s, но с характером. Рабочие уже несут %s колбасу из столовой." % [c.fur_name(), "кошка" if c.female else "кот", c.name, "тощая" if c.female else "тощий", "ей" if c.female else "ему"]
-	sim.story.letter("cat", "На заводе прибил%s %s" % ["ась" if c.female else "ся", "кошка" if c.female else "кот"], t, "cat", Sim.LVL_GOOD,
-		[{"text": "Оставить: поставить миску (Объекты → Декор)", "hint": "Людям приятно погладить, крысы обходят склад стороной"},
-		{"text": "Отдать в добрые руки", "hint": ""}], 0, {"name": c.name, "fur": c.fur, "female": c.female})
+	var t := Nicks.gendered(L.t("У проходной мяукает %s {кот|кошка} — %s, {тощий|тощая}, но с характером. Рабочие уже несут {ему|ей} колбасу из столовой."), c.female) % [c.fur_name(), c.shown_name()]
+	sim.story.letter("cat", Nicks.gendered(L.t("На заводе прибил{ся|ась} {кот|кошка}"), c.female), t, "cat", Sim.LVL_GOOD,
+		[{"text": L.t("Оставить: поставить миску (Объекты → Декор)"), "hint": L.t("Людям приятно погладить, крысы обходят склад стороной")},
+		{"text": L.t("Отдать в добрые руки"), "hint": ""}], 0, {"name": c.name, "fur": c.fur, "female": c.female})
 
 
 func on_letter(ev: String, d: Dictionary, choice: int) -> void:
@@ -454,8 +454,9 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 				c.until = sim.minute
 				cat = c
 				sim.stats["cat"] = 1
-				sim.notify("%s теперь живёт на заводе. Поставьте миску (Объекты → Декор) — без неё %s уйдёт." % [c.title(), "она" if c.female else "он"], Sim.LVL_GOOD)
-				sim.paper.add("Новости", "Пополнение: %s" % c.title().to_lower(), "%s %s поселил%s на заводе. Просим не кормить колбасой — только из миски!" % [c.fur_name().capitalize(), c.title().to_lower(), "ась" if c.female else "ся"])
+				sim.notify(Nicks.gendered(L.t("%s теперь живёт на заводе. Поставьте миску (Объекты → Декор) — без неё {он|она} уйдёт."), c.female) % c.title(), Sim.LVL_GOOD)
+				var ct := c.title() if L.is_en() else c.title().to_lower()   # в английском кличка — с большой буквы
+				sim.paper.add(L.t("Новости"), L.t("Пополнение: %s") % ct, Nicks.gendered(L.t("%s %s поселил{ся|ась} на заводе. Просим не кормить колбасой — только из миски!"), c.female) % [c.fur_name().capitalize(), ct])
 		"kittens":
 			if cat == null:
 				return
@@ -464,9 +465,9 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 				for w in sim.workers:
 					if got < 3 and sim.rng.randf() < 0.4:
 						Mood.add(sim, w, "kittens")
-						w.add_history(sim.day(), "Взял%s котёнка у заводской кошки" % ("а" if w.female else ""))
+						w.add_history(sim.day(), Nicks.gendered(L.t("Взял{|а} котёнка у заводской кошки"), w.female))
 						got += 1
-				sim.notify("Котят разобрали по домам: %d счастливых %s." % [maxi(1, got), Defs.plural(maxi(1, got), "семья", "семьи", "семей")], Sim.LVL_GOOD)
+				sim.notify(L.t("Котят разобрали по домам: %d счастливых %s.") % [maxi(1, got), Defs.plural(maxi(1, got), "семья", "семьи", "семей")], Sim.LVL_GOOD)
 
 
 func _spawn_cell() -> Vector2i:
@@ -514,15 +515,15 @@ func _cat_morning() -> void:
 		var nb := int(cat.get_meta("no_bowl", 0)) + 1
 		cat.set_meta("no_bowl", nb)
 		if nb == 2:
-			sim.notify("%s голодает: поставьте миску (Объекты → Декор), иначе уйдёт." % cat.title(), Sim.LVL_WARN)
+			sim.notify(L.t("%s голодает: поставьте миску (Объекты → Декор), иначе уйдёт.") % cat.title(), Sim.LVL_WARN)
 		if nb >= 4:
-			sim.story.info("%s ушёл" % cat.title() if not cat.female else "%s ушла" % cat.title(), "Без миски на заводе голодно — %s ушёл%s искать место посытнее." % [cat.name, "а" if cat.female else ""], "cat", Sim.LVL_WARN)
+			sim.story.info(L.t("%s ушёл") % cat.title() if not cat.female else L.t("%s ушла") % cat.title(), Nicks.gendered(L.t("Без миски на заводе голодно — %s ушёл{|а} искать место посытнее."), cat.female) % cat.shown_name(), "cat", Sim.LVL_WARN)
 			cat = null
 			cat_gone = true
 			return
 	if cat.female and sim.day() - cat.since == 24:
-		sim.story.letter("kittens", "У %s котята!" % cat.name, "%s принесла пятерых котят — в коробке за верстаком. Рабочие ходят смотреть по очереди." % cat.name, "cat", Sim.LVL_GOOD,
-			[{"text": "Раздать работникам", "hint": "Кому-то достанется котёнок — радость"}, {"text": "Отвезти в приют", "hint": ""}], 0, {})
+		sim.story.letter("kittens", L.t("У %s котята!") % cat.shown_name(), L.t("%s принесла пятерых котят — в коробке за верстаком. Рабочие ходят смотреть по очереди.") % cat.shown_name(), "cat", Sim.LVL_GOOD,
+			[{"text": L.t("Раздать работникам"), "hint": L.t("Кому-то достанется котёнок — радость")}, {"text": L.t("Отвезти в приют"), "hint": ""}], 0, {})
 
 
 ## Крысы на складе — если кота нет. Кот их ловит.
@@ -533,7 +534,7 @@ func _rats_week() -> void:
 		if sim.rng.randf() < 0.5:
 			cat.mice += 1
 			if cat.mice % 3 == 1:
-				sim.paper.add("Новости", "%s на страже склада" % cat.title(), "Поймал%s уже %d %s. Крысы обходят завод стороной." % ["а" if cat.female else "", cat.mice, Defs.plural(cat.mice, "крысу", "крысы", "крыс")])
+				sim.paper.add(L.t("Новости"), L.t("%s на страже склада") % cat.title(), Nicks.gendered(L.t("Поймал{|а} уже %d %s. Крысы обходят завод стороной."), cat.female) % [cat.mice, Defs.plural(cat.mice, "крысу", "крысы", "крыс")])
 		return
 	var stor := sim.things_of("storage").size()
 	if stor < 2 or sim.rng.randf() > 0.18:
@@ -548,7 +549,7 @@ func _rats_week() -> void:
 	for w in sim.workers:
 		if w.present:
 			Mood.add(sim, w, "rats")
-	sim.story.info("Крысы на складе", "Погрызли упаковки: пропало расходников — %d ед. Кошка бы помогла." % lost, "thief", Sim.LVL_WARN)
+	sim.story.info(L.t("Крысы на складе"), L.t("Погрызли упаковки: пропало расходников — %d ед. Кошка бы помогла.") % lost, "thief", Sim.LVL_WARN)
 
 
 # ================================================================ отношения с городом
@@ -575,19 +576,19 @@ func _rel_week() -> void:
 	rel = clampf(rel + d, 0.0, 100.0)
 	sim.stats["town_rel"] = maxi(int(sim.stats.get("town_rel", 0)), int(rel))
 	if old < 60.0 and rel >= 60.0:
-		sim.story.info("Город доволен заводом", "Администрация благодарит за рабочие места и заботу о людях. В отделе кадров теперь больше кандидатов.", "town", Sim.LVL_GOOD)
+		sim.story.info(L.t("Город доволен заводом"), L.t("Администрация благодарит за рабочие места и заботу о людях. В отделе кадров теперь больше кандидатов."), "town", Sim.LVL_GOOD)
 	elif old < 75.0 and rel >= 75.0:
-		sim.story.info("Льгота от города", "Совет депутатов утвердил льготу по местным налогам для градообразующего предприятия: налог с выручки на 1% ниже.", "town", Sim.LVL_GOOD, Vector2i(-1, -1), true)
+		sim.story.info(L.t("Льгота от города"), L.t("Совет депутатов утвердил льготу по местным налогам для градообразующего предприятия: налог с выручки на 1% ниже."), "town", Sim.LVL_GOOD, Vector2i(-1, -1), true)
 
 
 func rel_text() -> String:
 	if rel >= 75.0:
-		return "гордится заводом"
+		return L.t("гордится заводом")
 	if rel >= 60.0:
-		return "доволен"
+		return L.t("доволен")
 	if rel >= 35.0:
-		return "присматривается"
-	return "недоволен"
+		return L.t("присматривается")
+	return L.t("недоволен")
 
 
 ## Скидка налога для любимого городом завода.
@@ -619,18 +620,18 @@ func mood_parts(w: Worker) -> Array:
 		var r := sim.rooms.room_of_thing(bed)
 		var lv := sim.upkeep.level(r) if r else 1
 		if lv >= 3:
-			out.append(["Уютное общежитие", 5.0])
+			out.append([L.t("Уютное общежитие"), 5.0])
 		elif lv >= 2:
-			out.append(["Живу в заводском общежитии", 3.0])
+			out.append([L.t("Живу в заводском общежитии"), 3.0])
 		else:
-			out.append(["Общежитие — голые стены", -2.0])
+			out.append([L.t("Общежитие — голые стены"), -2.0])
 	elif w.from_away:
-		out.append(["Негде жить — снимаю угол", -6.0])
+		out.append([L.t("Негде жить — снимаю угол"), -6.0])
 	if w.kids > 0:
 		if has_kg_place(w):
-			out.append(["Ребёнок в заводском садике", 5.0])
+			out.append([L.t("Ребёнок в заводском садике"), 5.0])
 		elif sim.progress.stage >= 3:
-			out.append(["Не с кем оставить ребёнка", -2.0])
+			out.append([L.t("Не с кем оставить ребёнка"), -2.0])
 	return out
 
 

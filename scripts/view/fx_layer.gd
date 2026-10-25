@@ -124,10 +124,10 @@ func _draw_lots() -> void:
 		draw_rect(Rect2(sx - 2, sy - 6, 4, 18), Color("#5a4a3a"))
 		draw_rect(sr, Color("#3a4c3a") if hot else Color("#2c3a2c"))
 		draw_rect(sr, Color("#f0d070") if hot else Color("#d8d4c4"), false, 2.0 if hot else 1.5)
-		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 41), "ПРОДАЁТСЯ", HORIZONTAL_ALIGNMENT_CENTER, bw, 12, Color("#f0d070"))
+		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 41), L.t("ПРОДАЁТСЯ"), HORIZONTAL_ALIGNMENT_CENTER, bw, 12, Color("#f0d070"))
 		var sub := "%s · %d×%d" % [Defs.money_str(float(w.lots[k].get("price", 0))), lr.size.x, lr.size.y]
 		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 25), sub, HORIZONTAL_ALIGNMENT_CENTER, bw, 10, Color("#e7e4d8") if k == nxt else Color("#a8a49a"))
-		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 11), "щёлкните — купить", HORIZONTAL_ALIGNMENT_CENTER, bw, 9, Color("#f0d070") if hot else Color("#8a9a86"))
+		draw_string(fnt, Vector2(sx - bw * 0.5, sy - 11), L.t("щёлкните — купить"), HORIZONTAL_ALIGNMENT_CENTER, bw, 9, Color("#f0d070") if hot else Color("#8a9a86"))
 
 
 ## 1.18: обрыв провода — искры и вспышки; прорыв трубы — фонтанчик брызг.

@@ -55,7 +55,7 @@ static func _brigades(win: GameWindow) -> void:
 	for w in sim.workers:
 		if not w.is_itr() and w.brigade < 0:
 			free.append(w)
-	win._info("бригад %d из %d · без бригады %d чел." % [cr.brigades.size(), Crew.MAX_BRIG, free.size()])
+	win._info(L.t("бригад %d из %d · без бригады %d чел.") % [cr.brigades.size(), Crew.MAX_BRIG, free.size()])
 	win._intro("Бригадир получает +10% к ставке и ускоряет свою бригаду на 3–6% (если работает в ту же смену). Люди берут работу в первую очередь на станках своего участка — меньше беготни по заводу. Дружная бригада работает веселее, склочник в бригаде портит всем настроение.")
 	win._hbtn("Сформировать автоматически", func() -> void:
 		var err := cr.auto_form()
@@ -74,7 +74,7 @@ static func _brigades(win: GameWindow) -> void:
 	ch.add_child(_check("Соцсоревнование", cr.comp_on, func(v: bool) -> void:
 		cr.comp_on = v
 		win.rebuild(true), "По пятницам бригада с наибольшим числом операций на человека получает вымпел: +6 к настроению и +3% к скорости на неделю"))
-	ch.add_child(_check("Премия победителям %s" % Defs.money_str(Crew.PRIZE), cr.comp_prize, func(v: bool) -> void:
+	ch.add_child(_check(L.t("Премия победителям %s") % Defs.money_str(Crew.PRIZE), cr.comp_prize, func(v: bool) -> void:
 		cr.comp_prize = v
 		win.rebuild(true), "Каждому в бригаде-победителе", not cr.comp_on))
 	ch.add_child(UITheme.spacer())
@@ -83,7 +83,7 @@ static func _brigades(win: GameWindow) -> void:
 			var n := cr.members(int(b["id"])).size()
 			var ops := int(cr.comp.get(str(b["id"]), 0))
 			var lead := cr.pennant == int(b["id"])
-			ch.add_child(UITheme.chip("%s%s · %.1f" % ["★ " if lead else "", str(b["name"]), float(ops) / maxf(1.0, float(n))], cr.color(int(b["id"])).lightened(0.2), "%d операций за неделю, %.1f на человека%s" % [ops, float(ops) / maxf(1.0, float(n)), " · вымпел сейчас у них" if lead else ""]))
+			ch.add_child(UITheme.chip("%s%s · %.1f" % ["★ " if lead else "", str(b["name"]), float(ops) / maxf(1.0, float(n))], cr.color(int(b["id"])).lightened(0.2), L.t("%d операций за неделю, %.1f на человека%s") % [ops, float(ops) / maxf(1.0, float(n)), L.t(" · вымпел сейчас у них") if lead else ""]))
 	elif cr.comp_on:
 		ch.add_child(UITheme.label("нужно две бригады и больше", 12, UITheme.MUTED))
 	if cr.brigades.is_empty():
@@ -134,9 +134,9 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 		if name_e.text.strip_edges() != "":
 			b["name"] = name_e.text.strip_edges())
 	h.add_child(name_e)
-	h.add_child(UITheme.chip("%d чел." % ms.size(), UITheme.MUTED))
+	h.add_child(UITheme.chip(L.t("%d чел.") % ms.size(), UITheme.MUTED))
 	if int(b.get("wins", 0)) > 0 or cr.pennant == bid:
-		h.add_child(UITheme.chip("вымпел" + (" ×%d" % int(b["wins"]) if int(b.get("wins", 0)) > 1 else ""), UITheme.GOOD, "Побед в соцсоревновании: %d%s" % [int(b.get("wins", 0)), " · вымпел этой недели у них" if cr.pennant == bid else ""], cr.pennant == bid))
+		h.add_child(UITheme.chip(L.t("вымпел") + (" ×%d" % int(b["wins"]) if int(b.get("wins", 0)) > 1 else ""), UITheme.GOOD, L.t("Побед в соцсоревновании: %d%s") % [int(b.get("wins", 0)), L.t(" · вымпел этой недели у них") if cr.pennant == bid else ""], cr.pennant == bid))
 	h.add_child(UITheme.ghost("×", func() -> void:
 		cr.remove_brigade(bid)
 		win.rebuild(true), "Расформировать: люди останутся на заводе, просто без бригады", UITheme.MUTED))
@@ -155,7 +155,7 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 	var sel := 0
 	for i in ms.size():
 		var w: Worker = ms[i]
-		ob.add_item("%s, %s%s" % [w.call_name(), w.title_lc(), " (2-я смена)" if w.shift == 1 else ""], w.id)
+		ob.add_item("%s, %s%s" % [w.call_name(), w.title_lc(), L.t(" (2-я смена)") if w.shift == 1 else ""], w.id)
 		if int(b["lead"]) == w.id:
 			sel = i + 1
 	ob.select(sel)
@@ -194,9 +194,9 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 		rb.button_pressed = owner == bid
 		if owner >= 0 and owner != bid:
 			rb.modulate = Color(1, 1, 1, 0.5)
-			rb.tooltip_text = "Сейчас за «%s» — нажмите, чтобы забрать" % str(cr.brigade(owner).get("name", ""))
+			rb.tooltip_text = L.t("Сейчас за «%s» — нажмите, чтобы забрать") % str(cr.brigade(owner).get("name", ""))
 		else:
-			rb.tooltip_text = "Закрепить помещение (%d клеток) за бригадой" % room.area() if owner != bid else "Снять закрепление"
+			rb.tooltip_text = L.t("Закрепить помещение (%d клеток) за бригадой") % room.area() if owner != bid else L.t("Снять закрепление")
 		var rr := room
 		rb.pressed.connect(func() -> void:
 			cr.toggle_room(bid, rr)
@@ -216,7 +216,7 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 		var ww := w2
 		var mb := UITheme.small(("★ " if int(b["lead"]) == w2.id else "") + w2.call_name() + "  ×", func() -> void:
 			cr.set_member(ww, -1)
-			win.rebuild(true), "%s, %s. Нажмите, чтобы убрать из бригады" % [w2.full_name(), w2.prof_lc()])
+			win.rebuild(true), L.t("%s, %s. Нажмите, чтобы убрать из бригады") % [w2.full_name(), w2.prof_lc()])
 		# 1.33: маленький портрет рядом с именем
 		var mh := UITheme.hbox(3)
 		var mp := Portrait.new()
@@ -236,7 +236,7 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 		if w3.is_itr() or w3.brigade == bid:
 			continue
 		var cur := cr.brigade(w3.brigade)
-		add.add_item("%s — %s%s" % [w3.call_name(), w3.prof_lc(), (" (из «%s»)" % str(cur["name"])) if not cur.is_empty() else ""], w3.id)
+		add.add_item("%s — %s%s" % [w3.call_name(), w3.prof_lc(), (L.t(" (из «%s»)") % str(cur["name"])) if not cur.is_empty() else ""], w3.id)
 	add.select(0)
 	add.item_selected.connect(func(idx: int) -> void:
 		var wid := add.get_item_id(idx)
@@ -254,7 +254,7 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 	ms_strip.tooltip_text = cr.sched_text(cr.sched_str(sh, bid), sh)
 	ms_strip.mouse_filter = Control.MOUSE_FILTER_STOP
 	foot.add_child(ms_strip)
-	foot.add_child(UITheme.label("свой график" if own else "график %d-й смены" % (sh + 1), 12, UITheme.INFO if own else UITheme.MUTED))
+	foot.add_child(UITheme.label(L.t("свой график") if own else L.t("график %d-й смены") % (sh + 1), 12, UITheme.INFO if own else UITheme.MUTED))
 	foot.add_child(UITheme.spacer())
 	if ms.size() >= 2:
 		var s := 0.0
@@ -319,7 +319,7 @@ static func _schedule(win: GameWindow) -> void:
 	for kind in ["work", "lunch", "break", "meet", "clean"]:
 		var kc := Color(Crew.KIND_COLORS[kind])
 		var b2 := Button.new()
-		b2.text = str(Crew.KIND_NAMES[kind])
+		b2.text = L.t(str(Crew.KIND_NAMES[kind]))
 		b2.toggle_mode = true
 		b2.focus_mode = Control.FOCUS_NONE
 		b2.button_pressed = brush == kind
@@ -356,7 +356,7 @@ static func _schedule(win: GameWindow) -> void:
 		var cb := Button.new()
 		cb.custom_minimum_size = Vector2(cw, 40)
 		cb.focus_mode = Control.FOCUS_NONE
-		cb.tooltip_text = "%s–%s: %s" % [cr.slot_time(shift, i2), cr.slot_time(shift, i2 + 1), str(Crew.KIND_NAMES[kind2])]
+		cb.tooltip_text = "%s–%s: %s" % [cr.slot_time(shift, i2), cr.slot_time(shift, i2 + 1), L.t(str(Crew.KIND_NAMES[kind2]))]
 		var col := Color(Crew.KIND_COLORS[kind2])
 		var edge := UITheme.BG2 if i2 % 4 != 0 else UITheme.TEXT.darkened(0.45)
 		cb.add_theme_stylebox_override("normal", _cell_sb(col, edge))
@@ -369,12 +369,12 @@ static func _schedule(win: GameWindow) -> void:
 		cells.add_child(cb)
 	sv.add_child(cells)
 	var st := UITheme.hbox(8)
-	for it in [["work", _hm(cr.minutes(s, "work"))], ["lunch", "%d мин" % cr.minutes(s, "lunch")], ["break", "%d мин" % cr.minutes(s, "break")],
-			["meet", "%d мин" % cr.minutes(s, "meet")], ["clean", "%d мин" % cr.minutes(s, "clean")]]:
-		st.add_child(UITheme.chip("%s · %s" % [str(Crew.KIND_NAMES[it[0]]).to_lower(), str(it[1])], Color(Crew.KIND_COLORS[it[0]]).lightened(0.25)))
+	for it in [["work", _hm(cr.minutes(s, "work"))], ["lunch", L.t("%d мин") % cr.minutes(s, "lunch")], ["break", L.t("%d мин") % cr.minutes(s, "break")],
+			["meet", L.t("%d мин") % cr.minutes(s, "meet")], ["clean", L.t("%d мин") % cr.minutes(s, "clean")]]:
+		st.add_child(UITheme.chip("%s · %s" % [L.t(str(Crew.KIND_NAMES[it[0]])).to_lower(), str(it[1])], Color(Crew.KIND_COLORS[it[0]]).lightened(0.25)))
 	sv.add_child(st)
 	for p in cr.sched_problems(s):
-		sv.add_child(UITheme.label("⚠ " + p, 13, UITheme.BAD))
+		sv.add_child(UITheme.label("⚠ " + L.t(p), 13, UITheme.BAD))
 	# шаблоны и обзор
 	var g := win._cards(2)
 	var t := win._card_in(g, "Шаблоны")
@@ -395,7 +395,7 @@ static func _schedule(win: GameWindow) -> void:
 	var o := win._card_in(g, "Все графики", "Сравните, чтобы обеды бригад не совпадали: меньше очередей в столовой.")
 	for k2: Array in keys:
 		var kh := UITheme.hbox(8)
-		var kl := UITheme.label(str(k2[1]).split(" · ")[0], 12, UITheme.TEXT if str(k2[0]) == sched_key else UITheme.MUTED)
+		var kl := UITheme.label(L.t(str(k2[1]).split(" · ")[0]), 12, UITheme.TEXT if str(k2[0]) == sched_key else UITheme.MUTED)
 		kl.custom_minimum_size = Vector2(120, 0)
 		kl.clip_text = true
 		kh.add_child(kl)
@@ -416,7 +416,7 @@ static func _cell_sb(col: Color, edge: Color) -> StyleBoxFlat:
 
 
 static func _hm(m: int) -> String:
-	return "%d ч %02d мин" % [int(m / 60), m % 60]
+	return L.t("%d ч %02d мин") % [int(m / 60), m % 60]
 
 
 # ---------------------------------------------------------------- охрана
@@ -436,29 +436,29 @@ static func _security(win: GameWindow) -> void:
 			if r and not rooms.has(r.title()):
 				rooms.append(r.title())
 	var dk := int(round(cr.detect_k() * 100.0))
-	win._info("шанс поймать несуна на выходе: %d%%" % dk)
+	win._info(L.t("шанс поймать несуна на выходе: %d%%") % dk)
 	win._intro("Несуны выносят металл и расходники, уходя со смены. Охранник на проходной ловит больше половины, камеры отпугивают и записывают, а инвентаризация по пятницам показывает, сколько ушло мимо. Охрана ещё и отбивает охоту проносить спиртное.")
 	win._hbtn("Нанять охранника…", func() -> void:
 		GameWindow.ad_prof = "guard"
 		win.select_tab("hire"), "Откроется найм; можно дать объявление на охранника")
 	var g := win._cards(4)
 	g.add_child(UITheme.stat("Проходная", "есть" if cp else "нет", UITheme.GOOD if cp else UITheme.WARN, "" if cp else "Объекты → Безопасность", UITheme.MUTED, "Проходная с турникетами у въезда: люди проходят через турникеты, охранник сидит в будке"))
-	g.add_child(UITheme.stat("Охранники", str(gs.size()), UITheme.TEXT if not gs.is_empty() else UITheme.WARN, "на смене %d" % cr.guards(true).size() if not gs.is_empty() else "наймите в «Найме»"))
-	g.add_child(UITheme.stat("Камеры", "%d / %d" % [on, cams.size()], UITheme.GOOD if on > 0 and on == cams.size() else (UITheme.WARN if cams.size() > on else UITheme.MUTED), "работают / всего", UITheme.MUTED, ("Смотрят: " + ", ".join(PackedStringArray(rooms))) if not rooms.is_empty() else "Камере нужен ток"))
-	g.add_child(UITheme.stat("Задержано", str(cr.caught_total), UITheme.TEXT, "недостача %s" % Defs.money_str(cr.shortage_total), UITheme.BAD if cr.shortage_total > 0 else UITheme.MUTED))
+	g.add_child(UITheme.stat("Охранники", str(gs.size()), UITheme.TEXT if not gs.is_empty() else UITheme.WARN, L.t("на смене %d") % cr.guards(true).size() if not gs.is_empty() else "наймите в «Найме»"))
+	g.add_child(UITheme.stat("Камеры", "%d / %d" % [on, cams.size()], UITheme.GOOD if on > 0 and on == cams.size() else (UITheme.WARN if cams.size() > on else UITheme.MUTED), "работают / всего", UITheme.MUTED, (L.t("Смотрят: %s") % ", ".join(PackedStringArray(rooms))) if not rooms.is_empty() else "Камере нужен ток"))
+	g.add_child(UITheme.stat("Задержано", str(cr.caught_total), UITheme.TEXT, L.t("недостача %s") % Defs.money_str(cr.shortage_total), UITheme.BAD if cr.shortage_total > 0 else UITheme.MUTED))
 	var bar := UITheme.card(10)
 	win.content.add_child(bar)
 	var bh := UITheme.hbox(12)
 	bar.add_child(bh)
-	bh.add_child(_check("Досмотр силами ЧОП · %s в день" % Defs.money_str(Defs.ev("guard_cost_day")), sim.story.guard, func(v: bool) -> void:
+	bh.add_child(_check(L.t("Досмотр силами ЧОП · %s в день") % Defs.money_str(Defs.ev("guard_cost_day")), sim.story.guard, func(v: bool) -> void:
 		sim.story.guard = v
-		win.rebuild(true), "Нанятая охранная фирма досматривает всех на проходной: ловит 85% несунов, но людям неприятно. Работает, только когда в будке охранник на смене" + ("" if cp else ". Нужна проходная."), cp == null))
+		win.rebuild(true), L.t("Нанятая охранная фирма досматривает всех на проходной: ловит 85% несунов, но людям неприятно. Работает, только когда в будке охранник на смене") + ("" if cp else L.t(". Нужна проходная.")), cp == null))
 	bh.add_child(UITheme.spacer())
 	if not cr.missing.is_empty():
 		var mv := 0.0
 		for m: Dictionary in cr.missing:
 			mv += float(m["value"])
-		bh.add_child(UITheme.chip("с инвентаризации пропало на %s" % Defs.money_str(mv), UITheme.WARN, "Подробности — в пятницу, на инвентаризации"))
+		bh.add_child(UITheme.chip(L.t("с инвентаризации пропало на %s") % Defs.money_str(mv), UITheme.WARN, "Подробности — в пятницу, на инвентаризации"))
 	var cols := win._cards(2)
 	var a := win._card_in(cols, "Охранники")
 	if gs.is_empty():
@@ -468,7 +468,7 @@ static func _security(win: GameWindow) -> void:
 		var por := Portrait.new()
 		por.set_look(gd.look, 0.6, {"age": gd.age, "mood": gd.mood})
 		h.add_child(por)
-		var cell := win._cl2(gd.formal_name(), "охрана %d · %s · %s" % [gd.skill("security"), str(Worker.SHIFT_NAMES[gd.shift]).to_lower(), gd.activity])
+		var cell := win._cl2(gd.formal_name(), L.t("охрана %d · %s · %s") % [gd.skill("security"), L.t(str(Worker.SHIFT_NAMES[gd.shift])).to_lower(), L.t(gd.activity)])
 		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		h.add_child(cell)
 		a.add_child(h)
@@ -481,7 +481,7 @@ static func _security(win: GameWindow) -> void:
 		dl.custom_minimum_size = Vector2(70, 0)
 		dl.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		eh.add_child(dl)
-		eh.add_child(UITheme.para(str(e["text"]), 12, UITheme.MUTED))
+		eh.add_child(UITheme.para(L.t(str(e["text"])), 12, UITheme.MUTED))
 		lg.add_child(eh)
 
 
@@ -499,14 +499,14 @@ static func _union(win: GameWindow) -> void:
 		var v0 := UITheme.vbox(8)
 		c.add_child(v0)
 		v0.add_child(UITheme.label("Профсоюза пока нет", 18, UITheme.TEXT, UITheme.f_semi))
-		v0.add_child(UITheme.para("Он появится сам, когда рабочих станет %d и больше — быстрее, если в коллективе есть активист или люди недовольны." % Crew.UNION_MIN, 13))
-		v0.add_child(UITheme.meter(100.0 * n / maxf(1.0, float(Crew.UNION_MIN)), UITheme.INFO, 260, "%d из %d рабочих" % [mini(n, Crew.UNION_MIN), Crew.UNION_MIN]))
+		v0.add_child(UITheme.para(L.t("Он появится сам, когда рабочих станет %d и больше — быстрее, если в коллективе есть активист или люди недовольны.") % Crew.UNION_MIN, 13))
+		v0.add_child(UITheme.meter(100.0 * n / maxf(1.0, float(Crew.UNION_MIN)), UITheme.INFO, 260, L.t("%d из %d рабочих") % [mini(n, Crew.UNION_MIN), Crew.UNION_MIN]))
 		return
 	var lw := cr.union_lead()
 	var st := str(cr.union.get("stance", "neutral"))
 	var stance := {"support": "доволен администрацией", "neutral": "держит нейтралитет", "angry": "недоволен"}
 	var scol := UITheme.GOOD if st == "support" else (UITheme.BAD if st == "angry" else UITheme.MUTED)
-	win._info("профком %s" % str(stance.get(st, st)))
+	win._info(L.t("профком %s") % L.t(str(stance.get(st, st))))
 	var g := win._cards(2)
 	var a := win._card_in(g, "Профком")
 	var h := UITheme.hbox(10)
@@ -517,7 +517,7 @@ static func _union(win: GameWindow) -> void:
 	var v := UITheme.vbox(2)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	v.add_child(UITheme.label(lw.full_name() if lw else "председатель не выбран", 15, UITheme.TEXT, UITheme.f_semi))
-	v.add_child(UITheme.label("председатель · с дня %d" % int(cr.union.get("since", 0)), 12, UITheme.MUTED))
+	v.add_child(UITheme.label(L.t("председатель · с дня %d") % int(cr.union.get("since", 0)), 12, UITheme.MUTED))
 	v.add_child(UITheme.chip(str(stance.get(st, st)), scol))
 	h.add_child(v)
 	a.add_child(h)
@@ -527,7 +527,7 @@ static func _union(win: GameWindow) -> void:
 	oh.add_child(UITheme.chip("есть" if office else "нет", UITheme.GOOD if office else UITheme.WARN, "Председатель там работает — профком спокойнее" if office else "Помещение со столом ИТР и доской профкома (Объекты → Офис), назначьте «Профком»"))
 	a.add_child(oh)
 	var pat := cr.strike_patience()
-	a.add_child(UITheme.para("До забастовки люди терпят на %d %s %s обычного; перед забастовкой профком предупредит письмом." % [absi(pat), Defs.plural(absi(pat), "день", "дня", "дней"), "дольше" if pat >= 0 else "меньше"], 12, UITheme.INFO))
+	a.add_child(UITheme.para(L.t("До забастовки люди терпят на %d %s %s обычного; перед забастовкой профком предупредит письмом.") % [absi(pat), Defs.plural(absi(pat), "день", "дня", "дней"), L.t("дольше") if pat >= 0 else L.t("меньше")], 12, UITheme.INFO))
 	var offer: Array = cr.union.get("offer", [])
 	if not offer.is_empty():
 		var b := win._card_in(g, "Проект колдоговора", "Отметьте пункты, на которые согласны. Три и больше — профком доволен; меньше двух — будет недоволен.")
@@ -541,7 +541,7 @@ static func _union(win: GameWindow) -> void:
 			m.add_theme_constant_override("margin_left", 28)
 			m.add_child(dl)
 			b.add_child(m)
-		var sb := UITheme.primary("Подписать на %d дней" % Crew.KD_DAYS, func() -> void:
+		var sb := UITheme.primary(L.t("Подписать на %d дней") % Crew.KD_DAYS, func() -> void:
 			var sel: Array = []
 			for k2 in offer:
 				if bool(kd_pick.get(str(k2), true)):
@@ -555,7 +555,7 @@ static func _union(win: GameWindow) -> void:
 		b.add_child(sb)
 	elif cr.signed():
 		var until := int(cr.union["signed"]) + Crew.KD_DAYS
-		var b2 := win._card_in(g, "Колдоговор до дня %d" % until)
+		var b2 := win._card_in(g, L.t("Колдоговор до дня %d") % until)
 		var broken: Dictionary = cr.union.get("broken", {})
 		for k3 in (cr.union.get("clauses", {}) as Dictionary).keys():
 			var bd := -1
@@ -570,13 +570,13 @@ static func _union(win: GameWindow) -> void:
 			nl.mouse_filter = Control.MOUSE_FILTER_STOP
 			rh.add_child(nl)
 			if not ok:
-				rh.add_child(UITheme.chip("нарушен в день %d" % bd, UITheme.BAD))
+				rh.add_child(UITheme.chip(L.t("нарушен в день %d") % bd, UITheme.BAD))
 			b2.add_child(rh)
 		if (cr.union.get("clauses", {}) as Dictionary).is_empty():
 			b2.add_child(UITheme.para("Договор подписан без единого пункта — профком недоволен.", 13, UITheme.WARN))
 	else:
 		var b3 := win._card_in(g, "Колдоговор")
-		b3.add_child(UITheme.para("Профком готовит проект (с дня %d). Как будет готов — придёт письмо." % int(cr.union.get("talk", sim.day())), 13))
+		b3.add_child(UITheme.para(L.t("Профком готовит проект (с дня %d). Как будет готов — придёт письмо.") % int(cr.union.get("talk", sim.day())), 13))
 
 
 # ---------------------------------------------------------------- Н-1 для «Охраны труда»
@@ -584,9 +584,9 @@ static func _union(win: GameWindow) -> void:
 static func n1_section(win: GameWindow, parent: Control = null) -> void:
 	var sim := win.sim
 	var cr := sim.crew
-	var v := win._card_in(parent if parent else win.content, "Акты Н-1", "После каждой травмы комиссия за %d рабочих дня расследует причины и составляет акт Н-1. Причины по вине предприятия — компенсация пострадавшему и штраф трудовой инспекции; табло «Дней без травм» снижает травмы на 5%%." % Crew.N1_DAYS)
+	var v := win._card_in(parent if parent else win.content, "Акты Н-1", L.t("После каждой травмы комиссия за %d рабочих дня расследует причины и составляет акт Н-1. Причины по вине предприятия — компенсация пострадавшему и штраф трудовой инспекции; табло «Дней без травм» снижает травмы на 5%%.") % Crew.N1_DAYS)
 	var sd := cr.safe_days()
-	v.add_child(UITheme.label("%d %s без травм" % [sd, Defs.plural(sd, "день", "дня", "дней")], 18, UITheme.GOOD if sd >= 30 else UITheme.TEXT, UITheme.f_semi))
+	v.add_child(UITheme.label(L.t("%d %s без травм") % [sd, Defs.plural(sd, "день", "дня", "дней")], 18, UITheme.GOOD if sd >= 30 else UITheme.TEXT, UITheme.f_semi))
 	if cr.cases.is_empty():
 		v.add_child(UITheme.para("Несчастных случаев не было.", 13))
 		return
@@ -604,11 +604,11 @@ static func n1_section(win: GameWindow, parent: Control = null) -> void:
 			"hidden":
 				status = "не оформлен"
 			_:
-				status = str(c.get("verdict", ""))
+				status = L.t(str(c.get("verdict", "")))
 				if float(c.get("fine", 0.0)) > 0.0:
-					status += ", штраф " + Defs.money_str(float(c["fine"]))
+					status += L.t(", штраф %s") % Defs.money_str(float(c["fine"]))
 		var h := UITheme.hbox(8)
-		var cell := win._cl2("День %d · %s (%s)" % [int(c["day"]), str(c["name"]), str(c["prof"]).to_lower()], "; ".join(PackedStringArray(causes)), UITheme.TEXT, UITheme.MUTED, 13)
+		var cell := win._cl2(L.t("День %d · %s (%s)") % [int(c["day"]), L.name(str(c["name"])), L.t(str(c["prof"])).to_lower()], "; ".join(PackedStringArray(causes)), UITheme.TEXT, UITheme.MUTED, 13)
 		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		h.add_child(cell)
 		h.add_child(UITheme.chip(status, UITheme.WARN if st in ["open", "act", "hidden"] else UITheme.MUTED))

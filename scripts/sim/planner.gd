@@ -179,8 +179,8 @@ func _check_materials() -> void:
 			var err := sim.order_material(mat, maxi(5, d + maxi(1, int(ceil(maxf(0.0, material_deficit(mat)) * 0.12)))), true)
 			if err == "":
 				continue
-			sim.notify_once("auto_" + mat, "Снабженец не смог докупить металл: " + err, Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
-		sim.notify_once("mat_" + mat, "Металла «%s» не хватает на заказы: нужно ещё %d шт., а снабжению не хватает денег." % [Defs.material_name(mat), d], Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
+			sim.notify_once("auto_" + mat, L.t("Снабженец не смог докупить металл: ") + err, Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
+		sim.notify_once("mat_" + mat, L.t("Металла «%s» не хватает на заказы: нужно ещё %d шт., а снабжению не хватает денег.") % [Defs.material_name(mat), d], Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
 
 
 ## Запас металла сверх заказов (настройка «Запас» в «Производство → Металл и расходники»): только для металла,
@@ -189,8 +189,10 @@ func reserve_extra(mat: String) -> int:
 	if sim.supply_reserve <= 0:
 		return 0
 	var used := false
+	var avail := sim.prod.processes_available()
 	for p in sim.progress.products():
-		if material_of(str(p)) == mat:
+		# 1.39: запас — только под то, что завод уже может сделать (в гараже не копим поковки под фрезерный)
+		if material_of(str(p)) == mat and sim.prod.can_make(str(p), avail):
 			used = true
 			break
 	if not used:
@@ -235,7 +237,7 @@ func _check_cons() -> void:
 			var err := sim.order_cons(str(c), 1)
 			if err == "":
 				continue
-		sim.notify_once("cons_" + str(c), "Заканчивается %s (осталось на %d операций), а на покупку не хватает денег." % [str(cd["short"]), int(stock)], Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
+		sim.notify_once("cons_" + str(c), L.t("Заканчивается %s (осталось на %d операций), а на покупку не хватает денег.") % [L.dt("consumable.%s.short" % c, str(cd["short"])), int(stock)], Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
 	# СИЗ: если есть шкаф, держим запас на тех, у кого комплект скоро износится
 	if not sim.eng.cabinets().is_empty() and sim.auto_supply and not sim.cons_on_way("ppe"):
 		var need := 0
@@ -255,7 +257,7 @@ func _check_construction() -> void:
 	if not sim.is_work_time():
 		return
 	if sim.minute - sim.bp_progress_at > 300.0:
-		sim.notify_once("bp_idle", "Стройка стоит: все заняты производством. Наймите разнорабочего в разделе «Люди → Найм».", Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("bp_idle", L.t("Стройка стоит: все заняты производством. Наймите разнорабочего в разделе «Люди → Найм»."), Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
 
 
 # ---------------------------------------------------------------- станки
@@ -288,7 +290,7 @@ func staffed(m: Thing) -> bool:
 		return false
 	if not sim.power.powered(m):
 		if not sim.power.connected(m):
-			sim.notify_once("nopower%d" % m.id, "%s не подключён к электросети: заведите кабель от подстанции в клетку его розетки (меню «Сети»)." % m.title(), Sim.LVL_WARN, m.cell, 720.0)
+			sim.notify_once("nopower%d" % m.id, L.t("%s не подключён к электросети: заведите кабель от подстанции в клетку его розетки (меню «Сети»).") % m.title(), Sim.LVL_WARN, m.cell, 720.0)
 		return false
 	var pr := m.process()
 	var ops := 0
@@ -386,12 +388,12 @@ func _assign(m: Thing) -> void:
 			if not m.fits_part(ps):
 				# 1.16: деталь не влезает на этот станок; если на заводе нет станка побольше — сказать
 				if not Production.size_ok(ps, pr, sim.prod.processes_available()):
-					sim.notify_once("size_%s_%d" % [ps, i], "«%s» — %s деталь: для операции «%s» нужен станок под %s детали. Такие есть в меню «Объекты»." % [Defs.product_name(ps), Defs.SIZE_ONE[Defs.product_rank(ps)], Defs.process_name(pr), Defs.SIZE_PL[Defs.product_rank(ps)]], Sim.LVL_WARN, m.cell, 1440.0)
+					sim.notify_once("size_%s_%d" % [ps, i], L.t("«%s» — %s деталь: для операции «%s» нужен станок под %s детали. Такие есть в меню «Объекты».") % [Defs.product_name(ps), L.t(Defs.SIZE_ONE[Defs.product_rank(ps)]), Defs.process_name(pr), L.t(Defs.SIZE_PL[Defs.product_rank(ps)])], Sim.LVL_WARN, m.cell, 1440.0)
 				continue
 			s -= 40.0 * float(m.part_rank() - Defs.product_rank(ps))   # 1.16: крупный станок — сначала под крупные детали
 			var sk := int(rt[i].get("skill", 1))
 			if not _someone_can(pr, sk):
-				sim.notify_once("skill_%s_%d" % [ps, i], "Некому выполнить операцию «%s» для «%s»: нужен работник с навыком от %d." % [Defs.process_name(pr), Defs.product_name(ps), sk], Sim.LVL_WARN, m.cell, 720.0)
+				sim.notify_once("skill_%s_%d" % [ps, i], L.t("Некому выполнить операцию «%s» для «%s»: нужен работник с навыком от %d.") % [Defs.process_name(pr), Defs.product_name(ps), sk], Sim.LVL_WARN, m.cell, 720.0)
 				continue
 			if s > best_s:
 				best_s = s

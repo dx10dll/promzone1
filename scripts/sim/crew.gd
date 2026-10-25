@@ -216,11 +216,11 @@ func sched_problems(s: String) -> Array[String]:
 	var out: Array[String] = []
 	var lm := minutes(s, "lunch")
 	if lm < 30:
-		out.append("Обед меньше 30 минут — нарушение трудового кодекса, трудовая инспекция оштрафует")
+		out.append(L.t("Обед меньше 30 минут — нарушение трудового кодекса, трудовая инспекция оштрафует"))
 	elif lm > 120:
-		out.append("Обед больше двух часов — так нельзя по трудовому кодексу")
+		out.append(L.t("Обед больше двух часов — так нельзя по трудовому кодексу"))
 	if minutes(s, "work") < 360:
-		out.append("Работы меньше 6 часов — выпуск заметно упадёт")
+		out.append(L.t("Работы меньше 6 часов — выпуск заметно упадёт"))
 	return out
 
 
@@ -242,9 +242,9 @@ func sched_text(s: String, shift: int) -> String:
 			j += 1
 		if c != "w":
 			var kind := str(CODES.get(c, "work"))
-			parts.append("%s %s–%s" % [str(KIND_NAMES[kind]).to_lower(), slot_time(shift, i), slot_time(shift, j)])
+			parts.append("%s %s–%s" % [L.t(str(KIND_NAMES[kind])).to_lower(), slot_time(shift, i), slot_time(shift, j)])
 		i = j
-	return " · ".join(parts) if not parts.is_empty() else "без перерывов"
+	return " · ".join(parts) if not parts.is_empty() else L.t("без перерывов")
 
 
 ## Есть ли у кого-то из работающих график без нормального обеда.
@@ -328,7 +328,7 @@ func add_brigade(name: String = "") -> Dictionary:
 	var col := 0
 	while used.has(col) and col < BRIG_COLORS.size() - 1:
 		col += 1
-	var b := {"id": nid, "name": name if name != "" else "Бригада №%d" % nid, "lead": -1, "cells": [], "strict": false,
+	var b := {"id": nid, "name": name if name != "" else L.t("Бригада №%d") % nid, "lead": -1, "cells": [], "strict": false,
 		"sched": "", "wins": 0, "col": col}
 	brigades.append(b)
 	return b
@@ -364,7 +364,7 @@ func set_member(w: Worker, bid: int) -> void:
 	w.brigade = bid
 	if bid >= 0:
 		var b := brigade(bid)
-		w.add_history(sim.day(), Nicks.gendered("Переведен{|а} в «%s»", w.female) % str(b.get("name", "")))
+		w.add_history(sim.day(), Nicks.gendered(L.t("Переведен{|а} в «%s»"), w.female) % str(b.get("name", "")))
 
 
 func set_lead(bid: int, wid: int) -> void:
@@ -379,7 +379,7 @@ func set_lead(bid: int, wid: int) -> void:
 		if w.brigade != bid:
 			w.brigade = bid
 		Mood.add(sim, w, "brigadier")
-		w.add_history(sim.day(), Nicks.gendered("Назначен{|а} бригадиром: «%s»", w.female) % str(b["name"]))
+		w.add_history(sim.day(), Nicks.gendered(L.t("Назначен{|а} бригадиром: «%s»"), w.female) % str(b["name"]))
 		Mood.refresh(sim, w)
 
 
@@ -535,7 +535,7 @@ func auto_form() -> String:
 		if not w.is_itr() and w.prof not in ["guard", "cleaner"]:
 			staff.append(w)
 	if staff.size() < 2:
-		return "Мало рабочих для бригад: нужно хотя бы двое"
+		return L.t("Мало рабочих для бригад: нужно хотя бы двое")
 	for b0: Dictionary in brigades.duplicate():
 		remove_brigade(int(b0["id"]))
 	_next_brig = 1
@@ -548,7 +548,7 @@ func auto_form() -> String:
 	var made: Array = []
 	for sh: Array in shops.slice(0, MAX_BRIG):
 		var r: Rooms.Room = sh[0]
-		var b := add_brigade("Бригада №%d" % (made.size() + 1))
+		var b := add_brigade(L.t("Бригада №%d") % (made.size() + 1))
 		toggle_room(int(b["id"]), r)
 		made.append([b, sh[2]])
 	var rest: Array[Worker] = []
@@ -577,7 +577,7 @@ func auto_form() -> String:
 			remove_brigade(bid)
 		else:
 			_pick_lead(bid)
-	sim.notify("Бригады сформированы: %d. Бригадиры получают +10%% к ставке." % brigades.size(), Sim.LVL_GOOD)
+	sim.notify(L.t("Бригады сформированы: %d. Бригадиры получают +10%% к ставке.") % brigades.size(), Sim.LVL_GOOD)
 	return ""
 
 
@@ -665,12 +665,12 @@ func _competition() -> void:
 		sim.spend(sum, "Премия бригаде-победителю соцсоревнования")
 		for w2 in ms:
 			Mood.add(sim, w2, "bonus")
-		prize = " Премия по %s каждому." % Defs.money_str(PRIZE)
+		prize = L.t(" Премия по %s каждому.") % Defs.money_str(PRIZE)
 	var ld := lead_of(pennant)
-	sim.notify("Соцсоревнование: вымпел недели у «%s» — %d операций на человека.%s" % [str(win["name"]), int(round(float(cands[0][1]))), prize], Sim.LVL_GOOD)
-	sim.paper.add("Соцсоревнование", "Вымпел — «%s»!" % str(win["name"]),
-		"По итогам недели лучшая бригада — «%s»%s: %d операций. Отстающим — равняться на передовиков!" % [str(win["name"]),
-		(" бригадира %s" % ld.full_name()) if ld else "", int(cands[0][2])])
+	sim.notify(L.t("Соцсоревнование: вымпел недели у «%s» — %d операций на человека.%s") % [str(win["name"]), int(round(float(cands[0][1]))), prize], Sim.LVL_GOOD)
+	sim.paper.add(L.t("Соцсоревнование"), L.t("Вымпел — «%s»!") % str(win["name"]),
+		L.t("По итогам недели лучшая бригада — «%s»%s: %d операций. Отстающим — равняться на передовиков!") % [str(win["name"]),
+		(L.t(" бригадира %s") % ld.full_name()) if ld else "", int(cands[0][2])])
 
 
 # ================================================================ охрана и несуны
@@ -874,22 +874,22 @@ func _caught(w: Worker, lt: Dictionary, by_cam: bool) -> void:
 	if not gs.is_empty():
 		g = gs[0]
 		g.week_score += 3
-	var what := "%s (%d шт.)" % [str(lt["what"]), int(lt["n"])] if str(lt.get("kind", "")) == "mat" else str(lt["what"])
+	var what := L.t("%s (%d шт.)") % [str(lt["what"]), int(lt["n"])] if str(lt.get("kind", "")) == "mat" else str(lt["what"])
 	var text := ""
 	if by_cam:
-		text = Nicks.gendered("На записи камеры видно, как %s выносит со склада %s. Вещи уже не вернуть, но человек известен.", w.female) % [w.full_name(), what]
+		text = Nicks.gendered(L.t("На записи камеры видно, как %s выносит со склада %s. Вещи уже не вернуть, но человек известен."), w.female) % [w.full_name(), what]
 	else:
-		text = Nicks.gendered("На проходной у %s нашли %s. %s", w.female) % [w.full_name(), what,
-			("Задержал охранник %s, металл вернули на склад." % g.full_name()) if g else "Досмотр сделал своё дело, металл вернули на склад."]
-	text += "\nЧто будем делать?"
-	w.add_history(sim.day(), Nicks.gendered("Пойман{|а} на краже: %s", w.female) % what)
+		text = Nicks.gendered(L.t("На проходной у %s нашли %s. %s"), w.female) % [w.full_name(), what,
+			(L.t("Задержал охранник %s, металл вернули на склад.") % g.full_name()) if g else L.t("Досмотр сделал своё дело, металл вернули на склад.")]
+	text += L.t("\nЧто будем делать?")
+	w.add_history(sim.day(), Nicks.gendered(L.t("Пойман{|а} на краже: %s"), w.female) % what)
 	w.set_meta("caught_theft", int(w.get_meta("caught_theft", 0)) + 1)
-	_log(Nicks.gendered("Задержан{|а} %s: %s%s", w.female) % [w.full_name(), what, " (по записи камеры)" if by_cam else ""])
-	sim.story.letter("thief", "Задержан несун" if not by_cam else "Камера записала кражу", text, "thief", Sim.LVL_WARN, [
-		{"text": "Выговор", "hint": "Запишем в личное дело. Попадётся снова — разговор будет другой"},
-		{"text": "Лишить премии (−3 000 ₽)", "hint": "Вычтем из зарплаты за неделю"},
-		{"text": "Уволить по статье", "hint": "Честные одобрят, друзья обидятся"},
-		{"text": "Простить", "hint": "Станет смелее — украдёт снова"}], 0, {"wid": w.id})
+	_log(Nicks.gendered(L.t("Задержан{|а} %s: %s%s"), w.female) % [w.full_name(), what, L.t(" (по записи камеры)") if by_cam else ""])
+	sim.story.letter("thief", L.t("Задержан несун") if not by_cam else L.t("Камера записала кражу"), text, "thief", Sim.LVL_WARN, [
+		{"text": L.t("Выговор"), "hint": L.t("Запишем в личное дело. Попадётся снова — разговор будет другой")},
+		{"text": L.t("Лишить премии (−3 000 ₽)"), "hint": L.t("Вычтем из зарплаты за неделю")},
+		{"text": L.t("Уволить по статье"), "hint": L.t("Честные одобрят, друзья обидятся")},
+		{"text": L.t("Простить"), "hint": L.t("Станет смелее — украдёт снова")}], 0, {"wid": w.id})
 
 
 func _res_thief(d: Dictionary, choice: int) -> void:
@@ -900,13 +900,13 @@ func _res_thief(d: Dictionary, choice: int) -> void:
 		0:
 			Mood.add(sim, w, "reprimand")
 			w.set_meta("thief_k", float(w.get_meta("thief_k", 1.0)) * 0.7)
-			w.add_history(sim.day(), "Выговор за кражу")
+			w.add_history(sim.day(), L.t("Выговор за кражу"))
 		1:
 			var due := float(w.get_meta("wage_due", 0.0))
 			w.set_meta("wage_due", maxf(0.0, due - 3000.0))
 			Mood.add(sim, w, "fined")
 			w.set_meta("thief_k", float(w.get_meta("thief_k", 1.0)) * 0.5)
-			w.add_history(sim.day(), "Лишён премии за кражу" if not w.female else "Лишена премии за кражу")
+			w.add_history(sim.day(), L.t("Лишён премии за кражу") if not w.female else L.t("Лишена премии за кражу"))
 		2:
 			w.set_meta("fire_reason", "theft")
 			for o in sim.workers:
@@ -917,7 +917,7 @@ func _res_thief(d: Dictionary, choice: int) -> void:
 				elif not Mood.has_trait(o, "thief"):
 					Mood.add(sim, o, "thief_fired")
 			sim.fire(w)
-			_log("%s уволен по статье за кражу" % w.full_name())
+			_log(L.t("%s уволен по статье за кражу") % w.full_name())
 		3:
 			Mood.add(sim, w, "forgiven")
 			w.set_meta("thief_k", float(w.get_meta("thief_k", 1.0)) * 1.5)
@@ -936,17 +936,17 @@ func _inventory() -> void:
 		if bool(m.get("cam", false)):
 			seen_cam.append(m)
 	missing.clear()
-	_log("Инвентаризация: недостача %s" % Defs.money_str(total))
+	_log(L.t("Инвентаризация: недостача %s") % Defs.money_str(total))
 	var who := ""
 	if not seen_cam.is_empty():
 		var m0: Dictionary = seen_cam[0]
 		var w := sim.get_worker(int(m0["wid"]))
 		if w:
 			_caught(w, {"what": m0["what"], "n": m0["n"], "kind": "mat"}, true)
-			who = " Запись с камеры выдала одного из несунов."
-	sim.notify("Инвентаризация: недостача на %s — %s.%s%s" % [Defs.money_str(total), ", ".join(PackedStringArray(parts.slice(0, 4))), who,
-		"" if on_watch() or search_on() else " Наймите охранника на проходную и поставьте камеры на склад."], Sim.LVL_WARN)
-	sim.paper.add("Происшествия", "Недостача на складе", "Инвентаризация показала недостачу на %s. Товарищи, металл — не дачный забор!" % Defs.money_str(total))
+			who = L.t(" Запись с камеры выдала одного из несунов.")
+	sim.notify(L.t("Инвентаризация: недостача на %s — %s.%s%s") % [Defs.money_str(total), ", ".join(PackedStringArray(parts.slice(0, 4))), who,
+		"" if on_watch() or search_on() else L.t(" Наймите охранника на проходную и поставьте камеры на склад.")], Sim.LVL_WARN)
+	sim.paper.add(L.t("Происшествия"), L.t("Недостача на складе"), L.t("Инвентаризация показала недостачу на %s. Товарищи, металл — не дачный забор!") % Defs.money_str(total))
 
 
 ## Посторонние лезут на склад (событие «кража»): охрана и камеры могут спугнуть.
@@ -961,8 +961,8 @@ func stop_outside_theft() -> bool:
 				p += 0.2
 				break
 	if sim.rng.randf() < p:
-		sim.story.info("Охрана спугнула вора", "Чужой лез через забор к складу, но охранник%s заметил его вовремя. Металл на месте." % (" по камере" if not on_watch() else ""), "thief", Sim.LVL_GOOD)
-		_log("Спугнули постороннего у склада")
+		sim.story.info(L.t("Охрана спугнула вора"), L.t("Чужой лез через забор к складу, но охранник%s заметил его вовремя. Металл на месте.") % (L.t(" по камере") if not on_watch() else ""), "thief", Sim.LVL_GOOD)
+		_log(L.t("Спугнули постороннего у склада"))
 		return true
 	return false
 
@@ -1042,12 +1042,12 @@ func _union_check() -> void:
 				lead = w2
 	if lead == null:
 		return
-	sim.story.letter("union_form", "Рабочие создают профсоюз",
-		Nicks.gendered("%s собрал{|а} подписи: коллектив хочет создать первичную профсоюзную организацию. Профком будет вести переговоры о коллективном договоре, следить за охраной труда и заранее предупреждать о забастовках. Нужна комната под профком (стол и доска объявлений).", lead.female) % lead.full_name(),
+	sim.story.letter("union_form", L.t("Рабочие создают профсоюз"),
+		Nicks.gendered(L.t("%s собрал{|а} подписи: коллектив хочет создать первичную профсоюзную организацию. Профком будет вести переговоры о коллективном договоре, следить за охраной труда и заранее предупреждать о забастовках. Нужна комната под профком (стол и доска объявлений)."), lead.female) % lead.full_name(),
 		"handshake", Sim.LVL_INFO, [
-			{"text": "Поддержать", "hint": "Люди оценят. Через пару дней профком предложит колдоговор"},
-			{"text": "Не мешать", "hint": "Профсоюз будет, но без особой теплоты"},
-			{"text": "Отговорить", "hint": "Обидятся; могут пожаловаться в трудовую инспекцию"}], 0, {"lead": lead.id})
+			{"text": L.t("Поддержать"), "hint": L.t("Люди оценят. Через пару дней профком предложит колдоговор")},
+			{"text": L.t("Не мешать"), "hint": L.t("Профсоюз будет, но без особой теплоты")},
+			{"text": L.t("Отговорить"), "hint": L.t("Обидятся; могут пожаловаться в трудовую инспекцию")}], 0, {"lead": lead.id})
 
 
 func _res_union_form(d: Dictionary, choice: int) -> void:
@@ -1062,9 +1062,9 @@ func _res_union_form(d: Dictionary, choice: int) -> void:
 						Mood.add(sim, w, "union_ok")
 			var lw := sim.get_worker(lead)
 			if lw:
-				lw.add_history(sim.day(), Nicks.gendered("Избран{|а} председателем профкома", lw.female))
-			sim.notify("Создан профсоюз. Председатель профкома — %s. Вкладка «Бригады → Профсоюз»." % (lw.full_name() if lw else "—"), Sim.LVL_GOOD)
-			sim.paper.add("Профсоюзная жизнь", "У нас есть профком!", "Создана первичная профсоюзная организация. Взносы — 1%% от зарплаты, путёвки и материальная помощь — по заявлениям. Председатель — %s." % (lw.full_name() if lw else "—"))
+				lw.add_history(sim.day(), Nicks.gendered(L.t("Избран{|а} председателем профкома"), lw.female))
+			sim.notify(L.t("Создан профсоюз. Председатель профкома — %s. Вкладка «Бригады → Профсоюз».") % (lw.full_name() if lw else "—"), Sim.LVL_GOOD)
+			sim.paper.add(L.t("Профсоюзная жизнь"), L.t("У нас есть профком!"), L.t("Создана первичная профсоюзная организация. Взносы — 1%% от зарплаты, путёвки и материальная помощь — по заявлениям. Председатель — %s.") % (lw.full_name() if lw else "—"))
 		2:
 			union_cd = sim.day() + 45
 			for w in sim.workers:
@@ -1072,7 +1072,7 @@ func _res_union_form(d: Dictionary, choice: int) -> void:
 					Mood.add(sim, w, "union_denied")
 			if sim.rng.randf() < 0.4:
 				sim.inspect.schedule("labor", sim.minute + sim.rng.randf_range(2.0, 6.0) * 1440.0, false, "жалоба рабочих")
-				sim.notify("Рабочие пожаловались в трудовую инспекцию: препятствуют созданию профсоюза.", Sim.LVL_BAD)
+				sim.notify(L.t("Рабочие пожаловались в трудовую инспекцию: препятствуют созданию профсоюза."), Sim.LVL_BAD)
 
 
 func _union_daily() -> void:
@@ -1094,12 +1094,12 @@ func _union_daily() -> void:
 		union["offer_day"] = sim.day()
 		var names: Array[String] = []
 		for k2 in offer:
-			names.append("• " + str(CLAUSES[k2]["name"]))
-		sim.story.info("Профком предлагает колдоговор",
-			"Профком подготовил проект коллективного договора:\n%s\nОтметьте пункты, на которые согласны, и подпишите во вкладке «Бригады → Профсоюз». Чем больше пунктов — тем довольнее люди." % "\n".join(PackedStringArray(names)),
+			names.append("• " + L.t(str(CLAUSES[k2]["name"])))
+		sim.story.info(L.t("Профком предлагает колдоговор"),
+			L.t("Профком подготовил проект коллективного договора:\n%s\nОтметьте пункты, на которые согласны, и подпишите во вкладке «Бригады → Профсоюз». Чем больше пунктов — тем довольнее люди.") % "\n".join(PackedStringArray(names)),
 			"handshake", Sim.LVL_INFO, Vector2i(-1, -1), true)
 	elif not (union.get("offer", []) as Array).is_empty() and sim.day() == int(union.get("offer_day", 0)) + 10:
-		sim.notify("Профком ждёт подписи колдоговора уже десять дней. Люди начинают роптать.", Sim.LVL_WARN)
+		sim.notify(L.t("Профком ждёт подписи колдоговора уже десять дней. Люди начинают роптать."), Sim.LVL_WARN)
 		union["stance"] = "angry" if str(union.get("stance", "")) != "support" else "neutral"
 	# соблюдение колдоговора
 	if signed():
@@ -1134,7 +1134,7 @@ func _union_daily() -> void:
 	elif int(union.get("signed", -1)) >= 0 and sim.day() == int(union["signed"]) + KD_DAYS:
 		union["talk"] = sim.day() + 1
 		union["clauses"] = {}
-		sim.notify("Срок колдоговора истёк — профком готовит новый.", Sim.LVL_INFO)
+		sim.notify(L.t("Срок колдоговора истёк — профком готовит новый."), Sim.LVL_INFO)
 
 
 func _break_clause(k: String) -> void:
@@ -1144,7 +1144,7 @@ func _break_clause(k: String) -> void:
 	for w in sim.workers:
 		if not w.is_itr():
 			Mood.add(sim, w, "kd_broken")
-	sim.story.info("Нарушен колдоговор", "Профком фиксирует нарушение: «%s». Люди недовольны, до забастовки теперь ближе." % str(CLAUSES[k]["name"]),
+	sim.story.info(L.t("Нарушен колдоговор"), L.t("Профком фиксирует нарушение: «%s». Люди недовольны, до забастовки теперь ближе.") % L.t(str(CLAUSES[k]["name"])),
 		"strike", Sim.LVL_BAD)
 
 
@@ -1170,16 +1170,16 @@ func _new_union_lead() -> void:
 			best = w
 	union["lead"] = best.id if best else -1
 	if best:
-		sim.notify("Новый председатель профкома — %s." % best.full_name(), Sim.LVL_INFO)
+		sim.notify(L.t("Новый председатель профкома — %s.") % best.full_name(), Sim.LVL_INFO)
 
 
 ## Подписать колдоговор с выбранными пунктами.
 func sign(selected: Array) -> String:
 	if not union_on():
-		return "Профсоюза нет"
+		return L.t("Профсоюза нет")
 	var offer: Array = union.get("offer", [])
 	if offer.is_empty():
-		return "Профком пока не предлагал договор"
+		return L.t("Профком пока не предлагал договор")
 	var cl := {}
 	for k in selected:
 		if offer.has(k):
@@ -1199,9 +1199,9 @@ func sign(selected: Array) -> String:
 	for w2 in sim.workers:
 		if not w2.is_itr():
 			Mood.add(sim, w2, "kd_kept" if happy else "kd_broken")
-	sim.notify("Коллективный договор подписан: %d %s из %d. %s" % [cl.size(), Defs.plural(cl.size(), "пункт", "пункта", "пунктов"), offer.size(),
-		"Профком доволен." if happy else "Профком недоволен: мало пунктов."], Sim.LVL_GOOD if happy else Sim.LVL_WARN)
-	sim.paper.add("Профсоюзная жизнь", "Подписан коллективный договор", "Администрация и профком подписали коллективный договор на %d дней: %d %s." % [KD_DAYS, cl.size(), Defs.plural(cl.size(), "пункт", "пункта", "пунктов")])
+	sim.notify(L.t("Коллективный договор подписан: %d %s из %d. %s") % [cl.size(), Defs.plural(cl.size(), "пункт", "пункта", "пунктов"), offer.size(),
+		L.t("Профком доволен.") if happy else L.t("Профком недоволен: мало пунктов.")], Sim.LVL_GOOD if happy else Sim.LVL_WARN)
+	sim.paper.add(L.t("Профсоюзная жизнь"), L.t("Подписан коллективный договор"), L.t("Администрация и профком подписали коллективный договор на %d дней: %d %s.") % [KD_DAYS, cl.size(), Defs.plural(cl.size(), "пункт", "пункта", "пунктов")])
 	return ""
 
 
@@ -1230,12 +1230,12 @@ func strike_warning(avg: float) -> bool:
 		return false
 	union["warned"] = sim.day()
 	var lw := union_lead()
-	sim.story.letter("union_warn", "Профком предупреждает о забастовке",
-		"%s от имени профкома: настроение в коллективе %d из 100, люди готовы бросить станки. Профком просит принять меры — иначе через пару дней забастовка." % [lw.full_name() if lw else "Председатель профкома", int(avg)],
+	sim.story.letter("union_warn", L.t("Профком предупреждает о забастовке"),
+		L.t("%s от имени профкома: настроение в коллективе %d из 100, люди готовы бросить станки. Профком просит принять меры — иначе через пару дней забастовка.") % [lw.full_name() if lw else L.t("Председатель профкома"), int(avg)],
 		"strike", Sim.LVL_BAD, [
-			{"text": "Премия всем", "hint": "%s каждому" % Defs.money_str(Defs.b("bonus_amount"))},
-			{"text": "Собрание с профкомом", "hint": "Выслушать людей: отсрочит забастовку на пару дней"},
-			{"text": "Ничего не делать", "hint": ""}], 1)
+			{"text": L.t("Премия всем"), "hint": L.t("%s каждому") % Defs.money_str(Defs.b("bonus_amount"))},
+			{"text": L.t("Собрание с профкомом"), "hint": L.t("Выслушать людей: отсрочит забастовку на пару дней")},
+			{"text": L.t("Ничего не делать"), "hint": ""}], 1)
 	return true
 
 
@@ -1277,7 +1277,7 @@ func on_leave(w: Worker) -> void:
 		var b := brigade(w.brigade)
 		if not b.is_empty() and int(b["lead"]) == w.id:
 			b["lead"] = -1
-			sim.notify("«%s» осталась без бригадира — назначьте нового." % str(b["name"]), Sim.LVL_WARN)
+			sim.notify(L.t("«%s» осталась без бригадира — назначьте нового.") % str(b["name"]), Sim.LVL_WARN)
 	if union_on() and int(union.get("lead", -1)) == w.id:
 		union["lead"] = -1
 
@@ -1298,7 +1298,7 @@ func on_injury(w: Worker, cause: String) -> void:
 		cases.resize(30)
 	if union_on():
 		Mood.add(sim, w, "union_help")
-	sim.notify("Начато расследование несчастного случая с %s: комиссия составит акт Н-1 за %d рабочих дня." % [w.full_name(), N1_DAYS], Sim.LVL_INFO)
+	sim.notify(L.t("Начато расследование несчастного случая с %s: комиссия составит акт Н-1 за %d рабочих дня.") % [w.full_name(), N1_DAYS], Sim.LVL_INFO)
 
 
 func _causes(w: Worker, cause: String) -> Array:
@@ -1345,7 +1345,7 @@ func employer_causes(c: Dictionary) -> int:
 
 
 func cause_text(k: String) -> String:
-	return str((CAUSES.get(k, [k, false]) as Array)[0])
+	return L.t(str((CAUSES.get(k, [k, false]) as Array)[0]))
 
 
 func _case(id: int) -> Dictionary:
@@ -1367,20 +1367,20 @@ func _act_letter(c: Dictionary) -> void:
 	for k in c["causes"]:
 		lines.append("• " + cause_text(str(k)))
 	var emp := employer_causes(c)
-	var who := "директор, мастер"
+	var who := L.t("директор, мастер")
 	if union_on():
-		who += ", председатель профкома"
+		who += L.t(", председатель профкома")
 	var comp := 0.0
 	var w := sim.get_worker(int(c["wid"]))
 	if w and emp > 0:
 		comp = float(w.wage) * N1_COMP
-	sim.story.letter("n1", "Акт Н-1: %s" % str(c["name"]),
-		"Комиссия (%s) расследовала несчастный случай: %s, %s. Причины:\n%s\nПо вине предприятия: %d, по вине пострадавшего: %d." % [who, str(c["name"]), str(c["prof"]).to_lower(),
+	sim.story.letter("n1", L.t("Акт Н-1: %s") % str(c["name"]),
+		L.t("Комиссия (%s) расследовала несчастный случай: %s, %s. Причины:\n%s\nПо вине предприятия: %d, по вине пострадавшего: %d.") % [who, str(c["name"]), str(c["prof"]).to_lower(),
 		"\n".join(PackedStringArray(lines)), emp, c["causes"].size() - emp],
 		"injury", Sim.LVL_WARN, [
-			{"text": "Подписать акт как есть", "hint": ("Компенсация пострадавшему %s и штраф инспекции %s" % [Defs.money_str(comp), Defs.money_str(N1_FINE * emp)]) if emp > 0 else "Вина самого пострадавшего — без компенсации"},
-			{"text": "Записать вину на пострадавшего", "hint": "Дешевле, но люди это запомнят%s" % (", а профком обжалует" if union_on() else "")},
-			{"text": "Не оформлять акт", "hint": "Если всплывёт на проверке — штраф %s" % Defs.money_str(HIDE_FINE)}], 0, {"case": int(c["id"])})
+			{"text": L.t("Подписать акт как есть"), "hint": (L.t("Компенсация пострадавшему %s и штраф инспекции %s") % [Defs.money_str(comp), Defs.money_str(N1_FINE * emp)]) if emp > 0 else L.t("Вина самого пострадавшего — без компенсации")},
+			{"text": L.t("Записать вину на пострадавшего"), "hint": L.t("Дешевле, но люди это запомнят%s") % (L.t(", а профком обжалует") if union_on() else "")},
+			{"text": L.t("Не оформлять акт"), "hint": L.t("Если всплывёт на проверке — штраф %s") % Defs.money_str(HIDE_FINE)}], 0, {"case": int(c["id"])})
 
 
 func _res_n1(d: Dictionary, choice: int) -> void:
@@ -1415,7 +1415,7 @@ func _res_n1(d: Dictionary, choice: int) -> void:
 				if union_on() or sim.rng.randf() < 0.35:
 					fine = N1_FINE * 2.0 * emp
 					sim.spend(fine, "Штраф: акт Н-1 обжалован")
-					sim.notify("Акт Н-1 обжалован%s: трудовая инспекция пересмотрела причины и оштрафовала завод на %s." % [" профкомом" if union_on() else " пострадавшим", Defs.money_str(fine)], Sim.LVL_BAD)
+					sim.notify(L.t("Акт Н-1 обжалован%s: трудовая инспекция пересмотрела причины и оштрафовала завод на %s.") % [L.t(" профкомом") if union_on() else L.t(" пострадавшим"), Defs.money_str(fine)], Sim.LVL_BAD)
 					c["verdict"] = "обжалован, вина предприятия"
 			elif w:
 				Mood.add(sim, w, "reprimand")
@@ -1504,7 +1504,7 @@ func morning() -> void:
 	if sim.is_workday():
 		_brigade_daily()
 		if lunch_violation():
-			sim.notify_once("no_lunch_sched", "В графике смены обед меньше 30 минут (или больше двух часов): это нарушение трудового кодекса. Поправьте во вкладке «Бригады → График смены».", Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
+			sim.notify_once("no_lunch_sched", L.t("В графике смены обед меньше 30 минут (или больше двух часов): это нарушение трудового кодекса. Поправьте во вкладке «Бригады → График смены»."), Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
 		if pennant >= 0 and sim.day() - pennant_day > 7:
 			pennant = -1
 
@@ -1516,7 +1516,7 @@ func hints() -> void:
 		if not w.is_itr():
 			n += 1
 	if n >= 8 and brigades.is_empty():
-		sim.notify_once("brig_hint", "Рабочих уже %d. Разбейте их на бригады с бригадирами и закрепите за участками — меньше беготни, бригадир ускоряет работу (раздел «Люди → Бригады», клавиша K)." % n, Sim.LVL_INFO, Vector2i(-1, -1), 10080.0)
+		sim.notify_once("brig_hint", L.t("Рабочих уже %d. Разбейте их на бригады с бригадирами и закрепите за участками — меньше беготни, бригадир ускоряет работу (раздел «Люди → Бригады», клавиша K).") % n, Sim.LVL_INFO, Vector2i(-1, -1), 10080.0)
 
 
 func to_dict() -> Dictionary:

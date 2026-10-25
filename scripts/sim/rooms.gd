@@ -56,8 +56,8 @@ class Room:
 
 	func title() -> String:
 		if type == "":
-			return "Помещение без назначения"
-		return str(Defs.rooms.get(type, {}).get("name", type))
+			return L.t("Помещение без назначения")
+		return Defs.room_name(type)
 
 	## Оценка уюта 0–5: окна, растения, кафель, свет.
 	func quality() -> int:
@@ -377,8 +377,8 @@ func zone_ok(t: Thing) -> bool:
 static func zone_names(def_id: String) -> String:
 	var parts: Array[String] = []
 	for z in zone_req(def_id):
-		parts.append("«%s»" % str(Defs.rooms.get(str(z), {}).get("name", z)))
-	return " или ".join(parts)
+		parts.append("«%s»" % Defs.room_name(str(z)))
+	return L.t(" или ").join(parts)
 
 
 func thing_in(t: Thing, type: String) -> bool:
@@ -410,12 +410,12 @@ static func min_dims(type: String) -> Vector2i:
 static func req_text(type: String) -> String:
 	var d: Dictionary = Defs.rooms.get(type, {})
 	var md := Rooms.min_dims(type)
-	var parts: Array[String] = ["помещение от %d×%d клеток внутри" % [md.x, md.y]]
+	var parts: Array[String] = [L.t("помещение от %d×%d клеток внутри") % [md.x, md.y]]
 	var floors: Array = d.get("floors", [])
 	if not floors.is_empty():
-		parts.append("пол: " + str(Defs.floor_by_id.get(int(floors[0]), {}).get("name", "пол")).to_lower())
+		parts.append(L.t("пол: ") + L.t(str(Defs.floor_by_id.get(int(floors[0]), {}).get("name", "пол"))).to_lower())
 	for n: Dictionary in d.get("needs", []):
-		parts.append(str(n.get("text", "")))
+		parts.append(L.t(str(n.get("text", ""))))
 	return ", ".join(parts)
 
 
@@ -475,7 +475,7 @@ static func migrate_zones_v9(sim: Sim) -> int:
 	if n > 0:
 		sim.world.zone_rev += 1
 		sim.rooms.update()
-		sim.notify("Зоны стали обязательными: станком работают только в цехе, туалетом пользуются в зоне «Туалет» и т. д. Для %d объектов вне своих зон разметили маленькие зоны — поправьте их (меню «Зоны»)." % n, Sim.LVL_INFO)
+		sim.notify(L.t("Зоны стали обязательными: станком работают только в цехе, туалетом пользуются в зоне «Туалет» и т. д. Для %d объектов вне своих зон разметили маленькие зоны — поправьте их (меню «Зоны»).") % n, Sim.LVL_INFO)
 	return n
 
 

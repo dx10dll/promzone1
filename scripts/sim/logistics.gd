@@ -51,11 +51,11 @@ static func crates_for(def_id: String) -> int:
 
 
 static func crate_name(it: Item) -> String:
-	var nm := str(Defs.objects.get(it.def_id, {}).get("name", it.def_id))
+	var nm := Defs.obj_name(it.def_id)
 	if it.q == "loose":
 		return nm
 	var n := crates_for(it.def_id)
-	return "Ящик: %s" % nm + (" (%d из %d)" % [it.step + 1, n] if n > 1 else "")
+	return L.t("Ящик: %s") % nm + (L.t(" (%d из %d)") % [it.step + 1, n] if n > 1 else "")
 
 
 # ================================================================ зоны
@@ -126,7 +126,7 @@ func ship_only(v: Vehicle, p: String) -> bool:
 	probe.def_id = p
 	probe.q = "ok"
 	if free_cell(ship_cells(), probe, ship_cells()[0]).x < 0 or v.parked_time > 90.0:
-		sim.notify_once("ship_fallback", "Готовый заказ не донесли до зоны отгрузки — грузим в машину прямо со склада. Проверьте, свободна ли зона отгрузки и есть ли к ней проход.", Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("ship_fallback", L.t("Готовый заказ не донесли до зоны отгрузки — грузим в машину прямо со склада. Проверьте, свободна ли зона отгрузки и есть ли к ней проход."), Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
 		return false
 	return true
 
@@ -316,7 +316,7 @@ func sell_spare(def_id: String) -> String:
 	var pool: Array = spare_sets().get(def_id, [])
 	var need := crates_for(def_id)
 	if pool.size() < need:
-		return "На складе нет полного комплекта"
+		return L.t("На складе нет полного комплекта")
 	for k in need:
 		var it: Item = pool[k]
 		sim.delete_item(it)
@@ -360,10 +360,10 @@ func tick() -> void:
 	for e2: Dictionary in due:
 		e2["spawned"] = true
 		v.equip.append(int(e2["id"]))
-		var nm := str(Defs.objects.get(str(e2["def"]), {}).get("name", ""))
+		var nm := Defs.obj_name(str(e2["def"]))
 		if not names.has(nm):
 			names.append(nm)
-	v.cargo_desc = "оборудование: " + ", ".join(names.slice(0, 3)) + (" и др." if names.size() > 3 else "")
+	v.cargo_desc = L.t("оборудование: ") + ", ".join(names.slice(0, 3)) + (L.t(" и др.") if names.size() > 3 else "")
 
 
 ## Фургон с оборудованием встал у ворот: в кузове — ящики под каждый заказ.
@@ -389,8 +389,8 @@ func on_park(v: Vehicle) -> void:
 				t.order_eta = -1.0
 			equip.remove_at(i)
 	v.equip.clear()
-	var where := "в зону разгрузки" if has_zone() else "сразу к местам установки (зоны разгрузки нет)"
-	sim.notify("Привезли %s. Разгружаем %s." % [v.cargo_desc, where], Sim.LVL_INFO, v.access_cell(sim.world.sidewalk_row))
+	var where := L.t("в зону разгрузки") if has_zone() else L.t("сразу к местам установки (зоны разгрузки нет)")
+	sim.notify(L.t("Привезли %s. Разгружаем %s.") % [v.cargo_desc, where], Sim.LVL_INFO, v.access_cell(sim.world.sidewalk_row))
 
 
 # ================================================================ работа для людей
@@ -443,7 +443,7 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 					break
 			var dest := sim.find_storage(it, acc)
 			if dest.is_empty():
-				sim.notify_once("nostore_mat", "Металл некуда разгружать! Расширьте зону разгрузки (Стройка → Зоны) и поставьте в неё поддоны заготовок.", Sim.LVL_WARN)
+				sim.notify_once("nostore_mat", L.t("Металл некуда разгружать! Расширьте зону разгрузки (Стройка → Зоны) и поставьте в неё поддоны заготовок."), Sim.LVL_WARN)
 				break
 			cands.append({"s": sc, "k": "haul", "item": it, "dest": dest[0], "slot": dest[1]})
 			break
@@ -500,7 +500,7 @@ func add_ship_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void
 			continue
 		var c := free_cell(ship_cells(), it, sim.item_cell(it))
 		if c.x < 0:
-			sim.notify_once("ship_full", "Зона отгрузки заполнена: расширьте её (Стройка → Зоны), чтобы готовые заказы ждали машину у ворот.", Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
+			sim.notify_once("ship_full", L.t("Зона отгрузки заполнена: расширьте её (Стройка → Зоны), чтобы готовые заказы ждали машину у ворот."), Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
 			return
 		cands.append({"s": (50.0 if early else 66.0) + haul_bonus - b._dist(wc, sim.item_cell(it)) * 0.25, "k": "haul_cell", "item": it, "cell": c})
 		return
@@ -550,11 +550,11 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 			t.data["zres"] = sim.world.idx(c)
 			var n := 1 + extra.size()
 			var what := crate_name(it) if it.kind == "crate" else it.display_name()
-			var to := "в зону разгрузки" if in_zone(c) else ("в зону отгрузки" if in_ship(c) else ("к воротам" if it.kind == "bmat" else "на склад"))
+			var to := L.t("в зону разгрузки") if in_zone(c) else (L.t("в зону отгрузки") if in_ship(c) else (L.t("к воротам") if it.kind == "bmat" else L.t("на склад")))
 			if in_ship(c):
 				for iid2 in t.res_items:
 					(sim.items[iid2] as Item).set_meta("to_ship", true)
-			var verb := "Везёт на погрузчике" if t.data.get("veh", "") == "forklift" else ("Везёт на тележке" if t.data.has("veh") else "Несёт")
+			var verb := L.t("Везёт на погрузчике") if t.data.get("veh", "") == "forklift" else (L.t("Везёт на тележке") if t.data.has("veh") else L.t("Несёт"))
 			t.label = ("%s %s: " % [verb, to]) + what + (" ×%d" % n if n > 1 else "")
 			t.data["cool"] = "item%d" % it.id
 			t.add({"t": "goto", "cell": src})
@@ -574,7 +574,7 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 			t.res_items.append(it.id)
 			t.data["site"] = th.id
 			t.data["cool"] = "item%d" % it.id
-			t.label = ("Несёт к месту установки: " if it.q != "loose" else "Несёт в руках: ") + crate_name(it)
+			t.label = (L.t("Несёт к месту установки: ") if it.q != "loose" else L.t("Несёт в руках: ")) + crate_name(it)
 			t.add({"t": "goto", "cell": src})
 			t.add({"t": "pickup", "item": it.id, "extra": []})
 			t.add({"t": "goto", "cell": acc, "face": b._face_to_rect(acc, th.rect())})

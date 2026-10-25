@@ -171,8 +171,8 @@ func _draw_light() -> void:
 			continue
 		var pct := int(round(100.0 * good / maxf(1.0, float(r.area()))))
 		var ok := pct >= 60
-		var tail := "" if r.windows > 0 else " · без окон"
-		_text(r.center * T + Vector2(0, 26), "лампы %d%%%s" % [pct, tail], 14, UITheme.GOOD if ok else (UITheme.WARN if r.windows > 0 else UITheme.BAD))
+		var tail := "" if r.windows > 0 else L.t(" · без окон")
+		_text(r.center * T + Vector2(0, 26), L.t("лампы %d%%%s") % [pct, tail], 14, UITheme.GOOD if ok else (UITheme.WARN if r.windows > 0 else UITheme.BAD))
 	for t in lamps:
 		var rr2 := float(t.def().get("light_r", 3.0)) * T
 		var cc := (Vector2(t.cell) + Vector2(0.5, 0.5)) * T
@@ -181,9 +181,9 @@ func _draw_light() -> void:
 		draw_arc(cc, rr2, 0.0, TAU, 40, Color(lc.r, lc.g, lc.b, 0.22), 1.0)
 		draw_circle(cc, 4.0, lc)
 		if not on2:
-			_text(cc + Vector2(0, -8), "нет тока", 12, UITheme.BAD)
-	_legend([["Освещение: жёлтым — светят лампы, голубым — свет из окон днём, синим — темно", UITheme.TEXT],
-		["Ночью и в помещениях без окон лампы должны покрывать 60%% площади. %s" % ("Сейчас день." if day else "Сейчас темно — работают только лампы."), UITheme.MUTED]])
+			_text(cc + Vector2(0, -8), L.t("нет тока"), 12, UITheme.BAD)
+	_legend([[L.t("Освещение: жёлтым — светят лампы, голубым — свет из окон днём, синим — темно"), UITheme.TEXT],
+		[L.t("Ночью и в помещениях без окон лампы должны покрывать 60%% площади. %s") % (L.t("Сейчас день.") if day else L.t("Сейчас темно — работают только лампы.")), UITheme.MUTED]])
 
 
 # ---------------------------------------------------------------- шум
@@ -227,11 +227,11 @@ func _draw_noise() -> void:
 		var m2: Thing = lb[0]
 		var mc2 := (Vector2(m2.cell) + Vector2(m2.size()) * 0.5) * T
 		if bool(lb[2]):
-			_text(mc2, "%d дБ" % int(lb[1]), 14, Color("#ffb0a0") if float(lb[1]) >= 80.0 else Color("#ffd8a0"))
+			_text(mc2, L.t("%d дБ") % int(lb[1]), 14, Color("#ffb0a0") if float(lb[1]) >= 80.0 else Color("#ffd8a0"))
 		else:
-			_text(mc2, "стоит", 12, UITheme.MUTED)
-	_legend([["Шум работающих станков: жёлтым — до 70 дБ, оранжевым — до 80, красным — выше 80 дБ", UITheme.TEXT],
-		["Стены гасят шум. Рядом с шумными станками не ставьте столовую, контору и комнату отдыха", UITheme.MUTED]])
+			_text(mc2, L.t("стоит"), 12, UITheme.MUTED)
+	_legend([[L.t("Шум работающих станков: жёлтым — до 70 дБ, оранжевым — до 80, красным — выше 80 дБ"), UITheme.TEXT],
+		[L.t("Стены гасят шум. Рядом с шумными станками не ставьте столовую, контору и комнату отдыха"), UITheme.MUTED]])
 
 
 # ---------------------------------------------------------------- потоки людей
@@ -256,16 +256,16 @@ func _draw_dirt() -> void:
 			continue
 		var lv := up.level(r2)
 		var cl := up.cleanliness(r2)
-		_text(r2.center * T, "%s · чисто %d%%" % ["★".repeat(lv) + "☆".repeat(5 - lv), cl], 12, UITheme.GOOD if cl >= 70 else (UITheme.WARN if cl >= 40 else UITheme.BAD))
-	_legend([["Чистота и обустройство: стружка и грязь на полу, звёзды — уровень помещения", UITheme.TEXT],
-		["Стружку сметают уборщицы (Люди → Найм) в контейнеры для стружки; лом сдают по пятницам", UITheme.MUTED],
-		["Уровень поднимают окна, хороший пол, свет, растения и декор; грязь его снижает", UITheme.MUTED]])
+		_text(r2.center * T, L.t("%s · чисто %d%%") % ["★".repeat(lv) + "☆".repeat(5 - lv), cl], 12, UITheme.GOOD if cl >= 70 else (UITheme.WARN if cl >= 40 else UITheme.BAD))
+	_legend([[L.t("Чистота и обустройство: стружка и грязь на полу, звёзды — уровень помещения"), UITheme.TEXT],
+		[L.t("Стружку сметают уборщицы (Люди → Найм) в контейнеры для стружки; лом сдают по пятницам"), UITheme.MUTED],
+		[L.t("Уровень поднимают окна, хороший пол, свет, растения и декор; грязь его снижает"), UITheme.MUTED]])
 
 
 func _draw_traffic() -> void:
 	var w := sim.world
 	if sim.traffic.size() != w.w * w.h:
-		_legend([["Потоки людей: данных пока нет — пусть поработают", UITheme.MUTED]])
+		_legend([[L.t("Потоки людей: данных пока нет — пусть поработают"), UITheme.MUTED]])
 		return
 	var mx := 1.0
 	for v in sim.traffic:
@@ -278,8 +278,8 @@ func _draw_traffic() -> void:
 		var col := Color("#3d7fd0").lerp(Color("#e6c23a"), clampf(k * 2.0, 0.0, 1.0)) if k < 0.5 else Color("#e6c23a").lerp(Color("#e0483a"), (k - 0.5) * 2.0)
 		var c := Vector2i(i % w.w, i / w.w)
 		draw_rect(Rect2(Vector2(c) * T, Vector2(T, T)), Color(col.r, col.g, col.b, 0.22 + k * 0.4))
-	_legend([["Потоки людей: где чаще ходят (синим — редко, красным — тропа)", UITheme.TEXT],
-		["Длинные красные дорожки — лишние шаги: ставьте склады, шкафчики и туалет ближе к рабочим местам", UITheme.MUTED]])
+	_legend([[L.t("Потоки людей: где чаще ходят (синим — редко, красным — тропа)"), UITheme.TEXT],
+		[L.t("Длинные красные дорожки — лишние шаги: ставьте склады, шкафчики и туалет ближе к рабочим местам"), UITheme.MUTED]])
 
 
 # ---------------------------------------------------------------- загрузка станков
@@ -300,23 +300,23 @@ func _draw_load() -> void:
 		draw_rect(r.grow(-1), col, false, 2.0)
 		var st := "%d%%" % int(round(u * 100.0))
 		if m.broken:
-			st = "сломан"
+			st = L.t("сломан")
 		elif not m.enabled:
-			st = "выключен"
+			st = L.t("выключен")
 		_text(r.get_center() + Vector2(0, -2), st, 15, col.lightened(0.3))
 		var sub := ""
 		if m.parts_made > 0:
-			sub = "%d шт." % m.parts_made
+			sub = L.t("%d шт.") % m.parts_made
 			if m.defects > 0:
-				sub += " · брак %d%%" % int(round(100.0 * m.defects / maxf(1.0, float(m.parts_made))))
+				sub += L.t(" · брак %d%%") % int(round(100.0 * m.defects / maxf(1.0, float(m.parts_made))))
 		if sub != "":
 			_text(r.get_center() + Vector2(0, 18.0 / maxf(0.3, _zoom())), sub, 12, Color("#ffb0a0") if m.defects > 0 and float(m.defects) / maxf(1.0, float(m.parts_made)) > 0.05 else UITheme.MUTED)
 	var li := sim.office.load_info()
 	var tail := ""
 	if float(li[0]) > 0.3 and str(li[1]) != "":
-		tail = "Заказы: ~%.1f раб. дн., проблемный участок — %s" % [float(li[0]), Defs.process_name(str(li[1])).to_lower()]
-	_legend([["Загрузка станков в рабочее время: зелёным — от 60%, жёлтым — 25–60%, красным — простаивает", UITheme.TEXT],
-		[tail if tail != "" else "Принятых заказов нет — станки ждут работы", UITheme.WARN if tail != "" else UITheme.MUTED]])
+		tail = L.t("Заказы: ~%.1f раб. дн., проблемный участок — %s") % [float(li[0]), Defs.process_name(str(li[1])).to_lower()]
+	_legend([[L.t("Загрузка станков в рабочее время: зелёным — от 60%, жёлтым — 25–60%, красным — простаивает"), UITheme.TEXT],
+		[tail if tail != "" else L.t("Принятых заказов нет — станки ждут работы"), UITheme.WARN if tail != "" else UITheme.MUTED]])
 
 
 func _draw_rooms() -> void:
@@ -350,28 +350,28 @@ func _draw_rooms() -> void:
 		# название зоны уже написано на полу — подпись крупно только у той, на которую навели
 		if r.id == hover_room or r.type == "":
 			_text(center + Vector2(0, -2), r.title(), 12.0, col.lightened(0.35))
-		var sub := "%d кл." % r.area()
+		var sub := L.t("%d кл.") % r.area()
 		var sub_col := Color("#c9c5b8")
 		if r.type != "":
 			if r.valid:
-				sub = "✓ оборудовано · %s" % "★".repeat(sim.upkeep.level(r))
+				sub = L.t("✓ оборудовано · %s") % "★".repeat(sim.upkeep.level(r))
 				sub_col = Color("#8fcf78")
 			else:
 				sub = ""    # чего не хватает — уже на жёлтой метке в углу зоны
 		if not r.lit and not sim.is_daylight():
-			sub = "темно" if sub == "" else sub + " · темно"
+			sub = L.t("темно") if sub == "" else sub + L.t(" · темно")
 		if sub != "":
 			_text(center + Vector2(0, 12), sub, 9.5, sub_col)
 	if sim.rooms.list.is_empty():
-		_text(Vector2(w.w * T * 0.5, 4 * T), "Помещений пока нет: обнесите пол стенами с дверью", 13.0, Color("#e0aa48"))
-	var lg: Array = [["Цвет — группа зон: оранжевый — производство, жёлтый — склад, зелёный — быт, синий — кабинеты, фиолетовый — учёба и профком.", UITheme.TEXT],
-		["Пунктир — граница двух зон в одном зале. Серым — помещение без разметки.", UITheme.MUTED]]
+		_text(Vector2(w.w * T * 0.5, 4 * T), L.t("Помещений пока нет: обнесите пол стенами с дверью"), 13.0, Color("#e0aa48"))
+	var lg: Array = [[L.t("Цвет — группа зон: оранжевый — производство, жёлтый — склад, зелёный — быт, синий — кабинеты, фиолетовый — учёба и профком."), UITheme.TEXT],
+		[L.t("Пунктир — граница двух зон в одном зале. Серым — помещение без разметки."), UITheme.MUTED]]
 	var bad := 0
 	for r2 in sim.rooms.list:
 		if r2.type != "" and not r2.valid:
 			bad += 1
 	if bad > 0:
-		lg.append(["Зон, которым чего-то не хватает: %d — жёлтый треугольник в углу зоны." % bad, UITheme.WARN])
+		lg.append([L.t("Зон, которым чего-то не хватает: %d — жёлтый треугольник в углу зоны.") % bad, UITheme.WARN])
 	_legend(lg)
 
 
@@ -406,9 +406,9 @@ func _draw_power() -> void:
 	for r in sim.rooms.list:
 		var ctr2 := r.center * T
 		if r.powered:
-			_text_px(ctr2, "свет есть", 12, Color("#f2c84b"))
+			_text_px(ctr2, L.t("свет есть"), 12, Color("#f2c84b"))
 		else:
-			_text_px(ctr2, "нет подключения", 12, Color("#9aa3ab"))
+			_text_px(ctr2, L.t("нет подключения"), 12, Color("#9aa3ab"))
 	var hover := Vector2i(floori(get_global_mouse_position().x / T), floori(get_global_mouse_position().y / T))
 	var hover_txt := ""
 	var hover_pos := Vector2.ZERO
@@ -437,7 +437,7 @@ func _draw_power() -> void:
 				draw_arc(lc, (Defs.b("light_link_r") + 0.5) * T, 0.0, TAU, 48, Color(0.85, 0.4, 0.35, 0.55), 1.5)
 				draw_circle(lc, 4.0, Color("#d8644e"))
 				if hovered:
-					hover_txt = "%s · нет кабеля ближе %d клеток" % [t.title(), int(Defs.b("light_link_r"))]
+					hover_txt = L.t("%s · нет кабеля ближе %d клеток") % [t.title(), int(Defs.b("light_link_r"))]
 					hover_pos = top
 					hover_col = Color("#d8644e")
 			continue
@@ -445,13 +445,13 @@ func _draw_power() -> void:
 			var net := pw.net_of_thing(t)
 			var cap := pw.source_capacity(t)
 			draw_rect(rr.grow(2), Color("#f2c84b"), false, 2.5)
-			var txt := "%d кВт · не подключён" % int(cap)
+			var txt := L.t("%d кВт · не подключён") % int(cap)
 			var col := Color("#9aa3ab")
 			if net:
-				txt = "%.1f / %d кВт" % [net.load, int(net.capacity)]
+				txt = L.t("%.1f / %d кВт") % [net.load, int(net.capacity)]
 				col = Color("#d8644e") if net.tripped or net.load > net.capacity else Color("#f2c84b")
 				if net.tripped:
-					txt = "ВЫБИТ АВТОМАТ"
+					txt = L.t("ВЫБИТ АВТОМАТ")
 			_text_px(top, txt, 13, col, true)
 		else:
 			# потребитель: рамка цвета состояния, мощность — маленькой цифрой внутри,
@@ -476,11 +476,11 @@ func _draw_power() -> void:
 					if sim.world.in_plot(tc) and not Defs.wall_solid(sim.world.get_wall(tc)):
 						draw_rect(Rect2(Vector2(tc) * T, Vector2(T, T)).grow(-3), Color(0.95, 0.78, 0.3, a), false, 1.5)
 			if hovered:
-				hover_txt = "%s · %s кВт" % [t.title(), num]
+				hover_txt = L.t("%s · %s кВт") % [t.title(), num]
 				if not pw.connected(t):
-					hover_txt += " · нет кабеля"
+					hover_txt += L.t(" · нет кабеля")
 				elif not ok:
-					hover_txt += " · без тока"
+					hover_txt += L.t(" · без тока")
 				hover_pos = top
 				hover_col = col2
 	if hover_txt != "":
@@ -525,19 +525,19 @@ func _draw_water() -> void:
 		var rr := Rect2(Vector2(t.cell) * T, Vector2(t.size()) * T)
 		if t.kind() == "water_source":
 			draw_rect(rr.grow(2), Color("#4a8fd0"), false, 2.5)
-			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), "насос", 12, Color("#9cc8f0"), true)
+			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), L.t("насос"), 12, Color("#9cc8f0"), true)
 			continue
 		if t.def_id == "radiator":
 			var onb := sim.eng.boiler_rads.has(t.id)
 			draw_rect(rr.grow(-3), Color("#e0883a") if onb else Color("#8a949c"), false, 2.0)
 			if Rect2i(t.cell, Vector2i.ONE).has_point(hover):
-				_text_px(rr.get_center() + Vector2(0, -20.0), "батарея · " + ("от своего котла" if onb else "от городской теплосети"), 12, Color("#f0b080") if onb else Color("#c8d0d6"), true)
+				_text_px(rr.get_center() + Vector2(0, -20.0), L.t("батарея · ") + (L.t("от своего котла") if onb else L.t("от городской теплосети")), 12, Color("#f0b080") if onb else Color("#c8d0d6"), true)
 			continue
 		if not t.needs_water():
 			continue
 		if t.kind() == "boiler":
 			var bp := sim.eng.boiler_problem(t)
-			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 18.0), "котёл · " + ("греет %d из %d батарей" % [sim.eng.boiler_load(t), int(t.def().get("boiler_cap", 16))] if bp == "" else bp), 12, Color("#f0b080") if bp == "" else Color("#e08a6a"), true)
+			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 18.0), L.t("котёл · ") + (L.t("греет %d из %d батарей") % [sim.eng.boiler_load(t), int(t.def().get("boiler_cap", 16))] if bp == "" else bp), 12, Color("#f0b080") if bp == "" else Color("#e08a6a"), true)
 		var ok := sim.water.has_water(t)
 		var col2 := Color("#8fcf78") if ok else Color("#d8644e")
 		draw_rect(rr.grow(-1), col2, false, 2.0)
@@ -552,9 +552,9 @@ func _draw_water() -> void:
 				if w.in_plot(tc) and not Defs.wall_solid(w.get_wall(tc)):
 					draw_rect(Rect2(Vector2(tc) * T, Vector2(T, T)).grow(-3), Color(0.4, 0.7, 1.0, a), false, 1.5)
 		if Rect2i(t.cell, t.size()).has_point(hover):
-			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), "%s · %s" % [t.title(), "вода есть" if ok else ("в сети нет насоса" if sim.water.connected(t) else "труба не подведена")], 13, col2, true)
+			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), "%s · %s" % [t.title(), L.t("вода есть") if ok else (L.t("в сети нет насоса") if sim.water.connected(t) else L.t("труба не подведена"))], 13, col2, true)
 	if not sim.water.has_source():
-		_text(Vector2(w.w * T * 0.5, 4 * T), "Нет насоса: поставьте его (Сети → Водопровод) и тяните от него трубы", 13.0, Color("#9cc8f0"))
+		_text(Vector2(w.w * T * 0.5, 4 * T), L.t("Нет насоса: поставьте его (Сети → Водопровод) и тяните от него трубы"), 13.0, Color("#9cc8f0"))
 
 
 ## Цвет температуры: синий — холодно, зелёный — комфорт, оранжевый — жарко.
@@ -587,7 +587,7 @@ func _draw_temp() -> void:
 			var rr := Rect2(Vector2(t.cell) * T, Vector2(T, T)).grow(-3)
 			draw_rect(rr, Color("#e0883a"), false, 2.0)
 			draw_circle(rr.get_center(), 3.0, Color("#e0883a"))
-	_text(Vector2(w.plot.position.x * T + 8, w.plot.position.y * T + 20), "Улица: %+d °C" % int(round(t_out)), 15, oc.lightened(0.3), false)
+	_text(Vector2(w.plot.position.x * T + 8, w.plot.position.y * T + 20), L.t("Улица: %+d °C") % int(round(t_out)), 15, oc.lightened(0.3), false)
 
 
 # ---------------------------------------------------------------- вентиляция
@@ -667,9 +667,9 @@ func _draw_vent() -> void:
 		var vk := eng.vent_k(r)
 		var need := eng.needs_vent(r)
 		if f >= 3.0 or vk > 0.0 or need:
-			var t1 := "воздух: %s" % ("чисто" if f < 15.0 else ("душно %d%%" % int(f) if f < Eng.SMOKY else "дым %d%%" % int(f)))
+			var t1 := L.t("воздух: %s") % (L.t("чисто") if f < 15.0 else (L.t("душно %d%%") % int(f) if f < Eng.SMOKY else L.t("дым %d%%") % int(f)))
 			_text(r.center * T + Vector2(0, -2), t1, 14, col.lightened(0.3))
-			var t2 := "вентиляция ×%.1f" % vk if vk > 0.0 else ("нужна вентиляция" if need else "без вентиляции")
+			var t2 := L.t("вентиляция ×%.1f") % vk if vk > 0.0 else (L.t("нужна вентиляция") if need else L.t("без вентиляции"))
 			_text(r.center * T + Vector2(0, 16), t2, 12, Color("#9cc8e8") if vk > 0.0 else (Color("#e08a6a") if need else Color("#a8b0b6")))
 	var hover := Vector2i(floori(get_global_mouse_position().x / T), floori(get_global_mouse_position().y / T))
 	for t: Thing in sim.things.values():
@@ -681,21 +681,21 @@ func _draw_vent() -> void:
 			var ok := eng.fan_ok(t)
 			var col2 := Color("#8fcf78") if ok else Color("#d8644e")
 			draw_rect(rr.grow(2), col2, false, 2.5)
-			var why := "работает" if ok else ("нет тока" if not sim.power.powered(t) else "выключен")
-			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), "вентилятор · " + why, 12, col2, true)
+			var why := L.t("работает") if ok else (L.t("нет тока") if not sim.power.powered(t) else L.t("выключен"))
+			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), L.t("вентилятор · ") + why, 12, col2, true)
 		elif k == "vent_hood":
 			var ok2 := eng.hood_ok(t)
 			var col3 := Color("#8fcf78") if ok2 else Color("#e0a83a")
 			draw_circle(rr.get_center(), 9.0, Color(0.07, 0.08, 0.09, 0.8))
 			draw_arc(rr.get_center(), 9.0, 0.0, TAU, 20, col3, 2.2)
 			if Rect2i(t.cell, Vector2i.ONE).has_point(hover) or not ok2:
-				_text_px(rr.get_center() + Vector2(0, -14.0), "зонт · " + ("тянет" if ok2 else "не подключён к вентилятору"), 12, col3, true)
+				_text_px(rr.get_center() + Vector2(0, -14.0), L.t("зонт · ") + (L.t("тянет") if ok2 else L.t("не подключён к вентилятору")), 12, col3, true)
 		elif k == "machine" and FUMES_SHOW.has(t.process()):
 			var hd := bool(eng.hooded.get(t.id, false))
 			draw_rect(rr.grow(-1), Color("#8fcf78") if hd else Color("#e0a83a"), false, 1.5)
-	_legend([["Вентиляция: зелёный — чистый воздух, жёлтый — душно, бурый — дым", Color("#e7e4d8")],
-		["Вытяжной вентилятор (под током) тянет воздух из помещений по своему воздуховоду", Color("#9cc8e8")],
-		["Зонт над сварочным постом, камерой или печью — три четверти дыма уходит сразу", Color("#8fcf78")]])
+	_legend([[L.t("Вентиляция: зелёный — чистый воздух, жёлтый — душно, бурый — дым"), Color("#e7e4d8")],
+		[L.t("Вытяжной вентилятор (под током) тянет воздух из помещений по своему воздуховоду"), Color("#9cc8e8")],
+		[L.t("Зонт над сварочным постом, камерой или печью — три четверти дыма уходит сразу"), Color("#8fcf78")]])
 
 
 const FUMES_SHOW := ["welding", "paint", "heat", "casting"]
@@ -716,11 +716,11 @@ func _draw_crew() -> void:
 			var b := cr.brigade(bid)
 			var ld := cr.lead_of(bid)
 			_text(r.center * T + Vector2(0, -2), str(b["name"]), 14, col.lightened(0.35))
-			_text(r.center * T + Vector2(0, 16), "%d чел.%s" % [cr.members(bid).size(), (" · бригадир " + ld.call_name()) if ld else " · нет бригадира"], 12, Color("#d8d4c8"))
+			_text(r.center * T + Vector2(0, 16), L.t("%d чел.%s") % [cr.members(bid).size(), (L.t(" · бригадир ") + ld.call_name()) if ld else L.t(" · нет бригадира")], 12, Color("#d8d4c8"))
 		if cam:
 			var p := Vector2(r.rect.position) * T + Vector2(10, 10)
 			draw_rect(Rect2(Vector2(r.rect.position) * T, Vector2(r.rect.size) * T).grow(-3), Color("#8fb3c8"), false, 1.5)
-			_text_px(p + Vector2(40, 12), "под камерой", 11, Color("#8fb3c8"), true)
+			_text_px(p + Vector2(40, 12), L.t("под камерой"), 11, Color("#8fb3c8"), true)
 	for wk in sim.workers:
 		if not wk.present or wk.hidden:
 			continue
@@ -745,15 +745,15 @@ func _draw_crew() -> void:
 			draw_arc(rr.get_center(), 8.0, 0.0, TAU, 18, cc, 2.0)
 			draw_circle(rr.get_center(), 3.0, cc)
 			if not ok:
-				_text_px(rr.get_center() + Vector2(0, -14.0), "камера · нет тока", 12, cc, true)
+				_text_px(rr.get_center() + Vector2(0, -14.0), L.t("камера · нет тока"), 12, cc, true)
 		elif t.def_id == "checkpoint":
 			var on := cr.on_watch() or cr.search_on()
 			var c3 := Color("#8fcf78") if on else Color("#e0a83a")
 			draw_rect(rr.grow(3), c3, false, 2.5)
-			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 6.0), "проходная · " + ("охрана на посту" if on else "без охраны"), 12, c3, true)
-	_legend([["Бригады: участки и люди цветом бригады, бригадир — с ободком", Color("#e7e4d8")],
-		["Охрана: камеры (зелёные — пишут), проходная, охранники — жёлтый ободок", Color("#8fb3c8")],
-		["Шанс поймать несуна на выходе: %d%%" % int(round(cr.detect_k() * 100.0)), Color("#e0aa48")]])
+			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 6.0), L.t("проходная · ") + (L.t("охрана на посту") if on else L.t("без охраны")), 12, c3, true)
+	_legend([[L.t("Бригады: участки и люди цветом бригады, бригадир — с ободком"), Color("#e7e4d8")],
+		[L.t("Охрана: камеры (зелёные — пишут), проходная, охранники — жёлтый ободок"), Color("#8fb3c8")],
+		[L.t("Шанс поймать несуна на выходе: %d%%") % int(round(cr.detect_k() * 100.0)), Color("#e0aa48")]])
 
 
 # ---------------------------------------------------------------- сжатый воздух
@@ -776,13 +776,13 @@ func _draw_air() -> void:
 			var ok := sim.power.powered(t) and t.enabled
 			var col := Color("#e2843a") if ok else Color("#d8644e")
 			draw_rect(rr.grow(2), col, false, 2.5)
-			var txt := "компрессор"
+			var txt := L.t("компрессор")
 			if not ok:
-				txt += " · нет тока" if not sim.power.powered(t) else " · выключен"
+				txt += L.t(" · нет тока") if not sim.power.powered(t) else L.t(" · выключен")
 			elif net:
 				txt += " · %d/%d" % [int(net.demand), int(net.cap)]
 			else:
-				txt += " · магистраль не подведена"
+				txt += L.t(" · магистраль не подведена")
 			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), txt, 12, col.lightened(0.2), true)
 			continue
 		var mode2 := eng.air_mode(t)
@@ -796,12 +796,12 @@ func _draw_air() -> void:
 		draw_circle(cp, 7.0, Color(0.07, 0.08, 0.09, 0.85))
 		draw_circle(cp, 5.5, Color("#e2843a") if p > 0.0 else Color("#f0c8a0"))
 		if Rect2i(t.cell, t.size()).has_point(hover) or p <= 0.0:
-			var st := "воздух есть" if p >= 0.99 else ("давления не хватает" if p > 0.0 else ("компрессор не работает" if eng.anet_of_thing(t) else "магистраль не подведена"))
+			var st := L.t("воздух есть") if p >= 0.99 else (L.t("давления не хватает") if p > 0.0 else (L.t("компрессор не работает") if eng.anet_of_thing(t) else L.t("магистраль не подведена")))
 			if mode2 == "need" and p <= 0.0:
-				st += " — красят кистью, в 1,5 раза дольше"
+				st += L.t(" — красят кистью, в 1,5 раза дольше")
 			_text_px(rr.get_center() + Vector2(0, -rr.size.y * 0.5 - 4.0), "%s · %s" % [t.title(), st], 12, col2, true)
 	if not any_comp:
-		_text(Vector2(w.w * T * 0.5, 4 * T), "Нет компрессора: поставьте его (Сети → Сжатый воздух) и тяните пневмомагистраль", 13.0, Color("#f0c8a0"))
+		_text(Vector2(w.w * T * 0.5, 4 * T), L.t("Нет компрессора: поставьте его (Сети → Сжатый воздух) и тяните пневмомагистраль"), 13.0, Color("#f0c8a0"))
 
 
 # ================================================================ 1.15: все коммуникации на одном слое
@@ -914,10 +914,10 @@ func _draw_nets() -> void:
 		var ctr2 := r.center * T
 		var line := ""
 		if not r.powered and r.type != "":
-			line = "свет не подключён"
+			line = L.t("свет не подключён")
 		var f := eng.fumes_of(r)
 		if f >= 15.0:
-			line += (" · " if line != "" else "") + ("душно %d%%" % int(f) if f < Eng.SMOKY else "дым %d%%" % int(f))
+			line += (" · " if line != "" else "") + (L.t("душно %d%%") % int(f) if f < Eng.SMOKY else L.t("дым %d%%") % int(f))
 		if line != "":
 			_text_px(ctr2, line, 12, Color("#c8ccd0"))
 	var hover := Vector2i(floori(get_global_mouse_position().x / T), floori(get_global_mouse_position().y / T))
@@ -934,23 +934,23 @@ func _draw_nets() -> void:
 		# источники: трансформаторы и подстанция, насосы, компрессор, вентилятор
 		if str(t.def().get("power_source", "")) != "":
 			var net := pw.net_of_thing(t)
-			var txt := "%d кВт · кабель не проложен" % int(pw.source_capacity(t))
+			var txt := L.t("%d кВт · кабель не проложен") % int(pw.source_capacity(t))
 			var col := Color("#9aa3ab")
 			if net:
-				txt = "ВЫБИТ АВТОМАТ" if net.tripped else "%.1f / %d кВт" % [net.load, int(net.capacity)]
+				txt = L.t("ВЫБИТ АВТОМАТ") if net.tripped else L.t("%.1f / %d кВт") % [net.load, int(net.capacity)]
 				col = Color("#d8644e") if net.tripped or net.load > net.capacity else Color("#f2c84b")
 			draw_rect(rr.grow(2), Color("#f2c84b"), false, 2.5)
 			_text_px(top, txt, 13, col, true)
 			continue
 		if k == "water_source" or k == "pump":
 			draw_rect(rr.grow(2), Color("#4a9fe0"), false, 2.5)
-			_text_px(top, "насос" if k == "water_source" else "насосная", 12, Color("#9cc8f0"), true)
+			_text_px(top, L.t("насос") if k == "water_source" else L.t("насосная"), 12, Color("#9cc8f0"), true)
 			continue
 		if k == "compressor":
 			var an := eng.anet_of_thing(t)
 			var okc := pw.powered(t) and t.enabled
 			draw_rect(rr.grow(2), Color("#e2843a") if okc else Color("#d8644e"), false, 2.5)
-			_text_px(top, "компрессор" + ((" · %d/%d" % [int(an.demand), int(an.cap)]) if an and okc else (" · нет тока" if not okc else " · не подключён")), 12, Color("#f0b080"), true)
+			_text_px(top, L.t("компрессор") + ((" · %d/%d" % [int(an.demand), int(an.cap)]) if an and okc else (L.t(" · нет тока") if not okc else L.t(" · не подключён"))), 12, Color("#f0b080"), true)
 			continue
 		if k == "vent_fan":
 			var okf := eng.fan_ok(t)
@@ -985,15 +985,15 @@ func _draw_nets() -> void:
 		if hovered:
 			var parts: Array[String] = []
 			for n3: Array in needs:
-				var nm := {"power": "ток", "water": "вода", "air": "воздух"}[str(n3[0])] as String
-				parts.append(nm + (" есть" if bool(n3[1]) else " — нет"))
+				var nm := {"power": L.t("ток"), "water": L.t("вода"), "air": L.t("воздух")}[str(n3[0])] as String
+				parts.append(nm + (L.t(" есть") if bool(n3[1]) else L.t(" — нет")))
 			hover_txt = "%s · %s" % [t.title(), ", ".join(parts)]
 			hover_pos = top
 			hover_col = Color("#8fcf78") if all_ok else Color("#d8644e")
 	if hover_txt != "":
 		_text_px(hover_pos, hover_txt, 13, hover_col, true, true)
-	_legend([["Жёлтый — кабель (оранжевый — перегруз, красный — выбит автомат)", Color("#f2c84b")],
-		["Синий — водопровод (серый — нет воды в трубе)", Color("#7fb8e8")],
-		["Оранжевый пунктир — сжатый воздух", Color("#f0b080")],
-		["Широкий серый — воздуховод вентиляции", Color("#c4ccd2")],
-		["Значки в углу объекта — что ему нужно; красный — этого нет", Color("#e7e4d8")]])
+	_legend([[L.t("Жёлтый — кабель (оранжевый — перегруз, красный — выбит автомат)"), Color("#f2c84b")],
+		[L.t("Синий — водопровод (серый — нет воды в трубе)"), Color("#7fb8e8")],
+		[L.t("Оранжевый пунктир — сжатый воздух"), Color("#f0b080")],
+		[L.t("Широкий серый — воздуховод вентиляции"), Color("#c4ccd2")],
+		[L.t("Значки в углу объекта — что ему нужно; красный — этого нет"), Color("#e7e4d8")]])

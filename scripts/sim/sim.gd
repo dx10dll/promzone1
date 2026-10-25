@@ -280,9 +280,13 @@ func _ledger(reason: String, v: float) -> void:
 			top["n"] = n
 			top["base"] = reason
 			top["v"] = float(top["v"]) + v
-			top["text"] = "%s ×%d" % [reason, n]
+			top["text"] = "%s ×%d" % [L.tx(reason), n]
 			return
-	ledger.push_front({"day": day(), "time": time_str(), "text": reason, "v": v})
+	# 1.39: причина хранится по-русски (base — по ней статьи и склейка), text — на языке игры
+	if L.is_en():
+		ledger.push_front({"day": day(), "time": time_str(), "text": L.tx(reason), "base": reason, "v": v})
+	else:
+		ledger.push_front({"day": day(), "time": time_str(), "text": reason, "v": v})
 	if ledger.size() > 300:
 		ledger.resize(300)
 
@@ -399,16 +403,16 @@ func ad_price(prof: String = "") -> float:
 func post_ad(prof: String = "") -> String:
 	var cost := ad_price(prof)
 	if not can_afford(cost):
-		return "Не хватает денег: нужно " + Defs.money_str(cost)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 	spend(cost, "Объявление о вакансиях" + ((": " + str(Worker.PROF_NAMES.get(prof, prof))) if prof != "" else ""))
 	refresh_candidates(prof)
-	notify("Объявление размещено: пришли новые кандидаты.", LVL_INFO)
+	notify(L.t("Объявление размещено: пришли новые кандидаты."), LVL_INFO)
 	return ""
 
 
 func hire(index: int) -> String:
 	if index < 0 or index >= candidates.size():
-		return "Нет такого кандидата"
+		return L.t("Нет такого кандидата")
 	var w := Worker.from_dict(candidates[index])
 	var terr := town.can_hire(w)
 	if terr != "":
@@ -417,15 +421,15 @@ func hire(index: int) -> String:
 	w.ppe = 0.0   # новичку СИЗ выдают со склада (шкаф СИЗ)
 	add_worker(w)
 	candidates.remove_at(index)
-	w.add_history(day(), ("Принята" if w.female else "Принят") + " на работу: " + w.prof_name() + ((" (иногородняя, живёт в общежитии)" if w.female else " (иногородний, живёт в общежитии)") if w.from_away else ""))
+	w.add_history(day(), (L.t("Принята на работу: %s%s") if w.female else L.t("Принят на работу: %s%s")) % [w.prof_name(), (L.t(" (иногородняя, живёт в общежитии)") if w.female else L.t(" (иногородний, живёт в общежитии)")) if w.from_away else ""])
 	town.on_hired(w)
-	var when := "к началу следующей смены"
+	var when := L.t("к началу следующей смены")
 	var win := shift_window(w)
 	if shift_is_workday(win) and minute >= win.x - 60.0 and minute < win.y - 120.0:
 		w.shift_anchor = win.x
 		w.arrive_off = maxf(minute - win.x, -60.0) + rng.randf_range(30.0, 60.0)
-		when = "в течение часа"
-	notify(Nicks.gendered("%s принят{|а} на работу, выйдет %s.", w.female) % [w.full_name(), when], LVL_GOOD)
+		when = L.t("в течение часа")
+	notify(Nicks.gendered(L.t("%s принят{|а} на работу, выйдет %s."), w.female) % [w.full_name(), when], LVL_GOOD)
 	return ""
 
 
@@ -445,9 +449,9 @@ func fire(w: Worker, quit: bool = false, calm: bool = false) -> void:
 		stats["fired_week"] = int(stats.get("fired_week", 0)) + 1
 	town.assign_beds()
 	if quit:
-		notify(Nicks.gendered("%s уволил{ся|ась} по собственному желанию: «Достало всё». Следите за настроением людей.", w.female) % w.full_name(), LVL_BAD)
+		notify(Nicks.gendered(L.t("%s уволил{ся|ась} по собственному желанию: «Достало всё». Следите за настроением людей."), w.female) % w.full_name(), LVL_BAD)
 	else:
-		notify(Nicks.gendered("%s уволен{|а}.", w.female) % w.full_name(), LVL_WARN)
+		notify(Nicks.gendered(L.t("%s уволен{|а}."), w.female) % w.full_name(), LVL_WARN)
 	if not calm:
 		for o in workers:
 			Mood.add(self, o, "coworker_fired")
@@ -460,7 +464,7 @@ func change_wage(w: Worker, pct: float) -> void:
 	if nw == w.wage:
 		return
 	Mood.add(self, w, "raise" if nw > w.wage else "wage_cut")
-	w.add_history(day(), "Ставка изменена: %s → %s" % [Defs.money_str(w.wage), Defs.money_str(nw)])
+	w.add_history(day(), L.t("Ставка изменена: %s → %s") % [Defs.money_str(w.wage), Defs.money_str(nw)])
 	w.wage = nw
 	Mood.refresh(self, w)
 
@@ -468,17 +472,17 @@ func change_wage(w: Worker, pct: float) -> void:
 ## Премия всему коллективу разом.
 func bonus_all() -> String:
 	if workers.is_empty():
-		return "Некому выдавать"
+		return L.t("Некому выдавать")
 	var amount := Defs.b("bonus_amount") * workers.size()
 	if not can_afford(amount):
-		return "Не хватает денег: нужно " + Defs.money_str(amount)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(amount)
 	spend(amount, "Премия всем: %d чел." % workers.size())
 	for w in workers:
 		Mood.add(self, w, "bonus")
 		Nicks.count(w, "bonus")
-		w.add_history(day(), Nicks.gendered("Получил{|а} премию вместе со всеми", w.female))
+		w.add_history(day(), Nicks.gendered(L.t("Получил{|а} премию вместе со всеми"), w.female))
 		Mood.refresh(self, w)
-	notify("Премия всему коллективу: %s. Люди довольны." % Defs.money_str(amount), LVL_GOOD)
+	notify(L.t("Премия всему коллективу: %s. Люди довольны.") % Defs.money_str(amount), LVL_GOOD)
 	return ""
 
 
@@ -486,7 +490,7 @@ func bonus_all() -> String:
 func raise_all(pct: float) -> void:
 	for w in workers:
 		change_wage(w, pct)
-	notify("Ставки всем подняты на %d%%." % int(round(pct * 100.0)), LVL_GOOD)
+	notify(L.t("Ставки всем подняты на %d%%.") % int(round(pct * 100.0)), LVL_GOOD)
 
 
 ## Подтянуть ставки тех, кто получает ниже рынка. Возвращает, скольким подняли.
@@ -498,20 +502,20 @@ func wages_to_market() -> int:
 			change_wage(w, float(mw) / float(w.wage) - 1.0)
 			n += 1
 	if n > 0:
-		notify("Ставки подтянуты до рыночных: %d %s." % [n, Defs.plural(n, "человек", "человека", "человек")], LVL_GOOD)
+		notify(L.t("Ставки подтянуты до рыночных: %d %s.") % [n, Defs.plural(n, "человек", "человека", "человек")], LVL_GOOD)
 	return n
 
 
 func give_bonus(w: Worker) -> String:
 	var amount := Defs.b("bonus_amount")
 	if not can_afford(amount):
-		return "Не хватает денег"
+		return L.t("Не хватает денег")
 	spend(amount, "Премия: " + w.full_name())
 	Mood.add(self, w, "bonus")
 	Nicks.count(w, "bonus")
-	w.add_history(day(), Nicks.gendered("Получил{|а} премию %s", w.female) % Defs.money_str(amount))
+	w.add_history(day(), Nicks.gendered(L.t("Получил{|а} премию %s"), w.female) % Defs.money_str(amount))
 	Mood.refresh(self, w)
-	notify(Nicks.gendered("%s получил{|а} премию. Настроение — на высоте.", w.female) % w.full_name(), LVL_GOOD)
+	notify(Nicks.gendered(L.t("%s получил{|а} премию. Настроение — на высоте."), w.female) % w.full_name(), LVL_GOOD)
 	return ""
 
 
@@ -521,7 +525,7 @@ func set_shift(w: Worker, sh: int) -> void:
 		return
 	if w.present:
 		w.pending_shift = sh
-		notify("%s перейдёт в %s после этой смены." % [w.full_name(), "1-ю смену" if sh == 0 else "2-ю смену"], LVL_INFO)
+		notify(L.t("%s перейдёт в %s после этой смены.") % [w.full_name(), L.t("1-ю смену") if sh == 0 else L.t("2-ю смену")], LVL_INFO)
 	else:
 		w.shift = sh
 		w.pending_shift = -1
@@ -850,14 +854,14 @@ func material_total(mat: String) -> int:
 func order_cons(c: String, packs: int) -> String:
 	var cd: Dictionary = Defs.consumables.get(c, {})
 	if cd.is_empty() or packs <= 0:
-		return "Нечего заказывать"
+		return L.t("Нечего заказывать")
 	var cost := float(cd["price"]) * packs
 	if not can_afford(cost):
-		return "Не хватает денег: нужно " + Defs.money_str(cost)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 	spend(cost, "Расходники: %s × %d" % [str(cd["name"]), packs])
 	var eta := to_work_time(minute + rng.randf_range(60.0, 150.0))
 	cons_supply.append({"cons": c, "packs": packs, "eta": eta})
-	notify("Заказано: %s × %d. Курьер привезёт %s." % [str(cd["pack"]), packs, _eta_str(eta)], LVL_INFO)
+	notify(L.t("Заказано: %s × %d. Курьер привезёт %s.") % [L.dt("consumable.%s.pack" % c, str(cd["pack"])), packs, _eta_str(eta)], LVL_INFO)
 	return ""
 
 
@@ -881,7 +885,7 @@ func _tick_cons_supply() -> void:
 			var c := str(s["cons"])
 			var cd: Dictionary = Defs.consumables.get(c, {})
 			cons[c] = float(cons.get(c, 0.0)) + float(cd.get("units", 0)) * int(s["packs"])
-			notify("Привезли расходники: %s." % str(cd.get("name", c)), LVL_INFO)
+			notify(L.t("Привезли расходники: %s.") % L.dt("consumable.%s.name" % c, str(cd.get("name", c))), LVL_INFO)
 			cons_supply.remove_at(i)
 
 
@@ -940,7 +944,7 @@ func _finish_batch(m: Thing) -> void:
 	m.progress = 0.0
 	m.parts_made += ids.size()
 	item_rev += 1
-	notify("%s: партия «%s» × %d готова." % [m.title(), Defs.product_name(m.product), ids.size()], LVL_INFO, m.cell)
+	notify(L.t("%s: партия «%s» × %d готова.") % [m.title(), Defs.product_name(m.product), ids.size()], LVL_INFO, m.cell)
 
 
 ## Износ: ниже порога станок может сломаться на операции.
@@ -953,7 +957,7 @@ func roll_breakdown(m: Thing) -> void:
 		m.broken = true
 		m.working = false
 		sfx.emit("breakdown", m.cell)
-		notify("%s сломался! Нужен ремонт (%s на запчасти). Чтобы станки не ломались, обслуживайте их вовремя — включите ППР в «Производство → Станки»." % [m.title(), Defs.money_str(Defs.b("repair_cost"))], LVL_BAD, m.cell)
+		notify(L.t("%s сломался! Нужен ремонт (%s на запчасти). Чтобы станки не ломались, обслуживайте их вовремя — включите ППР в «Производство → Станки».") % [m.title(), Defs.money_str(Defs.b("repair_cost"))], LVL_BAD, m.cell)
 
 
 ## Готовые детали на складах и на полу (их можно отгружать).
@@ -1042,7 +1046,7 @@ var _uo_rev := -1
 func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -> String:
 	var d: Dictionary = Defs.objects.get(def_id, {})
 	if d.is_empty():
-		return "Неизвестный объект"
+		return L.t("Неизвестный объект")
 	var lock := progress.locked_reason(def_id)
 	if lock != "":
 		return lock
@@ -1051,52 +1055,52 @@ func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -
 	if bool(d.get("span", false)):
 		# кран-балка: в помещении, от стены до стены, одна на помещение
 		if not world.in_plot(c):
-			return "Только внутри участка"
+			return L.t("Только внутри участка")
 		var r := rooms.room_at(c)
 		if r == null:
-			return "Кран-балку ставят в помещении: щёлкните внутри цеха"
+			return L.t("Кран-балку ставят в помещении: щёлкните внутри цеха")
 		if r.srect.size.x > 26:
-			return "Пролёт %d клеток — для кран-балки слишком широко (до 26)" % r.srect.size.x
+			return L.t("Пролёт %d клеток — для кран-балки слишком широко (до 26)") % r.srect.size.x
 		for o: Thing in things.values():
 			if o.id != ignore_id and o.def().get("span", false) and rooms.space_id_at(o.cell) == r.space:
-				return "В этом помещении уже есть кран-балка"
+				return L.t("В этом помещении уже есть кран-балка")
 		if ceil_at.has(world.idx(c)) and int(ceil_at[world.idx(c)]) != ignore_id:
-			return "Здесь висит светильник"
+			return L.t("Здесь висит светильник")
 		return ""
 	if bool(d.get("ceiling", false)):
 		if not world.in_plot(c):
-			return "Только внутри участка"
+			return L.t("Только внутри участка")
 		var ci := world.idx(c)
 		if Defs.wall_solid(world.wall[ci]) or world.bp_wall[ci] != World.BP_NONE:
-			return "Мешает стена"
+			return L.t("Мешает стена")
 		if ceil_at.has(ci) and int(ceil_at[ci]) != ignore_id:
-			return "Здесь под потолком уже что-то висит"
+			return L.t("Здесь под потолком уже что-то висит")
 		return ""
 	var on_fence := str(d.get("kind", "")) == "checkpoint" and fence_fit(c, s, ignore_id)   # 1.30: проходная — прямо в заборе
 	for y in s.y:
 		for x in s.x:
 			var cc := c + Vector2i(x, y)
 			if not on_fence and not world.in_plot(cc):
-				return "Только внутри участка"
+				return L.t("Только внутри участка")
 			var i := world.idx(cc)
 			if not on_fence and (world.wall[i] != World.W_NONE or world.bp_wall[i] != World.BP_NONE):
-				return "Мешает стена"
+				return L.t("Мешает стена")
 			if world.occ[i] >= 0 and world.occ[i] != ignore_id:
-				return "Место занято"
+				return L.t("Место занято")
 			if world.flora[i] != 0:
-				return "Мешает %s — спилите его (Снос)" % World.flora_name(world.flora[i])
+				return L.t("Мешает %s — спилите его (Снос)") % World.flora_name(world.flora[i])
 			if bool(d.get("needs_floor", false)) and world.flr[i] == 0 and (world.bp_floor[i] == World.BP_NONE or world.bp_floor[i] == 0):
-				return "Нужен пол (только в помещении)"
+				return L.t("Нужен пол (только в помещении)")
 			if bool(d.get("blocks", true)):
 				for gid in ground_items:
 					var gi: Item = items.get(gid)
 					if gi and gi.cell == cc:
-						return "Мешают грузы на полу"
+						return L.t("Мешают грузы на полу")
 	# 1.20: насосная одна на завод — тянет все приборы
 	if str(d.get("kind", "")) == "pump":
 		for o: Thing in things.values():
 			if o.id != ignore_id and o.kind() == "pump" and not o.demolish:
-				return "Насосная уже есть — одна даёт воду всему заводу"
+				return L.t("Насосная уже есть — одна даёт воду всему заводу")
 	# 1.20: электрокотёл — вплотную к насосной
 	if str(d.get("kind", "")) == "heater":
 		var near := false
@@ -1105,7 +1109,7 @@ func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -
 				near = true
 				break
 		if not near:
-			return "Электрокотёл ставят рядом с насосной станцией — не дальше одной клетки"
+			return L.t("Электрокотёл ставят рядом с насосной станцией — не дальше одной клетки")
 	if str(d.get("kind", "")) == "battery":
 		# аккумуляторный шкаф — вплотную к подстанции, не больше девяти у одной (1.13)
 		var host: Thing = null
@@ -1114,13 +1118,13 @@ func can_place(def_id: String, c: Vector2i, rot: int = 0, ignore_id: int = -1) -
 				host = o
 				break
 		if host == null:
-			return "Аккумулятор ставят вплотную к подстанции — в пределах одной клетки, можно по углам"
+			return L.t("Аккумулятор ставят вплотную к подстанции — в пределах одной клетки, можно по углам")
 		var nb := 0
 		for b in power.batteries_of(host):
 			if b.id != ignore_id:
 				nb += 1
 		if nb >= Power.BATT_MAX:
-			return "У подстанции уже %d аккумуляторов — больше не поместится" % Power.BATT_MAX
+			return L.t("У подстанции уже %d аккумуляторов — больше не поместится") % Power.BATT_MAX
 	return ""
 
 
@@ -1174,8 +1178,8 @@ func _fit_old_checkpoint(t: Thing) -> void:
 		return
 	things.erase(t.id)
 	if t.built:
-		earn(t.cost_paid if t.cost_paid > 0.0 else thing_cost(t.def_id), "Возврат: " + t.title())
-	notify("Проходная стала шире (будка и два турникета) и не поместилась на старом месте — её разобрали, деньги вернули. Поставьте новую у въезда.", LVL_WARN)
+		earn(t.cost_paid if t.cost_paid > 0.0 else thing_cost(t.def_id), "Возврат: " + t.title_ru())
+	notify(L.t("Проходная стала шире (будка и два турникета) и не поместилась на старом месте — её разобрали, деньги вернули. Поставьте новую у въезда."), LVL_WARN)
 
 
 ## 1.30: собранная проходная в заборе — забор под ней убираем (проём с турникетами).
@@ -1215,16 +1219,16 @@ func place_thing(def_id: String, c: Vector2i, built: bool, pay: bool = true, rot
 		for cc in t.cells():
 			world.occ[world.idx(cc)] = t.id
 	if pay and not built and logi.take_spare(def_id, t):
-		notify("%s: возьмём со склада оборудования — платить не нужно." % t.title(), LVL_GOOD, c)
+		notify(L.t("%s: возьмём со склада оборудования — платить не нужно.") % t.title(), LVL_GOOD, c)
 	elif pay:
 		var cost := thing_cost(def_id)
 		if market.can_lease(def_id, cost):
 			# лизинг: сейчас — аванс, остальное — платежами по понедельникам
 			var adv := market.lease_buy(t, cost)
-			spend(adv, "Лизинг: аванс за " + t.title())
+			spend(adv, "Лизинг: аванс за " + t.title_ru())
 			cost = adv
 		else:
-			spend(cost, "Покупка: " + t.title())
+			spend(cost, "Покупка: " + t.title_ru())
 		t.cost_paid = cost
 		story.on_bought(def_id)
 		if not built:
@@ -1276,7 +1280,7 @@ func set_area(r: Rect2i, v: int) -> int:
 	for zv: int in lost.keys():
 		var have := logi.area_count(zv)
 		if have > 0 and int(lost[zv]) >= have:
-			area_refusal = str(AREA_NEED.get(zv, ""))
+			area_refusal = L.t(str(AREA_NEED.get(zv, "")))
 			return -1
 	var n := 0
 	for y in range(r.position.y, r.end.y):
@@ -1305,12 +1309,12 @@ func _area_ok(c: Vector2i, v: int) -> bool:
 func rotate_thing(t: Thing) -> String:
 	var nr := Thing.next_rot(t.def_id, t.rot)
 	if nr == t.rot:
-		return "Этот объект не поворачивается"
+		return L.t("Этот объект не поворачивается")
 	if t.user >= 0 or not t.spot_users.is_empty():
-		return "Сейчас с ним работают — попробуйте позже"
+		return L.t("Сейчас с ним работают — попробуйте позже")
 	var err := can_place(t.def_id, t.cell, nr, t.id)
-	if err != "" and not err.begins_with("Мешают грузы"):
-		return "Не помещается: " + err.to_lower()
+	if err != "" and not err.begins_with(L.t("Мешают грузы")):
+		return L.t("Не помещается: ") + err.to_lower()
 	for cc in t.cells():
 		var i := world.idx(cc)
 		world.occ[i] = -1
@@ -1366,7 +1370,7 @@ func remove_thing(t: Thing, refund_rate: float) -> void:
 	slot_items.erase(t.id)
 	var refund := t.cost_paid * refund_rate
 	if refund > 0.0:
-		earn(refund, "Возврат: " + t.title())
+		earn(refund, "Возврат: " + t.title_ru())
 	thing_rev += 1
 
 
@@ -1426,10 +1430,10 @@ func place_wall_bp(c: Vector2i, wid: int) -> bool:
 ## (общие стены с соседями не трогаем) и дверь посередине нижней стены. "" — получилось.
 func place_room_bp(r: Rect2i, fid: int) -> String:
 	if r.size.x < 3 or r.size.y < 3:
-		return "Помещение — минимум 3×3 клетки (стены по краю, внутри пол)."
+		return L.t("Помещение — минимум 3×3 клетки (стены по краю, внутри пол).")
 	var cost := room_bp_cost(r, fid)
 	if not can_afford(cost):
-		return "Не хватает денег: помещение обойдётся в %s." % Defs.money_str(cost)
+		return L.t("Не хватает денег: помещение обойдётся в %s.") % Defs.money_str(cost)
 	for y in range(r.position.y, r.end.y):
 		for x in range(r.position.x, r.end.x):
 			var c := Vector2i(x, y)
@@ -1531,8 +1535,8 @@ func buy_lot(k: int) -> bool:
 	var ob := OldBuild.place(self, k)
 	world.flora_rev += 1
 	world.refresh_all()
-	notify("Участок %s куплен: ещё %d×%d клеток%s. Старый забор между участками снесите (Снос), деревья спилят строители." % [side, r.size.x, r.size.y,
-		(", на нём %s — стены и ворота целы, нужны свет, проводка и уборка" % ob) if ob != "" else ""], LVL_GOOD, r.get_center())
+	notify(L.t("Участок %s куплен: ещё %d×%d клеток%s. Старый забор между участками снесите (Снос), деревья спилят строители.") % [side, r.size.x, r.size.y,
+		(L.t(", на нём %s — стены и ворота целы, нужны свет, проводка и уборка") % ob) if ob != "" else ""], LVL_GOOD, r.get_center())
 	return true
 
 
@@ -1632,9 +1636,9 @@ func cancel_thing(t: Thing) -> void:
 	if not_sent:
 		market.cancel_lease(t.id)
 	if t.cost_paid > 0.0 and not_sent:
-		earn(t.cost_paid, "Отмена покупки: " + t.title())
+		earn(t.cost_paid, "Отмена покупки: " + t.title_ru())
 	elif t.cost_paid > 0.0:
-		notify("%s уже везут — ящики сложат на склад оборудования, их можно поставить позже или продать (Производство → Склад оборудования)." % t.title(), LVL_INFO, t.cell)
+		notify(L.t("%s уже везут — ящики сложат на склад оборудования, их можно поставить позже или продать (Производство → Склад оборудования).") % t.title(), LVL_INFO, t.cell)
 	t.cost_paid = 0.0
 	remove_thing(t, 0.0)
 
@@ -1758,33 +1762,33 @@ func spawn_vehicle(kind: String) -> Vehicle:
 
 func order_material(mat: String, qty: int, auto: bool = false) -> String:
 	if qty <= 0:
-		return "Укажите количество"
+		return L.t("Укажите количество")
 	var price := material_price(mat)
 	var cost := price * qty
 	var sd := office.supplier_def()
 	if auto and not can_afford(cost):
 		# 1.20: снабжение само в долг не закупает — решает директор (Производство → Металл)
-		notify_once("auto_supply_debt", "Снабжение: на металл нет денег — само в долг не закупает. Купить в долг можно вручную: «Производство → Металл и расходники».", LVL_WARN, Vector2i(-1, -1), 720.0)
-		return "Не хватает денег: нужно " + Defs.money_str(cost)
+		notify_once("auto_supply_debt", L.t("Снабжение: на металл нет денег — само в долг не закупает. Купить в долг можно вручную: «Производство → Металл и расходники»."), LVL_WARN, Vector2i(-1, -1), 720.0)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 	if not can_afford(cost):
 		# товарный кредит: под принятые заказы поставщик отгружает с отсрочкой платежа
 		if trade_credit_left() < cost:
-			return "Не хватает денег: нужно " + Defs.money_str(cost)
+			return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 		office.add_debt(cost * 1.05, 2, "Отсрочка платежа за металл")
-		notify("Денег на металл не хватило — %s отгрузил %s × %d в долг: %s вернуть за две недели (+5%%)." % [str(sd.get("name", "поставщик")), Defs.material_name(mat), qty, Defs.money_str(cost * 1.05)], LVL_WARN)
+		notify(L.t("Денег на металл не хватило — %s отгрузил %s × %d в долг: %s вернуть за две недели (+5%%).") % [office.supplier_name(), Defs.material_name(mat), qty, Defs.money_str(cost * 1.05)], LVL_WARN)
 	else:
-		spend(cost, "Металл: %s × %d (%s)" % [Defs.material_name(mat), qty, str(sd.get("name", ""))])
+		spend(cost, "Металл: %s × %d (%s)" % [Defs.material_name(mat), qty, office.supplier_name()])
 	var dl: Array = sd.get("delay", [Defs.b("supply_delay_min"), Defs.b("supply_delay_max")])
 	var delay := rng.randf_range(float(dl[0]), float(dl[1]))
 	if rng.randf() < float(sd.get("risk", 0.0)):
 		delay += 1440.0
-		notify_once("sup_late", "Поставщик %s предупредил: машина задержится на сутки." % str(sd.get("name", "")), LVL_WARN, Vector2i(-1, -1), 600.0)
+		notify_once("sup_late", L.t("Поставщик %s предупредил: машина задержится на сутки.") % office.supplier_name(), LVL_WARN, Vector2i(-1, -1), 600.0)
 	if story.has_mod("roads"):
 		delay += 1440.0
 	var eta := to_work_time(minute + delay)
 	supply.append({"id": new_id(), "mat": mat, "qty": qty, "eta": eta, "spawned": false, "done": false})
 	var when := _eta_str(eta)
-	notify("Заказан металл: %s × %d. Привезут %s." % [Defs.material_name(mat), qty, when], LVL_INFO)
+	notify(L.t("Заказан металл: %s × %d. Привезут %s.") % [Defs.material_name(mat), qty, when], LVL_INFO)
 	return ""
 
 
@@ -1808,10 +1812,10 @@ func _eta_str(eta: float) -> String:
 	var m := int(fmod(eta, 1440.0))
 	var hm := "%02d:%02d" % [int(m / 60), m % 60]
 	if d == day():
-		return "сегодня к " + hm
+		return L.t("сегодня к ") + hm
 	if d == day() + 1:
-		return "завтра к " + hm
-	return "в день %d к %s" % [d, hm]
+		return L.t("завтра к ") + hm
+	return L.t("в день %d к %s") % [d, hm]
 
 
 func _tick_supply() -> void:
@@ -1908,7 +1912,7 @@ func _dump_cargo(v: Vehicle) -> void:
 		put_on_ground(it, c)
 		dumped += 1
 	if dumped > 0:
-		notify("Водитель не дождался разгрузки и оставил груз у ворот — занесут, когда освободятся руки.", LVL_INFO, Vector2i(gate_x, world.plot.end.y - 1))
+		notify(L.t("Водитель не дождался разгрузки и оставил груз у ворот — занесут, когда освободятся руки."), LVL_INFO, Vector2i(gate_x, world.plot.end.y - 1))
 
 
 func dispose() -> void:
@@ -1963,12 +1967,12 @@ func _on_park(v: Vehicle) -> void:
 					var it := new_item("mat", str(s["mat"]), "raw")
 					put_in_vehicle(it, v)
 				s["done"] = true
-				notify("Привезли металл: %s. Разгружаем." % v.cargo_desc, LVL_INFO, cell)
+				notify(L.t("Привезли металл: %s. Разгружаем.") % v.cargo_desc, LVL_INFO, cell)
 		supply = supply.filter(func(x: Dictionary) -> bool: return not bool(x["done"]))
 	else:
 		var o := orders.get_order(v.order_id)
 		if not o.is_empty():
-			notify("Приехали за заказом: %s. Грузим." % orders.short(o), LVL_INFO, cell)
+			notify(L.t("Приехали за заказом: %s. Грузим.") % orders.short(o), LVL_INFO, cell)
 
 
 # ---------------------------------------------------------------- тик
@@ -2058,7 +2062,7 @@ func _on_new_day() -> void:
 		spend(power_kwh_day * Defs.b("power_price_kwh"), "Электроэнергия: %d кВт·ч" % int(power_kwh_day))
 		power_kwh_day = 0.0
 	if money < 0.0:
-		notify_once("cash", "Кассовый разрыв! Денег нет — срочно выполняйте заказы.", LVL_BAD, Vector2i(-1, -1), 1440.0)
+		notify_once("cash", L.t("Кассовый разрыв! Денег нет — срочно выполняйте заказы."), LVL_BAD, Vector2i(-1, -1), 1440.0)
 
 
 func _pay_wages() -> void:
@@ -2071,7 +2075,7 @@ func _pay_wages() -> void:
 			w0.set_meta("wage_due", 0.0)
 		if paid:
 			spend(total, "Зарплата за неделю")
-			notify("Выдана зарплата за неделю: %s." % Defs.money_str(total), LVL_INFO)
+			notify(L.t("Выдана зарплата за неделю: %s.") % Defs.money_str(total), LVL_INFO)
 			for w2 in workers:
 				Mood.add(self, w2, "payday")
 	office.on_payday()
@@ -2096,8 +2100,8 @@ func _honor_board() -> void:
 			honor_log.resize(12)
 	if has_board and best and best.week_score > 0:
 		Mood.add(self, best, "honor_board")
-		best.add_history(day(), "Фото повесили на доску почёта")
-		notify("На доску почёта повесили фото: %s, %s. Лучший работник недели!" % [best.full_name(), best.prof_lc()], LVL_GOOD)
+		best.add_history(day(), L.t("Фото повесили на доску почёта"))
+		notify(L.t("На доску почёта повесили фото: %s, %s. Лучший работник недели!") % [best.full_name(), best.prof_lc()], LVL_GOOD)
 	for w in workers:
 		w.week_score = 0
 

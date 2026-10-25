@@ -99,3 +99,12 @@ static func got_count() -> int:
 		if got.has(str(a["id"])):
 			n += 1
 	return n
+
+
+## 1.39: название и описание достижения на языке игры (ключи ach.<id>.name / ach.<id>.desc).
+static func name_of(a: Dictionary) -> String:
+	return L.dt("ach.%s.name" % str(a.get("id", "")), str(a.get("name", "")))
+
+
+static func desc_of(a: Dictionary) -> String:
+	return L.dt("ach.%s.desc" % str(a.get("id", "")), str(a.get("desc", "")))

@@ -226,7 +226,7 @@ func _on_monday() -> void:
 	if memo_on and sim.day() >= 7 and sim.office.active("engineer"):
 		var adv := advice()
 		if not adv.is_empty():
-			sim.notify("Главный инженер: «%s» — и ещё %d %s в «Управление → Главный инженер»." % [str(adv[0]["title"]), adv.size() - 1, Defs.plural(adv.size() - 1, "совет", "совета", "советов")], Sim.LVL_INFO)
+			sim.notify(L.t("Главный инженер: «%s» — и ещё %d %s в «Управление → Главный инженер».") % [str(adv[0]["title"]), adv.size() - 1, Defs.plural(adv.size() - 1, "совет", "совета", "советов")], Sim.LVL_INFO)
 
 
 func _metal_shock() -> void:
@@ -235,9 +235,9 @@ func _metal_shock() -> void:
 	var up := sim.rng.randf() < 0.6
 	var k := sim.rng.randf_range(0.08, 0.15)
 	metal = clampf(metal * (1.0 + k if up else 1.0 - k), 0.75, 1.4)
-	var why: String = ["подорожал прокат на комбинатах", "выросли тарифы на перевозку", "новые пошлины на сталь"][sim.rng.randi_range(0, 2)] if up else ["комбинаты распродают запасы", "упал спрос у строителей", "открылся новый склад проката"][sim.rng.randi_range(0, 2)]
-	sim.story.info("Металл %s на %d%%" % ["подорожал" if up else "подешевел", int(roundf(k * 100.0))],
-		"Новость с металлобазы: %s. %s" % [why, "Держите запас «Только под заказы», пока цены не вернутся." if up else "Самое время закупить металл впрок — поставьте запас «Большой»."],
+	var why: String = [L.t("подорожал прокат на комбинатах"), L.t("выросли тарифы на перевозку"), L.t("новые пошлины на сталь")][sim.rng.randi_range(0, 2)] if up else [L.t("комбинаты распродают запасы"), L.t("упал спрос у строителей"), L.t("открылся новый склад проката")][sim.rng.randi_range(0, 2)]
+	sim.story.info(L.t("Металл %s на %d%%") % [L.t("подорожал") if up else L.t("подешевел"), int(roundf(k * 100.0))],
+		L.t("Новость с металлобазы: %s. %s") % [why, L.t("Держите запас «Только под заказы», пока цены не вернутся.") if up else L.t("Самое время закупить металл впрок — поставьте запас «Большой».")],
 		"supply", Sim.LVL_WARN if up else Sim.LVL_GOOD)
 
 
@@ -256,7 +256,7 @@ func _record_day() -> void:
 		if ed != d - 1:
 			continue
 		var v := float(e["v"])
-		if str(e["text"]).begins_with("Кредит получен"):
+		if str(e.get("base", e["text"])).begins_with("Кредит получен"):
 			continue
 		if v > 0.0:
 			rev += v
@@ -296,7 +296,7 @@ func _comp_events() -> void:
 			if comp(str(p["id"])).is_empty():
 				var nc := _new_comp(p)
 				comps.append(nc)
-				sim.story.info("Новый конкурент: %s" % str(nc["name"]), "В районе открылся %s. Специализация: %s." % [str(nc["name"]), _spec_text(nc)], "chart_down", Sim.LVL_WARN)
+				sim.story.info(L.t("Новый конкурент: %s") % Company.firm(str(nc["name"])), L.t("В районе открылся %s. Специализация: %s.") % [Company.firm(str(nc["name"])), _spec_text(nc)], "chart_down", Sim.LVL_WARN)
 				return
 	var r := rng.randf()
 	if r < 0.16 and not war_active():
@@ -306,7 +306,7 @@ func _comp_events() -> void:
 	elif r < 0.36:
 		var c2: Dictionary = al[rng.randi_range(0, al.size() - 1)]
 		c2["size"] = float(c2["size"]) + 0.8
-		sim.story.info("%s расширяется" % str(c2["name"]), "%s поставил новые станки — будет брать больше заказов. Держите сроки и качество, чтобы заказчики оставались с нами." % str(c2["name"]), "chart_down", Sim.LVL_INFO)
+		sim.story.info(L.t("%s расширяется") % Company.firm(str(c2["name"])), L.t("%s поставил новые станки — будет брать больше заказов. Держите сроки и качество, чтобы заказчики оставались с нами.") % Company.firm(str(c2["name"])), "chart_down", Sim.LVL_INFO)
 	elif r < 0.42 and policy == "dump":
 		# демпинг злит соседей
 		_start_war(al[rng.randi_range(0, al.size() - 1)], true)
@@ -322,11 +322,11 @@ func _spec_text(c: Dictionary) -> String:
 func _start_war(c: Dictionary, answer: bool = false) -> void:
 	c["war_until"] = sim.day() + 14
 	c["price"] = float(c["base_price"]) * 0.88
-	var t := "%s снизил цены на 12%%%s — заказчики считают деньги, заявок к нам станет меньше на две недели." % [str(c["name"]), " в ответ на наш демпинг" if answer else ""]
-	sim.story.letter("price_war", "Война цен", t, "chart_down", Sim.LVL_WARN,
-		[{"text": "Ответить демпингом", "hint": "Цены −10%, заявок больше, маржа меньше"},
-		{"text": "Держать цены", "hint": "Заявок −15% две недели"},
-		{"text": "Сделать упор на качество (60 000 ₽)", "hint": "Реклама в отраслевом журнале: репутация +4, война цен кончится раньше"}],
+	var t := L.t("%s снизил цены на 12%%%s — заказчики считают деньги, заявок к нам станет меньше на две недели.") % [Company.firm(str(c["name"])), L.t(" в ответ на наш демпинг") if answer else ""]
+	sim.story.letter("price_war", L.t("Война цен"), t, "chart_down", Sim.LVL_WARN,
+		[{"text": L.t("Ответить демпингом"), "hint": L.t("Цены −10%, заявок больше, маржа меньше")},
+		{"text": L.t("Держать цены"), "hint": L.t("Заявок −15% две недели")},
+		{"text": L.t("Сделать упор на качество (60 000 ₽)"), "hint": L.t("Реклама в отраслевом журнале: репутация +4, война цен кончится раньше")}],
 		1, {"comp": str(c["id"])})
 
 
@@ -340,14 +340,14 @@ func _bankrupt(c: Dictionary) -> void:
 			pick = m
 			if sim.rng.randf() < 0.5:
 				break
-	var t := "%s обанкротился: его заказчики ищут новых подрядчиков — наша доля рынка вырастет." % str(c["name"])
+	var t := L.t("%s обанкротился: его заказчики ищут новых подрядчиков — наша доля рынка вырастет.") % Company.firm(str(c["name"]))
 	if pick != "":
-		t += " Конкурсный управляющий распродаёт оборудование: «%s» с торгов — за 40%% цены." % str(Defs.objects[pick]["name"])
-		sim.story.letter("auction", "Банкротство конкурента", t, "court", Sim.LVL_GOOD,
-			[{"text": "Купить с торгов", "hint": "Следующий такой станок обойдётся в 40% цены (две недели)"}, {"text": "Не нужно", "hint": ""}],
+		t += L.t(" Конкурсный управляющий распродаёт оборудование: «%s» с торгов — за 40%% цены.") % Defs.obj_name(pick)
+		sim.story.letter("auction", L.t("Банкротство конкурента"), t, "court", Sim.LVL_GOOD,
+			[{"text": L.t("Купить с торгов"), "hint": L.t("Следующий такой станок обойдётся в 40% цены (две недели)")}, {"text": L.t("Не нужно"), "hint": ""}],
 			1, {"def": pick})
 	else:
-		sim.story.info("Банкротство конкурента", t, "court", Sim.LVL_GOOD)
+		sim.story.info(L.t("Банкротство конкурента"), t, "court", Sim.LVL_GOOD)
 
 
 func _poach() -> void:
@@ -366,12 +366,12 @@ func _poach() -> void:
 		return
 	var c: Dictionary = al[sim.rng.randi_range(0, al.size() - 1)]
 	var raise := int(roundf(best.wage * 0.15 / 50.0) * 50)
-	sim.story.letter("poach", "Переманивают %s" % best.full_name(),
-		"%s зовёт к себе %s (%s): обещают на 20%% больше. Человек думает." % [str(c["name"]), best.full_name(), best.title_lc()],
+	sim.story.letter("poach", L.t("Переманивают %s") % best.full_name(),
+		L.t("%s зовёт к себе %s (%s): обещают на 20%% больше. Человек думает.") % [Company.firm(str(c["name"])), best.full_name(), best.title_lc()],
 		"thief", Sim.LVL_WARN,
-		[{"text": "Поднять ставку на %s" % Defs.money_str(raise), "hint": "Останется и будет доволен"},
-		{"text": "Поговорить по душам", "hint": "Останется, если %s у нас хорошо (настроение %d)" % ["ей" if best.female else "ему", int(best.mood)]},
-		{"text": "Отпустить", "hint": "Уйдёт к конкуренту"}],
+		[{"text": L.t("Поднять ставку на %s") % Defs.money_str(raise), "hint": L.t("Останется и будет доволен")},
+		{"text": L.t("Поговорить по душам"), "hint": L.t("Останется, если %s у нас хорошо (настроение %d)") % [L.t("ей") if best.female else L.t("ему"), int(best.mood)]},
+		{"text": L.t("Отпустить"), "hint": L.t("Уйдёт к конкуренту")}],
 		1, {"w": best.id, "raise": raise, "comp": str(c["id"])})
 
 
@@ -382,38 +382,38 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 			var c := comp(str(d.get("comp", "")))
 			if choice == 0:
 				policy = "dump"
-				sim.notify("Перешли на демпинг: цены −10%. Вернуть цены можно в «Заказы → Конкуренты».", Sim.LVL_INFO)
+				sim.notify(L.t("Перешли на демпинг: цены −10%. Вернуть цены можно в «Заказы → Конкуренты»."), Sim.LVL_INFO)
 			elif choice == 2:
 				if sim.money < 60000.0:
-					sim.notify("Денег на рекламу нет — держим цены.", Sim.LVL_WARN)
+					sim.notify(L.t("Денег на рекламу нет — держим цены."), Sim.LVL_WARN)
 					return
 				sim.spend(60000.0, "Реклама в отраслевом журнале")
 				sim.reputation = minf(100.0, sim.reputation + 4.0)
 				if not c.is_empty():
 					c["war_until"] = mini(int(c["war_until"]), sim.day() + 5)
-				sim.notify("Статья о заводе вышла: заказчики помнят о качестве. Война цен скоро выдохнется.", Sim.LVL_GOOD)
+				sim.notify(L.t("Статья о заводе вышла: заказчики помнят о качестве. Война цен скоро выдохнется."), Sim.LVL_GOOD)
 		"auction":
 			if choice == 0:
 				var def := str(d.get("def", ""))
-				sim.story.add_mod("voucher:" + def, 0.4, 14.0 * 1440.0, "Станок с торгов")
-				sim.notify("Выкупили с торгов «%s»: ставьте его в течение двух недель — заплатите 40%% цены." % str(Defs.objects.get(def, {}).get("name", def)), Sim.LVL_GOOD)
+				sim.story.add_mod("voucher:" + def, 0.4, 14.0 * 1440.0, L.t("Станок с торгов"))
+				sim.notify(L.t("Выкупили с торгов «%s»: ставьте его в течение двух недель — заплатите 40%% цены.") % Defs.obj_name(def), Sim.LVL_GOOD)
 		"poach":
 			var w := sim.get_worker(int(d.get("w", -1)))
 			if w == null:
 				return
 			var c2 := comp(str(d.get("comp", "")))
-			var cn := str(c2.get("name", "конкурент"))
+			var cn := Company.firm(str(c2.get("name", L.t("конкурент"))))
 			if choice == 0:
 				w.wage += int(d.get("raise", 300))
 				Mood.add(sim, w, "raise")
-				w.add_history(sim.day(), "Звали к конкуренту — остался за прибавку")
-				sim.notify("%s остаётся: ставку подняли." % w.full_name(), Sim.LVL_GOOD)
+				w.add_history(sim.day(), L.t("Звали к конкуренту — остался за прибавку"))
+				sim.notify(L.t("%s остаётся: ставку подняли.") % w.full_name(), Sim.LVL_GOOD)
 			elif choice == 1 and w.mood >= 50.0:
-				w.add_history(sim.day(), "Звали к конкуренту — остался: «Здесь свои»")
-				sim.notify("%s подумал и остался: «Здесь свои люди, куда я пойду»." % w.full_name(), Sim.LVL_GOOD)
+				w.add_history(sim.day(), L.t("Звали к конкуренту — остался: «Здесь свои»"))
+				sim.notify(L.t("%s подумал и остался: «Здесь свои люди, куда я пойду».") % w.full_name(), Sim.LVL_GOOD)
 			else:
-				w.add_history(sim.day(), "Ушёл в %s" % cn)
-				sim.notify("%s ушёл в %s." % [w.full_name(), cn], Sim.LVL_BAD)
+				w.add_history(sim.day(), L.t("Ушёл в %s") % cn)
+				sim.notify(L.t("%s ушёл в %s.") % [w.full_name(), cn], Sim.LVL_BAD)
 				sim.fire(w, true)
 				if not c2.is_empty():
 					c2["quality"] = minf(0.95, float(c2["quality"]) + 0.02)
@@ -436,9 +436,9 @@ func on_reclamation() -> void:
 		if int(iso["reclam"]) >= 2:
 			iso["status"] = "suspended"
 			iso["until"] = sim.day()
-			sim.story.info("Сертификат ISO 9001 приостановлен", "Две рекламации за срок действия — орган по сертификации приостановил сертификат. Наведите порядок с качеством и закажите аудит заново.", "inspect", Sim.LVL_BAD)
+			sim.story.info(L.t("Сертификат ISO 9001 приостановлен"), L.t("Две рекламации за срок действия — орган по сертификации приостановил сертификат. Наведите порядок с качеством и закажите аудит заново."), "inspect", Sim.LVL_BAD)
 		else:
-			sim.notify("Рекламация при сертификате ISO 9001: ещё одна — и сертификат приостановят.", Sim.LVL_WARN)
+			sim.notify(L.t("Рекламация при сертификате ISO 9001: ещё одна — и сертификат приостановят."), Sim.LVL_WARN)
 
 
 # ================================================================ ISO 9001
@@ -452,12 +452,12 @@ func iso_reqs() -> Array:
 			break
 	var places := sim.eng.workplaces()
 	return [
-		["Контролёр ОТК и стол ОТК", qc_staff and not sim.things_of("qc").is_empty()],
-		["Качество в рейтинге от 65%", float(sim.progress.rating.get("quality", 0.5)) >= 0.65],
-		["Техотдел с технологом", sim.office.active("tech")],
-		["СОУТ проведена на всех местах", not places.is_empty() and sim.eng.unassessed() == 0],
-		["Инструктаж по охране труда действует", sim.training.tb_valid()],
-		["Без рекламаций последние 14 дней", sim.day() - last_reclam >= 14],
+		[L.t("Контролёр ОТК и стол ОТК"), qc_staff and not sim.things_of("qc").is_empty()],
+		[L.t("Качество в рейтинге от 65%"), float(sim.progress.rating.get("quality", 0.5)) >= 0.65],
+		[L.t("Техотдел с технологом"), sim.office.active("tech")],
+		[L.t("СОУТ проведена на всех местах"), not places.is_empty() and sim.eng.unassessed() == 0],
+		[L.t("Инструктаж по охране труда действует"), sim.training.tb_valid()],
+		[L.t("Без рекламаций последние 14 дней"), sim.day() - last_reclam >= 14],
 	]
 
 
@@ -473,19 +473,19 @@ func iso_ready() -> int:
 func iso_apply() -> String:
 	var st := str(iso.get("status", "none"))
 	if st == "audit":
-		return "Аудит уже назначен"
+		return L.t("Аудит уже назначен")
 	if st == "ok" and int(iso.get("until", 0)) - sim.day() > 14:
-		return "Сертификат действует до дня %d" % int(iso["until"])
+		return L.t("Сертификат действует до дня %d") % int(iso["until"])
 	if not sim.dev.on("tech3"):
-		return "Сертификацию открывает ступень «ISO 9001» (Управление → Развитие)"
+		return L.t("Сертификацию открывает ступень «ISO 9001» (Управление → Развитие)")
 	var cost := ISO_RENEW if st == "ok" else ISO_COST
 	if sim.money < cost:
-		return "Не хватает денег: аудит стоит %s" % Defs.money_str(cost)
+		return L.t("Не хватает денег: аудит стоит %s") % Defs.money_str(cost)
 	sim.spend(cost, "Сертификация ISO 9001: аудит")
 	iso["prev"] = st
 	iso["status"] = "audit"
 	iso["audit_at"] = sim.day() + 3
-	sim.notify("Орган по сертификации приедет с аудитом в день %d. Проверят: ОТК, качество, техотдел, СОУТ, инструктаж, рекламации." % int(iso["audit_at"]), Sim.LVL_INFO)
+	sim.notify(L.t("Орган по сертификации приедет с аудитом в день %d. Проверят: ОТК, качество, техотдел, СОУТ, инструктаж, рекламации.") % int(iso["audit_at"]), Sim.LVL_INFO)
 	return ""
 
 
@@ -495,9 +495,9 @@ func _tick_iso() -> void:
 		_audit()
 	elif st == "ok" and sim.day() >= int(iso.get("until", 0)):
 		iso["status"] = "expired"
-		sim.story.info("Сертификат ISO 9001 истёк", "Полгода прошло — нужен надзорный аудит (%s). Без сертификата премиальные заказчики уходят." % Defs.money_str(ISO_RENEW), "inspect", Sim.LVL_WARN)
+		sim.story.info(L.t("Сертификат ISO 9001 истёк"), L.t("Полгода прошло — нужен надзорный аудит (%s). Без сертификата премиальные заказчики уходят.") % Defs.money_str(ISO_RENEW), "inspect", Sim.LVL_WARN)
 	elif st == "ok" and int(iso.get("until", 0)) - sim.day() == 10:
-		sim.notify("Сертификат ISO 9001 истекает через 10 дней — закажите надзорный аудит («Управление → ISO 9001»).", Sim.LVL_WARN)
+		sim.notify(L.t("Сертификат ISO 9001 истекает через 10 дней — закажите надзорный аудит («Управление → ISO 9001»)."), Sim.LVL_WARN)
 
 
 func _audit() -> void:
@@ -511,29 +511,29 @@ func _audit() -> void:
 		if not was:
 			sim.reputation = minf(100.0, sim.reputation + 5.0)
 		sim.stats["iso"] = 1
-		sim.story.info("Сертификат ISO 9001 получен" if not was else "Сертификат ISO 9001 продлён",
-			"Аудитор доволен: система менеджмента качества работает. Сертификат действует до дня %d. Премиальные заказчики и экспорт — охотнее, заявок больше.%s" % [int(iso["until"]), "" if miss.is_empty() else " Замечание: " + miss[0] + "."],
+		sim.story.info(L.t("Сертификат ISO 9001 получен") if not was else L.t("Сертификат ISO 9001 продлён"),
+			L.t("Аудитор доволен: система менеджмента качества работает. Сертификат действует до дня %d. Премиальные заказчики и экспорт — охотнее, заявок больше.%s") % [int(iso["until"]), "" if miss.is_empty() else L.t(" Замечание: ") + miss[0] + "."],
 			"medal", Sim.LVL_GOOD, Vector2i(-1, -1), true)
 	else:
 		iso = {"status": "remarks", "since": sim.day(), "fix_until": sim.day() + 14}
-		sim.story.info("Аудит ISO 9001: есть несоответствия",
-			"Аудитор нашёл несоответствия: %s. Сертификат не выдан. Исправьте за две недели и закажите аудит снова — повторный обойдётся дешевле." % ", ".join(miss),
+		sim.story.info(L.t("Аудит ISO 9001: есть несоответствия"),
+			L.t("Аудитор нашёл несоответствия: %s. Сертификат не выдан. Исправьте за две недели и закажите аудит снова — повторный обойдётся дешевле.") % ", ".join(miss),
 			"inspect", Sim.LVL_BAD, Vector2i(-1, -1), true)
 
 
 func iso_text() -> String:
 	match str(iso.get("status", "none")):
 		"ok":
-			return "действует до дня %d" % int(iso.get("until", 0))
+			return L.t("действует до дня %d") % int(iso.get("until", 0))
 		"audit":
-			return "аудит в день %d" % int(iso.get("audit_at", 0))
+			return L.t("аудит в день %d") % int(iso.get("audit_at", 0))
 		"remarks":
-			return "несоответствия — исправить и повторить аудит"
+			return L.t("несоответствия — исправить и повторить аудит")
 		"suspended":
-			return "приостановлен из-за рекламаций"
+			return L.t("приостановлен из-за рекламаций")
 		"expired":
-			return "истёк — нужен надзорный аудит"
-	return "нет сертификата"
+			return L.t("истёк — нужен надзорный аудит")
+	return L.t("нет сертификата")
 
 
 # ================================================================ лизинг
@@ -542,7 +542,7 @@ func iso_text() -> String:
 func lease_buy(t: Thing, cost: float) -> float:
 	var adv := roundf(cost * LEASE_ADV)
 	var total := cost * (1.0 - LEASE_ADV) * (1.0 + LEASE_UP)
-	leases.append({"id": sim.new_id(), "thing": t.id, "title": t.title(), "payment": roundf(total / LEASE_WEEKS), "left": LEASE_WEEKS, "total": roundf(total)})
+	leases.append({"id": sim.new_id(), "thing": t.id, "title": t.title_ru(), "payment": roundf(total / LEASE_WEEKS), "left": LEASE_WEEKS, "total": roundf(total)})
 	return adv
 
 
@@ -574,7 +574,7 @@ func _pay_leases() -> void:
 		l["left"] = int(l["left"]) - 1
 		if int(l["left"]) <= 0:
 			sim.stats["leases_done"] = int(sim.stats.get("leases_done", 0)) + 1
-			sim.notify("Лизинг за «%s» выплачен — станок полностью наш." % str(l["title"]), Sim.LVL_GOOD)
+			sim.notify(L.t("Лизинг за «%s» выплачен — станок полностью наш.") % L.tx(str(l["title"])), Sim.LVL_GOOD)
 	leases = leases.filter(func(l2: Dictionary) -> bool: return int(l2["left"]) > 0)
 
 
@@ -604,13 +604,13 @@ func premium(kind: String) -> float:
 
 func toggle_insurance(kind: String, on: bool) -> void:
 	if on and not insurance.has(kind) and not sim.dev.on("fin3"):
-		sim.notify("Страховку оформляет бухгалтерия после ступени «Банк и лизинг» (Управление → Развитие).", Sim.LVL_WARN)
+		sim.notify(L.t("Страховку оформляет бухгалтерия после ступени «Банк и лизинг» (Управление → Развитие)."), Sim.LVL_WARN)
 		return
 	if on and not insurance.has(kind):
 		insurance[kind] = {"since": sim.day()}
 		var p := premium(kind)
 		sim.spend(p, "Страховка: %s, первый взнос" % str(INSURANCE[kind]["name"]).to_lower())
-		sim.notify("Полис «%s» оформлен: %s в неделю, действует со следующего дня." % [str(INSURANCE[kind]["name"]), Defs.money_str(p)], Sim.LVL_INFO)
+		sim.notify(L.t("Полис «%s» оформлен: %s в неделю, действует со следующего дня.") % [L.t(str(INSURANCE[kind]["name"])), Defs.money_str(p)], Sim.LVL_INFO)
 	elif not on and insurance.has(kind):
 		insurance.erase(kind)
 
@@ -655,14 +655,14 @@ func advice(limit: int = 6) -> Array:
 				if has_m and not sim.orders.by_status(["active"]).is_empty():
 					idle.append(w.prof_lc())
 	if not idle.is_empty():
-		out.append({"prio": 72 if sim.office.payroll_share(4) > 0.6 else 45, "title": "Без работы: " + ", ".join(idle),
-			"text": "Их передела нет ни в одном заказе в работе. Возьмите заказы на эти изделия, переобучите людей (Люди → Обучение) или не нанимайте новых, пока работы нет.",
+		out.append({"prio": 72 if sim.office.payroll_share(4) > 0.6 else 45, "title": L.t("Без работы: ") + ", ".join(idle),
+			"text": L.t("Их передела нет ни в одном заказе в работе. Возьмите заказы на эти изделия, переобучите людей (Люди → Обучение) или не нанимайте новых, пока работы нет."),
 			"open": "orders", "sec": "market"})
 	var s := sim.sales.summary(7)
 	if float(s["lost_sum"]) >= 30000.0 and str(s["top"]) != "":
 		var pr := str(s["top"])
-		out.append({"prio": 90, "title": "Узкое место — %s" % Defs.process_name(pr).to_lower(),
-			"text": "За неделю отказали заказчикам на %s, больше всего — из-за этого передела (%s). %s" % [Defs.money_str(float(s["lost_sum"])), Defs.money_str(float(s["top_sum"])), sim.sales.advice(pr)],
+		out.append({"prio": 90, "title": L.t("Узкое место — %s") % Defs.process_name(pr).to_lower(),
+			"text": L.t("За неделю отказали заказчикам на %s, больше всего — из-за этого передела (%s). %s") % [Defs.money_str(float(s["lost_sum"])), Defs.money_str(float(s["top_sum"])), sim.sales.advice(pr)],
 			"open": "orders", "sec": "market"})
 	var broken := 0
 	var worn := 0
@@ -672,15 +672,15 @@ func advice(limit: int = 6) -> Array:
 		elif t.built and t.condition < 35.0:
 			worn += 1
 	if broken > 0:
-		out.append({"prio": 95, "title": "Станков сломано: %d" % broken, "text": "Сломанный станок стоит, а заказы горят. Ремонт делает токарь или рукастый рабочий — проверьте, что у них есть время.", "open": "prod", "sec": "machines"})
+		out.append({"prio": 95, "title": L.t("Станков сломано: %d") % broken, "text": L.t("Сломанный станок стоит, а заказы горят. Ремонт делает токарь или рукастый рабочий — проверьте, что у них есть время."), "open": "prod", "sec": "machines"})
 	if worn >= 2 and not sim.ppr:
-		out.append({"prio": 70, "title": "Включите ППР", "text": "%d станка сильно изношены. Планово-предупредительный ремонт обслуживает их раньше — поломки реже." % worn, "open": "prod", "sec": "machines"})
+		out.append({"prio": 70, "title": L.t("Включите ППР"), "text": L.t("%d станка сильно изношены. Планово-предупредительный ремонт обслуживает их раньше — поломки реже.") % worn, "open": "prod", "sec": "machines"})
 	var late := 0
 	for o: Dictionary in sim.orders.by_status(["active", "ready"]):
 		if sim.minute > float(o["deadline"]) - 1440.0:
 			late += 1
 	if late > 0:
-		out.append({"prio": 85, "title": "Горят сроки: %d %s" % [late, Defs.plural(late, "заказ", "заказа", "заказов")], "text": "Поставьте им приоритет «срочно» — станки возьмут их первыми. Опоздание — неустойка 5% в день и минус репутация.", "open": "orders", "sec": "active"})
+		out.append({"prio": 85, "title": L.t("Горят сроки: %d %s") % [late, Defs.plural(late, "заказ", "заказа", "заказов")], "text": L.t("Поставьте им приоритет «срочно» — станки возьмут их первыми. Опоздание — неустойка 5% в день и минус репутация."), "open": "orders", "sec": "active"})
 	if not sim.workers.is_empty():
 		var avg := 0.0
 		var bad: Dictionary = {}
@@ -696,21 +696,21 @@ func advice(limit: int = 6) -> Array:
 			var top: Array[String] = []
 			for k in keys.slice(0, 3):
 				top.append("«%s»" % str(k))
-			out.append({"prio": 80 if avg < 35.0 else 60, "title": "Люди недовольны (%d)" % int(avg), "text": "Больше всего злит: %s. Плохое настроение — медленная работа, прогулы и увольнения." % ", ".join(top), "open": "people", "sec": "staff"})
+			out.append({"prio": 80 if avg < 35.0 else 60, "title": L.t("Люди недовольны (%d)") % int(avg), "text": L.t("Больше всего злит: %s. Плохое настроение — медленная работа, прогулы и увольнения.") % ", ".join(top), "open": "people", "sec": "staff"})
 	if sim.money < 0.0 or (not sim.workers.is_empty() and sim.money < _weekly_wages()):
-		out.append({"prio": 88, "title": "Денег меньше недельной зарплаты", "text": "Ускорьте отгрузки готовых заказов, возьмите кредит или отложите покупки. Станки можно брать в лизинг — 20% сразу.", "open": "finance", "sec": "loans"})
+		out.append({"prio": 88, "title": L.t("Денег меньше недельной зарплаты"), "text": L.t("Ускорьте отгрузки готовых заказов, возьмите кредит или отложите покупки. Станки можно брать в лизинг — 20% сразу."), "open": "finance", "sec": "loans"})
 	if metal < 0.9:
-		out.append({"prio": 45, "title": "Металл подешевел (%d%%)" % int(roundf((metal - 1.0) * 100.0)), "text": "Закупите впрок: запас «Большой» в «Производство → Металл и расходники».", "open": "prod", "sec": "supply"})
+		out.append({"prio": 45, "title": L.t("Металл подешевел (%d%%)") % int(roundf((metal - 1.0) * 100.0)), "text": L.t("Закупите впрок: запас «Большой» в «Производство → Металл и расходники»."), "open": "prod", "sec": "supply"})
 	elif metal > 1.15 and sim.supply_reserve > 0:
-		out.append({"prio": 45, "title": "Металл дорогой (+%d%%)" % int(roundf((metal - 1.0) * 100.0)), "text": "Держите запас «Только под заказы», пока цены не вернутся.", "open": "prod", "sec": "supply"})
+		out.append({"prio": 45, "title": L.t("Металл дорогой (+%d%%)") % int(roundf((metal - 1.0) * 100.0)), "text": L.t("Держите запас «Только под заказы», пока цены не вернутся."), "open": "prod", "sec": "supply"})
 	if war_active() and policy != "dump":
-		out.append({"prio": 55, "title": "Война цен у конкурентов", "text": "Заявок меньше на 15%. Можно ответить демпингом или переждать, держа качество.", "open": "orders", "sec": "compet"})
+		out.append({"prio": 55, "title": L.t("Война цен у конкурентов"), "text": L.t("Заявок меньше на 15%. Можно ответить демпингом или переждать, держа качество."), "open": "orders", "sec": "compet"})
 	if sim.workers.size() >= 4 and sim.eng.unassessed() > 0 and not sim.eng.sout_busy():
-		out.append({"prio": 50, "title": "Не проведена СОУТ", "text": "Без спецоценки трудовая инспекция штрафует, а для ISO 9001 она обязательна.", "open": "people", "sec": "safety"})
+		out.append({"prio": 50, "title": L.t("Не проведена СОУТ"), "text": L.t("Без спецоценки трудовая инспекция штрафует, а для ISO 9001 она обязательна."), "open": "people", "sec": "safety"})
 	if sim.workers.size() >= 6 and not sim.training.tb_valid() and not sim.training.tb_active():
-		out.append({"prio": 50, "title": "Пора провести инструктаж", "text": "Инструктаж по охране труда — минус 30% травм. Без него штрафуют.", "open": "people", "sec": "train"})
+		out.append({"prio": 50, "title": L.t("Пора провести инструктаж"), "text": L.t("Инструктаж по охране труда — минус 30% травм. Без него штрафуют."), "open": "people", "sec": "train"})
 	if sim.workers.size() >= 8 and sim.crew.brigades.is_empty():
-		out.append({"prio": 40, "title": "Разбейте людей на бригады", "text": "Бригадир ускоряет бригаду, люди меньше бегают по заводу.", "open": "people", "sec": "brig"})
+		out.append({"prio": 40, "title": L.t("Разбейте людей на бригады"), "text": L.t("Бригадир ускоряет бригаду, люди меньше бегают по заводу."), "open": "people", "sec": "brig"})
 	if sim.dev.on("tech3") and not iso_ok() and str(iso.get("status", "none")) != "audit":
 		var rd := iso_ready()
 		if rd >= 4:
@@ -718,18 +718,18 @@ func advice(limit: int = 6) -> Array:
 			for r: Array in iso_reqs():
 				if not bool(r[1]):
 					miss.append(str(r[0]).to_lower())
-			out.append({"prio": 35 + rd * 3, "title": "До ISO 9001 рукой подать (%d из 6)" % rd, "text": ("Осталось: %s. " % ", ".join(miss) if not miss.is_empty() else "Всё готово — заказывайте аудит. ") + "Сертификат даёт больше заявок и премиальные цены.", "open": "office", "sec": "iso"})
+			out.append({"prio": 35 + rd * 3, "title": L.t("До ISO 9001 рукой подать (%d из 6)") % rd, "text": (L.t("Осталось: %s. ") % ", ".join(miss) if not miss.is_empty() else L.t("Всё готово — заказывайте аудит. ")) + L.t("Сертификат даёт больше заявок и премиальные цены."), "open": "office", "sec": "iso"})
 	var mval := 0.0
 	for t2 in sim.things_of("machine"):
 		mval += float(Defs.objects.get(t2.def_id, {}).get("cost", 0))
 	if mval >= 900000.0 and not insurance.has("property"):
-		out.append({"prio": 30, "title": "Застрахуйте оборудование", "text": "Станков на %s. Полис — %s в неделю, возмещает 80%% ремонта и ущерб от пожара." % [Defs.money_str(mval), Defs.money_str(premium("property"))], "open": "finance", "sec": "insurance"})
+		out.append({"prio": 30, "title": L.t("Застрахуйте оборудование"), "text": L.t("Станков на %s. Полис — %s в неделю, возмещает 80%% ремонта и ущерб от пожара.") % [Defs.money_str(mval), Defs.money_str(premium("property"))], "open": "finance", "sec": "insurance"})
 	var unassigned := 0
 	for r2 in sim.rooms.list:
 		if r2.type == "" and r2.area() >= 6:
 			unassigned += 1
 	if unassigned > 0:
-		out.append({"prio": 25, "title": "Помещений без назначения: %d" % unassigned, "text": "Назначьте их (кнопка «Помещения»): оборудованные цеха, бытовка и столовая поднимают настроение.", "open": "", "sec": ""})
+		out.append({"prio": 25, "title": L.t("Помещений без назначения: %d") % unassigned, "text": L.t("Назначьте их (кнопка «Помещения»): оборудованные цеха, бытовка и столовая поднимают настроение."), "open": "", "sec": ""})
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a["prio"]) > int(b["prio"]))
 	return out.slice(0, limit)
 

@@ -1,0 +1,727 @@
+keys,en
+Уборщица,Cleaner
+%s «%s» %s,"%s ""%s"" %s"
+%d-й разряд,grade %d
+вторая категория,2nd category
+первая категория,1st category
+высшая категория,top category
+ведущий,lead
+%s категория,category %s
+%s %d-го разряда,"%s, grade %d"
+%s второй категории,"%s, 2nd category"
+%s первой категории,"%s, 1st category"
+%s высшей категории,"%s, top category"
+Ведущий %s,Lead %s
+%s %s категории,"%s, category %s"
+День %d: %s,Day %d: %s
+На месте,At work
+Дома,At home
+Токарное дело,Turning
+Контроль качества,Quality control
+Погрузка,Hauling
+Фрезерное дело,Milling
+Сварка,Welding
+Термообработка,Heat treatment
+Литьё,Casting
+Покраска,Painting
+Сборка,Assembly
+Руководство,Management
+Работа с документами,Paperwork
+Инженерное дело,Engineering
+Наладка станков,Machine setup
+Работа на ЧПУ,CNC work
+Кулинария,Cooking
+Медицина,Medicine
+1-я смена (8:00–17:00),1st shift (8:00–17:00)
+"2-я смена (17:00–02:00, +20%)","2nd shift (17:00–02:00, +20%)"
+Голоден,Hungry
+Вымотан,Exhausted
+Очень хочет в туалет,Badly needs the toilet
+"Платят меньше, чем везде",Paid less than elsewhere
+Хорошо платят,Well paid
+Вторая смена — мука,Second shift is torture
+Сова: вечером работается лучше,Night owl: works better in the evening
+Рано вставать,Early start
+Платят как везде,Paid like everywhere else
+Ветеран завода — уважают,Plant veteran — respected
+Коллектив,Team
+Дом,Home
+"Столовая с горячим обедом, душ, бытовка со шкафчиками, тепло, свет и чистота в цехах.","A canteen with hot lunches, showers, a locker room, warmth, light and clean shops."
+"Ставка не ниже рыночной, премии, зарплата вовремя, индексация.","Pay at least at market rate, bonuses, wages on time, indexation."
+"Своё рабочее место, толковый мастер, СИЗ, курсы и разряд, порядок на участке.","A workplace of one's own, a capable foreman, PPE, courses and grades, order in the section."
+"Бригада, праздники и подарки, профком; поменьше ссор, драк и увольнений.","A team, holidays and gifts, a union; fewer quarrels, fights and firings."
+"Отпуск летом, удобная смена, общежитие и детский сад для семейных.","Summer vacations, a convenient shift, a dorm and a kindergarten for families."
+★ %s приш{ёл|ла} наниматься (%s) — {он|она} среди кандидатов.,★ %s came looking for a job (%s) — {he|she} is on the candidate list.
+Индексация зарплаты на 5%,5% wage indexation
+Сразу при подписании: ставки рабочих +5%.,On signing: workers' pay rates +5%.
+Компенсация обедов — 120 ₽ за смену,Lunch allowance — 120 ₽ per shift
+"Каждому рабочему за выход на смену, вместе с зарплатой.","For every worker per shift worked, paid with wages."
+Премия по итогам месяца — 1 000 ₽,Monthly bonus — 1 000 ₽
+Первого числа каждому рабочему. Нечем заплатить — нарушение.,"On the 1st, to every worker. Can't pay — a violation."
+Доплата за вредность +4% сверх закона,Hazard pay +4% above the legal minimum
+На местах с классом 3.1 и выше по СОУТ.,At workplaces rated class 3.1 or higher.
+Все рабочие — в исправных СИЗ,All workers in proper PPE
+Профком следит за охраной труда: травм на 10% меньше. Кто-то без СИЗ два дня — нарушение.,The union watches over safety: 10% fewer injuries. Anyone without PPE for two days — a violation.
+Комната отдыха с чаем,A break room with tea
+Должна быть хотя бы одна комната отдыха.,There must be at least one break room.
+Сверхурочные — не больше 8 дней в месяц,Overtime — no more than 8 days a month
+Больше — нарушение договора.,More is a breach of the agreement.
+Увольнение — по согласованию с профкомом,Dismissals — only with the union's consent
+Уволить без нарушения можно только несуна. Остальные увольнения — нарушение.,Only a thief can be fired without a violation. Any other dismissal is a violation.
+не выданы средства защиты (СИЗ),no protective equipment (PPE) issued
+не проведён инструктаж по охране труда,no safety briefing held
+"изношенное оборудование, пропущен ремонт","worn equipment, missed repairs"
+"переутомление, нет перерывов на отдых","overwork, no rest breaks"
+"аврал, работа в спешке","crunch, rushed work"
+сверхурочная работа,overtime work
+недостаточное освещение,poor lighting
+захламлённое рабочее место,a cluttered workplace
+"загазованность, нет вентиляции","fumes, no ventilation"
+низкая температура в цехе,low temperature in the shop
+"гололёд на территории, не посыпано","ice on the grounds, not gritted"
+пожар,fire
+нахождение пострадавшего в состоянии опьянения,the victim was intoxicated
+нарушение инструкции самим пострадавшим,the victim broke the instructions
+вина предприятия,employer's fault
+вина пострадавшего,victim's fault
+записали на пострадавшего,blamed on the victim
+"обжалован, вина предприятия","appealed, employer's fault"
+сокрытие выявлено,cover-up exposed
+жалоба рабочих,workers' complaint
+сигнал профкома о сокрытии травмы,union report of a hidden injury
+на больничном,on sick leave
+в отпуске,on vacation
+на курсах,on a course
+плохое настроение,a bad mood
+«приболел» после выходных,"""feeling poorly"" after the weekend"
+«плохо себя чувствую» — на деле плохое настроение,"""not feeling well"" — really just a bad mood"
+сидит с ребёнком — в садик не взяли,staying home with a child — no kindergarten place
+Тянет кабель,Running cable
+Прокладывает трубу,Laying pipe
+Монтирует воздуховод,Installing a duct
+Тянет пневмомагистраль,Running an air line
+Прокладывает сеть,Laying a utility line
+сеть,utility line
+кабель,cable
+труба,pipe
+воздуховод,duct
+Прорыв водопровода,Burst water pipe
+Точит,Turning
+Фрезерует,Milling
+Сверлит,Drilling
+Варит,Welding
+Загружает печь,Loading the furnace
+Красит,Painting
+Собирает,Assembling
+Льёт,Casting
+Штампует,Stamping
+Заполняет наряды и табель,Filling in work orders and timesheets
+Проводит планёрку по телефону,Running a briefing by phone
+"Ведёт учёт, считает налоги","Keeping the books, working out taxes"
+Обзванивает поставщиков,Calling suppliers
+Составляет план производства,Drawing up the production plan
+Разбирает анкеты кандидатов,Going through candidate forms
+Разрабатывает техпроцесс,Developing a process plan
+Обзванивает заказчиков,Calling customers
+Заполняет журнал инструктажей,Filling in the briefing log
+Сверяет график ППР,Checking the maintenance schedule
+Готовит претензию,Preparing a claim
+Утренние новости,Morning news
+"В 8:15 — новости завода: заказы, передовики, планы. Людям приятно быть в курсе.","At 8:15 — plant news: orders, top workers, plans. People like being in the loop."
+"В 10:00 — пять минут разминки под радио: меньше устают, бодрее до обеда.","At 10:00 — five minutes of warm-up to the radio: less tired, livelier until lunch."
+Музыка в обед,Music at lunch
+В обеденный перерыв — эстрада и песни: обедается веселее.,During the lunch break — pop songs: lunch is more fun.
+пункт|пункта|пунктов,clause|clauses
+станок|станка|станков,machine|machines
+семья|семьи|семей,family|families
+крысу|крысы|крыс,rat|rats
+%s не вышел{|а} на смену: %s.,%s didn't show up for the shift: %s.
+Заперт: нет выхода,Locked in: no way out
+%s не может уйти домой: помещение без выхода. Поставьте дверь!,%s can't go home: the room has no exit. Put in a door!
+Вернул{ся|ась} на работу,Back at work
+%s на грани увольнения: настроение %d. Посмотрите его мысли в карточке.,%s is close to quitting: mood %d. Check their thoughts in the card.
+Пришёл на смену,Arrived for the shift
+Идёт домой,Going home
+Моется в душе после смены,Showering after the shift
+Переодевается после смены,Changing after the shift
+Сопровождает инспектора,Escorting the inspector
+Проводит инструктаж по охране труда,Giving a safety briefing
+Переодевается в спецовку,Changing into overalls
+Получает СИЗ,Getting PPE
+Перекур,Smoke break
+Ждёт вашей команды,Waiting for your orders
+Повару негде готовить: в столовой нужны плита (под током) и линия раздачи.,The cook has nowhere to cook: the canteen needs a stove (powered) and a serving line.
+Готовит обед,Cooking lunch
+На раздаче,Serving
+Моет посуду и протирает раздачу,Washing dishes and wiping the counter
+"Фельдшеру негде принимать: оборудуйте медпункт (кушетка, шкаф с лекарствами, раковина).","The paramedic has nowhere to see patients: set up a first-aid room (couch, medicine cabinet, sink)."
+Ведёт приём,Seeing patients
+Заполняет журнал медосмотров,Filling in the medical log
+Меряет давление сменщикам,Checking the shift's blood pressure
+Проверяет аптечки,Checking first-aid kits
+Перерыв на чай,Tea break
+Проводит планёрку,Running the briefing
+На планёрке,At the briefing
+Уборка участка по графику,Scheduled section cleanup
+Сдаёт смену: протирает станок,Handing over the shift: wiping the machine
+Дежурит в будке на проходной,On duty in the gatehouse
+Дежурит на проходной,On duty at the gate
+Обход территории,Patrolling the grounds
+Профсоюзная работа,Union work
+На курсах: %s,On a course: %s
+Инструктаж по охране труда,Safety briefing
+%s (%s) без рабочего места: поставьте стол ИТР в помещении «%s» или в общей конторе.,"%s (%s) has no workplace: put an office desk in the ""%s"" room or in the shared office."
+"Обходит участок, раздаёт задания","Walking the section, handing out jobs"
+Станок «%s» стоит: закончился %s — ждём поставку.,"Machine ""%s"" is idle: out of %s — waiting for a delivery."
+"%s вне цеха — на %s не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство). Список — «Производство → Простой».","%s outside the shop zone — nobody works on %s. Mark a ""Shop"" zone where the machines stand (Zones → Production). See the list under ""Production → Downtime""."
+нём,it
+них,them
+Нет воды: %s. Протяните трубу от насоса (меню «Сети»).,"No water: %s. Run a pipe from a pump (""Utilities"" menu)."
+«%s» и ещё %d %s,"""%s"" and %d more %s"
+Детали некуда нести на проверку. Поставьте стол ОТК.,Parts have nowhere to go for inspection. Put in a QC table.
+Деталям между операциями некуда деваться: поставьте стеллаж НЗП (меню «Объекты» → «Склад»).,"Parts have nowhere to wait between operations: put in a WIP rack (""Objects"" → ""Storage"" menu)."
+%s сейчас не на заводе,%s isn't at the plant right now
+ИТР работают в кабинетах — управлять можно только рабочими,Office staff work in offices — you can only control workers
+%s на больничном,%s is on sick leave
+"%s под вашим управлением: щёлкните по стройке, станку, грузу или месту — сделает сейчас.","%s is under your control: click a construction site, machine, load or spot — {he|she}'ll do it now."
+Чинить аварию сейчас: %s,Fix the fault now: %s
+Проложить сейчас: %s,Lay now: %s
+%s не умеет — нужен электрик или строитель,%s can't do this — needs an electrician or a builder
+"сначала нужно достроить то, что рядом (пол или соседнюю стену)",first finish what's next to it (the floor or the adjacent wall)
+нет стройматериала на участке — закажите в «Стройке»,"no building materials on site — order them under ""Construction"""
+Строить сейчас: %s,Build now: %s
+Демонтировать сейчас: %s,Dismantle now: %s
+Собрать сейчас: %s,Assemble now: %s
+ящики с оборудованием ещё в пути,equipment crates are still on the way
+Чинить сейчас: %s,Repair now: %s
+Встать за станок сейчас: %s,Take the machine now: %s
+станок без задания — сначала назначьте деталь,the machine has no job — assign a part first
+%s не умеет работать на этом станке,%s can't work this machine
+Работать здесь: %s,Work here: %s
+Отнести сейчас: %s,Carry now: %s
+Идти сюда,Go here
+снос стены,wall demolition
+стена,wall
+расчистка,clearing
+разборка пола,floor removal
+Туда %s не пройти,%s can't get there
+идти сюда,go here
+работать: %s,work: %s
+строить: %s,build: %s
+отнести: %s,carry: %s
+груз,load
+%s: %s — сейчас.,%s: %s — now.
+%s получил{|а} приказ — %s. Потом сам{|а} вернётся к обычной работе.,%s got an order — %s. Then {he|she}'ll go back to normal work.
+%s: %s — ждёт следующей команды.,%s: %s — waiting for the next command.
+%s вернул{ся|ась} к обычной работе: %s.,%s is back to normal work: %s.
+время приказа вышло,the order timed out
+сделано,done
+уже сделали,already done
+ (по приказу), (by order)
+сейчас это сделать нельзя,that can't be done right now
+Ждёт по команде у стройки,Waiting by the construction site as ordered
+работа на месте закончилась,the work here is finished
+там ему делать нечего,there's nothing for him to do there
+там ей делать нечего,there's nothing for her to do there
+Ждёт по команде у «%s»,"Waiting by ""%s"" as ordered"
+"Идёт, куда велели",Going where told
+туда не пройти,can't get there
+Чистит снег,Clearing snow
+Убирает стружку и мусор,Sweeping up chips and rubbish
+Режет заготовки: %s,Cutting blanks: %s
+Сдаёт на %d-й разряд: пробная деталь,Grade %d exam: test part
+Дорабатывает брак: %s,Reworking a reject: %s
+Режет заготовки ножовкой: %s,Cutting blanks with a hacksaw: %s
+Налаживает станок: %s,Setting up the machine: %s
+Переналадка: %s,Changeover: %s
+Проверяет детали (ОТК),Inspecting parts (QC)
+Везёт на погрузчике,Driving a forklift
+Везёт на тележке,Pushing a cart
+Несёт,Carrying
+Ведёт краном,Operating the crane
+Тащит,Hauling
+Грузит заказ в машину,Loading an order onto the truck
+Строит,Building
+стену,wall
+Сносит,Demolishing
+Разбирает,Dismantling
+Спиливает,Cutting down
+Выкорчёвывает,Uprooting
+дерево,Clearing the ground for
+куст,tree
+Расчищает место под,bush
+Демонтирует: %s,Dismantling: %s
+Обслуживает станок,Servicing the machine
+Ремонтирует станок,Repairing the machine
+Сбрасывает автомат на подстанции,Resetting the breaker at the substation
+Монтирует: %s,Installing: %s
+%s · несёт: %s,%s · carrying: %s
+Людям некуда сходить в туалет! Поставьте туалетную кабинку.,People have nowhere to go to the toilet! Put in a toilet cubicle.
+Туалетом не пользуются: он стоит вне зоны «Туалет». Разметьте её вокруг кабинки (Зоны → Быт и здоровье).,"The toilet isn't used: it's outside a ""Toilet"" zone. Mark one around the cubicle (Zones → Amenities & Health)."
+Не хватает воды: один насос тянет %d приборов. Поставьте ещё насос или насосную станцию (Сети → Водопровод).,Not enough water: one pump serves %d fixtures. Add another pump or a pumping station (Utilities → Water).
+"В туалете нет воды — кабинкой пользоваться нельзя. Поставьте насос и протяните от него трубу (меню «Сети», W).","There's no water in the toilet — the cubicle can't be used. Put in a pump and run a pipe from it (""Utilities"" menu, W)."
+В туалете,In the toilet
+Обедает в столовой,Eating in the canteen
+Обедает,Eating lunch
+Обедает на скамейке,Eating on a bench
+Негде пообедать. Поставьте обеденный стол и стулья вплотную к нему.,Nowhere to eat. Put in a dining table with chairs right next to it.
+Обедает стоя,Eating standing up
+Отдыхает,Resting
+Без дела,Idle
+тару для брака,a reject bin
+ещё один поддон для готовой продукции,another pallet for finished goods
+Некуда положить «%s». Поставьте %s.,"Nowhere to put ""%s"". Put in %s."
+Несёт: %s,Carrying: %s
+%s загрузил{|а} печь: %s × %d.,%s loaded the furnace: %s × %d.
+%s починил{|а} %s.,%s repaired %s.
+%s обслужил{|а} станок — он как новый.,%s serviced the machine — good as new.
+%s сбросил{|а} автомат — свет и станки снова работают.,%s reset the breaker — lights and machines are back on.
+Несёт на ОТК: %s,Carrying to QC: %s
+Несёт пробную деталь мастеру,Carrying the test part to the foreman
+"Стоит, где велели",Standing where told
+"постоял{|а}, где велели",stood where told
+Набрался опыта: %s,Gained experience: %s
+Тушит пожар,Fighting a fire
+Бежит за огнетушителем,Running for an extinguisher
+Тушит пожар подручными средствами,Fighting a fire with whatever is at hand
+Бастует у проходной,On strike at the gate
+"Обед меньше 30 минут — нарушение трудового кодекса, трудовая инспекция оштрафует",Lunch under 30 minutes breaks the Labor Code — the labor inspectorate will fine you
+Обед больше двух часов — так нельзя по трудовому кодексу,Lunch over two hours isn't allowed by the Labor Code
+Работы меньше 6 часов — выпуск заметно упадёт,Under 6 hours of work — output will drop noticeably
+Бригада №%d,Brigade #%d
+Переведен{|а} в «%s»,"Moved to ""%s"""
+Назначен{|а} бригадиром: «%s»,"Made brigade leader: ""%s"""
+Мало рабочих для бригад: нужно хотя бы двое,Not enough workers for brigades: you need at least two
+Бригады сформированы: %d. Бригадиры получают +10%% к ставке.,Brigades formed: %d. Brigade leaders get +10%% pay.
+ Премия по %s каждому., A bonus of %s each.
+Соцсоревнование: вымпел недели у «%s» — %d операций на человека.%s,"Socialist competition: this week's pennant goes to ""%s"" — %d operations per person.%s"
+Вымпел — «%s»!,"The pennant goes to ""%s""!"
+По итогам недели лучшая бригада — «%s»%s: %d операций. Отстающим — равняться на передовиков!,"This week's best brigade is ""%s""%s: %d operations. Laggards — follow the leaders' example!"
+ бригадира %s, led by %s
+%s (%d шт.),%s (%d pcs)
+"На записи камеры видно, как %s выносит со склада %s. Вещи уже не вернуть, но человек известен.","The camera footage shows %s carrying %s out of the warehouse. The goods are gone, but we know who did it."
+На проходной у %s нашли %s. %s,%s was caught at the gate with %s. %s
+"Задержал охранник %s, металл вернули на склад.",Guard %s stopped them; the metal is back in the warehouse.
+"Досмотр сделал своё дело, металл вернули на склад.",The search did its job; the metal is back in the warehouse.
+"
+Что будем делать?","
+What shall we do?"
+Пойман{|а} на краже: %s,Caught stealing: %s
+Задержан{|а} %s: %s%s,Caught: %s: %s%s
+ (по записи камеры), (on camera footage)
+Задержан несун,Thief caught
+Камера записала кражу,Camera caught a theft
+Выговор,Reprimand
+Запишем в личное дело. Попадётся снова — разговор будет другой,We'll note it in the personnel file. Next time it'll be a different talk
+Лишить премии (−3 000 ₽),Dock the bonus (−3 000 ₽)
+Вычтем из зарплаты за неделю,Deducted from this week's pay
+Уволить по статье,Fire for cause
+"Честные одобрят, друзья обидятся",Honest workers will approve; friends will take offense
+Простить,Forgive
+Станет смелее — украдёт снова,They'll get bolder and steal again
+Выговор за кражу,Reprimanded for theft
+Лишён премии за кражу,Lost bonus for theft
+Лишена премии за кражу,Lost bonus for theft
+%s уволен по статье за кражу,%s fired for cause for theft
+Инвентаризация: недостача %s,Inventory check: shortage of %s
+ Запись с камеры выдала одного из несунов., The camera footage gave away one of the thieves.
+Инвентаризация: недостача на %s — %s.%s%s,Inventory check: a shortage of %s — %s.%s%s
+ Наймите охранника на проходную и поставьте камеры на склад., Hire a guard for the gate and put cameras in the warehouse.
+Недостача на складе,Warehouse Shortage
+"Инвентаризация показала недостачу на %s. Товарищи, металл — не дачный забор!","The inventory check revealed a shortage of %s. Comrades, metal isn't a dacha fence!"
+Охрана спугнула вора,Guards Scare Off a Thief
+"Чужой лез через забор к складу, но охранник%s заметил его вовремя. Металл на месте.","A stranger climbed the fence toward the warehouse, but the guard%s spotted him in time. The metal is safe."
+ по камере, on the camera
+Спугнули постороннего у склада,Scared off an intruder at the warehouse
+Рабочие создают профсоюз,Workers Are Forming a Union
+"%s собрал{|а} подписи: коллектив хочет создать первичную профсоюзную организацию. Профком будет вести переговоры о коллективном договоре, следить за охраной труда и заранее предупреждать о забастовках. Нужна комната под профком (стол и доска объявлений).","%s has collected signatures: the workers want to set up a union branch. The union committee will negotiate a collective agreement, watch over workplace safety and give advance warning of strikes. It needs a union room (a desk and a notice board)."
+Поддержать,Support it
+Люди оценят. Через пару дней профком предложит колдоговор,People will appreciate it. In a couple of days the union will propose a collective agreement
+Не мешать,Don't interfere
+"Профсоюз будет, но без особой теплоты","There will be a union, but without much warmth"
+Отговорить,Talk them out of it
+Обидятся; могут пожаловаться в трудовую инспекцию,They'll take offense and may complain to the labor inspectorate
+Избран{|а} председателем профкома,Elected union committee chair
+Создан профсоюз. Председатель профкома — %s. Вкладка «Бригады → Профсоюз».,"A union has been formed. Union committee chair: %s. See the ""Brigades → Union"" tab."
+У нас есть профком!,We Have a Union Committee!
+"Создана первичная профсоюзная организация. Взносы — 1%% от зарплаты, путёвки и материальная помощь — по заявлениям. Председатель — %s.",A union branch has been set up. Dues are 1%% of wages; holiday vouchers and financial aid on request. Chair: %s.
+Рабочие пожаловались в трудовую инспекцию: препятствуют созданию профсоюза.,Workers complained to the labor inspectorate: you're obstructing the union.
+Профком предлагает колдоговор,The Union Proposes a Collective Agreement
+"Профком подготовил проект коллективного договора:
+%s
+Отметьте пункты, на которые согласны, и подпишите во вкладке «Бригады → Профсоюз». Чем больше пунктов — тем довольнее люди.","The union has drafted a collective agreement:
+%s
+Tick the clauses you agree to and sign it in the ""Brigades → Union"" tab. The more clauses, the happier the people."
+Профком ждёт подписи колдоговора уже десять дней. Люди начинают роптать.,The union has been waiting ten days for the agreement to be signed. People are starting to grumble.
+Срок колдоговора истёк — профком готовит новый.,The collective agreement has expired — the union is preparing a new one.
+Нарушен колдоговор,Collective Agreement Broken
+"Профком фиксирует нарушение: «%s». Люди недовольны, до забастовки теперь ближе.","The union records a violation: ""%s"". People are unhappy, and a strike is now closer."
+Новый председатель профкома — %s.,New union committee chair: %s.
+Профсоюза нет,There's no union
+Профком пока не предлагал договор,The union hasn't proposed an agreement yet
+Коллективный договор подписан: %d %s из %d. %s,Collective agreement signed: %d %s of %d. %s
+Профком доволен.,The union is pleased.
+Профком недоволен: мало пунктов.,The union is unhappy: too few clauses.
+Подписан коллективный договор,Collective Agreement Signed
+Администрация и профком подписали коллективный договор на %d дней: %d %s.,Management and the union signed a collective agreement for %d days: %d %s.
+Профком предупреждает о забастовке,The Union Warns of a Strike
+"%s от имени профкома: настроение в коллективе %d из 100, люди готовы бросить станки. Профком просит принять меры — иначе через пару дней забастовка.","%s, on behalf of the union: team morale is %d out of 100, people are ready to walk off the machines. The union asks you to act — otherwise there'll be a strike in a couple of days."
+Председатель профкома,The union committee chair
+Премия всем,Bonus for everyone
+%s каждому,%s each
+Собрание с профкомом,Meet with the union
+Выслушать людей: отсрочит забастовку на пару дней,Hear people out: postpones the strike by a couple of days
+«%s» осталась без бригадира — назначьте нового.,"""%s"" has no leader — appoint a new one."
+Начато расследование несчастного случая с %s: комиссия составит акт Н-1 за %d рабочих дня.,An investigation into the accident involving %s has begun: the commission will draw up an N-1 report within %d working days.
+"директор, мастер","director, foreman"
+", председатель профкома",", union committee chair"
+Акт Н-1: %s,N-1 Report: %s
+"Комиссия (%s) расследовала несчастный случай: %s, %s. Причины:
+%s
+По вине предприятия: %d, по вине пострадавшего: %d.","The commission (%s) investigated the accident: %s, %s. Causes:
+%s
+The employer's fault: %d, the victim's fault: %d."
+Подписать акт как есть,Sign the report as is
+Компенсация пострадавшему %s и штраф инспекции %s,Compensation to the victim %s and an inspectorate fine of %s
+Вина самого пострадавшего — без компенсации,The victim's own fault — no compensation
+Записать вину на пострадавшего,Blame the victim
+"Дешевле, но люди это запомнят%s","Cheaper, but people will remember%s"
+", а профком обжалует",", and the union will appeal"
+Не оформлять акт,Don't file the report
+Если всплывёт на проверке — штраф %s,If it surfaces during an inspection — a fine of %s
+Акт Н-1 обжалован%s: трудовая инспекция пересмотрела причины и оштрафовала завод на %s.,The N-1 report was appealed%s: the labor inspectorate reviewed the causes and fined the plant %s.
+ профкомом, by the union
+ пострадавшим, by the victim
+В графике смены обед меньше 30 минут (или больше двух часов): это нарушение трудового кодекса. Поправьте во вкладке «Бригады → График смены».,"The shift schedule has a lunch under 30 minutes (or over two hours): that breaks the Labor Code. Fix it in the ""Brigades → Shift schedule"" tab."
+"Рабочих уже %d. Разбейте их на бригады с бригадирами и закрепите за участками — меньше беготни, бригадир ускоряет работу (раздел «Люди → Бригады», клавиша K).","You have %d workers now. Split them into brigades with leaders and assign them to sections — less running around, and the leader speeds up work (""People → Brigades"", K key)."
+Иногороднему нужна койка в общежитии — свободных мест нет,An out-of-towner needs a dorm bed — there are none free
+Прививать некого,Nobody to vaccinate
+Коллектив уже привит,Everyone's already vaccinated
+Не хватает денег: %s,Not enough money: %s
+Всем сделали прививку от гриппа: зимой болеть будут в четыре раза реже.,Everyone got a flu shot: they'll get sick four times less often in winter.
+Грипп. Больничный %d дн.,Flu. Sick leave for %d days
+Грипп: %s на больничном. Прививка всему коллективу — в «Город → Столовая и медпункт».,"Flu: %s is on sick leave. Vaccinate everyone under ""Town → Canteen & First Aid""."
+Садик уже самый большой,The kindergarten is already at its largest
+Детсад открывает ступень «Шефство» (Управление → Развитие),"The kindergarten is unlocked by the ""Patronage"" stage (Management → Development)"
+Не хватает денег: нужно %s,Not enough money: %s needed
+"Заводской детсад «%s»: теперь %d мест. Родители спокойнее, прогулов меньше.","Plant kindergarten ""%s"": now %d places. Parents are calmer, fewer absences."
+Детсад «%s» принимает малышей,"Kindergarten ""%s"" Welcomes Little Ones"
+Завод открыл группы на %d мест. Мамы говорят спасибо!,The plant has opened groups for %d children. The mums say thank you!
+Шестерёнка,Gear
+ДК уже на балансе завода,The House of Culture is already on the plant's books
+Дом культуры берёт на баланс завод со ступенью «Шефство» (Управление → Развитие),"A plant with the ""Patronage"" stage can take over the House of Culture (Management → Development)"
+"Завод взял на баланс Дом культуры: кружки, ансамбль, концерты к праздникам. Город доволен.","The plant has taken over the House of Culture: clubs, an ensemble, holiday concerts. The town is pleased."
+хор ветеранов,the veterans' choir
+секция бокса,a boxing club
+кружок радиолюбителей,a radio amateurs' club
+ансамбль «Токарушка»,"the ""Tokarushka"" ensemble"
+шахматный клуб,a chess club
+фотокружок,a photo club
+Культура,Culture
+В ДК «Машиностроитель» — %s,"At the ""Mashinostroitel"" House of Culture — %s"
+Записались %d наших работников. Приходите и вы!,%d of our workers have signed up. Come and join them!
+"У проходной мяукает %s {кот|кошка} — %s, {тощий|тощая}, но с характером. Рабочие уже несут {ему|ей} колбасу из столовой.","A %s {tomcat|she-cat} is meowing at the gate — %s, skinny but feisty. The workers are already bringing {him|her} sausage from the canteen."
+На заводе прибил{ся|ась} {кот|кошка},A Stray {Tomcat|Cat} Has Turned Up at the Plant
+Оставить: поставить миску (Объекты → Декор),Keep it: put out a bowl (Objects → Decor)
+"Людям приятно погладить, крысы обходят склад стороной","People enjoy petting it, and rats steer clear of the warehouse"
+Отдать в добрые руки,Give it to a good home
+%s теперь живёт на заводе. Поставьте миску (Объекты → Декор) — без неё {он|она} уйдёт.,%s now lives at the plant. Put out a bowl (Objects → Decor) — without it {he|she}'ll leave.
+Новости,News
+Пополнение: %s,New Arrival: %s
+%s %s поселил{ся|ась} на заводе. Просим не кормить колбасой — только из миски!,%s %s has settled at the plant. Please don't feed it sausage — only from the bowl!
+Взял{|а} котёнка у заводской кошки,Took a kitten from the plant cat
+Котят разобрали по домам: %d счастливых %s.,The kittens have found homes: %d happy %s.
+"%s голодает: поставьте миску (Объекты → Декор), иначе уйдёт.","%s is starving: put out a bowl (Objects → Decor), or it'll leave."
+%s ушёл,%s Has Left
+%s ушла,%s Has Left
+Без миски на заводе голодно — %s ушёл{|а} искать место посытнее.,"No bowl, the plant is a hungry place — %s left to look for somewhere better fed."
+У %s котята!,%s Has Kittens!
+%s принесла пятерых котят — в коробке за верстаком. Рабочие ходят смотреть по очереди.,%s has had five kittens — in a box behind the workbench. The workers take turns going to look.
+Раздать работникам,Give them to the workers
+Кому-то достанется котёнок — радость,Someone gets a kitten — what a joy
+Отвезти в приют,Take them to a shelter
+%s на страже склада,%s Guards the Warehouse
+Поймал{|а} уже %d %s. Крысы обходят завод стороной.,Has caught %d %s already. Rats give the plant a wide berth.
+Крысы на складе,Rats in the Warehouse
+Погрызли упаковки: пропало расходников — %d ед. Кошка бы помогла.,They chewed through the packaging: %d units of consumables lost. A cat would help.
+Город доволен заводом,The Town Is Pleased with the Plant
+Администрация благодарит за рабочие места и заботу о людях. В отделе кадров теперь больше кандидатов.,The administration thanks you for the jobs and for caring about people. The HR department now gets more candidates.
+Льгота от города,A Tax Break from the Town
+Совет депутатов утвердил льготу по местным налогам для градообразующего предприятия: налог с выручки на 1% ниже.,The town council approved a local tax break for the town's main employer: the revenue tax is 1% lower.
+гордится заводом,proud of the plant
+доволен,satisfied
+присматривается,taking a look
+Уютное общежитие,A cozy dorm
+Живу в заводском общежитии,Living in the plant dorm
+Общежитие — голые стены,The dorm has bare walls
+Негде жить — снимаю угол,Nowhere to live — renting a corner
+Ребёнок в заводском садике,My child is in the plant kindergarten
+Не с кем оставить ребёнка,No one to leave the child with
+ИТР учатся у себя в отделе,Office staff train in their own department
+уже мастер своего дела,already a master of the trade
+уже на курсах,already on a course
+Таким курсам не учат,No such course
+Нет учебного класса: постройте помещение с партами и доской (Помещения → Учебный класс),No classroom: build a room with desks and a board (Rooms → Classroom)
+В учебном классе нет свободных мест — поставьте ещё парт,No free seats in the classroom — add more desks
+Уезжает на курсы,Leaving for a course
+%s уезжает на курсы в учебный центр (%s) на %d %s.,%s is off to a course at the training center (%s) for %d %s.
+%s пойдёт на курсы в учебный класс: %s. Учится в свою смену.,%s will take a course in the classroom: %s. Studies during their own shift.
+Направлен на курсы: %s,Sent on a course: %s
+Курсы отменены,Course canceled
+Освоил смежную профессию: %s,Learned a related trade: %s
+%s окончил{|а} курсы и освоил{|а} смежную профессию: %s. Теперь может работать и на этих станках.,%s finished the course and learned a related trade: %s. Can now work these machines too.
+Учёба,Training
+Смежная профессия: %s,A Related Trade: %s
+Окончил курсы и теперь может подменить %s. Широкий профиль — надёжный цех!,Finished the course and can now stand in for a %s. A broad skill set makes for a reliable shop!
+фрезеровщика,milling operator
+Окончил курсы: %s %d → %d,Finished a course: %s %d → %d
+ Можно сдавать на %d-й разряд., Can now take the grade %d exam.
+%s окончил{|а} курсы: %s %d → %d.%s,%s finished the course: %s %d → %d.%s
+Инструктаж уже идёт,The briefing is already under way
+Инструктаж проводят в рабочее время,Briefings are held during working hours
+Сейчас на смене никого нет,Nobody is on shift right now
+Начался инструктаж по охране труда: %d %s по очереди пройдут его в %s.,A safety briefing has begun: %d %s will take it in turn in %s.
+учебном классе,the classroom
+цеху,the shop
+Прослушал инструктаж по охране труда,Attended a safety briefing
+"Инструктаж по охране труда проведён (%d чел.). Ближайшие %d дней травм будет меньше на 30%%, журнал для трудовой инспекции заполнен.",Safety briefing done (%d people). For the next %d days there will be 30%% fewer injuries; the log for the labor inspectorate is filled in.
+Наставничество снято,Mentorship ended
+%s не может быть наставником для %s,%s can't mentor %s
+Наставник: %s (%s),Mentor: %s (%s)
+Взял ученика: %s,Took on an apprentice: %s
+"%s и наставник %s работают в разные смены — учить получится, только когда смены совпадут.",%s and mentor %s work different shifts — teaching will only happen when their shifts match.
+%s теперь учится у %s.,%s is now learning from %s.
+Подрос у наставника: %s %d,Improved under a mentor: %s %d
+Выучил{ся|ась} у наставника %s,Learned from mentor %s
+Выучил ученика: %s,Trained an apprentice: %s
+Ученик вырос: %s работает самостоятельно%s. Спасибо наставнику %s!,The apprentice has grown: %s now works independently%s. Thanks to mentor %s!
+ и готов сдавать на %d-й разряд, and is ready for the grade %d exam
+%s вырастил смену,%s Has Trained a Successor
+"%s теперь работает самостоятельно. «Руки золотые, голова светлая», — говорит наставник.","%s now works independently. ""Golden hands and a clear head,"" says the mentor."
+Подружил{ся|ась} с %s,Made friends with %s
+%s и %s подружились: вместе работается веселее.,%s and %s became friends: work is more fun together.
+Не поладил с %s,Didn't get along with %s
+%s и %s не ладят — в одной смене будут цапаться. Можно развести их по разным сменам.,%s and %s don't get along — on the same shift they'll bicker. You could put them on different shifts.
+Работает вместе с другом: %s,Working alongside a friend: %s
+Опять рядом этот %s,That %s is next to me again
+Есть у кого поучиться: %s,Someone to learn from: %s
+Учит молодых,Teaches the young ones
+Практика на настоящем заводе,An internship at a real plant
+Конфликт в смене,Conflict on the Shift
+"%s и %s третий день цапаются в смене: то инструмент не поделят, то станок. Остальные уже ставки делают.","%s and %s have been bickering on shift for three days: over tools, over a machine. The others are already placing bets."
+%s перейдёт в %s,%s will move to %s
+Поговорить с обоими,Talk to both of them
+Скорее всего помирятся,They'll most likely make up
+Пусть сами разбираются,Let them sort it out
+Может дойти до драки,It may come to a fight
+%s и %s пожали друг другу руки. Мир.,%s and %s shook hands. Peace.
+Разговор не помог: %s и %s остались при своём.,The talk didn't help: %s and %s are sticking to their guns.
+%s и %s подрались в курилке. Мастер разнял.,%s and %s got into a fight in the smoking area. The foreman broke it up.
+Договор с ПТУ уже есть,There's already an agreement with the vocational school
+Договор с ПТУ заключает кадровик после ступени «Связь с ПТУ» (Управление → Развитие),"The HR officer signs an agreement with the vocational school after the ""Vocational School Ties"" stage (Management → Development)"
+Договор с ПТУ подписан: по понедельникам будут приходить практиканты на %d дней.,Vocational school agreement signed: interns will come on Mondays for %d days.
+Договор с ПТУ расторгнут. Нынешние практиканты доработают свой срок.,The vocational school agreement has been terminated. Current interns will finish their term.
+Пришёл на практику из ПТУ: будущий %s,Came for an internship from the vocational school: future %s
+"Из ПТУ приш{ёл|ла} практикант{|ка}: %s, будущий %s. Учится вдвое быстрее, стипендия %s за смену.","An intern has come from the vocational school: %s, a future %s. Learns twice as fast; stipend %s per shift."
+Практика окончена,Internship Over
+"%s, %d лет, заканчивает практику: %s, тянет на %d-й разряд. Мастер говорит: «%s».","%s, age %d, is finishing the internship: %s, good for grade %d. The foreman says: ""%s""."
+"Толковый, берите","A capable one, take them on"
+"Старается, руки растут откуда надо","Tries hard, the hands are in the right place"
+Взять в штат,Hire on staff
+Ставка %s за смену,Pay %s per shift
+Отпустить с благодарностью,Let them go with thanks
+Взят{|а} в штат после практики,Hired on staff after the internship
+"%s взят{|а} в штат: %s, ставка %s.","%s has been hired on staff: %s, pay %s."
+%s закончил{|а} практику и вернул{ся|ась} в училище.,%s finished the internship and went back to school.
+У этой профессии нет разрядов,This trade has no grades
+"Высший, 6-й разряд уже есть","Already at the top grade, 6"
+Навыка пока мало: нужно «%s» от %d,"Not enough skill yet: needs ""%s"" of %d"
+Уже сдаёт — сделает пробную деталь на смене,Already taking the exam — will make a test part on shift
+Пересдача — с дня %d,Retake from day %d
+"%s сдаёт на %d-й разряд: на смене сделает пробную деталь, мастер примет.",%s is taking the grade %d exam: will make a test part on shift for the foreman to accept.
+мастер %s,foreman %s
+контролёр ОТК,the QC inspector
+Сдал{|а} экзамен на %d-й разряд,Passed the grade %d exam
+%s сдал{|а} на %d-й разряд — пробную деталь принял %s.,%s passed the grade %d exam — the test part was accepted by %s.
+%s не сдал{|а} на %d-й разряд: %s забраковал пробную деталь. Пересдача через неделю.,%s failed the grade %d exam: %s rejected the test part. Retake in a week.
+Просит прибавку,Asks for a Raise
+%s сдал{|а} на %d-й разряд и просит ставку по разряду: %s вместо %s за смену.,%s passed the grade %d exam and asks for the grade rate: %s instead of %s per shift.
+Ставка по разряду: %s,Grade rate: %s
+Человек доволен,They'll be pleased
+Половину: %s,Half: %s
+"Без восторга, но и без обиды","Not thrilled, but no hard feelings"
+Отказать,Refuse
+Обидится; может начать искать другое место,They'll take offense and may start looking for another job
+Отказали в прибавке за разряд,Refused a raise for the grade
+Зарплаты проиндексированы на %d%%.,Wages indexed by %d%%.
+Индексация зарплат,Wage Indexation
+"Цены за квартал выросли примерно на %d%%: на рынке ставки уже подняли. Люди ждут индексации — иначе начнут считать, что платят меньше, чем везде.",Prices rose by about %d%% this quarter: market rates have already gone up. People expect indexation — otherwise they'll feel they're paid less than elsewhere.
+Проиндексировать всем на %d%%,Index everyone by %d%%
+≈ %s в неделю,≈ %s a week
+Только рабочим,Workers only
+ИТР (%d чел.) обидятся,Office staff (%d people) will be offended
+Не индексировать,Don't index
+Все расстроятся; ставка отстанет от рынка,Everyone will be upset; pay will fall behind the market
+Новый год — все стали на год старше.%s,New Year — everyone is a year older.%s
+ Пенсионного возраста достигли: %s., Reached retirement age: %s.
+Ветеран завода — год на предприятии,Plant veteran — a year at the company
+"%s — год на заводе! Теперь ветеран завода: уважают, учит молодых охотнее.",%s — a year at the plant! Now a plant veteran: respected and keener to teach the young.
+Год на заводе: %s,A Year at the Plant: %s
+"Спасибо за верность заводу! Молодёжь, берите пример.","Thank you for your loyalty to the plant! Young people, follow the example."
+%s готов{|а} сдавать на %d-й разряд — в карточке кнопка «Экзамен».,"%s is ready for the grade %d exam — there's an ""Exam"" button in the card."
+приспособление для «%s» на станке «%s»,"a jig for ""%s"" on the ""%s"" machine"
+операция на 12% быстрее,the operation is 12% faster
+шаблон для контроля «%s»,"a gauge for checking ""%s"""
+брака по этой детали на 20% меньше,20% fewer rejects on this part
+свою схему смазки и ухода за станком «%s» (инв. № %05d),"a lubrication and care routine for the ""%s"" machine (inv. No. %05d)"
+этот станок изнашивается на 25% медленнее,this machine wears 25% slower
+%s предлагает %s: %s. Автор просит вознаграждение %s.,%s proposes %s: %s. The author asks for a reward of %s.
+Внедрить и заплатить %s,Implement and pay %s
+Рацпредложение внедрено: %s,Improvement implemented: %s
+Рацпредложение: %s,Improvement Proposal: %s
+thought.ate_canteen.text,Had lunch in a decent canteen
+thought.ate_table.text,Ate lunch at a table right on the shop floor
+thought.ate_bench.text,Ate lunch on a bench
+thought.ate_standing.text,"Ate standing up, on the go"
+thought.toilet_open.text,"A toilet right on the shop floor, no walls"
+thought.toilet_nosink.text,Nowhere to wash my hands
+thought.toilet_good.text,"A clean, tiled toilet"
+thought.held_it.text,Had to hold it — the toilet was taken
+thought.changed_locker.text,Changed in the locker room
+thought.changed_shop.text,The locker stands right on the shop floor
+thought.changed_corner.text,Changed wherever I could
+thought.dark.text,Worked in the dark
+thought.rested_room.text,Rested in the break room
+thought.sofa.text,Sat on the sofa for a bit
+thought.smoked.text,Had a smoke
+thought.no_smoke.text,Nowhere to smoke
+thought.idle_bad.text,Nothing to do — so dull
+thought.payday.text,Got paid on time
+thought.bonus.text,Got a bonus
+thought.raise.text,Got a raise
+thought.wage_cut.text,My pay was cut
+thought.coworker_fired.text,A coworker was fired
+thought.new_machine.text,New equipment at the plant
+thought.honor_board.text,My photo is on the honor board
+thought.breaker.text,The power tripped mid-shift
+thought.overtime_drink.text,Headache after the weekend
+thought.master_good.text,A capable foreman on shift
+thought.no_master.text,A mess: no foreman on shift
+thought.rush.text,Crunch time: they're pushing the plan
+thought.overtime.text,"Overtime: tired, but it pays"
+thought.five_s.text,A tidy workplace (5S)
+thought.office_own.text,My own office
+thought.office_shared.text,Cramped in the shared office
+thought.no_desk.text,No workplace — working off my knee
+thought.ate_menu.text,A set lunch in the canteen
+thought.cold.text,Cold at my workplace
+thought.freezing.text,My teeth are chattering
+thought.hot.text,Hot as an oven
+thought.warm_winter.text,"Freezing outside, but warm in the shop"
+thought.injured.text,Got injured at work
+thought.coworker_injured.text,A coworker got hurt at work
+thought.fire_scare.text,A fire! That was scary
+thought.inspection_ok.text,Passed the inspection with no remarks
+thought.corporate.text,Great company party
+thought.no_party.text,Not even a New Year's greeting
+thought.ny_bonus.text,New Year's bonus!
+thought.holiday_gift.text,They greeted us for the holiday
+thought.holiday_forgot.text,They forgot about the holiday
+thought.machine_day.text,A ceremony with certificates
+thought.subbotnik.text,The whole team came out for a cleanup day
+thought.strike_won.text,We got our way with the strike
+thought.strike_half.text,Met management halfway
+thought.strike_lost.text,Management doesn't listen to people
+thought.strike_crushed.text,The ringleader was fired. People are afraid to speak
+thought.gift_given.text,The team congratulated me on a big day
+thought.gift_none.text,Didn't even sign a card
+thought.rational_paid.text,My improvement idea was accepted and paid for
+thought.rational_ignored.text,My improvement idea was shelved
+thought.layoff_rumor.text,Rumors of layoffs
+thought.rumor_cleared.text,The rumors were cleared up at a meeting
+thought.reprimand.text,Got a reprimand
+thought.fight.text,Got in a fight with a coworker
+thought.chaos.text,The plant is a mess and management doesn't care
+thought.searched.text,Searched at the gate like in prison
+thought.plan_done.text,We hit the monthly plan
+thought.retire_party.text,We saw a veteran off to retirement
+thought.raise_kept.text,Got a raise so I wouldn't leave for a competitor
+thought.vacation.text,Back from vacation
+thought.no_vacation.text,Wasn't allowed a summer vacation
+thought.governor_visit.text,The governor himself visited the plant
+thought.shift_mess.text,The last shift left a mess again
+thought.suspended.text,Our section was shut down by order
+thought.nye_off.text,New Year holidays
+thought.roof_leak.text,The roof leaks — working under drips
+thought.arrears.text,Wages have been late for months now
+thought.arrears_paid.text,Back wages finally paid
+thought.dogs.text,Stray dogs on the grounds
+thought.dogs_tame.text,The plant dogs are our own now
+thought.stage_up.text,The plant is growing — there's a future here
+thought.noisy.text,Noisy — my head is buzzing (earmuffs would help)
+thought.nickname.text,The guys gave me a nickname — I'm one of them now
+thought.on_course.text,Taking courses — I'm growing
+thought.course_done.text,Finished the course — something to be proud of
+thought.mentor_proud.text,My apprentice has grown — I'm proud
+thought.friend_left.text,A friend left
+thought.practice_kept.text,Hired on staff after my internship!
+thought.room_l1.text,A dismal room: bare walls
+thought.room_l3.text,The room is nicely furnished
+thought.room_l4.text,"Well furnished, like it should be"
+thought.room_l5.text,Beautifully furnished
+thought.dirty.text,"Dirty, chips everywhere"
+thought.very_dirty.text,Filthy: you can't walk for the chips
+thought.stuffy.text,"Stuffy, smells of burning — needs ventilation"
+thought.fumes.text,"Smoke and fumes, eyes watering — can't breathe"
+thought.no_ppe.text,Working without a hard hat or goggles — a bit scary
+thought.new_ppe.text,Got new overalls and earmuffs
+thought.milk.text,Got milk for hazardous work
+thought.no_milk.text,"The work is hazardous, but no milk"
+thought.sout_harm.text,My job is rated hazardous — at least there's extra pay
+thought.tea_break.text,A scheduled tea break
+thought.no_lunch_break.text,No lunch in the schedule — we eat on the go
+thought.planerka.text,Morning briefing: I know what to do this shift
+thought.brigadier.text,Made team leader
+thought.brigade_friends.text,A close-knit team
+thought.brigade_feud.text,We don't get along in our team
+thought.pennant.text,Our team is the best: we've got the pennant!
+thought.fined.text,Lost my bonus
+thought.thief_fired.text,The thief was fired — and rightly so
+thought.friend_fired_article.text,My friend was fired for cause
+thought.forgiven.text,Got forgiven — lucky
+thought.union_ok.text,The union was recognized
+thought.union_denied.text,They wouldn't let us form a union
+thought.kd_kept.text,The collective agreement is honored
+thought.kd_broken.text,The collective agreement was broken
+thought.kd_lunch.text,Lunches are reimbursed under the agreement
+thought.n1_fair.text,The plant admitted fault and paid compensation
+thought.n1_blame.text,They made the injured worker the scapegoat
+thought.n1_hidden.text,The injury was hushed up
+thought.union_help.text,The union helped with money
+thought.clean_handover.text,Handed over the section in good order
+thought.pennant_banner.text,The challenge banner belongs to our team
+thought.union_heard.text,The union listened; management promised to look into it
+thought.ate_hot.text,"A hot lunch: soup, a main course and compote"
+thought.cat_pet.text,Petted the plant cat
+thought.nurse_helped.text,The paramedic helped right away
+thought.radio_music.text,Music on the plant radio
+thought.radio_gym.text,Workplace exercises
+thought.radio_news.text,Up to date on plant news
+thought.dk_club.text,I go to a club at the House of Culture
+thought.dk_concert.text,A holiday concert at the House of Culture
+thought.rats.text,Rats in the warehouse — gross
+thought.kittens.text,Took a kitten from the plant cat
+thought.showered.text,Showered after the shift
+thought.no_shower.text,Went home covered in oil and soot — no shower
+thought.chatted.text,Had a chat with a mate
+thought.argued.text,Had a row with a coworker
+thought.saw_fight.text,Two people fought right in front of me — unpleasant
+thought.grade_up.text,Passed a grade exam — my skills are growing
+thought.exam_failed.text,Failed the grade exam — frustrating
+thought.raise_refused.text,"Passed the grade exam, but got no raise"
+thought.indexed.text,Wages were indexed
+thought.no_index.text,"Prices are rising, but wages aren't indexed"
+thought.veteran_honor.text,"A year at the plant — a veteran, respected"
+thought.wage_late.text,"No pay — they said ""be patient"""
+thought.no_tools.text,"Nothing to work with: no tools, and management is silent"
+thought.mice.text,"Saw a mouse in the shop — ugh, filthy"

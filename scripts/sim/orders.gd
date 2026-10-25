@@ -18,8 +18,14 @@ func get_order(id: int) -> Dictionary:
 	return {}
 
 
+## 1.39: то же по-русски — для журнала денег (статьи считаются по русскому тексту).
+func short_ru(o: Dictionary) -> String:
+	var p := str(o["product"])
+	return "%s × %d для %s" % [str(Defs.products.get(p, {}).get("name", p)), int(o["qty"]), str(o["client"])]
+
+
 func short(o: Dictionary) -> String:
-	return "%s × %d для %s" % [Defs.product_name(str(o["product"])), int(o["qty"]), str(o["client"])]
+	return L.t("%s × %d для %s") % [Defs.product_name(str(o["product"])), int(o["qty"]), Company.firm(str(o["client"]))]
 
 
 const KIND_NAMES := {"export": "Экспорт", "state": "Госзаказ", "contract": "Контракт"}
@@ -87,7 +93,7 @@ func morning() -> void:
 	var had := by_status(["offer"]).size()
 	_special_offers()
 	if by_status(["offer"]).size() > had:
-		sim.notify("Пришёл тендер — решение за вами: «Заказы» → «Контракты».", Sim.LVL_INFO)
+		sim.notify(L.t("Пришёл тендер — решение за вами: «Заказы» → «Контракты»."), Sim.LVL_INFO)
 	for i in n:
 		sim.sales.inquiry(_maybe_trial(make_offer()))
 
@@ -123,11 +129,11 @@ func _maybe_trial(o: Dictionary) -> Dictionary:
 ## Можно ли перенести срок: пустая строка — можно, иначе причина.
 func postpone_block(o: Dictionary) -> String:
 	if str(o.get("status", "")) != "active":
-		return "Заказ уже не в работе"
+		return L.t("Заказ уже не в работе")
 	if str(o.get("kind", "")) == "state":
-		return "Госзаказ не переносится"
+		return L.t("Госзаказ не переносится")
 	if bool(o.get("moved", false)):
-		return "Срок уже переносили — второй раз заказчик не согласится"
+		return L.t("Срок уже переносили — второй раз заказчик не согласится")
 	return ""
 
 
@@ -135,7 +141,7 @@ func postpone_block(o: Dictionary) -> String:
 func postpone(id: int) -> String:
 	var o := get_order(id)
 	if o.is_empty():
-		return "Заказ не найден"
+		return L.t("Заказ не найден")
 	var why := postpone_block(o)
 	if why != "":
 		return why
@@ -151,7 +157,7 @@ func postpone(id: int) -> String:
 	o["moved"] = true
 	sim.reputation = maxf(0.0, sim.reputation - 2.0)
 	sim.stats["postponed"] = int(sim.stats.get("postponed", 0)) + 1
-	sim.notify("Договорились с заказчиком: %s — срок до %s, скидка %d%%." % [short(o), deadline_str(o), int(MOVE_DISCOUNT * 100.0)], Sim.LVL_INFO)
+	sim.notify(L.t("Договорились с заказчиком: %s — срок до %s, скидка %d%%.") % [short(o), deadline_str(o), int(MOVE_DISCOUNT * 100.0)], Sim.LVL_INFO)
 	return ""
 
 
@@ -198,7 +204,7 @@ func make_offer(product: String = "") -> Dictionary:
 	var rep_k := (0.9 + sim.reputation / 500.0) * (1.1 if sim.season.month() >= 10 else 1.0) * sim.story.mod("order_price") * sim.progress.price_k() * sim.market.price_k()
 	var price := int(round(rng.randf_range(float(pr[0]), float(pr[1])) * rep_k * sim.sales.price_index(p) / 10.0) * 10)
 	var work_days := make_lead(p, qty) - 2 + rng.randi_range(1, 3)
-	var clients: Array = Defs.names.get("clients", ["ИП Иванов"])
+	var clients: Array = Defs.names.get("clients", [L.t("ИП Иванов")])
 	return {
 		"id": sim.new_id(), "client": str(clients[rng.randi_range(0, clients.size() - 1)]),
 		"product": p, "qty": qty, "price": price, "lead": work_days,
@@ -216,9 +222,9 @@ func _special_offers() -> void:
 	# режимный завод получает госзаказ с первого дня; остальным нужна ступень «Тендеры» (её держит юрист)
 	var state_ok := (bool(pg.pdef().get("state", false)) and has_cp) or (sim.dev.on("law3") and pg.ooo and has_cp)
 	if not state_ok and not bool(pg.pdef().get("state", false)) and pg.stage >= 4 and not sim.dev.on("law3"):
-		sim.notify_once("need_lawyer", "Госзаказ разыгрывают на тендере: нужна ступень «Тендеры» (Управление → Развитие), документы готовит юрист.", Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
+		sim.notify_once("need_lawyer", L.t("Госзаказ разыгрывают на тендере: нужна ступень «Тендеры» (Управление → Развитие), документы готовит юрист."), Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
 	if bool(pg.pdef().get("state", false)) and not has_cp:
-		sim.notify_once("need_cp", "Госзаказ дают только режимным предприятиям: поставьте «Проходную с вахтой» (Объекты → Безопасность).", Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
+		sim.notify_once("need_cp", L.t("Госзаказ дают только режимным предприятиям: поставьте «Проходную с вахтой» (Объекты → Безопасность)."), Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
 	var chance_state := 0.45 if bool(pg.pdef().get("state", false)) else 0.15
 	if state_ok and sim.rng.randf() < chance_state and by_status(["offer"]).filter(func(o: Dictionary) -> bool: return str(o.get("kind", "")) == "state").is_empty():
 		var o := make_offer()
@@ -269,23 +275,30 @@ func deadline_after(n: int) -> float:
 func accept(id: int, auto_buy: bool, by_sales: bool = false) -> String:
 	var o := get_order(id)
 	if o.is_empty() or str(o["status"]) != "offer":
-		return "Заказ недоступен"
+		return L.t("Заказ недоступен")
 	if active_count() >= max_active() and str(o.get("kind", "")) != "contract":
-		return "Слишком много заказов в работе (максимум %d — растёт со штатом)" % max_active()
+		return L.t("Слишком много заказов в работе (максимум %d — растёт со штатом)") % max_active()
 	o["status"] = "active"
 	o["accepted"] = sim.minute
 	o["deadline"] = deadline_after(int(o.get("lead", 3)))
 	var p := str(o["product"])
-	var msg := ("Сбыт взял заказ: %s, %s. Срок — %s." % [short(o), Defs.money_str(float(o["price"]) * int(o["qty"])), deadline_str(o)]) if by_sales else ("Заказ принят: %s. Срок — %s." % [short(o), deadline_str(o)])
+	var msg := (L.t("Сбыт взял заказ: %s, %s. Срок — %s.") % [short(o), Defs.money_str(float(o["price"]) * int(o["qty"])), deadline_str(o)]) if by_sales else (L.t("Заказ принят: %s. Срок — %s.") % [short(o), deadline_str(o)])
 	if str(o.get("kind", "")) == "contract":
-		msg = "Партия по контракту: %s. Срок — %s." % [short(o), deadline_str(o)]
+		msg = L.t("Партия по контракту: %s. Срок — %s.") % [short(o), deadline_str(o)]
 	if bool(o.get("trial", false)):
-		msg += " Пробная партия: срок вдвое больше, без неустойки."
+		msg += L.t(" Пробная партия: срок вдвое больше, без неустойки.")
 	if str(o.get("kind", "")) == "state":
 		var adv := float(o["price"]) * int(o["qty"]) * 0.5
 		o["paid_part"] = adv
 		sim.earn(adv, "Оплата: аванс 50% по госзаказу")
-		msg += " Получен аванс %s." % Defs.money_str(adv)
+		msg += L.t(" Получен аванс %s.") % Defs.money_str(adv)
+	elif str(o.get("kind", "")) == "" and sim.day() - sim.progress.start_day < int(Defs.b("early_advance_days")) and Defs.b("early_advance") > 0.0:
+		# 1.39: первые две недели обычные клиенты платят аванс — новому заводу есть на что жить до первой отгрузки
+		var adv2 := roundf(float(o["price"]) * int(o["qty"]) * Defs.b("early_advance") / 10.0) * 10.0
+		o["paid_part"] = float(o.get("paid_part", 0.0)) + adv2
+		o["early_adv"] = adv2
+		sim.earn(adv2, "Оплата: аванс %d%% за %s" % [int(round(Defs.b("early_advance") * 100.0)), short_ru(o)])
+		msg += L.t(" Аванс %s.") % Defs.money_str(adv2)
 	if auto_buy:
 		var mat := sim.planner.material_of(p)
 		var need := sim.planner.material_deficit(mat)
@@ -293,7 +306,7 @@ func accept(id: int, auto_buy: bool, by_sales: bool = false) -> String:
 			var extra := maxi(1, int(ceil(remaining(o) * 0.12)))
 			var err := sim.order_material(mat, need + extra, true)
 			if err != "":
-				msg += " Металл не заказан: " + err
+				msg += L.t(" Металл не заказан: ") + err
 	sim.notify(msg, Sim.LVL_INFO if by_sales else Sim.LVL_GOOD)
 	return ""
 
@@ -319,14 +332,14 @@ func deadline_str(o: Dictionary) -> String:
 	var dl := float(o["deadline"])
 	var d := int(dl / 1440.0) + 1
 	var left := d - sim.day()
-	var base := "день %d (%s)" % [d, sim.weekday_name(d)]
+	var base := L.t("день %d (%s)") % [d, L.t(sim.weekday_name(d))]
 	if left == 0:
-		return base + ", сегодня"
+		return base + L.t(", сегодня")
 	if left == 1:
-		return base + ", завтра"
+		return base + L.t(", завтра")
 	if left < 0:
-		return base + ", просрочен"
-	return base + ", через %d %s" % [left, Defs.plural(left, "день", "дня", "дней")]
+		return base + L.t(", просрочен")
+	return base + L.t(", через %d %s") % [left, Defs.plural(left, "день", "дня", "дней")]
 
 
 func tick(dt: float) -> void:
@@ -344,12 +357,12 @@ func tick(dt: float) -> void:
 			o["allocated"] = remaining(o)
 			var delay := sim.rng.randf_range(Defs.b("pickup_delay_min"), Defs.b("pickup_delay_max"))
 			o["pickup_eta"] = sim.to_work_time(sim.minute + delay)
-			sim.notify("Заказ готов: %s. Клиент выслал машину." % short(o), Sim.LVL_GOOD)
+			sim.notify(L.t("Заказ готов: %s. Клиент выслал машину.") % short(o), Sim.LVL_GOOD)
 		elif sim.minute > float(o["deadline"]) + Defs.b("fail_after_days") * 1440.0:
-			fail(o, "Клиент ушёл, репутация упала")
+			fail(o, L.t("Клиент ушёл, репутация упала"))
 		elif sim.minute > float(o["deadline"]):
-			var hint := " Можно позвонить заказчику и перенести срок: «Заказы → В работе»." if postpone_block(o) == "" else ""
-			sim.notify_once("late_%d" % int(o["id"]), "Просрочка по заказу: %s. Каждый день — штраф %d%%.%s" % [short(o), int(float(o["penalty"]) * 100), hint], Sim.LVL_BAD, Vector2i(-1, -1), 1440.0)
+			var hint := L.t(" Можно позвонить заказчику и перенести срок: «Заказы → В работе».") if postpone_block(o) == "" else ""
+			sim.notify_once("late_%d" % int(o["id"]), L.t("Просрочка по заказу: %s. Каждый день — штраф %d%%.%s") % [short(o), int(float(o["penalty"]) * 100), hint], Sim.LVL_BAD, Vector2i(-1, -1), 1440.0)
 	for o: Dictionary in by_status(["ready"]):
 		if not bool(o["pickup_spawned"]) and sim.minute >= float(o["pickup_eta"]):
 			var v := sim.spawn_vehicle("pickup")
@@ -378,9 +391,11 @@ func fail(o: Dictionary, why: String) -> void:
 		var fine := float(o["price"]) * int(o["qty"]) * MAX_LATE_CUT + float(o.get("paid_part", 0.0))
 		sim.spend(fine, "Штраф: срыв госзаказа (возврат аванса и неустойка)")
 		sim.reputation = maxf(0.0, sim.reputation - 7.0)
+	elif float(o.get("early_adv", 0.0)) > 0.0:
+		sim.spend(float(o["early_adv"]), "Неустойка: возврат аванса за " + short_ru(o))
 	sim.stats["orders_failed"] = int(sim.stats["orders_failed"]) + 1
 	sim.market.on_shipped(99)   # срыв — тоже «не вовремя»
-	sim.notify("Заказ сорван: %s. %s." % [short(o), why], Sim.LVL_BAD)
+	sim.notify(L.t("Заказ сорван: %s. %s.") % [short(o), why], Sim.LVL_BAD)
 	if str(o.get("kind", "")) == "contract":
 		sim.sales.on_order_closed(o, false)
 
@@ -414,14 +429,14 @@ func on_partial_pickup(v: Vehicle) -> void:
 		return
 	var amount := float(o["price"]) * v.loaded
 	if amount > 0.0:
-		sim.earn(amount, "Частичная оплата: " + short(o))
+		sim.earn(amount, "Частичная оплата: " + short_ru(o))
 		o["paid_part"] = float(o.get("paid_part", 0.0)) + amount
 		sim.stats["shipped"] = int(sim.stats["shipped"]) + v.loaded
 	o["status"] = "active"
 	o["allocated"] = 0
 	o["pickup_spawned"] = false
 	o["pickup_eta"] = -1.0
-	sim.notify("Машина уехала недогруженной (%d из %d): не хватило готовых деталей. Остаток заказа снова в работе." % [v.loaded, v.need], Sim.LVL_WARN)
+	sim.notify(L.t("Машина уехала недогруженной (%d из %d): не хватило готовых деталей. Остаток заказа снова в работе.") % [v.loaded, v.need], Sim.LVL_WARN)
 
 
 ## Пропущенный ОТК брак возвращается рекламацией через несколько дней.
@@ -464,11 +479,11 @@ func on_pickup_done(v: Vehicle) -> void:
 	if str(o.get("kind", "")) == "contract":
 		sim.sales.on_order_closed(o, true)
 	if not sim.story.defer_payment(amount, str(o["client"]), short(o)):
-		sim.earn(amount, "Оплата: " + short(o))
+		sim.earn(amount, "Оплата: " + short_ru(o))
 	else:
 		o["deferred"] = true
 	if late_days > 0:
-		sim.market.claim("liability", full - amount, "неустойка за опоздание, " + short(o))
+		sim.market.claim("liability", full - amount, "неустойка за опоздание, " + short_ru(o))
 	_reclamation_check(o)
 	sim.stats["orders_done"] = int(sim.stats["orders_done"]) + 1
 	var okind := str(o.get("kind", ""))
@@ -477,10 +492,10 @@ func on_pickup_done(v: Vehicle) -> void:
 	sim.stats["shipped"] = int(sim.stats["shipped"]) + v.loaded
 	if late_days == 0:
 		sim.reputation = minf(100.0, sim.reputation + 3.0)
-		sim.notify("Заказ отгружен вовремя: %s. Получено %s." % [short(o), Defs.money_str(amount)], Sim.LVL_GOOD)
+		sim.notify(L.t("Заказ отгружен вовремя: %s. Получено %s.") % [short(o), Defs.money_str(amount)], Sim.LVL_GOOD)
 	else:
 		sim.reputation = maxf(0.0, sim.reputation - 2.0)
-		sim.notify("Заказ отгружен с опозданием на %d дн.: получено %s." % [late_days, Defs.money_str(amount)], Sim.LVL_WARN)
+		sim.notify(L.t("Заказ отгружен с опозданием на %d дн.: получено %s.") % [late_days, Defs.money_str(amount)], Sim.LVL_WARN)
 	# отрубить старые выполненные заказы, чтобы список не рос бесконечно
 	var done := by_status(["done", "failed"])
 	if done.size() > 30:

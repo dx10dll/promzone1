@@ -143,7 +143,7 @@ func flora_at(c: Vector2i) -> int:
 
 
 static func flora_name(v: int) -> String:
-	return ["", "тополь", "берёза", "клён", "куст сирени", "куст шиповника"][clampi(v, 0, 5)]
+	return ["", L.t("тополь"), L.t("берёза"), L.t("клён"), L.t("куст сирени"), L.t("куст шиповника")][clampi(v, 0, 5)]
 
 
 ## Свой забор: внутри участка (остался от границы до покупки соседнего) или по краю своей земли.
@@ -235,8 +235,8 @@ func lot_rect(k: int) -> Rect2i:
 func lot_side(k: int) -> String:
 	var r := lot_rect(k)
 	if r.position.y < plot.position.y - 1 or (r.end.y < plot.position.y):
-		return "сзади"
-	return "слева" if r.end.x <= plot.position.x else "справа"
+		return L.t("сзади")
+	return L.t("слева") if r.end.x <= plot.position.x else L.t("справа")
 
 
 ## Купить участок: его земля и общий с ним забор становятся своими.

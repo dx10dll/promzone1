@@ -174,10 +174,10 @@ func show_worker(s: Sim, w: Worker) -> void:
 	root.move_child(actions, 2)
 	# бланк
 	var form := UITheme.hbox(8)
-	form.add_child(UITheme.label("ЛИЧНАЯ КАРТОЧКА РАБОТНИКА", 11, FORM_RED, UITheme.f_caps))
+	form.add_child(UITheme.label(L.t("ЛИЧНАЯ КАРТОЧКА РАБОТНИКА"), 11, FORM_RED, UITheme.f_caps))
 	form.add_child(UITheme.spacer())
-	form.add_child(UITheme.label("ТАБ. № %s" % tab_no(w), 11, UITheme.MUTED, UITheme.f_caps))
-	var cx := UITheme.ghost("×", func() -> void: close_request.emit(), "Закрыть (Esc)", UITheme.MUTED)
+	form.add_child(UITheme.label(L.t("ТАБ. № %s") % tab_no(w), 11, UITheme.MUTED, UITheme.f_caps))
+	var cx := UITheme.ghost("×", func() -> void: close_request.emit(), L.t("Закрыть (Esc)"), UITheme.MUTED)
 	cx.add_theme_font_size_override("font_size", 14)
 	form.add_child(cx)
 	head.add_child(form)
@@ -192,50 +192,50 @@ func show_worker(s: Sim, w: Worker) -> void:
 	var ph := Control.new()
 	ph.custom_minimum_size = por.custom_minimum_size + Vector2(10, 6)
 	ph.add_child(por)
-	var st := Stamp.round_stamp("ОТДЕЛ КАДРОВ • ПРИНЯТ • ", PackedStringArray(["день", str(w.hired_day)]), INK, 54.0, -14.0)
+	var st := Stamp.round_stamp(L.t("ОТДЕЛ КАДРОВ • ПРИНЯТ • "), PackedStringArray([L.t("день"), str(w.hired_day)]), INK, 54.0, -14.0)
 	st.position = por.custom_minimum_size - Vector2(38, 42)
 	ph.add_child(st)
 	ph.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	top.add_child(ph)
 	var col := UITheme.vbox(3)
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var sur := UITheme.label(w.last.to_upper(), 20, UITheme.TEXT, UITheme.f_semi)
+	var sur := UITheme.label(L.name(w.last).to_upper(), 20, UITheme.TEXT, UITheme.f_semi)
 	col.add_child(sur)
-	var nm := UITheme.label(w.first + ((" " + w.patronymic) if w.custom_id != "" and w.patronymic != "" else "") + ("  «%s»" % w.nick if w.nick != "" else ""), 15, UITheme.TEXT)
+	var nm := UITheme.label(L.name(w.first) + ((" " + L.name(w.patronymic)) if w.custom_id != "" and w.patronymic != "" else "") + (L.t("  «%s»") % _nick(w) if w.nick != "" else ""), 15, UITheme.TEXT)
 	if w.nick_why != "":
-		nm.tooltip_text = "Почему «%s»: %s" % [w.nick, w.nick_why]
+		nm.tooltip_text = L.t("Почему «%s»: %s") % [_nick(w), L.t(w.nick_why)]
 		nm.mouse_filter = Control.MOUSE_FILTER_STOP
 	col.add_child(nm)
 	var chips := HFlowContainer.new()
 	chips.add_theme_constant_override("h_separation", 5)
 	chips.add_theme_constant_override("v_separation", 4)
 	chips.add_child(UITheme.chip(w.prof_name() + (" · " + w.rank_text() if w.rank_text() != "" else ""), UITheme.ACCENT, _rank_tip(w), true))
-	chips.add_child(UITheme.chip(str(Worker.SHIFT_NAMES[w.shift]).split(" ")[0] + " смена", UITheme.INFO if w.shift == 0 else Color("#a58ad8")))
+	chips.add_child(UITheme.chip(L.t(["1-я смена", "2-я смена"][clampi(w.shift, 0, 1)]) if L.is_en() else str(Worker.SHIFT_NAMES[w.shift]).split(" ")[0] + " смена", UITheme.INFO if w.shift == 0 else Color("#a58ad8")))
 	if w.custom_id != "":
-		chips.add_child(UITheme.chip("★ свой", UITheme.ACCENT, "Свой рабочий: собран в главном меню («Создать рабочего»)"))
+		chips.add_child(UITheme.chip(L.t("★ свой"), UITheme.ACCENT, L.t("Свой рабочий: собран в главном меню («Создать рабочего»)")))
 	if w.brigade >= 0 and not sim.crew.brigade(w.brigade).is_empty():
 		var lead := sim.crew.lead_of(w.brigade) == w
-		chips.add_child(UITheme.chip(("★ бригадир · " if lead else "") + str(sim.crew.brigade(w.brigade)["name"]), sim.crew.color(w.brigade).lightened(0.25)))
+		chips.add_child(UITheme.chip((L.t("★ бригадир · ") if lead else "") + str(sim.crew.brigade(w.brigade)["name"]), sim.crew.color(w.brigade).lightened(0.25)))
 	if w.is_itr():
-		chips.add_child(UITheme.chip(str(Defs.departments.get(w.dept(), {}).get("name", "ИТР")), UITheme.INFO))
+		chips.add_child(UITheme.chip(L.dt("department.%s.name" % w.dept(), str(Defs.departments.get(w.dept(), {}).get("name", "ИТР"))), UITheme.INFO))
 	if w.practice_until >= 0:
-		chips.add_child(UITheme.chip("практикант", UITheme.GOOD, "Практика до дня %d" % w.practice_until))
+		chips.add_child(UITheme.chip(L.t("практикант"), UITheme.GOOD, L.t("Практика до дня %d") % w.practice_until))
 	if sim.crew.union_on() and int(sim.crew.union.get("lead", -1)) == w.id:
-		chips.add_child(UITheme.chip("председатель профкома", UITheme.BAD))
+		chips.add_child(UITheme.chip(L.t("председатель профкома"), UITheme.BAD))
 	if sim.town.is_resident(w):
-		chips.add_child(UITheme.chip("живёт в общежитии", UITheme.INFO, ("Не опаздывает. Иногородняя" if w.female else "Не опаздывает. Иногородний") if w.from_away else "Не опаздывает"))
+		chips.add_child(UITheme.chip(L.t("живёт в общежитии"), UITheme.INFO, (L.t("Не опаздывает. Иногородняя") if w.female else L.t("Не опаздывает. Иногородний")) if w.from_away else L.t("Не опаздывает")))
 	elif w.from_away:
-		chips.add_child(UITheme.chip("негде жить", UITheme.BAD, ("Иногородняя без койки в общежитии — снимает угол, недовольна" if w.female else "Иногородний без койки в общежитии — снимает угол, недоволен")))
+		chips.add_child(UITheme.chip(L.t("негде жить"), UITheme.BAD, (L.t("Иногородняя без койки в общежитии — снимает угол, недовольна") if w.female else L.t("Иногородний без койки в общежитии — снимает угол, недоволен"))))
 	var places := Workplace.places_of(sim, w)
 	if not places.is_empty():
 		var pn: Array[String] = []
 		for pl in places:
 			pn.append(pl.title())
-		chips.add_child(UITheme.chip("рабочее место: " + ", ".join(pn), Color("#b8c48a"), "Закреплено за человеком: работает здесь первым. Если не может — на больничном, занят другим делом, не на смене — встаёт любой, кто умеет. Сменить — в карточке станка."))
+		chips.add_child(UITheme.chip(L.t("рабочее место: ") + ", ".join(pn), Color("#b8c48a"), L.t("Закреплено за человеком: работает здесь первым. Если не может — на больничном, занят другим делом, не на смене — встаёт любой, кто умеет. Сменить — в карточке станка.")))
 	if w.kids > 0:
-		chips.add_child(UITheme.chip("дети: %d%s" % [w.kids, " · в садике" if sim.town.has_kg_place(w) else ""], UITheme.GOOD if sim.town.has_kg_place(w) else UITheme.MUTED))
+		chips.add_child(UITheme.chip(L.t("дети: %d%s") % [w.kids, L.t(" · в садике") if sim.town.has_kg_place(w) else ""], UITheme.GOOD if sim.town.has_kg_place(w) else UITheme.MUTED))
 	col.add_child(chips)
-	col.add_child(UITheme.label("%d %s · %s · на заводе с дня %d" % [w.age, Defs.plural(w.age, "год", "года", "лет"), People.body_name(w).to_lower(), w.hired_day], 12, UITheme.MUTED))
+	col.add_child(UITheme.label(L.t("%d %s · %s · на заводе с дня %d") % [w.age, Defs.plural(w.age, "год", "года", "лет"), People.body_name(w).to_lower(), w.hired_day], 12, UITheme.MUTED))
 	var act := UITheme.label("", 13, UITheme.INFO)
 	act.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	act.custom_minimum_size = Vector2(300, 0)
@@ -245,10 +245,10 @@ func show_worker(s: Sim, w: Worker) -> void:
 		# 1.19: управление — заметная кнопка, а не подсказка мелким шрифтом
 		var cb: Button
 		if w.controlled:
-			cb = UITheme.button("Отпустить — пусть работает сам", func() -> void: control_request.emit(w, false), "Вернуть к обычной работе (Esc)")
+			cb = UITheme.button(L.t("Отпустить — пусть работает сам"), func() -> void: control_request.emit(w, false), L.t("Вернуть к обычной работе (Esc)"))
 		else:
-			cb = UITheme.primary("Взять под управление", func() -> void: control_request.emit(w, true),
-				"Человек бросит своё и будет ждать ваших команд: щёлкните по стройке, станку, грузу или месту — и выберите «Сделать сейчас»")
+			cb = UITheme.primary(L.t("Взять под управление"), func() -> void: control_request.emit(w, true),
+				L.t("Человек бросит своё и будет ждать ваших команд: щёлкните по стройке, станку, грузу или месту — и выберите «Сделать сейчас»"))
 		cb.icon = Tex.ui("control")
 		cb.add_theme_constant_override("icon_max_width", 20)
 		UITheme.icon_colors(cb)
@@ -256,7 +256,7 @@ func show_worker(s: Sim, w: Worker) -> void:
 		col.add_child(cb)
 		dyn["order_hint"] = cb
 	var mrow := UITheme.hbox(8)
-	mrow.add_child(UITheme.label("Настроение", 12, UITheme.MUTED))
+	mrow.add_child(UITheme.label(L.t("Настроение"), 12, UITheme.MUTED))
 	var mb := UITheme.bar(50, UITheme.GOOD, 170, 8)
 	mb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	mrow.add_child(mb)
@@ -272,12 +272,12 @@ func show_worker(s: Sim, w: Worker) -> void:
 		for t in w.traits:
 			var d: Dictionary = Defs.traits.get(t, {})
 			var good := float(d.get("mood", 0.0)) >= 0.0 if d.has("mood") else true
-			tr.add_child(UITheme.chip(str(d.get("name", t)), UITheme.TEXT if good else UITheme.WARN, str(d.get("desc", ""))))
+			tr.add_child(UITheme.chip(L.dt("trait.%s.name" % t, str(d.get("name", t))), UITheme.TEXT if good else UITheme.WARN, L.dt("trait.%s.desc" % t, str(d.get("desc", "")))))
 		col.add_child(tr)
 	top.add_child(col)
 	head.add_child(top)
 	# вкладки
-	var tabs := UITheme.segmented([["main", "Обзор"], ["skills", "Навыки"], ["rel", "Отношения"], ["hist", "История"]], w_tab, func(k: String) -> void:
+	var tabs := UITheme.segmented([["main", L.t("Обзор")], ["skills", L.t("Навыки")], ["rel", L.t("Отношения")], ["hist", L.t("История")]], w_tab, func(k: String) -> void:
 		w_tab = k
 		_worker_tab()
 		refresh()
@@ -295,29 +295,29 @@ func show_worker(s: Sim, w: Worker) -> void:
 		if err != "":
 			sim.notify(err, Sim.LVL_WARN)
 		refresh()
-	actions.add_child(_act("−10%", on_down, "Урезать ставку: сэкономите, но человек обидится"))
-	actions.add_child(_act("+10%", on_upw, "Поднять ставку: настроение вверх"))
-	actions.add_child(_act("Премия %s" % Defs.money_str(Defs.b("bonus_amount")), on_bonus, "Разовая премия: хорошее настроение на три дня", "money"))
+	actions.add_child(_act("−10%", on_down, L.t("Урезать ставку: сэкономите, но человек обидится")))
+	actions.add_child(_act("+10%", on_upw, L.t("Поднять ставку: настроение вверх")))
+	actions.add_child(_act(L.t("Премия %s") % Defs.money_str(Defs.b("bonus_amount")), on_bonus, L.t("Разовая премия: хорошее настроение на три дня"), "money"))
 	if not w.is_itr():
-		actions.add_child(_act("Учить…", _open_training, "Курсы, наставник, инструктаж (Люди → Обучение)", "research"))
+		actions.add_child(_act(L.t("Учить…"), _open_training, L.t("Курсы, наставник, инструктаж (Люди → Обучение)"), "research"))
 	actions.add_child(UITheme.spacer())
 	if not w.order.is_empty():
-		actions.add_child(_act("Отменить приказ", func() -> void:
+		actions.add_child(_act(L.t("Отменить приказ"), func() -> void:
 			sim.brain.abort(w)
-			sim.brain.end_order(w, "приказ отменён")
-			show_worker(sim, w), "Вернуть к обычной работе сейчас", "cancel"))
+			sim.brain.end_order(w, L.t("приказ отменён"))
+			show_worker(sim, w), L.t("Вернуть к обычной работе сейчас"), "cancel"))
 	if w.has_grade():
 		# 1.15 (РП-10): разряд — только через экзамен с пробной деталью
 		var why := sim.career.exam_block(w)
-		var ex := _act("Экзамен на %d-й разряд" % mini(6, w.grade() + 1), func() -> void:
+		var ex := _act(L.t("Экзамен на %d-й разряд") % mini(6, w.grade() + 1), func() -> void:
 			var err := sim.career.request_exam(w)
 			if err != "":
 				sim.notify(err, Sim.LVL_WARN)
-			show_worker(sim, w), ("На смене сделает пробную деталь, мастер примет. Сдал — разряд и просьба о прибавке; не сдал — пересдача через неделю." if why == "" else why), "medal")
+			show_worker(sim, w), (L.t("На смене сделает пробную деталь, мастер примет. Сдал — разряд и просьба о прибавке; не сдал — пересдача через неделю.") if why == "" else why), "medal")
 		ex.disabled = why != ""
 		actions.add_child(ex)
-	actions.add_child(_act("Показать", func() -> void: focus_request.emit(w.cell()), "Перевести камеру на человека", "inspect"))
-	actions.add_child(_act("Уволить", func() -> void: _confirm_fire(w), "Уволить с выплатой расчёта", "fire_worker", UITheme.BAD))
+	actions.add_child(_act(L.t("Показать"), func() -> void: focus_request.emit(w.cell()), L.t("Перевести камеру на человека"), "inspect"))
+	actions.add_child(_act(L.t("Уволить"), func() -> void: _confirm_fire(w), L.t("Уволить с выплатой расчёта"), "fire_worker", UITheme.BAD))
 	_worker_tab()
 	visible = true
 	refresh()
@@ -329,15 +329,15 @@ static func _rank_tip(w: Worker) -> String:
 	match w.rank_kind():
 		"grade":
 			if w.pot_grade() > w.grade():
-				return "Разряд подтверждён экзаменом. Руки уже тянут на %d-й — скоро сдаст пробную деталь мастеру." % w.pot_grade()
-			return "Разряд подтверждают экзаменом: пробная деталь мастеру, когда навык подрастёт."
+				return L.t("Разряд подтверждён экзаменом. Руки уже тянут на %d-й — скоро сдаст пробную деталь мастеру.") % w.pot_grade()
+			return L.t("Разряд подтверждают экзаменом: пробная деталь мастеру, когда навык подрастёт.")
 		"category":
 			if w.prof == "nurse":
-				return "Медицинская категория растёт с опытом: вторая — с навыком 4, первая — с 6, высшая — с 8."
-			return "Категория растёт с опытом: II — с навыком 4, I — с 6, ведущий — с 8."
+				return L.t("Медицинская категория растёт с опытом: вторая — с навыком 4, первая — с 6, высшая — с 8.")
+			return L.t("Категория растёт с опытом: II — с навыком 4, I — с 6, ведущий — с 8.")
 		"position":
-			return "Руководитель: у должности нет разрядов."
-	return "Простая работа — без разрядов."
+			return L.t("Руководитель: у должности нет разрядов.")
+	return L.t("Простая работа — без разрядов.")
 
 
 ## Шапка-бланк карточки: красная надпись капсом, номер справа, крестик, двойная линовка.
@@ -347,7 +347,7 @@ func _form_head(title: String, no: String) -> VBoxContainer:
 	form.add_child(UITheme.label(title.to_upper(), 11, FORM_RED, UITheme.f_caps))
 	form.add_child(UITheme.spacer())
 	form.add_child(UITheme.label(no.to_upper(), 11, UITheme.MUTED, UITheme.f_caps))
-	var cx := UITheme.ghost("×", func() -> void: close_request.emit(), "Закрыть (Esc)", UITheme.MUTED)
+	var cx := UITheme.ghost("×", func() -> void: close_request.emit(), L.t("Закрыть (Esc)"), UITheme.MUTED)
 	cx.add_theme_font_size_override("font_size", 14)
 	form.add_child(cx)
 	v.add_child(form)
@@ -399,8 +399,8 @@ func _wt_main(w: Worker) -> void:
 	var cols := UITheme.hbox(18)
 	var left := UITheme.vbox(4)
 	left.custom_minimum_size = Vector2(236, 0)
-	left.add_child(UITheme.caption("Потребности"))
-	for pair in [["food", "Сытость"], ["bladder", "Туалет"], ["rest", "Бодрость"]]:
+	left.add_child(UITheme.caption(L.t("Потребности")))
+	for pair in [["food", L.t("Сытость")], ["bladder", L.t("Туалет")], ["rest", L.t("Бодрость")]]:
 		var row := UITheme.hbox(6)
 		var l := UITheme.label(pair[1], 12)
 		l.custom_minimum_size = Vector2(70, 0)
@@ -413,13 +413,13 @@ func _wt_main(w: Worker) -> void:
 		left.add_child(row)
 		dyn["t_need_" + pair[0]] = b
 		dyn["t_needl_" + pair[0]] = vl
-	left.add_child(UITheme.caption("Работа"))
+	left.add_child(UITheme.caption(L.t("Работа")))
 	var g := UITheme.grid(2, 6, 6)
 	for k in ["days", "ops", "speed", "ppe"]:
 		var tile := UITheme.card(8)
 		var tv := UITheme.vbox(0)
 		tile.add_child(tv)
-		var cap := UITheme.label({"days": "смен", "ops": "операций", "speed": "скорость", "ppe": "СИЗ" if not w.is_itr() else "рабочее место"}[k], 11, UITheme.MUTED)
+		var cap := UITheme.label({"days": L.t("смен"), "ops": L.t("операций"), "speed": L.t("скорость"), "ppe": L.t("СИЗ") if not w.is_itr() else L.t("рабочее место")}[k], 11, UITheme.MUTED)
 		tv.add_child(cap)
 		var val := UITheme.label("", 16, UITheme.TEXT, UITheme.f_semi)
 		tv.add_child(val)
@@ -432,10 +432,10 @@ func _wt_main(w: Worker) -> void:
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if not w.visitor:
 		# 1.15 (РП-8): пять жизненных потребностей
-		right.add_child(UITheme.caption("Что важно"))
+		right.add_child(UITheme.caption(L.t("Что важно")))
 		var lg := UITheme.grid(3, 6, 2)
 		for lfg in Mood.LIFE:
-			var gl := UITheme.label(str(lfg[1]), 12)
+			var gl := UITheme.label(L.t(str(lfg[1])), 12)
 			gl.custom_minimum_size = Vector2(74, 0)
 			gl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lg.add_child(gl)
@@ -452,7 +452,7 @@ func _wt_main(w: Worker) -> void:
 		var hint := _wrap("", 12, UITheme.WARN, 300.0)
 		right.add_child(hint)
 		dyn["t_life_hint"] = hint
-	right.add_child(UITheme.caption("О чём думает"))
+	right.add_child(UITheme.caption(L.t("О чём думает")))
 	var thoughts := UITheme.vbox(1)
 	right.add_child(thoughts)
 	dyn["t_thoughts"] = thoughts
@@ -475,12 +475,12 @@ func _wt_main(w: Worker) -> void:
 	wr.add_child(wl)
 	dyn["t_wage"] = wage_v
 	dyn["t_wage_s"] = wage_s
-	wr.add_child(UITheme.label("Смена", 12, UITheme.MUTED))
+	wr.add_child(UITheme.label(L.t("Смена"), 12, UITheme.MUTED))
 	var ob := OptionButton.new()
 	ob.focus_mode = Control.FOCUS_NONE
 	ob.add_theme_font_size_override("font_size", 13)
 	for n in Worker.SHIFT_NAMES:
-		ob.add_item(n)
+		ob.add_item(L.t(n))
 	ob.select(w.pending_shift if w.pending_shift >= 0 else w.shift)
 	ob.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var wid := w.id
@@ -503,37 +503,37 @@ func _wt_skills(w: Worker) -> void:
 	for k in keys:
 		var row := UITheme.hbox(8)
 		var main := k == w.main_skill()
-		var nl := UITheme.label(str(Worker.SKILL_NAMES[k]), 13, UITheme.ACCENT if main else UITheme.TEXT, UITheme.f_semi if main else null)
+		var nl := UITheme.label(L.t(str(Worker.SKILL_NAMES[k])), 13, UITheme.ACCENT if main else UITheme.TEXT, UITheme.f_semi if main else null)
 		nl.custom_minimum_size = Vector2(128, 0)
 		nl.clip_text = true
 		nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		nl.tooltip_text = "Основной навык профессии" if main else str(Worker.SKILL_NAMES[k])
+		nl.tooltip_text = L.t("Основной навык профессии") if main else L.t(str(Worker.SKILL_NAMES[k]))
 		nl.mouse_filter = Control.MOUSE_FILTER_STOP
 		row.add_child(nl)
 		row.add_child(_pips(w.skill(k), UITheme.ACCENT if main else UITheme.INFO))
 		row.add_child(UITheme.label(str(w.skill(k)), 12, UITheme.MUTED))
 		g.add_child(row)
 	box.add_child(g)
-	box.add_child(UITheme.caption("Обучение"))
+	box.add_child(UITheme.caption(L.t("Обучение")))
 	var tr := sim.training
 	var c := tr.course_of(w)
 	if not c.is_empty():
-		box.add_child(UITheme.meter(tr.progress(w) * 100.0, UITheme.INFO, 160, "на курсах: %s %d → %d" % [str(Worker.SKILL_NAMES.get(str(c["skill"]), "")).to_lower(), int(c["from"]), int(c["to"])]))
+		box.add_child(UITheme.meter(tr.progress(w) * 100.0, UITheme.INFO, 160, L.t("на курсах: %s %d → %d") % [L.t(str(Worker.SKILL_NAMES.get(str(c["skill"]), ""))).to_lower(), int(c["from"]), int(c["to"])]))
 	var m := tr.mentor_of(w)
 	var lines: Array[String] = []
 	if m:
-		lines.append("Наставник: %s%s" % [m.full_name(), "" if m.shift == w.shift else " (другая смена — не учит!)"])
+		lines.append(L.t("Наставник: %s%s") % [m.full_name(), "" if m.shift == w.shift else L.t(" (другая смена — не учит!)")])
 	var ap: Array[String] = []
 	for a in tr.apprentices(w):
 		ap.append(a.full_name())
 	if not ap.is_empty():
-		lines.append("Ученики: " + ", ".join(ap))
+		lines.append(L.t("Ученики: ") + ", ".join(ap))
 	if c.is_empty() and lines.is_empty():
-		lines.append("Не учится. Курсы дают +2 к навыку, наставник утраивает рост у станка.")
+		lines.append(L.t("Не учится. Курсы дают +2 к навыку, наставник утраивает рост у станка."))
 	for l in lines:
 		box.add_child(_wrap(l, 12, UITheme.TEXT))
 	if not w.is_itr():
-		var b := _act("Курсы и наставник…", _open_training, "Люди → Обучение", "research")
+		var b := _act(L.t("Курсы и наставник…"), _open_training, L.t("Люди → Обучение"), "research")
 		b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		box.add_child(b)
 
@@ -562,18 +562,18 @@ func _wt_rel(w: Worker) -> void:
 			sw.color = sim.crew.color(w.brigade)
 			sw.custom_minimum_size = Vector2(5, 18)
 			h.add_child(sw)
-			h.add_child(UITheme.label("«%s» — %d чел.%s" % [str(b["name"]), sim.crew.members(w.brigade).size(), (" · бригадир: " + ld.full_name()) if ld and ld != w else (" · бригадир (+10% к ставке)" if ld == w else "")], 13, UITheme.TEXT))
+			h.add_child(UITheme.label(L.t("«%s» — %d чел.%s") % [str(b["name"]), sim.crew.members(w.brigade).size(), (L.t(" · бригадир: ") + ld.full_name()) if ld and ld != w else (L.t(" · бригадир (+10% к ставке)") if ld == w else "")], 13, UITheme.TEXT))
 			box.add_child(h)
 	else:
-		box.add_child(UITheme.label("Не в бригаде", 13, UITheme.MUTED))
+		box.add_child(UITheme.label(L.t("Не в бригаде"), 13, UITheme.MUTED))
 	var others: Array = []
 	for o in sim.workers:
 		if o != w and absf(tr.rel(w, o)) >= 8.0:
 			others.append(o)
 	others.sort_custom(func(a: Worker, b2: Worker) -> bool: return absf(tr.rel(w, a)) > absf(tr.rel(w, b2)))
-	box.add_child(UITheme.caption("Отношения в коллективе"))
+	box.add_child(UITheme.caption(L.t("Отношения в коллективе")))
 	if others.is_empty():
-		box.add_child(_wrap("Пока ни с кем не сблизился и не поссорился. Отношения складываются, когда люди работают в одном помещении.", 12, UITheme.MUTED))
+		box.add_child(_wrap(L.t("Пока ни с кем не сблизился и не поссорился. Отношения складываются, когда люди работают в одном помещении."), 12, UITheme.MUTED))
 		return
 	var g := UITheme.grid(2, 12, 6)
 	for o: Worker in others.slice(0, 10):
@@ -588,7 +588,7 @@ func _wt_rel(w: Worker) -> void:
 		nl.clip_text = true
 		nl.custom_minimum_size = Vector2(120, 0)
 		vv.add_child(nl)
-		var word := "друг" if v >= 25.0 else ("приятель" if v > 0.0 else ("не ладят" if v <= -25.0 else "недолюбливает"))
+		var word := L.t("друг") if v >= 25.0 else (L.t("приятель") if v > 0.0 else (L.t("не ладят") if v <= -25.0 else L.t("недолюбливает")))
 		var cc := UITheme.GOOD if v > 0.0 else UITheme.BAD
 		vv.add_child(UITheme.meter(absf(v), cc, 60, "%s %+d" % [word, int(round(v))]))
 		h2.add_child(vv)
@@ -598,21 +598,21 @@ func _wt_rel(w: Worker) -> void:
 
 func _wt_hist(w: Worker) -> void:
 	var facts: Array[String] = []
-	facts.append("На заводе с дня %d · отработал смен: %d · операций: %d" % [w.hired_day, w.days_worked, w.parts_made])
+	facts.append(L.t("На заводе с дня %d · отработал смен: %d · операций: %d") % [w.hired_day, w.days_worked, w.parts_made])
 	if w.nick != "":
-		facts.append("Прозвище «%s»%s" % [w.nick, (": " + w.nick_why) if w.nick_why != "" else ""])
+		facts.append(L.t("Прозвище «%s»%s") % [_nick(w), (": " + L.t(w.nick_why)) if w.nick_why != "" else ""])
 	for f in facts:
 		box.add_child(_wrap(f, 12, UITheme.INFO))
 	if not w.tally.is_empty():
-		var names := {"fire": "тушил пожары", "injury": "травмы", "breaker": "поднимал автоматы", "smoke": "перекуры", "repair": "ремонты", "theft": "попадался на выносе"}
+		var names := {"fire": L.t("тушил пожары"), "injury": L.t("травмы"), "breaker": L.t("поднимал автоматы"), "smoke": L.t("перекуры"), "repair": L.t("ремонты"), "theft": L.t("попадался на выносе")}
 		var fl := HFlowContainer.new()
 		fl.add_theme_constant_override("h_separation", 4)
 		for k in w.tally.keys():
 			fl.add_child(UITheme.chip("%s: %d" % [str(names.get(k, k)), int(w.tally[k])], UITheme.MUTED))
 		box.add_child(fl)
-	box.add_child(UITheme.caption("Записи в карточке"))
+	box.add_child(UITheme.caption(L.t("Записи в карточке")))
 	if w.history.is_empty():
-		box.add_child(_wrap("Записей пока нет.", 12, UITheme.MUTED))
+		box.add_child(_wrap(L.t("Записей пока нет."), 12, UITheme.MUTED))
 	for line in w.history.slice(0, 14):
 		var t := str(line)
 		var h := UITheme.hbox(8)
@@ -640,7 +640,7 @@ func show_visitor(s: Sim, v: Worker) -> void:
 	col.add_child(UITheme.title(v.formal_name(), 16))
 	var t := str(sim.inspect.visit.get("type", ""))
 	var guest := v.has_meta("who")   # 1.30: пожарный, водитель ломовоза — не инспектор
-	col.add_child(UITheme.label(str(v.get_meta("who")) if guest else str(sim.inspect.tdef(t).get("who", "Гость завода")), 13, UITheme.MUTED))
+	col.add_child(UITheme.label(str(v.get_meta("who")) if guest else str(sim.inspect.tdef(t).get("who", L.t("Гость завода"))), 13, UITheme.MUTED))
 	var act := UITheme.label("", 13, UITheme.INFO)
 	act.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	act.custom_minimum_size = Vector2(200, 0)
@@ -652,14 +652,14 @@ func show_visitor(s: Sim, v: Worker) -> void:
 	box.add_child(found)
 	dyn["found"] = found
 	if guest:
-		box.add_child(_wrap("Приехал по делу и уедет сам — ничего делать не нужно." if str(v.get_meta("who")) != "Пожарный" else "Пожарный расчёт тушит огонь и уедет, когда пожар потушат.", 12, UITheme.MUTED))
+		box.add_child(_wrap(L.t("Приехал по делу и уедет сам — ничего делать не нужно.") if str(v.get_meta("who")) != "Пожарный" else L.t("Пожарный расчёт тушит огонь и уедет, когда пожар потушат."), 12, UITheme.MUTED))
 	elif not Inspections.VISIT_KINDS.has(t):
-		box.add_child(UITheme.label("Что проверяет:", 13, UITheme.MUTED, UITheme.f_med))
+		box.add_child(UITheme.label(L.t("Что проверяет:"), 13, UITheme.MUTED, UITheme.f_med))
 		for line in sim.inspect.checklist(t):
 			box.add_child(_wrap("• " + str(line), 12, UITheme.TEXT))
-		box.add_child(_wrap("Нарушения записываются, когда инспектор заходит в помещение. Успеете исправить до его прихода — не запишет.", 12, UITheme.MUTED))
+		box.add_child(_wrap(L.t("Нарушения записываются, когда инспектор заходит в помещение. Успеете исправить до его прихода — не запишет."), 12, UITheme.MUTED))
 	else:
-		box.add_child(_wrap("Оценивает порядок: грузы на полу, сломанные станки, оборудованные помещения, настроение людей, снег на дорожках, нарушения.", 12, UITheme.MUTED))
+		box.add_child(_wrap(L.t("Оценивает порядок: грузы на полу, сломанные станки, оборудованные помещения, настроение людей, снег на дорожках, нарушения."), 12, UITheme.MUTED))
 	visible = true
 	refresh()
 	_fit()
@@ -670,11 +670,11 @@ func _pick_owner(t: Thing, anchor: Control) -> void:
 	var pm := PopupMenu.new()
 	add_child(pm)
 	var list := Workplace.candidates(sim, t)
-	pm.add_item("Не закреплять", 0)
+	pm.add_item(L.t("Не закреплять"), 0)
 	var ids: Array[int] = [-1]
 	for w in list:
 		var places := Workplace.places_of(sim, w).filter(func(x: Thing) -> bool: return x.id != t.id)
-		var extra: String = (" · уже: " + (places[0] as Thing).title()) if not places.is_empty() else ""
+		var extra: String = (L.t(" · уже: ") + (places[0] as Thing).title()) if not places.is_empty() else ""
 		pm.add_item("%s%s — %s%s" % ["✓ " if w.id == t.owner else "", w.full_name(), w.title_lc(), extra], ids.size())
 		ids.append(w.id)
 	pm.id_pressed.connect(func(ix: int) -> void:
@@ -696,7 +696,7 @@ func _confirm_fire(w: Worker) -> void:
 func show_thing(s: Sim, t: Thing) -> void:
 	sim = s
 	_begin("thing", t.id, 360.0)
-	head.add_child(_form_head("Паспорт станка" if t.kind() == "machine" else "Объект", "инв. № %05d" % ((t.id * 7919) % 99000 + 1000)))
+	head.add_child(_form_head(L.t("Паспорт станка") if t.kind() == "machine" else L.t("Объект"), L.t("инв. № %05d") % ((t.id * 7919) % 99000 + 1000)))
 	var top := UITheme.hbox(10)
 	var oic := TextureRect.new()
 	oic.texture = Tex.obj(t.def_id if t.def_id != "chair" else "chair_down")
@@ -713,7 +713,7 @@ func show_thing(s: Sim, t: Thing) -> void:
 	top.add_child(chip)
 	dyn["chip"] = chip
 	head.add_child(top)
-	var desc := str(t.def().get("desc", ""))
+	var desc := L.dt("object.%s.desc" % t.def_id, str(t.def().get("desc", "")))
 	if desc != "":
 		var dl := _wrap(desc, 12, UITheme.MUTED)
 		dl.max_lines_visible = 2
@@ -726,28 +726,28 @@ func show_thing(s: Sim, t: Thing) -> void:
 	# 1.13: зона обязательна — вне своей зоны объектом не пользуются
 	if t.built and not sim.rooms.zone_ok(t):
 		var zw := UITheme.hbox(6)
-		var zl := _wrap("Не работает: стоит вне зоны %s. Разметьте зону там, где он стоит." % Rooms.zone_names(t.def_id), 12, UITheme.WARN, card_w - 110.0)
+		var zl := _wrap(L.t("Не работает: стоит вне зоны %s. Разметьте зону там, где он стоит.") % Rooms.zone_names(t.def_id), 12, UITheme.WARN, card_w - 110.0)
 		zl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		zw.add_child(zl)
 		var ztype := str(Rooms.zone_req(t.def_id)[0])
-		zw.add_child(_act("Разметить", func() -> void:
+		zw.add_child(_act(L.t("Разметить"), func() -> void:
 			var hd: Node = get_parent()
 			while hd and not (hd is Hud):
 				hd = hd.get_parent()
 			if hd:
-				(hd as Hud).open_rooms_type(ztype), "Откроется меню «Зоны» с нужной зоной", "", UITheme.WARN))
+				(hd as Hud).open_rooms_type(ztype), L.t("Откроется меню «Зоны» с нужной зоной"), "", UITheme.WARN))
 		head.add_child(zw)
 	# 1.15: рабочее место закреплено за человеком
 	if t.built and Workplace.is_place(t):
 		var orow := UITheme.hbox(6)
 		var ow := Workplace.owner_of(sim, t)
-		var otxt := "Закреплён за: " + (ow.full_name() + " (" + ow.title_lc() + ")" if ow else "никем — работает любой, кто умеет")
+		var otxt := L.t("Закреплён за: ") + (ow.full_name() + " (" + ow.title_lc() + ")" if ow else L.t("никем — работает любой, кто умеет"))
 		var ol := _wrap(otxt, 12, UITheme.TEXT if ow else UITheme.MUTED, card_w - 120.0)
 		ol.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		ol.tooltip_text = "Хозяин работает на своём месте первым. Если он не может — на больничном, в отпуске, занят другим делом или не на смене — встаёт любой, кто умеет. Освободился — сменщик доделает деталь и уступит."
+		ol.tooltip_text = L.t("Хозяин работает на своём месте первым. Если он не может — на больничном, в отпуске, занят другим делом или не на смене — встаёт любой, кто умеет. Освободился — сменщик доделает деталь и уступит.")
 		ol.mouse_filter = Control.MOUSE_FILTER_STOP
 		orow.add_child(ol)
-		var ob := _act("Сменить…", func() -> void: pass, "Закрепить место за другим человеком", "staff")
+		var ob := _act(L.t("Сменить…"), func() -> void: pass, L.t("Закрепить место за другим человеком"), "staff")
 		ob.pressed.connect(func() -> void: _pick_owner(t, ob))
 		orow.add_child(ob)
 		head.add_child(orow)
@@ -755,7 +755,7 @@ func show_thing(s: Sim, t: Thing) -> void:
 	if (t.kind() == "machine" or t.kind() in ["vent_fan", "compressor", "boiler"]) and t.built:
 		var tg := _act("", func() -> void: pass)
 		var upd := func() -> void:
-			tg.text = "Выключить" if t.enabled else "Включить"
+			tg.text = L.t("Выключить") if t.enabled else L.t("Включить")
 			tg.icon = Tex.ui("power_off" if t.enabled else "power")
 			_color_icon(tg)
 		var on_toggle := func() -> void:
@@ -767,7 +767,7 @@ func show_thing(s: Sim, t: Thing) -> void:
 		tg.expand_icon = false
 		tg.add_theme_constant_override("icon_max_width", 16)
 		upd.call()
-		tg.tooltip_text = "Выключенный станок не работает и не берёт нагрузку сети. Металл с него вернут на склад." if t.kind() == "machine" else "Выключенный агрегат не работает и не берёт нагрузку сети."
+		tg.tooltip_text = L.t("Выключенный станок не работает и не берёт нагрузку сети. Металл с него вернут на склад.") if t.kind() == "machine" else L.t("Выключенный агрегат не работает и не берёт нагрузку сети.")
 		actions.add_child(tg)
 	if Thing.rotations(t.def_id) > 1:
 		var on_rot := func() -> void:
@@ -776,32 +776,32 @@ func show_thing(s: Sim, t: Thing) -> void:
 				sim.notify(err, Sim.LVL_WARN)
 			else:
 				Snd.play("place", -8.0)
-		actions.add_child(_act("Повернуть", on_rot, "Повернуть объект на месте на 90° (клавиша R при установке)"))
+		actions.add_child(_act(L.t("Повернуть"), on_rot, L.t("Повернуть объект на месте на 90° (клавиша R при установке)")))
 	if str(t.def().get("power_source", "")) != "" and t.built:
-		actions.add_child(_act("Сеть…", _open_power, "Меню «Сети»: кабель, подстанция, мощность", "power"))
+		actions.add_child(_act(L.t("Сеть…"), _open_power, L.t("Меню «Сети»: кабель, подстанция, мощность"), "power"))
 	if t.kind() == "ppe_cabinet" and t.built:
-		actions.add_child(_act("Охрана труда…", _open_safety, "СОУТ, СИЗ и молоко за вредность"))
+		actions.add_child(_act(L.t("Охрана труда…"), _open_safety, L.t("СОУТ, СИЗ и молоко за вредность")))
 	actions.add_child(UITheme.spacer())
 	if not t.built:
 		var on_cancel := func() -> void:
 			sim.cancel_thing(t)
 			visible = false
-		actions.add_child(_act("Отменить заказ", on_cancel, "Отменить установку; деньги за ещё не привезённое вернут", "cancel", UITheme.BAD))
+		actions.add_child(_act(L.t("Отменить заказ"), on_cancel, L.t("Отменить установку; деньги за ещё не привезённое вернут"), "cancel", UITheme.BAD))
 	elif t.demolish:
 		var on_keep := func() -> void:
 			sim.cancel_thing(t)
 			show_thing(sim, t)
-		actions.add_child(_act("Не сносить", on_keep, "Снять пометку о демонтаже", "cancel"))
+		actions.add_child(_act(L.t("Не сносить"), on_keep, L.t("Снять пометку о демонтаже"), "cancel"))
 	else:
 		var on_dem := func() -> void:
 			t.demolish = true
 			sim.thing_rev += 1
 			show_thing(sim, t)
-		actions.add_child(_act("Демонтаж", on_dem, "Рабочие разберут объект и унесут в ящиках на склад оборудования (помещение «Склад» или зона разгрузки). Поставить снова — бесплатно, продать — за полцены (Производство → Склад оборудования).", "demolish", UITheme.BAD))
+		actions.add_child(_act(L.t("Демонтаж"), on_dem, L.t("Рабочие разберут объект и унесут в ящиках на склад оборудования (помещение «Склад» или зона разгрузки). Поставить снова — бесплатно, продать — за полцены (Производство → Склад оборудования)."), "demolish", UITheme.BAD))
 	# тело
 	if t.kind() == "machine" and t.built:
-		_bar_row("Состояние", UITheme.GOOD, "cond")
-		_bar_row("Операция", UITheme.INFO, "prog")
+		_bar_row(L.t("Состояние"), UITheme.GOOD, "cond")
+		_bar_row(L.t("Операция"), UITheme.INFO, "prog")
 	var st := _wrap("", 13, UITheme.TEXT)
 	box.add_child(st)
 	dyn["state"] = st
@@ -901,46 +901,46 @@ func show_cell(s: Sim, c: Vector2i) -> void:
 	var bpw := int(w.bp_wall[i])
 	var is_wall := wall != World.W_NONE or (bpw != World.BP_NONE and bpw > 0)
 	var d: Dictionary = Defs.wall_by_id.get(wall if wall != World.W_NONE else bpw, {}) if is_wall else Defs.floor_by_id.get(int(w.flr[i]) if w.flr[i] > 0 else int(w.bp_floor[i]), {})
-	head.add_child(_form_head("Конструкция", "клетка %d·%d" % [c.x, c.y]))
+	head.add_child(_form_head(L.t("Конструкция"), L.t("клетка %d·%d") % [c.x, c.y]))
 	var top := UITheme.hbox(8)
-	var tl := UITheme.title(str(d.get("name", "Клетка")), 16)
+	var tl := UITheme.title(L.t(str(d.get("name", "Клетка"))), 16)
 	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(tl)
 	var pending := (is_wall and bpw != World.BP_NONE) or (not is_wall and int(w.bp_floor[i]) != World.BP_NONE)
 	var demol := (is_wall and bpw == 0) or (not is_wall and int(w.bp_floor[i]) == 0)
-	top.add_child(_chip("под снос" if demol else ("чертёж" if pending else "построено"), UITheme.BAD if demol else (UITheme.INFO if pending else UITheme.GOOD)))
+	top.add_child(_chip(L.t("под снос") if demol else (L.t("чертёж") if pending else L.t("построено")), UITheme.BAD if demol else (UITheme.INFO if pending else UITheme.GOOD)))
 	head.add_child(top)
-	var desc := str(d.get("desc", ""))
+	var desc := L.t(str(d.get("desc", "")))
 	if desc != "":
 		head.add_child(_wrap(desc, 12, UITheme.MUTED))
 	var info := ""
 	if float(d.get("cost", 0)) > 0.0:
-		info = "Стоимость клетки %s, стройка ~%d мин." % [Defs.money_str(float(d["cost"])), int(d.get("build_time", 0))]
+		info = L.t("Стоимость клетки %s, стройка ~%d мин.") % [Defs.money_str(float(d["cost"])), int(d.get("build_time", 0))]
 	var r := sim.rooms.room_at(c + Vector2i(0, 1)) if is_wall else null
 	if r == null and is_wall:
 		r = sim.rooms.room_at(c + Vector2i(0, -1))
 	if r:
-		info += ("\n" if info != "" else "") + "Стена помещения «%s»." % r.title()
+		info += ("\n" if info != "" else "") + L.t("Стена помещения «%s».") % r.title()
 	if pending and not demol:
 		var mat := sim.bmats.mat_for(i)
 		if mat != "":
-			var st := "на участке — строят по очереди" if sim.bmats.free_on_ground(mat) > 0 or int(sim.bmats.have().get(mat, 0)) > 0 else ("едет машиной" if sim.bmats.coming().has(mat) else "заказывается у поставщика")
-			info += ("\n" if info != "" else "") + "Материал: %s — %s." % [BuildMats.mat_name(mat).to_lower(), st]
+			var st := L.t("на участке — строят по очереди") if sim.bmats.free_on_ground(mat) > 0 or int(sim.bmats.have().get(mat, 0)) > 0 else (L.t("едет машиной") if sim.bmats.coming().has(mat) else L.t("заказывается у поставщика"))
+			info += ("\n" if info != "" else "") + L.t("Материал: %s — %s.") % [BuildMats.mat_name(mat).to_lower(), st]
 	if info != "":
 		box.add_child(_wrap(info, 12, UITheme.TEXT))
 	actions.add_child(UITheme.spacer())
 	if pending:
-		actions.add_child(_act("Отменить чертёж", func() -> void:
+		actions.add_child(_act(L.t("Отменить чертёж"), func() -> void:
 			sim.cancel_all_at(c)
-			show_cell(sim, c), "Деньги за чертёж вернутся", "cancel", UITheme.BAD))
+			show_cell(sim, c), L.t("Деньги за чертёж вернутся"), "cancel", UITheme.BAD))
 	elif (bool(d.get("buildable", true)) or w.inner_fence(c)) and (is_wall or w.flr[i] > 0):
-		actions.add_child(_act("Снести", func() -> void:
+		actions.add_child(_act(L.t("Снести"), func() -> void:
 			if sim.place_demolish(c):
 				Snd.play("place", -8.0)
-			show_cell(sim, c), "Рабочие разберут, клетка освободится", "demolish", UITheme.BAD))
+			show_cell(sim, c), L.t("Рабочие разберут, клетка освободится"), "demolish", UITheme.BAD))
 	else:
 		var nl := sim.next_lot()
-		actions.add_child(UITheme.label("Граница участка — не сносится" + (" (соседний участок покупают: Развитие → Земля)" if nl >= 0 and WallKinds.is_fence(wall) else ""), 12, UITheme.MUTED))
+		actions.add_child(UITheme.label(L.t("Граница участка — не сносится") + (L.t(" (соседний участок покупают: Развитие → Земля)") if nl >= 0 and WallKinds.is_fence(wall) else ""), 12, UITheme.MUTED))
 	visible = true
 	_fit()
 
@@ -948,7 +948,7 @@ func show_cell(s: Sim, c: Vector2i) -> void:
 ## 1.18: груз на земле — штабель или пачка. Что лежит, сколько, кто уже несёт.
 func _pile_card(c: Vector2i, pile: Array[Item]) -> void:
 	var first: Item = pile[0]
-	head.add_child(_form_head("Груз на земле", "клетка %d·%d" % [c.x, c.y]))
+	head.add_child(_form_head(L.t("Груз на земле"), L.t("клетка %d·%d") % [c.x, c.y]))
 	var top := UITheme.hbox(10)
 	var ic := TextureRect.new()
 	ic.texture = Tex.for_item(first) if first.kind != "bmat" else Tex.item("%s_p3" % first.def_id)
@@ -967,29 +967,29 @@ func _pile_card(c: Vector2i, pile: Array[Item]) -> void:
 		groups[nm] = int(groups[nm]) + 1
 		if it.reserved_by >= 0:
 			busy += 1
-	var title := first.display_name() if order.size() == 1 else "Груз"
-	var tl := UITheme.title("%s — %d шт." % [title, pile.size()], 16)
+	var title := first.display_name() if order.size() == 1 else L.t("Груз")
+	var tl := UITheme.title(L.t("%s — %d шт.") % [title, pile.size()], 16)
 	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tl.custom_minimum_size = Vector2(180, 0)
 	top.add_child(tl)
 	if busy > 0:
-		top.add_child(_chip("несут %d" % busy, UITheme.INFO))
+		top.add_child(_chip(L.t("несут %d") % busy, UITheme.INFO))
 	head.add_child(top)
 	var lines: Array[String] = []
 	if order.size() > 1:
 		for nm2 in order:
-			lines.append("• %s — %d шт." % [nm2, int(groups[nm2])])
+			lines.append(L.t("• %s — %d шт.") % [nm2, int(groups[nm2])])
 	var txt := ""
 	match first.kind:
 		"bmat":
-			txt = "Поддон: %d из %d. Строители берут отсюда материал на ближайшую стройку." % [pile.size(), BuildMats.pallet(first.def_id)]
+			txt = L.t("Поддон: %d из %d. Строители берут отсюда материал на ближайшую стройку.") % [pile.size(), BuildMats.pallet(first.def_id)]
 		"crate":
-			txt = "Ящик с оборудованием ждёт установки или места на складе оборудования."
+			txt = L.t("Ящик с оборудованием ждёт установки или места на складе оборудования.")
 		"mat":
-			txt = "Металл занесут на стеллаж, когда освободятся руки." if not sim.logi.in_zone(c) else "Лежит в зоне разгрузки — отсюда металл берут прямо к станкам."
+			txt = L.t("Металл занесут на стеллаж, когда освободятся руки.") if not sim.logi.in_zone(c) else L.t("Лежит в зоне разгрузки — отсюда металл берут прямо к станкам.")
 		_:
-			txt = "Детали отнесут дальше по маршруту или на склад."
+			txt = L.t("Детали отнесут дальше по маршруту или на склад.")
 	if not lines.is_empty():
 		box.add_child(_wrap("\n".join(lines), 12, UITheme.TEXT))
 	box.add_child(_wrap(txt, 12, UITheme.MUTED))
@@ -1002,26 +1002,26 @@ func _pile_card(c: Vector2i, pile: Array[Item]) -> void:
 func _fault_card(c: Vector2i, i: int) -> void:
 	var layer := "cable" if sim.faults.at("cable", c) else "pipe"
 	var f: Dictionary = sim.faults.list[Faults.key(layer, i)]
-	head.add_child(_form_head("Авария", "клетка %d·%d" % [c.x, c.y]))
+	head.add_child(_form_head(L.t("Авария"), L.t("клетка %d·%d") % [c.x, c.y]))
 	var top := UITheme.hbox(8)
 	var tl := UITheme.title(str(Faults.LAYERS[layer]), 16)
 	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(tl)
 	var crew := float(f["fix_at"]) >= 0.0
 	var fixing := sim.net_res.has(Faults.key(layer, i))
-	top.add_child(_chip("бригада едет" if crew else ("чинят" if fixing else "ждёт ремонта"), UITheme.INFO if crew or fixing else UITheme.BAD))
+	top.add_child(_chip(L.t("бригада едет") if crew else (L.t("чинят") if fixing else L.t("ждёт ремонта")), UITheme.INFO if crew or fixing else UITheme.BAD))
 	head.add_child(top)
-	var txt := "Перебит кабель: дальше по линии тока нет — станки и свет за обрывом стоят." if layer == "cable" \
-		else "Лопнула труба: дальше по ней воды нет — туалеты и раковины за прорывом сухие, на полу лужа."
-	txt += " Любой свободный рабочий заменит кусок, как при прокладке сети."
+	var txt := L.t("Перебит кабель: дальше по линии тока нет — станки и свет за обрывом стоят.") if layer == "cable" \
+		else L.t("Лопнула труба: дальше по ней воды нет — туалеты и раковины за прорывом сухие, на полу лужа.")
+	txt += L.t(" Любой свободный рабочий заменит кусок, как при прокладке сети.")
 	head.add_child(_wrap(txt, 12, UITheme.MUTED))
 	actions.add_child(UITheme.spacer())
 	if not crew:
 		var cost := float(Faults.CREW_COST[layer])
-		actions.add_child(_act("Аварийная бригада (%s)" % Defs.money_str(cost), func() -> void:
+		actions.add_child(_act(L.t("Аварийная бригада (%s)") % Defs.money_str(cost), func() -> void:
 			if sim.can_afford(cost):
 				sim.faults.call_crew(layer, i)
-			show_cell(sim, c), "Починят за час, своих людей не отвлекать", "wrench", UITheme.TEXT))
+			show_cell(sim, c), L.t("Починят за час, своих людей не отвлекать"), "wrench", UITheme.TEXT))
 	visible = true
 	_fit()
 
@@ -1031,31 +1031,31 @@ func _flora_card(c: Vector2i, i: int) -> void:
 	var w := sim.world
 	var v := int(w.flora[i])
 	var tree := v <= 3
-	head.add_child(_form_head("Дерево" if tree else "Куст", "клетка %d·%d" % [c.x, c.y]))
+	head.add_child(_form_head(L.t("Дерево") if tree else L.t("Куст"), L.t("клетка %d·%d") % [c.x, c.y]))
 	var top := UITheme.hbox(8)
-	var tl := UITheme.title(World.flora_name(v).capitalize(), 16)
+	var tl := UITheme.title(L.t(World.flora_name(v)).capitalize(), 16)
 	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(tl)
 	var marked := int(w.bp_floor[i]) == 0
 	if marked:
-		top.add_child(_chip("спилят", UITheme.BAD))
+		top.add_child(_chip(L.t("спилят"), UITheme.BAD))
 	head.add_child(top)
 	var own := w.in_plot(c)
-	var txt := "Растёт на участке и мешает строить: на этой клетке нельзя поставить объект. Пол и стену можно — строитель сначала спилит дерево." if own \
-		else "Это чужая земля. Соседние участки покупают через «Развитие → Земля»."
+	var txt := L.t("Растёт на участке и мешает строить: на этой клетке нельзя поставить объект. Пол и стену можно — строитель сначала спилит дерево.") if own \
+		else L.t("Это чужая земля. Соседние участки покупают через «Развитие → Земля».")
 	if c.y > w.sidewalk_row:
-		txt = "Городская аллея вдоль дороги."
+		txt = L.t("Городская аллея вдоль дороги.")
 	head.add_child(_wrap(txt, 12, UITheme.MUTED))
 	actions.add_child(UITheme.spacer())
 	if own and marked:
-		actions.add_child(_act("Оставить", func() -> void:
+		actions.add_child(_act(L.t("Оставить"), func() -> void:
 			sim.cancel_all_at(c)
-			show_cell(sim, c), "Пусть растёт", "cancel", UITheme.BAD))
+			show_cell(sim, c), L.t("Пусть растёт"), "cancel", UITheme.BAD))
 	elif own:
-		actions.add_child(_act("Спилить" if tree else "Выкорчевать", func() -> void:
+		actions.add_child(_act(L.t("Спилить") if tree else L.t("Выкорчевать"), func() -> void:
 			if sim.place_demolish(c):
 				Snd.play("place", -8.0)
-			show_cell(sim, c), "Рабочий уберёт за %d мин." % (14 if tree else 6), "demolish", UITheme.BAD))
+			show_cell(sim, c), L.t("Рабочий уберёт за %d мин.") % (14 if tree else 6), "demolish", UITheme.BAD))
 	visible = true
 	_fit()
 
@@ -1068,7 +1068,7 @@ func show_room(s: Sim, room_id: int) -> void:
 		return
 	var r: Rooms.Room = sim.rooms.list[room_id]
 	dyn["anchor"] = r.cells[0]
-	head.add_child(_form_head("Зона" if r.type != "" else "Помещение", "№ %d" % (room_id + 1)))
+	head.add_child(_form_head(L.t("Зона") if r.type != "" else L.t("Помещение"), "№ %d" % (room_id + 1)))
 	var top := UITheme.hbox(8)
 	var tl := UITheme.title(r.title(), 16)
 	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1079,26 +1079,26 @@ func show_room(s: Sim, room_id: int) -> void:
 	dyn["chip"] = chip
 	head.add_child(top)
 	var sp_n := sim.rooms.space_rooms(r.space).size()
-	head.add_child(UITheme.label("Площадь %d кл. · окон %d · дверей %d%s" % [r.area(), r.windows, r.doors, (" · в зале ещё %d %s" % [sp_n - 1, Defs.plural(sp_n - 1, "зона", "зоны", "зон")]) if sp_n > 1 else ""], 12, UITheme.MUTED))
+	head.add_child(UITheme.label(L.t("Площадь %d кл. · окон %d · дверей %d%s") % [r.area(), r.windows, r.doors, (L.t(" · в зале ещё %d %s") % [sp_n - 1, Defs.plural(sp_n - 1, "зона", "зоны", "зон")]) if sp_n > 1 else ""], 12, UITheme.MUTED))
 	# назначение — выпадающий список вместо сетки из 15 кнопок
-	actions.add_child(UITheme.label("Назначение", 13, UITheme.MUTED))
+	actions.add_child(UITheme.label(L.t("Назначение"), 13, UITheme.MUTED))
 	var ob := OptionButton.new()
 	ob.focus_mode = Control.FOCUS_NONE
 	ob.add_theme_font_size_override("font_size", 13)
 	ob.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ob.add_item("— не назначено —")
+	ob.add_item(L.t("— не назначено —"))
 	ob.set_item_metadata(0, "")
 	var sel := 0
 	for type in Rooms.UI_ORDER:
 		var d: Dictionary = Defs.rooms[type]
-		ob.add_icon_item(_swatch(Color(str(d.get("color", "#888")))), str(d["name"]))
+		ob.add_icon_item(_swatch(Color(str(d.get("color", "#888")))), L.dt("room.%s.name" % type, str(d["name"])))
 		var i := ob.item_count - 1
 		ob.set_item_metadata(i, type)
 		var reqs: Array[String] = []
 		for n: Dictionary in d.get("needs", []):
-			reqs.append(str(n.get("text", "")))
+			reqs.append(L.t(str(n.get("text", ""))))
 		var mdt := Rooms.min_dims(type)
-		ob.set_item_tooltip(i, "%s\nНужно: %s; помещение от %d×%d клеток внутри." % [str(d.get("desc", "")), ", ".join(reqs), mdt.x, mdt.y])
+		ob.set_item_tooltip(i, L.t("%s\nНужно: %s; помещение от %d×%d клеток внутри.") % [L.dt("room.%s.desc" % type, str(d.get("desc", ""))), ", ".join(reqs), mdt.x, mdt.y])
 		if r.type == type:
 			sel = i
 	ob.select(sel)
@@ -1140,39 +1140,39 @@ func _current_room() -> Rooms.Room:
 func _room_state(r: Rooms.Room) -> String:
 	var lines: Array[String] = []
 	if r.type == "":
-		lines.append("Выберите назначение — от него зависит, как люди используют помещение и что они о нём думают.")
+		lines.append(L.t("Выберите назначение — от него зависит, как люди используют помещение и что они о нём думают."))
 	else:
 		var d: Dictionary = Defs.rooms.get(r.type, {})
-		lines.append(str(d.get("desc", "")))
-		lines.append("Требования:")
+		lines.append(L.dt("room.%s.desc" % r.type, str(d.get("desc", ""))))
+		lines.append(L.t("Требования:"))
 		var min_area := int(d.get("min_area", 1))
 		var md := Rooms.min_dims(r.type)
-		lines.append(("  ✓ " if r.area() >= min_area else "  × ") + "помещение от %d×%d клеток внутри (у вас %d×%d)" % [md.x, md.y, r.rect.size.x, r.rect.size.y])
+		lines.append(("  ✓ " if r.area() >= min_area else "  × ") + L.t("помещение от %d×%d клеток внутри (у вас %d×%d)") % [md.x, md.y, r.rect.size.x, r.rect.size.y])
 		var floors: Array = d.get("floors", [])
 		if not floors.is_empty():
 			var fname := str(Defs.floor_by_id.get(int(floors[0]), {}).get("name", "пол")).to_lower()
 			var has_floor := not r.missing.any(func(m: String) -> bool: return m.contains(fname))
-			lines.append(("  ✓ " if has_floor else "  × ") + fname)
+			lines.append(("  ✓ " if has_floor else "  × ") + (L.t(str(Defs.floor_by_id.get(int(floors[0]), {}).get("name", "пол"))).to_lower() if L.is_en() else fname))
 		for n: Dictionary in d.get("needs", []):
 			var txt := str(n.get("text", ""))
-			lines.append(("  × " if r.missing.has(txt) else "  ✓ ") + txt)
+			lines.append(("  × " if r.missing.has(txt) else "  ✓ ") + L.tx(txt))
 		var lv := sim.upkeep.level(r)
 		var pp: Array[String] = []
 		for p: Array in sim.upkeep.level_parts(r):
 			pp.append("%s %s" % [str(p[0]), ("%+.1f" % float(p[1])).replace(".0", "")])
-		lines.append("Обустройство: %s %d из 5%s" % ["★".repeat(lv) + "☆".repeat(5 - lv), lv, (" (" + ", ".join(pp) + ")") if not pp.is_empty() else ""])
+		lines.append(L.t("Обустройство: %s %d из 5%s") % ["★".repeat(lv) + "☆".repeat(5 - lv), lv, (" (" + ", ".join(pp) + ")") if not pp.is_empty() else ""])
 		if lv < 5:
-			lines.append("Выше уровень — лучше настроение: окна, хороший пол, электрический свет, растения и декор (Объекты → Декор), чистота.")
-	lines.append("Чистота: %d%%%s" % [sim.upkeep.cleanliness(r), " — нужна уборка" if sim.upkeep.room_dirt(r) > Upkeep.DIRTY else ""])
+			lines.append(L.t("Выше уровень — лучше настроение: окна, хороший пол, электрический свет, растения и декор (Объекты → Декор), чистота."))
+	lines.append(L.t("Чистота: %d%%%s") % [sim.upkeep.cleanliness(r), L.t(" — нужна уборка") if sim.upkeep.room_dirt(r) > Upkeep.DIRTY else ""])
 	var fu := sim.eng.fumes_of(r)
 	var vk := sim.eng.vent_k(r)
 	if fu >= 3.0 or vk > 0.0 or sim.eng.needs_vent(r):
-		lines.append("Воздух: %s · %s" % ["чисто" if fu < 15.0 else ("душно, %d%%" % int(fu) if fu < Eng.SMOKY else "дым, %d%%" % int(fu)),
-			("вентиляция ×%.1f" % vk) if vk > 0.0 else ("нужна вентиляция (Сети → Вентиляция)" if sim.eng.needs_vent(r) else "без вентиляции")])
+		lines.append(L.t("Воздух: %s · %s") % [L.t("чисто") if fu < 15.0 else (L.t("душно, %d%%") % int(fu) if fu < Eng.SMOKY else L.t("дым, %d%%") % int(fu)),
+			(L.t("вентиляция ×%.1f") % vk) if vk > 0.0 else (L.t("нужна вентиляция (Сети → Вентиляция)") if sim.eng.needs_vent(r) else L.t("без вентиляции"))])
 	if r.lit:
-		lines.append("Свет: есть" + (" (электричество)" if r.powered else " (дневной, из окон)"))
+		lines.append(L.t("Свет: есть") + (L.t(" (электричество)") if r.powered else L.t(" (дневной, из окон)")))
 	else:
-		lines.append("Свет: нет — проложите кабель от подстанции в помещение")
+		lines.append(L.t("Свет: нет — проложите кабель от подстанции в помещение"))
 	return "\n".join(lines)
 
 
@@ -1187,6 +1187,11 @@ func _process(delta: float) -> void:
 		refresh()
 
 
+## 1.39: прозвище на языке игры: перевод, если есть, иначе латиницей.
+static func _nick(w: Worker) -> String:
+	return L.name(L.t(w.nick))
+
+
 func _set_chip(text: String, col: Color) -> void:
 	var chip: Label = dyn.get("chip")
 	if chip == null:
@@ -1196,11 +1201,11 @@ func _set_chip(text: String, col: Color) -> void:
 		return
 	chip.text = text
 	# 1.20: красная плашка подсказывает, что сделать
-	var fixes := {"Нет тока": "Как исправить: протяните кабель от щитка к этому объекту («Сети», E). Если кабель есть — проверьте, не выбит ли автомат, и хватает ли мощности подстанции.",
-		"Сломан": "Как исправить: отправьте в ремонт кнопкой ниже — придёт слесарь или станочник. Чтобы ломалось реже, включите ППР (Производство → Станки).",
-		"Не греет": "Как исправить: котлу нужен ток, вода (труба от водомера) и топливо. Подробности — в строке состояния ниже.",
-		"Простаивает": "Нет работы или некому работать: проверьте заказы, металл на стеллаже и есть ли станочник нужной профессии.",
-		"Не подключён": "Как исправить: протяните воздуховод от вытяжного вентилятора к зонту («Сети» → «Вентиляция»)."}
+	var fixes := {"Нет тока": L.t("Как исправить: протяните кабель от щитка к этому объекту («Сети», E). Если кабель есть — проверьте, не выбит ли автомат, и хватает ли мощности подстанции."),
+		"Сломан": L.t("Как исправить: отправьте в ремонт кнопкой ниже — придёт слесарь или станочник. Чтобы ломалось реже, включите ППР (Производство → Станки)."),
+		"Не греет": L.t("Как исправить: котлу нужен ток, вода (труба от водомера) и топливо. Подробности — в строке состояния ниже."),
+		"Простаивает": L.t("Нет работы или некому работать: проверьте заказы, металл на стеллаже и есть ли станочник нужной профессии."),
+		"Не подключён": L.t("Как исправить: протяните воздуховод от вытяжного вентилятора к зонту («Сети» → «Вентиляция»).")}
 	chip.tooltip_text = str(fixes.get(text, ""))
 	chip.mouse_filter = Control.MOUSE_FILTER_STOP if chip.tooltip_text != "" else Control.MOUSE_FILTER_IGNORE
 	chip.add_theme_color_override("font_color", col)
@@ -1216,17 +1221,17 @@ func refresh() -> void:
 		"visitor":
 			var v := sim.get_person(id)
 			if v != null and v.has_meta("who") and sim.visitors.has(v):
-				(dyn["act"] as Label).text = "Сейчас: " + v.activity   # 1.30: пожарный, водитель
+				(dyn["act"] as Label).text = L.t("Сейчас: ") + v.activity   # 1.30: пожарный, водитель
 				return
 			if v == null or sim.inspect.visit.is_empty():
 				visible = false
 				return
-			(dyn["act"] as Label).text = "Сейчас: " + v.activity
+			(dyn["act"] as Label).text = L.t("Сейчас: ") + v.activity
 			var f: Array = sim.inspect.visit.get("found", [])
-			var txt := "Записано нарушений: %d" % f.size()
+			var txt := L.t("Записано нарушений: %d") % f.size()
 			for vi: Dictionary in f:
 				txt += "\n• " + str(vi["text"])
-			(dyn["found"] as Label).text = txt if not Inspections.VISIT_KINDS.has(str(sim.inspect.visit.get("type", ""))) else "Ходит по заводу и смотрит, как всё устроено."
+			(dyn["found"] as Label).text = txt if not Inspections.VISIT_KINDS.has(str(sim.inspect.visit.get("type", ""))) else L.t("Ходит по заводу и смотрит, как всё устроено.")
 		"thing":
 			var t: Thing = sim.things.get(id)
 			if t == null:
@@ -1253,7 +1258,7 @@ func refresh() -> void:
 				var lv2 := sim.upkeep.level(r)
 				_set_chip("★".repeat(lv2), UITheme.GOOD if lv2 >= 3 else UITheme.WARN)
 			else:
-				_set_chip("Не оборудовано", UITheme.WARN)
+				_set_chip(L.t("Не оборудовано"), UITheme.WARN)
 
 
 func _refresh_worker() -> void:
@@ -1261,11 +1266,11 @@ func _refresh_worker() -> void:
 	if w == null:
 		visible = false
 		return
-	var act := w.activity if w.present else ("Не вышел на работу" if w.skip_shift else "Дома · %s" % Worker.SHIFT_NAMES[w.shift])
+	var act := w.activity if w.present else (L.t("Не вышел на работу") if w.skip_shift else L.t("Дома · %s") % L.t(Worker.SHIFT_NAMES[w.shift]))
 	if w.sick_until > sim.minute and w.away_why != "":
-		act = "%s до %s" % [w.away_why.capitalize(), sim.season.date_str(int(w.sick_until / 1440.0) + 1)]
+		act = L.t("%s до %s") % [L.t(w.away_why).capitalize(), sim.season.date_str(int(w.sick_until / 1440.0) + 1)]
 	if not w.order.is_empty() and w.present:
-		act += " · ⚑ приказ до %02d:%02d" % [int(fmod(float(w.order.get("until", 0.0)), 1440.0) / 60.0), int(fmod(float(w.order.get("until", 0.0)), 60.0))]
+		act += L.t(" · ⚑ приказ до %02d:%02d") % [int(fmod(float(w.order.get("until", 0.0)), 1440.0) / 60.0), int(fmod(float(w.order.get("until", 0.0)), 60.0))]
 	(dyn["act"] as Label).text = ("● " + act) if w.present else "○ " + act
 	(dyn["act"] as Label).add_theme_color_override("font_color", (Color("#f0c060") if not w.order.is_empty() else UITheme.INFO) if w.present else UITheme.MUTED)
 	var mb: ProgressBar = dyn["mood_bar"]
@@ -1274,7 +1279,7 @@ func _refresh_worker() -> void:
 	mb.add_theme_stylebox_override("fill", UITheme.sb(mc, mc, 0, 3, 0, 0))
 	var hr_on := sim.office.active("hr")
 	var risk := sim.dev.on("hr3") and not w.is_itr() and (w.low_mood_days > 0 or w.mood < Defs.b("quit_mood") + 8.0)   # «Кадровый резерв»
-	(dyn["mood_lab"] as Label).text = ("%d · %s" % [int(w.mood), Mood.label(w.mood).to_lower()] if hr_on else Mood.label(w.mood).to_lower()) + (" · риск ухода!" if risk else "")
+	(dyn["mood_lab"] as Label).text = ("%d · %s" % [int(w.mood), Mood.label(w.mood).to_lower()] if hr_on else Mood.label(w.mood).to_lower()) + (L.t(" · риск ухода!") if risk else "")
 	(dyn["mood_lab"] as Label).add_theme_color_override("font_color", UITheme.BAD if risk else mc)
 	if dyn.has("t_thoughts"):
 		var parts := Mood.breakdown(sim, w)
@@ -1285,7 +1290,7 @@ func _refresh_worker() -> void:
 			UITheme.clear(tv)
 			var shown := parts.filter(func(p: Array) -> bool: return absf(float(p[1])) >= 0.5)
 			if shown.is_empty():
-				tv.add_child(UITheme.label("Ничего особенного", 12, UITheme.MUTED))
+				tv.add_child(UITheme.label(L.t("Ничего особенного"), 12, UITheme.MUTED))
 			shown.sort_custom(func(a: Array, b: Array) -> bool: return absf(float(a[1])) > absf(float(b[1])))
 			var cap := 8 if hr_on else 3
 			for i in mini(shown.size(), cap):
@@ -1306,7 +1311,7 @@ func _refresh_worker() -> void:
 				row.add_child(tl)
 				tv.add_child(row)
 			if shown.size() > cap:
-				tv.add_child(UITheme.label(("…и ещё %d" % (shown.size() - cap)) if hr_on else "…остальное и цифры — у кадровика (отдел кадров)", 12, UITheme.MUTED))
+				tv.add_child(UITheme.label((L.t("…и ещё %d") % (shown.size() - cap)) if hr_on else L.t("…остальное и цифры — у кадровика (отдел кадров)"), 12, UITheme.MUTED))
 			_fit()
 	if dyn.has("t_life_hint"):
 		var lf := Mood.life(sim, w)
@@ -1317,18 +1322,18 @@ func _refresh_worker() -> void:
 			gb.value = lv
 			var gc := UITheme.GOOD if lv >= 70.0 else (Color("#8fa6bb") if lv >= 45.0 else (UITheme.WARN if lv >= 30.0 else UITheme.BAD))
 			gb.add_theme_stylebox_override("fill", UITheme.sb(gc, gc, 0, 3, 0, 0))
-			(dyn["t_life_v_" + gk] as Label).text = "хорошо" if lv >= 70.0 else ("норма" if lv >= 45.0 else ("терпимо" if lv >= 30.0 else "плохо"))
+			(dyn["t_life_v_" + gk] as Label).text = L.t("хорошо") if lv >= 70.0 else (L.t("норма") if lv >= 45.0 else (L.t("терпимо") if lv >= 30.0 else L.t("плохо")))
 			(dyn["t_life_v_" + gk] as Label).add_theme_color_override("font_color", gc if lv < 45.0 or lv >= 70.0 else UITheme.MUTED)
 			var tip: Array[String] = []
 			for pp: Array in lf[gk]["parts"]:
 				if absf(float(pp[1])) >= 0.5:
 					tip.append(("%+d  " % int(round(float(pp[1])))) + str(pp[0]))
-			var ttxt := str(g[1]) + ": " + (("\n" + "\n".join(tip)) if not tip.is_empty() else "ничего особенного") + "\n\nЧто помогает: " + str(Mood.LIFE_HINT[gk])
+			var ttxt := L.t(str(g[1])) + ": " + (("\n" + "\n".join(tip)) if not tip.is_empty() else L.t("ничего особенного")) + L.t("\n\nЧто помогает: ") + L.t(str(Mood.LIFE_HINT[gk]))
 			gb.tooltip_text = ttxt
 			(dyn["t_life_l_" + gk] as Label).tooltip_text = ttxt
 		var worst := Mood.life_worst(sim, w)
 		var hl: Label = dyn["t_life_hint"]
-		hl.text = ("Проседает «%s»: %s" % [str(worst[1]).to_lower(), str(worst[2]).to_lower()]) if not worst.is_empty() else ""
+		hl.text = (L.t("Проседает «%s»: %s") % [L.t(str(worst[1])).to_lower(), L.t(str(worst[2])).to_lower()]) if not worst.is_empty() else ""
 		hl.visible = not worst.is_empty()
 	if dyn.has("t_need_food"):
 		for k in ["food", "bladder", "rest"]:
@@ -1346,39 +1351,39 @@ func _refresh_worker() -> void:
 		(dyn["t_st_speed"] as Label).add_theme_color_override("font_color", UITheme.GOOD if spd >= 1.0 else UITheme.WARN)
 		if w.is_itr():
 			var dk := sim.office.desk_k(w)
-			(dyn["t_st_ppe"] as Label).text = "кабинет" if dk >= 1.0 else ("контора" if dk > 0.0 else "нет!")
+			(dyn["t_st_ppe"] as Label).text = L.t("кабинет") if dk >= 1.0 else (L.t("контора") if dk > 0.0 else L.t("нет!"))
 			(dyn["t_st_ppe"] as Label).add_theme_color_override("font_color", UITheme.TEXT if dk >= 1.0 else (UITheme.WARN if dk > 0.0 else UITheme.BAD))
 		else:
-			(dyn["t_st_ppe"] as Label).text = "нет!" if w.ppe <= 0.0 else "%d%%" % int(w.ppe)
+			(dyn["t_st_ppe"] as Label).text = L.t("нет!") if w.ppe <= 0.0 else "%d%%" % int(w.ppe)
 			(dyn["t_st_ppe"] as Label).add_theme_color_override("font_color", UITheme.BAD if w.ppe <= 0.0 else UITheme.TEXT)
 	if dyn.has("t_stats"):
 		var parts2: Array[String] = []
 		if w.is_itr():
 			var dk2 := sim.office.desk_k(w)
-			parts2.append("Отдел: %s" % str(Defs.departments.get(w.dept(), {}).get("name", "")))
+			parts2.append(L.t("Отдел: %s") % L.dt("department.%s.name" % w.dept(), str(Defs.departments.get(w.dept(), {}).get("name", ""))))
 			if dk2 <= 0.0:
-				parts2.append("НЕТ РАБОЧЕГО МЕСТА — поставьте стол ИТР в кабинет")
+				parts2.append(L.t("НЕТ РАБОЧЕГО МЕСТА — поставьте стол ИТР в кабинет"))
 			elif dk2 < 1.0:
-				parts2.append("работает в общей конторе (−30%)")
+				parts2.append(L.t("работает в общей конторе (−30%)"))
 		else:
 			if w.present:
-				parts2.append("на месте %+d °C" % int(round(sim.season.temp_at(w.cell()))))
+				parts2.append(L.t("на месте %+d °C") % int(round(sim.season.temp_at(w.cell()))))
 			var hc := sim.eng.worker_class(w)
 			if hc > 0:
-				parts2.append("вредность %s: +%d%% к ставке%s" % [Eng.CLASS_NAMES[hc], int(Eng.BONUS[hc] * 100.0), ", молоко" if sim.eng.milk_on else ", молоко не дают"])
+				parts2.append(L.t("вредность %s: +%d%% к ставке%s") % [L.t(Eng.CLASS_NAMES[hc]), int(Eng.BONUS[hc] * 100.0), L.t(", молоко") if sim.eng.milk_on else L.t(", молоко не дают")])
 		var lab: Label = dyn["t_stats"]
 		lab.text = " · ".join(parts2)
 		lab.visible = not parts2.is_empty()
 	if dyn.has("t_wage"):
 		var market := Mood.market_wage(w)
-		(dyn["t_wage"] as Label).text = "%s за смену" % Defs.money_str(w.wage)
-		var sub := "на рынке ~%s" % Defs.money_str(market)
+		(dyn["t_wage"] as Label).text = L.t("%s за смену") % Defs.money_str(w.wage)
+		var sub := L.t("на рынке ~%s") % Defs.money_str(market)
 		if w.wage < int(market * 0.97):
-			sub += " — недоплачиваете"
+			sub += L.t(" — недоплачиваете")
 		if w.shift == 1:
-			sub += " · ночные +%d%%" % int(Defs.b("night_bonus") * 100.0)
+			sub += L.t(" · ночные +%d%%") % int(Defs.b("night_bonus") * 100.0)
 		if w.pending_shift >= 0:
-			sub += " · переходит в %s" % ("1-ю смену" if w.pending_shift == 0 else "2-ю смену")
+			sub += L.t(" · переходит в %s") % (L.t("1-ю смену") if w.pending_shift == 0 else L.t("2-ю смену"))
 		(dyn["t_wage_s"] as Label).text = sub
 		(dyn["t_wage_s"] as Label).add_theme_color_override("font_color", UITheme.WARN if w.wage < int(market * 0.97) else UITheme.MUTED)
 
@@ -1391,145 +1396,145 @@ func _people_line(w: Worker) -> String:
 		var b := sim.crew.brigade(w.brigade)
 		if not b.is_empty():
 			var ld := sim.crew.lead_of(w.brigade)
-			parts.append("«%s»%s" % [str(b["name"]), (", бригадир (+10% к ставке)" if ld == w else (", бригадир — " + ld.call_name()) if ld else "")])
+			parts.append("«%s»%s" % [str(b["name"]), (L.t(", бригадир (+10% к ставке)") if ld == w else (L.t(", бригадир — ") + ld.call_name()) if ld else "")])
 	if sim.crew.union_on() and int(sim.crew.union.get("lead", -1)) == w.id:
-		parts.append("председатель профкома")
+		parts.append(L.t("председатель профкома"))
 	var c := tr.course_of(w)
 	if not c.is_empty():
-		parts.append("на курсах: %s, %d%%" % [str(Worker.SKILL_NAMES.get(str(c["skill"]), "")).to_lower(), int(tr.progress(w) * 100.0)])
+		parts.append(L.t("на курсах: %s, %d%%") % [L.t(str(Worker.SKILL_NAMES.get(str(c["skill"]), ""))).to_lower(), int(tr.progress(w) * 100.0)])
 	var m := tr.mentor_of(w)
 	if m:
-		parts.append("наставник: " + m.full_name())
+		parts.append(L.t("наставник: ") + m.full_name())
 	var ap: Array[String] = []
 	for a in tr.apprentices(w):
 		ap.append(a.call_name())
 	if not ap.is_empty():
-		parts.append("ученики: " + ", ".join(ap))
+		parts.append(L.t("ученики: ") + ", ".join(ap))
 	if w.practice_until >= 0:
-		parts.append("практика до дня %d" % w.practice_until)
+		parts.append(L.t("практика до дня %d") % w.practice_until)
 	var fr: Array[String] = []
 	for f in tr.friends(w):
 		fr.append(f.call_name())
 	if not fr.is_empty():
-		parts.append("дружит: " + ", ".join(fr.slice(0, 3)))
+		parts.append(L.t("дружит: ") + ", ".join(fr.slice(0, 3)))
 	var fo: Array[String] = []
 	for f2 in tr.foes(w):
 		fo.append(f2.call_name())
 	if not fo.is_empty():
-		parts.append("не ладит: " + ", ".join(fo.slice(0, 3)))
+		parts.append(L.t("не ладит: ") + ", ".join(fo.slice(0, 3)))
 	return "" if parts.is_empty() else "\n" + " · ".join(parts)
 
 
 func _thing_state(t: Thing) -> String:
 	if not t.built:
 		if t.order_eta >= 0.0:
-			return "Заказано у поставщика. Фургон с оборудованием приедет %s, ящики разгрузят и принесут сюда." % sim._eta_str(t.order_eta)
+			return L.t("Заказано у поставщика. Фургон с оборудованием приедет %s, ящики разгрузят и принесут сюда.") % sim._eta_str(t.order_eta)
 		if t.crates_in < t.crates_need:
-			return "Привезли. Ящики несут к месту установки: %d из %d.%s" % [t.crates_in, t.crates_need, "" if sim.logi.has_zone() else "\nСовет: отметьте зону разгрузки у ворот (Стройка → Зоны на улице)."]
-		return "Всё на месте — ждёт монтажа. Прогресс: %d%%" % int(t.progress * 100.0)
+			return L.t("Привезли. Ящики несут к месту установки: %d из %d.%s") % [t.crates_in, t.crates_need, "" if sim.logi.has_zone() else L.t("\nСовет: отметьте зону разгрузки у ворот (Стройка → Зоны на улице).")]
+		return L.t("Всё на месте — ждёт монтажа. Прогресс: %d%%") % int(t.progress * 100.0)
 	if t.demolish:
-		return "Помечен под снос: рабочие разберут его, когда освободятся."
+		return L.t("Помечен под снос: рабочие разберут его, когда освободятся.")
 	var lines: Array[String] = []
 	var src := str(t.def().get("power_source", ""))
 	if src != "":
 		var net := sim.power.net_of_thing(t)
 		var cap := sim.power.source_capacity(t)
-		lines.append("Мощность: %d кВт" % int(cap))
+		lines.append(L.t("Мощность: %d кВт") % int(cap))
 		if net == null:
-			lines.append("Кабель не подведён — тяните кабель от подстанции прямо в клетки розеток станков и приборов.")
+			lines.append(L.t("Кабель не подведён — тяните кабель от подстанции прямо в клетки розеток станков и приборов."))
 		else:
-			lines.append("Сеть: нагрузка %.1f из %d кВт · потребителей %d · помещений %d" % [net.load, int(net.capacity), net.consumers.size(), net.rooms.size()])
+			lines.append(L.t("Сеть: нагрузка %.1f из %d кВт · потребителей %d · помещений %d") % [net.load, int(net.capacity), net.consumers.size(), net.rooms.size()])
 			if net.tripped:
-				lines.append("АВТОМАТ ВЫБИТ — ждём электрика или рабочего.")
+				lines.append(L.t("АВТОМАТ ВЫБИТ — ждём электрика или рабочего."))
 			elif net.over():
-				lines.append("ПЕРЕГРУЗ: станки тянут больше, чем даёт подстанция. Скоро выбьет автомат — поставьте вплотную аккумуляторные шкафы.")
+				lines.append(L.t("ПЕРЕГРУЗ: станки тянут больше, чем даёт подстанция. Скоро выбьет автомат — поставьте вплотную аккумуляторные шкафы."))
 		if Power.boostable(t):
 			var bl := sim.power.batteries_of(t)
 			var base := float(t.def().get("capacity_kw", 40.0))
 			if bl.is_empty():
-				lines.append("Своих %d кВт. Аккумуляторов нет: вплотную к подстанции (и по углам) можно поставить до %d шкафов — каждый +%d кВт (Объекты → Электрика)." % [int(base), Power.BATT_MAX, 20])
+				lines.append(L.t("Своих %d кВт. Аккумуляторов нет: вплотную к подстанции (и по углам) можно поставить до %d шкафов — каждый +%d кВт (Объекты → Электрика).") % [int(base), Power.BATT_MAX, 20])
 			else:
-				lines.append("Своих %d кВт + аккумуляторы: %d из %d шкафов, +%d кВт." % [int(base), mini(bl.size(), Power.BATT_MAX), Power.BATT_MAX, int(sim.power.battery_boost(t))])
+				lines.append(L.t("Своих %d кВт + аккумуляторы: %d из %d шкафов, +%d кВт.") % [int(base), mini(bl.size(), Power.BATT_MAX), Power.BATT_MAX, int(sim.power.battery_boost(t))])
 		elif net and net.over():
-			lines.append("Мощности мало — прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый) или выключите лишний станок.")
+			lines.append(L.t("Мощности мало — прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый) или выключите лишний станок."))
 		return "\n".join(lines)
 	match t.def_id:
 		"days_board":
-			lines.append("Дней без травм: %d. В помещении с табло травм на 5%% меньше." % sim.crew.safe_days())
+			lines.append(L.t("Дней без травм: %d. В помещении с табло травм на 5%% меньше.") % sim.crew.safe_days())
 		"union_board":
-			lines.append("Профком: " + ("председатель — %s" % sim.crew.union_lead().full_name() if sim.crew.union_lead() else ("есть" if sim.crew.union_on() else "профсоюза пока нет")))
+			lines.append(L.t("Профком: ") + (L.t("председатель — %s") % sim.crew.union_lead().full_name() if sim.crew.union_lead() else (L.t("есть") if sim.crew.union_on() else L.t("профсоюза пока нет"))))
 	match t.kind():
 		"battery":
 			var host := sim.power.battery_host(t)
-			lines.append("Подстанция: " + ("рядом — шкаф добавляет ей %d кВт мощности" % int(t.def().get("boost_kw", 20)) if host else "НЕТ — поставьте шкаф вплотную к подстанции"))
+			lines.append(L.t("Подстанция: ") + (L.t("рядом — шкаф добавляет ей %d кВт мощности") % int(t.def().get("boost_kw", 20)) if host else L.t("НЕТ — поставьте шкаф вплотную к подстанции")))
 		"pump":
 			sim.water.update()
 			var k := int(sim.water.thing_net.get(t.id, -1))
 			if k < 0:
-				lines.append("Не подключена к водопроводу — протяните трубу.")
+				lines.append(L.t("Не подключена к водопроводу — протяните трубу."))
 			else:
-				lines.append("Приборов в сети: %d · напора хватает на %d" % [sim.water.net_fix[k], sim.water.net_cap[k]])
-			lines.append("Работает" if sim.water.pump_running(t) else ("Нет тока" if not sim.power.powered(t) else "Не работает"))
+				lines.append(L.t("Приборов в сети: %d · напора хватает на %d") % [sim.water.net_fix[k], sim.water.net_cap[k]])
+			lines.append(L.t("Работает") if sim.water.pump_running(t) else (L.t("Нет тока") if not sim.power.powered(t) else L.t("Не работает")))
 		"machine":
 			var pr := t.process()
 			var prd: Dictionary = Defs.processes.get(pr, {})
-			var prof_nm := str(Worker.PROF_NAMES.get(str(prd.get("prof", "")), "станочник")).to_lower()
+			var prof_nm := L.t(str(Worker.PROF_NAMES.get(str(prd.get("prof", "")), "станочник"))).to_lower()
 			if t.broken:
-				lines.append("Ремонт: %s запчастей и полдня работы слесаря или станочника." % Defs.money_str(Defs.b("repair_cost")))
+				lines.append(L.t("Ремонт: %s запчастей и полдня работы слесаря или станочника.") % Defs.money_str(Defs.b("repair_cost")))
 			elif not t.enabled:
 				pass
 			elif not sim.power.connected(t):
-				lines.append("Нет питания: заведите кабель от подстанции в клетку розетки станка.")
+				lines.append(L.t("Нет питания: заведите кабель от подстанции в клетку розетки станка."))
 			elif not sim.power.powered(t):
-				lines.append("Нет тока: выбит автомат или сеть без источника.")
+				lines.append(L.t("Нет тока: выбит автомат или сеть без источника."))
 			elif not sim.planner.staffed(t) and t.user < 0:
-				lines.append("Некому работать: нужен %s — наймите в разделе «Люди → Найм»." % prof_nm)
+				lines.append(L.t("Некому работать: нужен %s — наймите в разделе «Люди → Найм».") % prof_nm)
 			elif t.product == "":
-				lines.append("Нет работы: нет заказа, металла или деталей с прошлой операции.")
+				lines.append(L.t("Нет работы: нет заказа, металла или деталей с прошлой операции."))
 			else:
 				var rt := Defs.route(t.product)
-				lines.append("Задание: %s · операция %d из %d" % [Defs.product_name(t.product), t.job_step + 1, rt.size()])
+				lines.append(L.t("Задание: %s · операция %d из %d") % [Defs.product_name(t.product), t.job_step + 1, rt.size()])
 				var miss := sim.prod.missing_inputs(t)
 				if not miss.is_empty() and not t.working:
 					var ms: Array[String] = []
 					for k in miss.keys():
 						var nm2 := Defs.material_name(str(k)) if Defs.materials.has(k) else Defs.product_name(str(k))
 						ms.append("%s ×%d" % [nm2, int(miss[k])])
-					lines.append("Ждёт: " + ", ".join(ms))
+					lines.append(L.t("Ждёт: ") + ", ".join(ms))
 				if not sim.prod.has_cons(t):
-					lines.append("Нет расходников (%s) — снабжение уже везёт." % str(Defs.consumables.get(str(prd.get("cons", "")), {}).get("short", "")))
+					lines.append(L.t("Нет расходников (%s) — снабжение уже везёт.") % L.dt("consumable.%s.short" % str(prd.get("cons", "")), str(Defs.consumables.get(str(prd.get("cons", "")), {}).get("short", ""))))
 				var ck := sim.prod.crane_k(t)
 				if ck < 1.0:
-					lines.append("Тяжёлая деталь без кран-балки: на %d%% медленнее." % int(round((1.0 / ck - 1.0) * 100.0)))
+					lines.append(L.t("Тяжёлая деталь без кран-балки: на %d%% медленнее.") % int(round((1.0 / ck - 1.0) * 100.0)))
 			if t.is_batch():
-				lines.append("Печь: партия до %d деталей, греется сама." % t.slot_cap(0))
+				lines.append(L.t("Печь: партия до %d деталей, греется сама.") % t.slot_cap(0))
 			if not t.broken and t.condition < sim.service_at():
-				lines.append("Изношен — ждёт обслуживания (%s)." % Defs.money_str(Defs.b("service_cost")))
+				lines.append(L.t("Изношен — ждёт обслуживания (%s).") % Defs.money_str(Defs.b("service_cost")))
 			elif not t.broken and t.condition < Defs.b("breakdown_below"):
-				lines.append("Сильно изношен — может сломаться!")
+				lines.append(L.t("Сильно изношен — может сломаться!"))
 			var am := sim.eng.air_mode(t)
 			if am != "":
 				var pz := sim.eng.pressure(t)
 				if am == "need":
-					lines.append("Сжатый воздух: " + ("есть — краскопульт" if pz >= 0.99 else ("мало давления — медленнее" if pz > 0.0 else "НЕТ — красят кистью, в 1,5 раза дольше (Сети → Сжатый воздух)")))
+					lines.append(L.t("Сжатый воздух: ") + (L.t("есть — краскопульт") if pz >= 0.99 else (L.t("мало давления — медленнее") if pz > 0.0 else L.t("НЕТ — красят кистью, в 1,5 раза дольше (Сети → Сжатый воздух)"))))
 				else:
-					lines.append("Сжатый воздух: " + ("есть — пневмогайковёрт, на 20% быстрее" if pz >= 0.99 else ("мало давления" if pz > 0.0 else "нет (с ним на 20% быстрее)")))
+					lines.append(L.t("Сжатый воздух: ") + (L.t("есть — пневмогайковёрт, на 20% быстрее") if pz >= 0.99 else (L.t("мало давления") if pz > 0.0 else L.t("нет (с ним на 20% быстрее)"))))
 			var cls := sim.eng.class_of(t)
 			var fs := sim.eng.factors(t)
 			var fnames: Array[String] = []
 			for f: Array in fs:
 				fnames.append(str(f[0]) + ("" if str(f[2]) == "" else " " + str(f[2])))
 			var now_cls := sim.eng.class_now(t)
-			var ctext := "СОУТ: не проводилась" if cls < 0 else "СОУТ: класс %s (%s)" % [Eng.CLASS_NAMES[cls], Eng.CLASS_TEXT[cls]]
-			ctext += " · сейчас " + ("допустимо" if fnames.is_empty() else "вредно: " + ", ".join(fnames))
+			var ctext := L.t("СОУТ: не проводилась") if cls < 0 else L.t("СОУТ: класс %s (%s)") % [L.t(Eng.CLASS_NAMES[cls]), L.t(Eng.CLASS_TEXT[cls])]
+			ctext += L.t(" · сейчас ") + (L.t("допустимо") if fnames.is_empty() else L.t("вредно: ") + ", ".join(fnames))
 			if cls >= 0 and now_cls < cls:
-				ctext += " — переоценка снизит класс"
+				ctext += L.t(" — переоценка снизит класс")
 			lines.append(ctext)
 			if t.process() in ["welding", "paint", "heat", "casting"]:
-				lines.append("Вытяжной зонт: " + ("работает" if bool(sim.eng.hooded.get(t.id, false)) else "нет — дым идёт в помещение"))
+				lines.append(L.t("Вытяжной зонт: ") + (L.t("работает") if bool(sim.eng.hooded.get(t.id, false)) else L.t("нет — дым идёт в помещение")))
 			var op := sim.get_worker(t.user)
-			lines.append("Работает: %s · нужен %s" % [op.full_name() if op else "—", prof_nm])
-			lines.append("Вход %d · выход %d · операций %d · %.1f кВт" % [sim.count_slot(t, 0), sim.count_slot(t, 1), t.parts_made, float(t.machine_def().get("power_kw", 0.0))])
+			lines.append(L.t("Работает: %s · нужен %s") % [op.full_name() if op else "—", prof_nm])
+			lines.append(L.t("Вход %d · выход %d · операций %d · %.1f кВт") % [sim.count_slot(t, 0), sim.count_slot(t, 1), t.parts_made, float(t.machine_def().get("power_kw", 0.0))])
 		"storage", "qc":
 			var counts := {}
 			for s in t.slot_count():
@@ -1543,15 +1548,15 @@ func _thing_state(t: Thing) -> String:
 			for s in t.slot_count():
 				total += sim.count_slot(t, s)
 				cap2 += t.slot_cap(s)
-			lines.append("Заполнено: %d из %d" % [total, cap2])
+			lines.append(L.t("Заполнено: %d из %d") % [total, cap2])
 			var keys := counts.keys()
 			for i in mini(keys.size(), 6):
-				lines.append("· %s — %d шт." % [keys[i], counts[keys[i]]])
+				lines.append(L.t("· %s — %d шт.") % [keys[i], counts[keys[i]]])
 			if keys.size() > 6:
-				lines.append("· …и ещё %d наименований" % (keys.size() - 6))
+				lines.append(L.t("· …и ещё %d наименований") % (keys.size() - 6))
 			if t.kind() == "qc":
 				var q := sim.get_worker(t.user)
-				lines.append("Контролёр: " + (q.full_name() if q else "—"))
+				lines.append(L.t("Контролёр: ") + (q.full_name() if q else "—"))
 		"locker":
 			var owners: Array[String] = []
 			for w in sim.workers:
@@ -1559,92 +1564,92 @@ func _thing_state(t: Thing) -> String:
 					owners.append(w.full_name())
 			var seats := maxi(1, int(t.def().get("seats", 1)))
 			if seats > 1:
-				lines.append("Мест: %d · занято %d" % [seats, owners.size()])
-			lines.append("Закреплён за: " + (", ".join(owners) if not owners.is_empty() else "свободен"))
-			lines.append("В бытовке" if sim.rooms.thing_in(t, "locker") else "Стоит не в бытовке — переодеваться здесь не так приятно.")
+				lines.append(L.t("Мест: %d · занято %d") % [seats, owners.size()])
+			lines.append(L.t("Закреплён за: ") + (", ".join(owners) if not owners.is_empty() else L.t("свободен")))
+			lines.append(L.t("В бытовке") if sim.rooms.thing_in(t, "locker") else L.t("Стоит не в бытовке — переодеваться здесь не так приятно."))
 		"toilet", "chair", "rest":
-			lines.append("Занято" if not t.spot_users.is_empty() else "Свободно")
+			lines.append(L.t("Занято") if not t.spot_users.is_empty() else L.t("Свободно"))
 		"desk":
 			var owner2: Worker = null
 			for w2 in sim.workers:
 				if w2.desk_id == t.id:
 					owner2 = w2
-			lines.append("Рабочее место: " + ((owner2.full_name() + ", " + owner2.prof_lc()) if owner2 else "свободно"))
+			lines.append(L.t("Рабочее место: ") + ((owner2.full_name() + ", " + owner2.prof_lc()) if owner2 else L.t("свободно")))
 			var rr := sim.rooms.room_of_thing(t)
 			if rr == null or not Rooms.OFFICE_TYPES.has(rr.type) or not rr.valid:
-				lines.append("Стоит не в кабинете: обнесите стенами, постелите линолеум и назначьте помещение (контора, бухгалтерия, ПДО…).")
+				lines.append(L.t("Стоит не в кабинете: обнесите стенами, постелите линолеум и назначьте помещение (контора, бухгалтерия, ПДО…)."))
 		"appliance":
-			lines.append("Потребляет %.1f кВт · %s" % [float(t.def().get("power_kw", 0.0)), "питание есть" if sim.power.powered(t) else "НЕТ ПИТАНИЯ"])
+			lines.append(L.t("Потребляет %.1f кВт · %s") % [float(t.def().get("power_kw", 0.0)), L.t("питание есть") if sim.power.powered(t) else L.t("НЕТ ПИТАНИЯ")])
 		"chip_bin":
-			lines.append("Стружки: %d из %d кг" % [int(float(sim.upkeep.bin_kg.get(t.id, 0.0))), int(Upkeep.BIN_CAP)])
-			lines.append("Во всех контейнерах: %d кг ≈ %s. Ломовоз приезжает по пятницам, забирает стружку и брак из тары." % [int(sim.upkeep.bin_total()), Defs.money_str(sim.upkeep.bin_total() * Upkeep.CHIP_PRICE)])
+			lines.append(L.t("Стружки: %d из %d кг") % [int(float(sim.upkeep.bin_kg.get(t.id, 0.0))), int(Upkeep.BIN_CAP)])
+			lines.append(L.t("Во всех контейнерах: %d кг ≈ %s. Ломовоз приезжает по пятницам, забирает стружку и брак из тары.") % [int(sim.upkeep.bin_total()), Defs.money_str(sim.upkeep.bin_total() * Upkeep.CHIP_PRICE)])
 			if sim.upkeep.pickups > 0:
-				lines.append("Сдано в металлолом за всё время: %s" % Defs.money_str(sim.upkeep.scrap_earned))
+				lines.append(L.t("Сдано в металлолом за всё время: %s") % Defs.money_str(sim.upkeep.scrap_earned))
 		"vent_fan":
 			var vn := sim.eng.vnet_of_thing(t)
-			lines.append("Производительность: до %d клеток площади · %.1f кВт" % [int(t.def().get("vent_cap", 80)), float(t.def().get("power_kw", 0.0))])
+			lines.append(L.t("Производительность: до %d клеток площади · %.1f кВт") % [int(t.def().get("vent_cap", 80)), float(t.def().get("power_kw", 0.0))])
 			if vn:
 				var rn: Array[String] = []
 				for rid in vn.rooms:
 					if rid >= 0 and rid < sim.rooms.list.size():
 						rn.append(sim.rooms.list[rid].title())
-				lines.append("Тянет из: " + (", ".join(rn) if not rn.is_empty() else "ниоткуда — поставьте в помещение или подведите воздуховод"))
+				lines.append(L.t("Тянет из: ") + (", ".join(rn) if not rn.is_empty() else L.t("ниоткуда — поставьте в помещение или подведите воздуховод")))
 				if vn.area > 0:
-					lines.append("Площадь сети %d кл., вентиляторов %d: кратность ×%.1f" % [vn.area, vn.srcs.size(), vn.cap / float(vn.area) if vn.cap > 0.0 else 0.0])
+					lines.append(L.t("Площадь сети %d кл., вентиляторов %d: кратность ×%.1f") % [vn.area, vn.srcs.size(), vn.cap / float(vn.area) if vn.cap > 0.0 else 0.0])
 			if not sim.power.powered(t):
-				lines.append("Нет тока — подведите кабель к розетке.")
+				lines.append(L.t("Нет тока — подведите кабель к розетке."))
 		"vent_hood":
-			lines.append("Подключён к вентилятору" if sim.eng.hood_ok(t) else "Не тянет: подведите воздуховод к сети с работающим вентилятором.")
+			lines.append(L.t("Подключён к вентилятору") if sim.eng.hood_ok(t) else L.t("Не тянет: подведите воздуховод к сети с работающим вентилятором."))
 			var hm: Array[String] = []
 			for m2 in sim.things_of("machine"):
 				if m2.rect().grow(1).has_point(t.cell):
 					hm.append(m2.title())
-			lines.append("Над: " + (", ".join(hm) if not hm.is_empty() else "станков рядом нет — зонт вешают над станком или вплотную"))
+			lines.append(L.t("Над: ") + (", ".join(hm) if not hm.is_empty() else L.t("станков рядом нет — зонт вешают над станком или вплотную")))
 		"compressor":
 			var an := sim.eng.anet_of_thing(t)
-			lines.append("Держит %d потребителей · %.1f кВт под нагрузкой" % [int(t.def().get("air_cap", 4)), float(t.def().get("power_kw", 0.0))])
+			lines.append(L.t("Держит %d потребителей · %.1f кВт под нагрузкой") % [int(t.def().get("air_cap", 4)), float(t.def().get("power_kw", 0.0))])
 			if an == null:
-				lines.append("Пневмомагистраль не подведена (Сети → Сжатый воздух).")
+				lines.append(L.t("Пневмомагистраль не подведена (Сети → Сжатый воздух)."))
 			else:
-				lines.append("Подключено потребителей: %d · работают сейчас: %d" % [an.users.size(), int(an.demand)])
-			lines.append("В компрессорной — тихо" if sim.rooms.thing_in(t, "compressor_room") else "Шумит под 90 дБ: лучше в отдельной компрессорной.")
+				lines.append(L.t("Подключено потребителей: %d · работают сейчас: %d") % [an.users.size(), int(an.demand)])
+			lines.append(L.t("В компрессорной — тихо") if sim.rooms.thing_in(t, "compressor_room") else L.t("Шумит под 90 дБ: лучше в отдельной компрессорной."))
 		"boiler":
 			var bp2 := sim.eng.boiler_problem(t)
 			if bp2 != "":
-				lines.append("Не греет: " + bp2)
+				lines.append(L.t("Не греет: ") + bp2)
 			else:
-				lines.append("Греет батарей: %d из %d (подключённых трубой к его водопроводу)" % [sim.eng.boiler_load(t), int(t.def().get("boiler_cap", 16))])
-			lines.append("Газ — %d%% от цены городского тепла. Аварии на теплотрассе не страшны." % int(round(Eng.BOILER_K * 100.0)))
+				lines.append(L.t("Греет батарей: %d из %d (подключённых трубой к его водопроводу)") % [sim.eng.boiler_load(t), int(t.def().get("boiler_cap", 16))])
+			lines.append(L.t("Газ — %d%% от цены городского тепла. Аварии на теплотрассе не страшны.") % int(round(Eng.BOILER_K * 100.0)))
 		"radiator":
 			if sim.eng.boiler_rads.has(t.id):
-				lines.append("Тепло: от своего газового котла")
+				lines.append(L.t("Тепло: от своего газового котла"))
 			elif not sim.eng.heater_ok():
-				lines.append("Батарея холодная: нет работающего электрокотла. Поставьте его вплотную к насосной станции (Объекты → Водопровод) и подведите ток.")
+				lines.append(L.t("Батарея холодная: нет работающего электрокотла. Поставьте его вплотную к насосной станции (Объекты → Водопровод) и подведите ток."))
 			else:
-				lines.append("Тепло: от электрокотла у насосной" + ("" if sim.eng.radiator_on(t) else " — АВАРИЯ, батарея холодная"))
+				lines.append(L.t("Тепло: от электрокотла у насосной") + ("" if sim.eng.radiator_on(t) else L.t(" — АВАРИЯ, батарея холодная")))
 		"heater":
 			var hp := sim.eng.heater_problem(t)
-			lines.append("Не греет: " + hp if hp != "" else "Греет воду для всех батарей завода (%d шт.) · %.1f кВт" % [sim.season.radiators, float(t.def().get("power_kw", 0.0))])
+			lines.append(L.t("Не греет: ") + hp if hp != "" else L.t("Греет воду для всех батарей завода (%d шт.) · %.1f кВт") % [sim.season.radiators, float(t.def().get("power_kw", 0.0))])
 		"camera":
 			var rr := sim.rooms.room_at(t.cell)
-			lines.append(("Смотрит за помещением «%s»" % rr.title()) if rr else "Висит не в помещении — смотреть не за чем")
-			lines.append("Записывает" if sim.crew.cam_ok(t) else "Нет тока: подведите кабель не дальше 3 клеток")
+			lines.append((L.t("Смотрит за помещением «%s»") % rr.title()) if rr else L.t("Висит не в помещении — смотреть не за чем"))
+			lines.append(L.t("Записывает") if sim.crew.cam_ok(t) else L.t("Нет тока: подведите кабель не дальше 3 клеток"))
 		"ppe_cabinet":
-			lines.append("Комплектов СИЗ на складе: %d" % sim.eng.ppe_stock())
+			lines.append(L.t("Комплектов СИЗ на складе: %d") % sim.eng.ppe_stock())
 			var bare := sim.eng.without_ppe().size()
-			lines.append("Без СИЗ сейчас: %d чел." % bare if bare > 0 else "У всех рабочих СИЗ в порядке.")
+			lines.append(L.t("Без СИЗ сейчас: %d чел.") % bare if bare > 0 else L.t("У всех рабочих СИЗ в порядке."))
 		"saw":
 			var bl: Array[String] = []
 			for mk in sim.upkeep.blanks.keys():
 				if int(sim.upkeep.blanks[mk]) > 0:
 					bl.append("%s ×%d" % [Defs.material_name(str(mk)), int(sim.upkeep.blanks[mk])])
-			lines.append("Нарезано заготовок: " + (", ".join(bl) if not bl.is_empty() else "нет"))
-			lines.append("Первая операция из заготовки на %d%% быстрее. Запас — до %d на материал." % [int(round((1.0 - Upkeep.BLANK_K) * 100.0)), Upkeep.BLANKS_MAX])
+			lines.append(L.t("Нарезано заготовок: ") + (", ".join(bl) if not bl.is_empty() else L.t("нет")))
+			lines.append(L.t("Первая операция из заготовки на %d%% быстрее. Запас — до %d на материал.") % [int(round((1.0 - Upkeep.BLANK_K) * 100.0)), Upkeep.BLANKS_MAX])
 			var so := sim.get_worker(t.user)
-			lines.append("Режет: " + (so.full_name() if so else "—") + (" · нет питания" if not sim.power.powered(t) else ""))
+			lines.append(L.t("Режет: ") + (so.full_name() if so else "—") + (L.t(" · нет питания") if not sim.power.powered(t) else ""))
 		_:
-			lines.append("Стоимость: " + Defs.money_str(float(t.def().get("cost", 0))))
+			lines.append(L.t("Стоимость: ") + Defs.money_str(float(t.def().get("cost", 0))))
 	var r := sim.rooms.room_of_thing(t)
 	if r:
-		lines.append("Помещение: " + r.title() + ("" if r.valid or r.type == "" else " (не оборудовано)"))
+		lines.append(L.t("Помещение: ") + r.title() + ("" if r.valid or r.type == "" else L.t(" (не оборудовано)")))
 	return "\n".join(lines)

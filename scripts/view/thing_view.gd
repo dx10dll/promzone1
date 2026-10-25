@@ -278,7 +278,7 @@ func _draw_over() -> void:
 				var pl := _anchor("plate")
 				if not pl.is_empty():
 					var r0 := Rect2(tp(pl[0], pl[1]), Vector2(pl[2], pl[3]) * 0.5)
-					Emblem.draw_sign_plate(over, r0, Company.emblem_of(sim), Company.name_of(sim), "ООО" if sim.progress.ooo else "МАСТЕРСКАЯ")
+					Emblem.draw_sign_plate(over, r0, Company.emblem_of(sim), Company.name_of(sim), L.t("ООО") if sim.progress.ooo else L.t("МАСТЕРСКАЯ"))
 			if thing.def_id == "days_board":
 				var dg := _anchor("digits")
 				if not dg.is_empty():

@@ -147,13 +147,13 @@ func _task(w: Worker, o: Worker, kind: String, cell: Vector2i, dur: float) -> Ta
 	t.data["other"] = o.id
 	match kind:
 		"chat":
-			t.label = "Болтает: " + o.short_name()
+			t.label = L.t("Болтает: %s") % o.short_name()
 			t.data["bubble"] = "laugh" if Mood.has_trait(w, "cheerful") or rng.randf() < 0.3 else "chat"
 		"argue":
-			t.label = "Ругается: " + o.short_name()
+			t.label = L.t("Ругается: %s") % o.short_name()
 			t.data["bubble"] = "argue"
 		_:
-			t.label = "Дерётся: " + o.short_name()
+			t.label = L.t("Дерётся: %s") % o.short_name()
 			t.data["bubble"] = "fight"
 	t.add({"t": "goto", "cell": cell})
 	t.add({"t": "work", "what": "social", "other": o.id, "dur": dur, "anim": "fight" if kind == "fight" else ("talk" if kind == "argue" else "idle")})
@@ -194,7 +194,7 @@ func _gather(e: Dictionary, a: Worker) -> void:
 			sim.brain.abort(w)
 			var t := Task.new()
 			t.kind = "social"
-			t.label = "Разнимает драку"
+			t.label = L.t("Разнимает драку")
 			t.data["bubble"] = "argue"
 			t.add({"t": "goto", "cell": _beside(a.cell(), w.cell())})
 			t.add({"t": "work", "what": "social", "other": a.id, "dur": 2.0, "anim": "talk", "breakup": true})
@@ -216,7 +216,7 @@ func _gather(e: Dictionary, a: Worker) -> void:
 				break
 		var tw := Task.new()
 		tw.kind = "social"
-		tw.label = "Смотрит на драку"
+		tw.label = L.t("Смотрит на драку")
 		tw.add({"t": "goto", "cell": spot})
 		tw.add({"t": "work", "what": "social", "other": a.id, "dur": float(e["end"]) - sim.minute, "anim": "idle"})
 		sim.brain.assign(w, tw)
@@ -286,15 +286,15 @@ func _after_fight(e: Dictionary, a: Worker, b: Worker) -> void:
 		hurt = b if rng.randf() < 0.5 else a
 		sim.story.injure(hurt, "fight")
 	for p in [a, b]:
-		p.add_history(sim.day(), Nicks.gendered("Подрал{ся|ась} с ", p.female) + (b if p == a else a).full_name())
+		p.add_history(sim.day(), Nicks.gendered(L.t("Подрал{ся|ась} с %s"), p.female) % (b if p == a else a).full_name())
 	var breaker := sim.get_worker(int(e["breaker"]))
-	var txt := "%s и %s сначала ругались, а потом сцепились прямо в цеху. Остальные бросили работу и смотрели." % [a.full_name(), b.full_name()]
+	var txt := L.t("%s и %s сначала ругались, а потом сцепились прямо в цеху. Остальные бросили работу и смотрели.") % [a.full_name(), b.full_name()]
 	if breaker:
-		txt += " " + Nicks.gendered("Разнял{|а} %s.", breaker.female) % breaker.full_name()
+		txt += " " + Nicks.gendered(L.t("Разнял{|а} %s."), breaker.female) % breaker.full_name()
 	if hurt:
-		txt += " %s пострадал%s." % [hurt.full_name(), "а" if hurt.female else ""]
-	sim.story.letter("fight", "Драка в цеху", txt, "staff", Sim.LVL_WARN,
-		[{"text": "Объявить выговор обоим", "hint": "Настроение у них упадёт, но порядок будет"},
-		 {"text": "Уволить зачинщика (%s)" % a.full_name(), "hint": "Остальные запомнят"},
-		 {"text": "Развести по разным сменам", "hint": "Не будут видеться — не будут драться"}], 0, {"a": a.id, "b": b.id})
-	sim.paper.add("Происшествия", "Кулаки вместо слов", "В цеху подрались двое. Товарищи, споры решают на собрании, а не кулаками!")
+		txt += Nicks.gendered(L.t(" %s пострадал{|а}."), hurt.female) % hurt.full_name()
+	sim.story.letter("fight", L.t("Драка в цеху"), txt, "staff", Sim.LVL_WARN,
+		[{"text": L.t("Объявить выговор обоим"), "hint": L.t("Настроение у них упадёт, но порядок будет")},
+		 {"text": L.t("Уволить зачинщика (%s)") % a.full_name(), "hint": L.t("Остальные запомнят")},
+		 {"text": L.t("Развести по разным сменам"), "hint": L.t("Не будут видеться — не будут драться")}], 0, {"a": a.id, "b": b.id})
+	sim.paper.add(L.t("Происшествия"), L.t("Кулаки вместо слов"), L.t("В цеху подрались двое. Товарищи, споры решают на собрании, а не кулаками!"))

@@ -188,7 +188,7 @@ func _draw() -> void:
 							draw_line(r2.position + Vector2(T, 0), r2.end, Color(zc, 0.9), 2.0)
 		if any_zone.x >= 0:
 			var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
-			draw_string(f, Vector2(any_zone) * T + Vector2(3, 12), str(zk[2]), HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(zc, 0.85))
+			draw_string(f, Vector2(any_zone) * T + Vector2(3, 12), L.t(str(zk[2])), HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(zc, 0.85))
 	# соседние участки (1.13): дымка и табличка «Продаётся» — в FxLayer, поверх деревьев (1.18)
 	# продолжение улицы за краями карты (1.30: сначала асфальт, потом разметка — раньше асфальт её закрывал,
 	# и за краем карты дорога выглядела оборванной; плюс газон и южный тротуар вдоль жилого квартала)

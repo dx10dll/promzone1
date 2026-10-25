@@ -78,33 +78,33 @@ func offer(w: Worker, sk: String) -> Dictionary:
 	var to := mini(10, cur + 2) if kind == "up" else 3
 	var why := ""
 	if w.is_itr() or w.visitor:
-		why = "ИТР учатся у себя в отделе"
+		why = L.t("ИТР учатся у себя в отделе")
 	elif cur >= 10:
-		why = "уже мастер своего дела"
+		why = L.t("уже мастер своего дела")
 	elif not course_of(w).is_empty():
-		why = "уже на курсах"
+		why = L.t("уже на курсах")
 	return {"kind": kind, "from": cur, "to": to, "cls": d["cls"], "ctr": d["ctr"], "days": d["days"], "why": why}
 
 
 ## Отправить на курсы. where: "class" — в своём учебном классе, "center" — с выездом в учебный центр.
 func start_course(w: Worker, sk: String, where: String) -> String:
 	if not SKILLS.has(sk):
-		return "Таким курсам не учат"
+		return L.t("Таким курсам не учат")
 	var o := offer(w, sk)
 	if str(o["why"]) != "":
 		return "%s: %s" % [w.full_name(), o["why"]]
 	var cost := float(o["cls"] if where == "class" else o["ctr"])
 	if where == "class":
 		if classrooms().is_empty():
-			return "Нет учебного класса: постройте помещение с партами и доской (Помещения → Учебный класс)"
+			return L.t("Нет учебного класса: постройте помещение с партами и доской (Помещения → Учебный класс)")
 		if class_busy() >= class_seats():
-			return "В учебном классе нет свободных мест — поставьте ещё парт"
+			return L.t("В учебном классе нет свободных мест — поставьте ещё парт")
 	if not sim.can_afford(cost):
-		return "Не хватает денег: нужно " + Defs.money_str(cost)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 	var kind := str(o["kind"])
 	var c := {"wid": w.id, "skill": sk, "kind": kind, "where": where, "need": float(COURSE[kind]["study"]),
 		"done": 0.0, "until": -1, "from": int(o["from"]), "to": int(o["to"]), "day": sim.day()}
-	var skn := str(Worker.SKILL_NAMES.get(sk, sk)).to_lower()
+	var skn := L.t(str(Worker.SKILL_NAMES.get(sk, sk))).to_lower()
 	sim.spend(cost, "Обучение: %s (%s)" % [w.full_name(), skn])
 	if where == "center":
 		var days := int(o["days"])
@@ -112,11 +112,11 @@ func start_course(w: Worker, sk: String, where: String) -> String:
 		w.sick_until = float(sim.day() + days - 1) * 1440.0 + 300.0
 		w.away_why = "на курсах"
 		if w.present:
-			sim.brain.send_home(w, "Уезжает на курсы")
-		sim.notify("%s уезжает на курсы в учебный центр (%s) на %d %s." % [w.full_name(), skn, days, Defs.plural(days, "день", "дня", "дней")], Sim.LVL_INFO)
+			sim.brain.send_home(w, L.t("Уезжает на курсы"))
+		sim.notify(L.t("%s уезжает на курсы в учебный центр (%s) на %d %s.") % [w.full_name(), skn, days, Defs.plural(days, "день", "дня", "дней")], Sim.LVL_INFO)
 	else:
-		sim.notify("%s пойдёт на курсы в учебный класс: %s. Учится в свою смену." % [w.full_name(), skn], Sim.LVL_INFO)
-	w.add_history(sim.day(), "Направлен на курсы: " + skn)
+		sim.notify(L.t("%s пойдёт на курсы в учебный класс: %s. Учится в свою смену.") % [w.full_name(), skn], Sim.LVL_INFO)
+	w.add_history(sim.day(), L.t("Направлен на курсы: %s") % skn)
 	courses.append(c)
 	return ""
 
@@ -128,7 +128,7 @@ func cancel_course(w: Worker) -> void:
 	courses.erase(c)
 	if str(c["where"]) == "center" and w.away_why == "на курсах":
 		w.sick_until = -1.0
-	w.add_history(sim.day(), "Курсы отменены")
+	w.add_history(sim.day(), L.t("Курсы отменены"))
 
 
 ## Учится ли сейчас в своём учебном классе (а не работает).
@@ -165,19 +165,19 @@ func _complete(c: Dictionary) -> void:
 	var sk := str(c["skill"])
 	var before := w.skill(sk)
 	w.skills[sk] = maxi(before, int(c["to"]))
-	var skn := str(Worker.SKILL_NAMES.get(sk, sk)).to_lower()
+	var skn := L.t(str(Worker.SKILL_NAMES.get(sk, sk))).to_lower()
 	sim.stats["courses"] = int(sim.stats.get("courses", 0)) + 1
 	Mood.add(sim, w, "course_done")
 	if str(c["kind"]) == "new":
 		var pf := prof_for_skill(sk)
-		var pn := Worker.lc(str(Worker.PROF_NAMES.get(pf, skn)))
-		w.add_history(sim.day(), "Освоил смежную профессию: " + pn)
-		sim.notify(Nicks.gendered("%s окончил{|а} курсы и освоил{|а} смежную профессию: %s. Теперь может работать и на этих станках.", w.female) % [w.full_name(), pn], Sim.LVL_GOOD)
-		sim.paper.add("Учёба", "Смежная профессия: " + w.full_name(), "Окончил курсы и теперь может подменить %s. Широкий профиль — надёжный цех!" % ("фрезеровщика" if sk == "milling" else pn))
+		var pn := Worker.lc(L.t(str(Worker.PROF_NAMES.get(pf, skn))))
+		w.add_history(sim.day(), L.t("Освоил смежную профессию: %s") % pn)
+		sim.notify(Nicks.gendered(L.t("%s окончил{|а} курсы и освоил{|а} смежную профессию: %s. Теперь может работать и на этих станках."), w.female) % [w.full_name(), pn], Sim.LVL_GOOD)
+		sim.paper.add(L.t("Учёба"), L.t("Смежная профессия: %s") % w.full_name(), L.t("Окончил курсы и теперь может подменить %s. Широкий профиль — надёжный цех!") % (L.t("фрезеровщика") if sk == "milling" else pn))
 	else:
-		w.add_history(sim.day(), "Окончил курсы: %s %d → %d" % [skn, before, w.skill(sk)])
-		var next_g := (" Можно сдавать на %d-й разряд." % w.pot_grade()) if w.has_grade() and w.pot_grade() > w.grade() else ""
-		sim.notify(Nicks.gendered("%s окончил{|а} курсы: %s %d → %d.%s", w.female) % [w.full_name(), skn, before, w.skill(sk), next_g], Sim.LVL_GOOD)
+		w.add_history(sim.day(), L.t("Окончил курсы: %s %d → %d") % [skn, before, w.skill(sk)])
+		var next_g := (L.t(" Можно сдавать на %d-й разряд.") % w.pot_grade()) if w.has_grade() and w.pot_grade() > w.grade() else ""
+		sim.notify(Nicks.gendered(L.t("%s окончил{|а} курсы: %s %d → %d.%s"), w.female) % [w.full_name(), skn, before, w.skill(sk), next_g], Sim.LVL_GOOD)
 	Mood.refresh(sim, w)
 
 
@@ -199,17 +199,17 @@ func injury_k() -> float:
 ## в цеху, если класса нет) и слушают инженера по охране труда.
 func start_tb() -> String:
 	if tb_active():
-		return "Инструктаж уже идёт"
+		return L.t("Инструктаж уже идёт")
 	if not sim.is_work_time():
-		return "Инструктаж проводят в рабочее время"
+		return L.t("Инструктаж проводят в рабочее время")
 	var who: Array = []
 	for w in sim.workers:
 		if w.present and not w.is_itr():
 			who.append(w.id)
 	if who.is_empty():
-		return "Сейчас на смене никого нет"
+		return L.t("Сейчас на смене никого нет")
 	if not sim.can_afford(TB_COST):
-		return "Не хватает денег: нужно " + Defs.money_str(TB_COST)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(TB_COST)
 	sim.spend(TB_COST, "Инструктаж по охране труда")
 	tb_wait = who
 	var lead := tb_lead()
@@ -217,7 +217,7 @@ func start_tb() -> String:
 		sim.brain.abort(lead)   # ведущий бросает бумаги и идёт к доске
 	tb_people = 0
 	tb_until = sim.minute + 180.0
-	sim.notify("Начался инструктаж по охране труда: %d %s по очереди пройдут его в %s." % [who.size(), Defs.plural(who.size(), "человек", "человека", "человек"), "учебном классе" if not classrooms().is_empty() else "цеху"], Sim.LVL_INFO)
+	sim.notify(L.t("Начался инструктаж по охране труда: %d %s по очереди пройдут его в %s.") % [who.size(), Defs.plural(who.size(), "человек", "человека", "человек"), L.t("учебном классе") if not classrooms().is_empty() else L.t("цеху")], Sim.LVL_INFO)
 	return ""
 
 
@@ -292,7 +292,7 @@ func wants_tb(w: Worker) -> bool:
 func tb_done(w: Worker) -> void:
 	tb_wait.erase(w.id)
 	tb_people += 1
-	w.add_history(sim.day(), "Прослушал инструктаж по охране труда")
+	w.add_history(sim.day(), L.t("Прослушал инструктаж по охране труда"))
 	if tb_wait.is_empty():
 		_tb_finish()
 
@@ -302,7 +302,7 @@ func _tb_finish() -> void:
 	tb_until = -1.0
 	if tb_people > 0:
 		tb_day = sim.day()
-		sim.notify("Инструктаж по охране труда проведён (%d чел.). Ближайшие %d дней травм будет меньше на 30%%, журнал для трудовой инспекции заполнен." % [tb_people, TB_DAYS], Sim.LVL_GOOD)
+		sim.notify(L.t("Инструктаж по охране труда проведён (%d чел.). Ближайшие %d дней травм будет меньше на 30%%, журнал для трудовой инспекции заполнен.") % [tb_people, TB_DAYS], Sim.LVL_GOOD)
 
 
 # ================================================================ наставники
@@ -358,22 +358,22 @@ func set_mentor(w: Worker, m: Worker) -> String:
 		if w.mentor >= 0:
 			w.mentor = -1
 			_appr_sig = ""
-			w.add_history(sim.day(), "Наставничество снято")
+			w.add_history(sim.day(), L.t("Наставничество снято"))
 		return ""
 	if not mentor_candidates(w).has(m):
-		return "%s не может быть наставником для %s" % [m.full_name(), w.full_name()]
+		return L.t("%s не может быть наставником для %s") % [m.full_name(), w.full_name()]
 	for a in apprentices(w):
 		a.mentor = -1
 		_appr_sig = ""
 	w.mentor = m.id
 	_appr_sig = ""
-	var skn := str(Worker.SKILL_NAMES.get(w.main_skill(), "")).to_lower()
-	w.add_history(sim.day(), "Наставник: %s (%s)" % [m.full_name(), skn])
-	m.add_history(sim.day(), "Взял ученика: " + w.full_name())
+	var skn := L.t(str(Worker.SKILL_NAMES.get(w.main_skill(), ""))).to_lower()
+	w.add_history(sim.day(), L.t("Наставник: %s (%s)") % [m.full_name(), skn])
+	m.add_history(sim.day(), L.t("Взял ученика: %s") % w.full_name())
 	if m.shift != w.shift:
-		sim.notify("%s и наставник %s работают в разные смены — учить получится, только когда смены совпадут." % [w.full_name(), m.full_name()], Sim.LVL_WARN)
+		sim.notify(L.t("%s и наставник %s работают в разные смены — учить получится, только когда смены совпадут.") % [w.full_name(), m.full_name()], Sim.LVL_WARN)
 	else:
-		sim.notify("%s теперь учится у %s." % [w.full_name(), m.full_name()], Sim.LVL_INFO)
+		sim.notify(L.t("%s теперь учится у %s.") % [w.full_name(), m.full_name()], Sim.LVL_INFO)
 	return ""
 
 
@@ -428,7 +428,7 @@ func _mentor_morning() -> void:
 		if m.shift == w.shift and w.sick_until < sim.minute and m.sick_until < sim.minute and sim.rng.randf() < 0.18 * Mood.trait_val(m, "mentor_k", 1.0):
 			if w.skill(sk) < m.skill(sk) - 1:
 				w.skills[sk] = w.skill(sk) + 1
-				w.add_history(sim.day(), "Подрос у наставника: %s %d" % [str(Worker.SKILL_NAMES.get(sk, "")).to_lower(), w.skill(sk)])
+				w.add_history(sim.day(), L.t("Подрос у наставника: %s %d") % [L.t(str(Worker.SKILL_NAMES.get(sk, ""))).to_lower(), w.skill(sk)])
 		if w.skill(sk) >= m.skill(sk) - 1 or w.skill(sk) >= 8:
 			w.mentor = -1
 			_appr_sig = ""
@@ -436,10 +436,10 @@ func _mentor_morning() -> void:
 			sim.stats["mentored"] = int(sim.stats.get("mentored", 0)) + 1
 			Mood.add(sim, m, "mentor_proud")
 			Nicks.count(m, "mentor")
-			w.add_history(sim.day(), Nicks.gendered("Выучил{ся|ась} у наставника %s", w.female) % m.full_name())
-			m.add_history(sim.day(), "Выучил ученика: " + w.full_name())
-			sim.notify("Ученик вырос: %s работает самостоятельно%s. Спасибо наставнику %s!" % [w.full_name(), (" и готов сдавать на %d-й разряд" % w.pot_grade()) if w.has_grade() and w.pot_grade() > w.grade() else "", m.full_name()], Sim.LVL_GOOD)
-			sim.paper.add("Наставники", "%s вырастил смену" % m.full_name(), "%s теперь работает самостоятельно. «Руки золотые, голова светлая», — говорит наставник." % w.full_name())
+			w.add_history(sim.day(), Nicks.gendered(L.t("Выучил{ся|ась} у наставника %s"), w.female) % m.full_name())
+			m.add_history(sim.day(), L.t("Выучил ученика: %s") % w.full_name())
+			sim.notify(L.t("Ученик вырос: %s работает самостоятельно%s. Спасибо наставнику %s!") % [w.full_name(), (L.t(" и готов сдавать на %d-й разряд") % w.pot_grade()) if w.has_grade() and w.pot_grade() > w.grade() else "", m.full_name()], Sim.LVL_GOOD)
+			sim.paper.add(L.t("Наставники"), L.t("%s вырастил смену") % m.full_name(), L.t("%s теперь работает самостоятельно. «Руки золотые, голова светлая», — говорит наставник.") % w.full_name())
 
 
 # ================================================================ отношения
@@ -460,13 +460,13 @@ func _add_rel(a: Worker, b: Worker, v: float) -> void:
 	if (old >= FRIEND) != (nv >= FRIEND) or (old <= FOE) != (nv <= FOE):
 		rel_rev += 1
 	if old < FRIEND and nv >= FRIEND:
-		a.add_history(sim.day(), Nicks.gendered("Подружил{ся|ась} с ", a.female) + b.full_name())
-		b.add_history(sim.day(), Nicks.gendered("Подружил{ся|ась} с ", b.female) + a.full_name())
-		sim.notify("%s и %s подружились: вместе работается веселее." % [a.full_name(), b.full_name()], Sim.LVL_INFO)
+		a.add_history(sim.day(), Nicks.gendered(L.t("Подружил{ся|ась} с %s"), a.female) % b.full_name())
+		b.add_history(sim.day(), Nicks.gendered(L.t("Подружил{ся|ась} с %s"), b.female) % a.full_name())
+		sim.notify(L.t("%s и %s подружились: вместе работается веселее.") % [a.full_name(), b.full_name()], Sim.LVL_INFO)
 	elif old > FOE and nv <= FOE:
-		a.add_history(sim.day(), "Не поладил с " + b.full_name())
-		b.add_history(sim.day(), "Не поладил с " + a.full_name())
-		sim.notify("%s и %s не ладят — в одной смене будут цапаться. Можно развести их по разным сменам." % [a.full_name(), b.full_name()], Sim.LVL_WARN)
+		a.add_history(sim.day(), L.t("Не поладил с %s") % b.full_name())
+		b.add_history(sim.day(), L.t("Не поладил с %s") % a.full_name())
+		sim.notify(L.t("%s и %s не ладят — в одной смене будут цапаться. Можно развести их по разным сменам.") % [a.full_name(), b.full_name()], Sim.LVL_WARN)
 
 
 ## 1.23: идём только по тем, с кем есть отношения (раньше — по всем людям), порядок — по id, как в списке.
@@ -551,22 +551,22 @@ func mood_parts(w: Worker) -> Array:
 	var fn := 0
 	for o in friends(w):
 		if fn < 2 and o.present and o.shift == w.shift:
-			out.append(["Работает вместе с другом: " + o.call_name(), 2.0])
+			out.append([L.t("Работает вместе с другом: %s") % o.call_name(), 2.0])
 			fn += 1
 	var en := 0
 	for o2 in foes(w):
 		if en < 2 and o2.present and o2.shift == w.shift:
-			out.append(["Опять рядом этот " + o2.call_name(), -4.0])
+			out.append([L.t("Опять рядом этот %s") % o2.call_name(), -4.0])
 			en += 1
 	var m := mentor_of(w)
 	if m and _together(w, m):
-		out.append(["Есть у кого поучиться: " + m.call_name(), 3.0])
+		out.append([L.t("Есть у кого поучиться: %s") % m.call_name(), 3.0])
 	for a in apprentices(w):
 		if _together(a, w):
-			out.append(["Учит молодых", 5.0 if Mood.has_trait(w, "born_mentor") else 3.0])
+			out.append([L.t("Учит молодых"), 5.0 if Mood.has_trait(w, "born_mentor") else 3.0])
 			break
 	if w.practice_until >= 0:
-		out.append(["Практика на настоящем заводе", 4.0])
+		out.append([L.t("Практика на настоящем заводе"), 4.0])
 	return out
 
 
@@ -580,10 +580,10 @@ func _check_feuds() -> void:
 			if sim.day() < int(_feud_cd.get(key, 0)) or sim.rng.randf() > 0.25:
 				continue
 			_feud_cd[key] = sim.day() + 14
-			sim.story.letter("feud", "Конфликт в смене", "%s и %s третий день цапаются в смене: то инструмент не поделят, то станок. Остальные уже ставки делают." % [a.full_name(), b.full_name()], "staff", Sim.LVL_WARN,
-				[{"text": "Развести по разным сменам", "hint": "%s перейдёт в %s" % [b.full_name(), "1-ю смену" if b.shift == 1 else "2-ю смену"]},
-				 {"text": "Поговорить с обоими", "hint": "Скорее всего помирятся"},
-				 {"text": "Пусть сами разбираются", "hint": "Может дойти до драки"}], 1, {"a": a.id, "b": b.id})
+			sim.story.letter("feud", L.t("Конфликт в смене"), L.t("%s и %s третий день цапаются в смене: то инструмент не поделят, то станок. Остальные уже ставки делают.") % [a.full_name(), b.full_name()], "staff", Sim.LVL_WARN,
+				[{"text": L.t("Развести по разным сменам"), "hint": L.t("%s перейдёт в %s") % [b.full_name(), L.t("1-ю смену") if b.shift == 1 else L.t("2-ю смену")]},
+				 {"text": L.t("Поговорить с обоими"), "hint": L.t("Скорее всего помирятся")},
+				 {"text": L.t("Пусть сами разбираются"), "hint": L.t("Может дойти до драки")}], 1, {"a": a.id, "b": b.id})
 			return
 
 
@@ -598,14 +598,14 @@ func resolve_feud(d: Dictionary, choice: int) -> void:
 		1:
 			if sim.rng.randf() < 0.75:
 				_add_rel(a, b, 45.0)
-				sim.notify("%s и %s пожали друг другу руки. Мир." % [a.full_name(), b.full_name()], Sim.LVL_GOOD)
+				sim.notify(L.t("%s и %s пожали друг другу руки. Мир.") % [a.full_name(), b.full_name()], Sim.LVL_GOOD)
 			else:
-				sim.notify("Разговор не помог: %s и %s остались при своём." % [a.full_name(), b.full_name()], Sim.LVL_WARN)
+				sim.notify(L.t("Разговор не помог: %s и %s остались при своём.") % [a.full_name(), b.full_name()], Sim.LVL_WARN)
 		2:
 			if sim.rng.randf() < 0.4:
 				Mood.add(sim, a, "fight")
 				Mood.add(sim, b, "fight")
-				sim.notify("%s и %s подрались в курилке. Мастер разнял." % [a.full_name(), b.full_name()], Sim.LVL_BAD)
+				sim.notify(L.t("%s и %s подрались в курилке. Мастер разнял.") % [a.full_name(), b.full_name()], Sim.LVL_BAD)
 
 
 # ================================================================ ПТУ
@@ -624,21 +624,21 @@ func ptu_cap() -> int:
 
 func ptu_sign() -> String:
 	if ptu:
-		return "Договор с ПТУ уже есть"
+		return L.t("Договор с ПТУ уже есть")
 	if not sim.dev.on("hr2"):
-		return "Договор с ПТУ заключает кадровик после ступени «Связь с ПТУ» (Управление → Развитие)"
+		return L.t("Договор с ПТУ заключает кадровик после ступени «Связь с ПТУ» (Управление → Развитие)")
 	if not sim.can_afford(PTU_COST):
-		return "Не хватает денег: нужно " + Defs.money_str(PTU_COST)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(PTU_COST)
 	sim.spend(PTU_COST, "Договор с ПТУ о практике")
 	ptu = true
-	sim.notify("Договор с ПТУ подписан: по понедельникам будут приходить практиканты на %d дней." % PTU_DAYS, Sim.LVL_GOOD)
+	sim.notify(L.t("Договор с ПТУ подписан: по понедельникам будут приходить практиканты на %d дней.") % PTU_DAYS, Sim.LVL_GOOD)
 	_ptu_arrive()
 	return ""
 
 
 func ptu_cancel() -> void:
 	ptu = false
-	sim.notify("Договор с ПТУ расторгнут. Нынешние практиканты доработают свой срок.", Sim.LVL_INFO)
+	sim.notify(L.t("Договор с ПТУ расторгнут. Нынешние практиканты доработают свой срок."), Sim.LVL_INFO)
 
 
 ## Нужные заводу рабочие профессии (по станкам), иначе токарь.
@@ -673,16 +673,16 @@ func _ptu_arrive() -> void:
 	w.wage = PTU_WAGE
 	w.practice_until = sim.day() + PTU_DAYS
 	sim.add_worker(w)
-	w.add_history(sim.day(), "Пришёл на практику из ПТУ: будущий " + Worker.lc(str(Worker.PROF_NAMES.get(w.prof, ""))))
-	sim.notify(Nicks.gendered("Из ПТУ приш{ёл|ла} практикант%s: %s, будущий %s. Учится вдвое быстрее, стипендия %s за смену.", w.female) % ["" if not w.female else "ка", w.full_name(), Worker.lc(str(Worker.PROF_NAMES.get(w.prof, ""))), Defs.money_str(PTU_WAGE)], Sim.LVL_GOOD)
+	w.add_history(sim.day(), L.t("Пришёл на практику из ПТУ: будущий %s") % Worker.lc(L.t(str(Worker.PROF_NAMES.get(w.prof, "")))))
+	sim.notify(Nicks.gendered(L.t("Из ПТУ приш{ёл|ла} практикант{|ка}: %s, будущий %s. Учится вдвое быстрее, стипендия %s за смену."), w.female) % [w.full_name(), Worker.lc(L.t(str(Worker.PROF_NAMES.get(w.prof, "")))), Defs.money_str(PTU_WAGE)], Sim.LVL_GOOD)
 
 
 func _ptu_morning() -> void:
 	for w in practicants():
 		if sim.day() >= w.practice_until and sim.story.get_letter_by_ev("practice_end").is_empty():
 			var mw := People.wage_for(w)
-			sim.story.letter("practice_end", "Практика окончена", "%s, %d лет, заканчивает практику: %s, тянет на %d-й разряд. Мастер говорит: «%s»." % [w.full_name(), w.age, w.prof_lc(), w.pot_grade(), "Толковый, берите" if w.pot_grade() >= 3 else "Старается, руки растут откуда надо"], "staff", Sim.LVL_INFO,
-				[{"text": "Взять в штат", "hint": "Ставка %s за смену" % Defs.money_str(mw)}, {"text": "Отпустить с благодарностью", "hint": ""}], 0, {"w": w.id})
+			sim.story.letter("practice_end", L.t("Практика окончена"), L.t("%s, %d лет, заканчивает практику: %s, тянет на %d-й разряд. Мастер говорит: «%s».") % [w.full_name(), w.age, w.prof_lc(), w.pot_grade(), L.t("Толковый, берите") if w.pot_grade() >= 3 else L.t("Старается, руки растут откуда надо")], "staff", Sim.LVL_INFO,
+				[{"text": L.t("Взять в штат"), "hint": L.t("Ставка %s за смену") % Defs.money_str(mw)}, {"text": L.t("Отпустить с благодарностью"), "hint": ""}], 0, {"w": w.id})
 			return
 	if ptu and sim.weekday() == 0:
 		_ptu_arrive()
@@ -699,9 +699,9 @@ func resolve_practice(d: Dictionary, choice: int) -> void:
 			w.grade_n = w.pot_grade()   # квалификационный экзамен сдан в ПТУ
 		w.wage = People.wage_for(w)
 		Mood.add(sim, w, "practice_kept")
-		w.add_history(sim.day(), Nicks.gendered("Взят{|а} в штат после практики", w.female))
+		w.add_history(sim.day(), Nicks.gendered(L.t("Взят{|а} в штат после практики"), w.female))
 		sim.stats["ptu_kept"] = int(sim.stats.get("ptu_kept", 0)) + 1
-		sim.notify(Nicks.gendered("%s взят{|а} в штат: %s, ставка %s.", w.female) % [w.full_name(), w.prof_lc(), Defs.money_str(w.wage)], Sim.LVL_GOOD)
+		sim.notify(Nicks.gendered(L.t("%s взят{|а} в штат: %s, ставка %s."), w.female) % [w.full_name(), w.prof_lc(), Defs.money_str(w.wage)], Sim.LVL_GOOD)
 	else:
 		sim.brain.abort(w)
 		sim.office.on_quit(w)
@@ -711,7 +711,7 @@ func resolve_practice(d: Dictionary, choice: int) -> void:
 		on_leave(w)
 		sim.workers.erase(w)
 		sim.worker_rev += 1
-		sim.notify(Nicks.gendered("%s закончил{|а} практику и вернул{ся|ась} в училище.", w.female) % w.full_name(), Sim.LVL_INFO)
+		sim.notify(Nicks.gendered(L.t("%s закончил{|а} практику и вернул{ся|ась} в училище."), w.female) % w.full_name(), Sim.LVL_INFO)
 
 
 # ================================================================ общее

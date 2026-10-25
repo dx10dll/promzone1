@@ -67,7 +67,8 @@ func _axis(a: Vector2, b: Vector2) -> void:
 		t += 5.0
 
 
-func _text(p: Vector2, s: String, size: int = 11, col: Color = INK, center: bool = false, rot: float = 0.0) -> void:
+func _text(p: Vector2, s0: String, size: int = 11, col: Color = INK, center: bool = false, rot: float = 0.0) -> void:
+	var s := tr(s0)   # 1.39: надписи листа — через перевод (подписи граф, ГОСТ, технические требования)
 	var w := font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
 	var o := Vector2(-w * 0.5, 0) if center else Vector2.ZERO
 	draw_set_transform(p, rot, Vector2.ONE)
@@ -181,7 +182,7 @@ func _kind() -> String:
 
 func designation() -> String:
 	var base := 715000 + absi(hash(product)) % 999
-	return "ПРЗ.%06d.%03d" % [base, order_id % 1000]
+	return tr("ПРЗ.%06d.%03d") % [base, order_id % 1000]
 
 
 func _material_line() -> String:
@@ -205,8 +206,8 @@ func _who(prof: String, fallback: String) -> String:
 	if sim:
 		for w in sim.workers:
 			if w.prof == prof:
-				return w.last
-	return fallback
+				return L.name(w.last)
+	return L.name(tr(fallback))
 
 
 func _title_block() -> void:
@@ -238,7 +239,7 @@ func _title_block() -> void:
 	_line(q.call(65, 40), q.call(W, 40), 2.0)
 	_line(q.call(135, 15), q.call(135, H), 2.0)
 	_text(q.call(125, 10), designation(), 16, INK, true)
-	var nm := str(Defs.products.get(product, {}).get("name", product))
+	var nm := Defs.product_name(product)
 	_text(q.call(100, 28), nm, 16 if nm.length() <= 16 else 12, INK, true)
 	if _kind() == "assembly":
 		_text(q.call(100, 35), "Сборочный чертёж", 11, INK, true)
@@ -262,12 +263,12 @@ func _title_block() -> void:
 	_text(q.call(176, 27), "1:%d" % [1, 2, 2, 4][_ri(0, 3)], 10, INK, true)
 	_text(q.call(137, 34), "Лист 1", 8)
 	_text(q.call(162, 34), "Листов 1", 8)
-	_text(q.call(160, 47), Company.title(sim) if sim else "ООО «Прогресс»", 11, INK, true)
+	_text(q.call(160, 47), Company.title(sim) if sim else tr("ООО «Прогресс»"), 11, INK, true)
 	# графа обозначения в перевёрнутом виде (вверху слева) — как на настоящих листах
 	draw_rect(Rect2(P(20, 5), P(70, 14)), INK, false, 1.6)
 	_text(P(55, 14), designation(), 11, INK, true)
 	# заказ — карандашом на полях
-	_text(P(26, 202), "Заказ № %d · %s · %d шт." % [order_id, client, qty], 9, Color(0.35, 0.38, 0.42))
+	_text(P(26, 202), tr("Заказ № %d · %s · %d шт.") % [order_id, L.name(client), qty], 9, Color(0.35, 0.38, 0.42))
 
 
 func _tech_req() -> void:
@@ -334,7 +335,7 @@ func _draw_shaft(a: Rect2) -> void:
 		var hwm := dias[mid] * k * 0.5
 		for s in 6:
 			_line(Vector2(xm + 6 + s * 5, cy - hwm), Vector2(xm + 6 + s * 5, cy + hwm), 0.6, THIN)
-		_text(Vector2(xm + lens[mid] * k * 0.5, cy - hwm - 22.0), "D-8×%d×%d ГОСТ 1139-80" % [int(dias[mid]) - 4, int(dias[mid])], 10, INK, true)
+		_text(Vector2(xm + lens[mid] * k * 0.5, cy - hwm - 22.0), tr("D-8×%d×%d ГОСТ 1139-80") % [int(dias[mid]) - 4, int(dias[mid])], 10, INK, true)
 	elif product != "pin":
 		var hwm2 := dias[mid] * k * 0.5
 		var kw := lens[mid] * k * 0.5
@@ -442,7 +443,7 @@ func _draw_flange(a: Rect2, gear: bool) -> void:
 		for h in holes:
 			var ang2: float = TAU * h / float(holes)
 			draw_arc(c + Vector2(cos(ang2), sin(ang2)) * pr, R * 0.09, 0.0, TAU, 20, INK, 1.4, true)
-		_text(c + Vector2(0, R + 22.0), "%d отв. Ø%d равном. на Ø%d" % [holes, int(D * 0.09 * 2), int(D * 0.75)], 11, INK, true)
+		_text(c + Vector2(0, R + 22.0), tr("%d отв. Ø%d равном. на Ø%d") % [holes, int(D * 0.09 * 2), int(D * 0.75)], 11, INK, true)
 	draw_arc(c, d * k * 0.5, 0.0, TAU, 64, INK, 1.8, true)
 	_axis(c - Vector2(R + 10, 0), c + Vector2(R + 10, 0))
 	_axis(c - Vector2(0, R + 10), c + Vector2(0, R + 10))
@@ -479,8 +480,8 @@ func _draw_plate(a: Rect2) -> void:
 		_axis(c - Vector2(R + 10, 0), c + Vector2(R + 10, 0))
 		_axis(c - Vector2(0, R + 10), c + Vector2(0, R + 10))
 		_dim_h(c.x - R, c.x + R, c.y + R, c.y + R + 26.0, "Ø%d" % int(H * 1.2))
-		_text(c + Vector2(R + 40.0, -10), "□%d (под ось)" % _ri(30, 40), 11)
-		_text(c + Vector2(R + 40.0, 10), "%d вырезов R%d" % [notches, _ri(15, 25)], 11)
+		_text(c + Vector2(R + 40.0, -10), tr("□%d (под ось)") % _ri(30, 40), 11)
+		_text(c + Vector2(R + 40.0, 10), tr("%d вырезов R%d") % [notches, _ri(15, 25)], 11)
 		return
 	# кронштейн: Г-образная пластина с отверстиями
 	var r := Rect2(o, Vector2(W * k, H * k))
@@ -495,7 +496,7 @@ func _draw_plate(a: Rect2) -> void:
 		draw_arc(hc, hd * k * 0.5, 0.0, TAU, 24, INK, 1.4, true)
 		_axis(hc - Vector2(10, 0), hc + Vector2(10, 0))
 		_axis(hc - Vector2(0, 10), hc + Vector2(0, 10))
-	_text(r.position + Vector2(r.size.x * 0.18 + 10, r.size.y * 0.2 - 10), "3 отв. Ø%d" % hd, 11)
+	_text(r.position + Vector2(r.size.x * 0.18 + 10, r.size.y * 0.2 - 10), tr("3 отв. Ø%d") % hd, 11)
 	_dim_h(r.position.x, r.end.x, r.position.y, r.position.y - 22.0, str(int(W)))
 	_dim_v(r.position.y, r.end.y, r.position.x, r.position.x - 24.0, str(int(H)))
 	_dim_h(r.position.x, r.position.x + cut.x, r.end.y, r.end.y + 24.0, str(int(W * 0.55)))
@@ -596,7 +597,7 @@ func _draw_assembly(a: Rect2) -> void:
 		_line(p, q, 0.9)
 		_line(q, q + Vector2(22, 0), 0.9)
 		_text(q + Vector2(6, -3), str(i), 12)
-		spec.append([i, str(Defs.products.get(cid, {}).get("name", cid)), int(comps[cid])])
+		spec.append([i, Defs.product_name(str(cid)), int(comps[cid])])
 		i += 1
 	# спецификация справа
 	var sx := a.position.x + a.size.x * 0.66

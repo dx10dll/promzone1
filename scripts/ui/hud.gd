@@ -452,8 +452,8 @@ func _chip(icon: String, key: String, cb: Callable) -> VBoxContainer:
 
 func _short_money(v: float) -> String:
 	if v >= 1000000.0:
-		return "%.2f млн" % (v / 1000000.0)
-	return "%d тыс." % int(v / 1000.0)
+		return tr("%.2f млн") % (v / 1000000.0)
+	return tr("%d тыс.") % int(v / 1000.0)
 
 
 ## 1.30: значок верхней панели — цветной из набора владельца, если он есть, иначе прежний векторный.
@@ -480,37 +480,38 @@ func _refresh_top() -> void:
 		if int(e["day"]) != d0:
 			break
 		today += float(e["v"])
-	money_d.text = "сегодня %s%s" % ["+" if today > 0 else "", Defs.money_str(today)] if absf(today) >= 1.0 else "сегодня без движения"
+	money_d.text = tr("сегодня %s%s") % ["+" if today > 0 else "", Defs.money_str(today)] if absf(today) >= 1.0 else tr("сегодня без движения")
 	money_d.add_theme_color_override("font_color", UITheme.GOOD if today > 0 else (UITheme.BAD if today < 0 else UITheme.MUTED))
-	var mtip := "Деньги на счёте. Последние операции:\n"
+	var mtip := tr("Деньги на счёте. Последние операции:") + "\n"
 	for e2: Dictionary in sim.ledger.slice(0, 6):
 		var v := float(e2["v"])
 		mtip += "%s%s — %s\n" % ["+" if v > 0 else "", Defs.money_str(v), str(e2["text"])]
-	(_chips["money"] as Control).tooltip_text = mtip + "Нажмите — «Финансы» (F)."
-	rep_l.text = "%d из 100" % int(sim.reputation)
+	(_chips["money"] as Control).tooltip_text = mtip + tr("Нажмите — «Финансы» (F).")
+	rep_l.text = tr("%d из 100") % int(sim.reputation)
 	rep_l.add_theme_color_override("font_color", UITheme.ramp(sim.reputation / 100.0))
-	(_chips["rep"] as Control).tooltip_text = "Репутация %d из 100. Растёт от заказов, сданных вовремя, и падает от опозданий и срывов.\nОт неё зависят цены и число заказов." % int(sim.reputation)
-	if sim.company_rev != _company_rev or company_s.text != ("ООО" if sim.progress.ooo else "Мастерская"):
+	(_chips["rep"] as Control).tooltip_text = tr("Репутация %d из 100. Растёт от заказов, сданных вовремя, и падает от опозданий и срывов.\nОт неё зависят цены и число заказов.") % int(sim.reputation)
+	if sim.company_rev != _company_rev or company_s.text != tr("ООО" if sim.progress.ooo else "Мастерская"):
 		_company_rev = sim.company_rev
 		emblem_v.set_spec(Company.emblem_of(sim))
 		company_l.text = Company.name_of(sim)
-		company_s.text = "ООО" if sim.progress.ooo else "Мастерская"
-		(_chips["company"] as Control).tooltip_text = "%s — паспорт завода: название и эмблема (нажмите, чтобы изменить)." % Company.title(sim)
+		company_s.text = tr("ООО" if sim.progress.ooo else "Мастерская")
+		(_chips["company"] as Control).tooltip_text = tr("%s — паспорт завода: название и эмблема (нажмите, чтобы изменить).") % Company.title(sim)
 	var pg := sim.progress
-	stage_l.text = pg.stage_name()
+	var stn := L.dt("stage.%s.name" % str(pg.stage_def().get("id", "")), pg.stage_name())
+	stage_l.text = stn
 	stars_l.text = pg.stars_text()
-	var gtip := "Этап %d из %d: «%s». Рейтинг завода: %d из 5 звёзд.\n" % [pg.stage, Progress.STAGE_COUNT, pg.stage_name(), pg.stars]
+	var gtip := tr("Этап %d из %d: «%s». Рейтинг завода: %d из 5 звёзд.") % [pg.stage, Progress.STAGE_COUNT, stn, pg.stars] + "\n"
 	if pg.stage < Progress.STAGE_COUNT:
-		gtip += "Чтобы перейти на следующий этап:\n"
+		gtip += tr("Чтобы перейти на следующий этап:") + "\n"
 		for g2: Dictionary in pg.stage_goals():
 			var gs: Array = pg.goal_state(g2)
 			gtip += "%s %s — %s\n" % ["✓" if bool(gs[0]) else "•", str(g2.get("text", "")), str(gs[1])]
 		if pg.choice_need() > 0:
-			gtip += "И любые %d на выбор (%d выполнено):\n" % [pg.choice_need(), pg.choice_done()]
+			gtip += tr("И любые %d на выбор (%d выполнено):") % [pg.choice_need(), pg.choice_done()] + "\n"
 			for g3: Dictionary in pg.stage_choice().get("list", []):
 				var gs3: Array = pg.goal_state(g3)
 				gtip += "%s %s: %s — %s\n" % ["✓" if bool(gs3[0]) else "◦", str(g3.get("route", "")), str(g3.get("text", "")), str(gs3[1])]
-	gtip += "Нажмите, чтобы открыть «Цели» (G)."
+	gtip += tr("Нажмите, чтобы открыть «Цели» (G).")
 	(_chips["goals"] as Control).tooltip_text = gtip
 	# люди
 	var tot := 0
@@ -522,14 +523,15 @@ func _refresh_top() -> void:
 		if w.present:
 			here += 1
 	var avg := ms / maxf(1.0, float(tot))
-	people_l.text = "%d / %d на заводе" % [here, tot] if tot > 0 else "Нет людей"
-	people_s.text = "настроение %d — %s" % [int(avg), Mood.label(avg).to_lower()] if tot > 0 else "наймите во вкладке «Найм»"
+	people_l.text = tr("%d / %d на заводе") % [here, tot] if tot > 0 else tr("Нет людей")
+	people_s.text = tr("настроение %d — %s") % [int(avg), tr(Mood.label(avg)).to_lower()] if tot > 0 else tr("наймите во вкладке «Найм»")
 	people_s.add_theme_color_override("font_color", Mood.color(avg) if tot > 0 else UITheme.MUTED)
-	(_chips["people"] as Control).tooltip_text = "Сейчас на заводе %d из %d. Среднее настроение %d.\nНажмите — «Люди» (L)." % [here, tot, int(avg)]
+	(_chips["people"] as Control).tooltip_text = tr("Сейчас на заводе %d из %d. Среднее настроение %d.\nНажмите — «Люди» (L).") % [here, tot, int(avg)]
 	date_l.text = sim.season.short_date()
 	if cal_sheet:
 		var dd := sim.season.dom()
-		var mm: String = ["ЯНВ", "ФЕВ", "МАРТ", "АПР", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГ", "СЕНТ", "ОКТ", "НОЯБ", "ДЕК"][sim.season.month()]
+		var mm: String = (Season.MONTHS_EN[sim.season.month()].left(3).to_upper() if L.is_en() else
+			["ЯНВ", "ФЕВ", "МАРТ", "АПР", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГ", "СЕНТ", "ОКТ", "НОЯБ", "ДЕК"][sim.season.month()])
 		var hol := not sim.is_workday()
 		if dd != cal_sheet.day or mm != cal_sheet.month or hol != cal_sheet.holiday:
 			cal_sheet.day = dd
@@ -562,13 +564,13 @@ func _refresh_top() -> void:
 				s = "идёт смена"
 	else:
 		s = "смена окончена"
-	time_l.text = "%s · %s" % [sim.time_str(), s]
+	time_l.text = "%s · %s" % [sim.time_str(), tr(s)]
 	time_l.add_theme_color_override("font_color", scol)
 	if g.menu_paused or g.speed == 0:
-		fast_l.text = "ПАУЗА"
+		fast_l.text = tr("ПАУЗА")
 		fast_l.add_theme_color_override("font_color", UITheme.ACCENT)
 	elif g.fast:
-		fast_l.text = "ускорено"
+		fast_l.text = tr("ускорено")
 		fast_l.tooltip_text = "На заводе никого — ночь и выходные проматываются быстро"
 		fast_l.add_theme_color_override("font_color", UITheme.INFO)
 	else:
@@ -576,18 +578,18 @@ func _refresh_top() -> void:
 	var pw := sim.power
 	var cap := pw.capacity_total()
 	if pw.any_tripped():
-		power_l.text = "АВТОМАТ ВЫБИТ"
+		power_l.text = tr("АВТОМАТ ВЫБИТ")
 		power_l.add_theme_color_override("font_color", UITheme.BAD)
 		power_bar.value = 100
 		power_bar.add_theme_stylebox_override("fill", UITheme.sb(UITheme.BAD, UITheme.BAD, 0, 3, 0, 0))
 	else:
-		power_l.text = "%.1f / %d кВт" % [pw.total_load, int(cap)]
+		power_l.text = tr("%.1f / %d кВт") % [pw.total_load, int(cap)]
 		var frac := pw.total_load / maxf(1.0, cap)
 		power_bar.value = frac * 100.0
 		var pc := UITheme.BAD if frac > 0.95 else (UITheme.WARN if frac > 0.8 else UITheme.GOOD)
 		power_bar.add_theme_stylebox_override("fill", UITheme.sb(pc, pc, 0, 3, 0, 0))
 		power_l.add_theme_color_override("font_color", UITheme.TEXT)
-	(_chips["power"] as Control).tooltip_text = "Электросеть: нагрузка %.1f из %d кВт.\nНажмите — меню «Сети» (E)." % [pw.total_load, int(cap)]
+	(_chips["power"] as Control).tooltip_text = tr("Электросеть: нагрузка %.1f из %d кВт.\nНажмите — меню «Сети» (E).") % [pw.total_load, int(cap)]
 	var offers := sim.orders.by_status(["offer"]).size() + sim.sales.by_state(["offer"]).size()
 	order_badge.text = str(offers)
 	order_badge.visible = offers > 0
@@ -597,19 +599,19 @@ func _refresh_top() -> void:
 	weather_l.add_theme_color_override("font_color", Color("#9cd0f0") if tt <= -10 else (UITheme.WARN if tt >= 28 else UITheme.TEXT))
 	# снег и мороз — прежний голубой значок, иначе термометр из новых значков
 	weather_i.texture = Tex.ui("snow") if se.is_snowing() or tt < 0 else _top_tex("temperature")
-	var wtip := "%s, %s. На улице %+d °C." % [se.season_name(), se.long_date(), tt]
+	var wtip := tr("%s, %s. На улице %+d °C.") % [se.season_name(), se.long_date(), tt]
 	if se.is_snowing():
-		wtip += " Идёт снег."
+		wtip += " " + tr("Идёт снег.")
 	if se.ice:
-		wtip += " Гололёд!"
+		wtip += " " + tr("Гололёд!")
 	if se.heating_season():
-		wtip += "\nОтопительный сезон: батарей %d." % se.radiators
+		wtip += "\n" + tr("Отопительный сезон: батарей %d.") % se.radiators
 		var cold := se.cold_rooms()
 		if not cold.is_empty():
-			wtip += " Холодно: " + ", ".join(PackedStringArray(cold.map(func(r: Rooms.Room) -> String: return r.title()))) + "."
-	wtip += "\nНажмите — «События» (C)."
+			wtip += " " + tr("Холодно: ") + ", ".join(PackedStringArray(cold.map(func(r: Rooms.Room) -> String: return r.title()))) + "."
+	wtip += "\n" + tr("Нажмите — «События» (C).")
 	(_chips["weather"] as Control).tooltip_text = wtip
-	(_chips["date"] as Control).tooltip_text = "%s, %s. %s\nНажмите — календарь и проверки (C)." % [se.long_date(), sim.time_str(), sim.crew.sched_text(sim.crew.sched_str(0), 0).capitalize() if sim.is_workday() else "Выходной"]
+	(_chips["date"] as Control).tooltip_text = tr("%s, %s. %s\nНажмите — календарь и проверки (C).") % [se.long_date(), sim.time_str(), sim.crew.sched_text(sim.crew.sched_str(0), 0).capitalize() if sim.is_workday() else tr("Выходной")]
 	_refresh_crisis()
 	var alerts := sim.story.letters.size() + (1 if sim.story.strike.get("active", false) else 0) + (1 if not sim.story.fires.is_empty() else 0) + sim.inspect.queue.size() + (1 if sim.paper.unread else 0)
 	events_badge.text = str(alerts)
@@ -638,13 +640,13 @@ func _refresh_crisis() -> void:
 	var tg := ""
 	var arr := sim.progress.arrears_total()
 	if arr > 0.0:
-		txt = "Не платим зарплату: долг %s. Люди уходят (%d из %d) — потом завод закроют. Нажмите, чтобы выплатить" % [Defs.money_str(arr), sim.crisis.arrears_quits.size(), Crisis.QUITS_TO_CLOSE]
+		txt = tr("Не платим зарплату: долг %s. Люди уходят (%d из %d) — потом завод закроют. Нажмите, чтобы выплатить") % [Defs.money_str(arr), sim.crisis.arrears_quits.size(), Crisis.QUITS_TO_CLOSE]
 		tg = "finance"
 	elif not sim.crisis.tools_short.is_empty():
-		txt = "Нет инструмента и денег на него: станки стоят, люди грозят уволиться. Нажмите — снабжение"
+		txt = tr("Нет инструмента и денег на него: станки стоят, люди грозят уволиться. Нажмите — снабжение")
 		tg = "supply"
 	elif sim.money < 0.0 and sim.crisis.debt_days >= 1:
-		txt = "Завод в долгах (%s): репутация падает, новых заказов не берём. Нажмите — финансы" % Defs.money_str(sim.money)
+		txt = tr("Завод в долгах (%s): репутация падает, новых заказов не берём. Нажмите — финансы") % Defs.money_str(sim.money)
 		tg = "finance"
 	crisis_bar.visible = txt != "" and not sim.crisis.is_over()
 	if crisis_bar.visible:
@@ -822,7 +824,7 @@ func open_rooms_type(type: String) -> void:
 		open_rooms()
 	g.tool.set_mode("room", type)
 	_fill_sub()
-	toast("Зона «%s»: протяните прямоугольник по полу помещения или щёлкните по помещению, чтобы залить его целиком." % str(Defs.rooms.get(type, {}).get("name", type)), Sim.LVL_INFO)
+	toast(tr("Зона «%s»: протяните прямоугольник по полу помещения или щёлкните по помещению, чтобы залить его целиком.") % _room_name(type, type), Sim.LVL_INFO)
 
 
 ## Каталог помещений: все типы с требованиями видны заранее, ещё до постройки.
@@ -898,7 +900,7 @@ func toggle_plan() -> void:
 			toggle_sub("build")
 		else:
 			_fill_sub()
-		toast("Планировка: рисуйте стены, полы, зоны и станки — это калька, бесплатно. Готово — «Утвердить план».", Sim.LVL_INFO, 5.0)
+		toast(tr("Планировка: рисуйте стены, полы, зоны и станки — это калька, бесплатно. Готово — «Утвердить план»."), Sim.LVL_INFO, 5.0)
 	else:
 		if sub_kind != "":
 			_fill_sub()
@@ -939,23 +941,23 @@ func _refresh_plan_panel() -> void:
 	v.add_child(UITheme.label("ПЛАНИРОВКА — ничего не строится и не стоит денег", 14, Color(0.78, 0.88, 1.0), UITheme.f_semi))
 	var parts: Array[String] = []
 	if int(cn["walls"]) > 0:
-		parts.append("стен и проёмов %d" % int(cn["walls"]))
+		parts.append(tr("стен и проёмов %d") % int(cn["walls"]))
 	if int(cn["floors"]) > 0:
-		parts.append("пола %d кл." % int(cn["floors"]))
+		parts.append(tr("пола %d кл.") % int(cn["floors"]))
 	if int(cn["zones"]) > 0:
-		parts.append("зон %d" % int(cn["zones"]))
+		parts.append(tr("зон %d") % int(cn["zones"]))
 	if int(cn["objs"]) > 0:
-		parts.append("объектов %d" % int(cn["objs"]))
-	var txt := ("На плане: " + ", ".join(parts) + " · по смете ≈ " + Defs.money_str(cost)) if not parts.is_empty() else "Выберите стену, пол, зону или станок в меню снизу и рисуйте. Снос стирает план."
+		parts.append(tr("объектов %d") % int(cn["objs"]))
+	var txt := (tr("На плане: %s · по смете ≈ %s") % [", ".join(parts), Defs.money_str(cost)]) if not parts.is_empty() else tr("Выберите стену, пол, зону или станок в меню снизу и рисуйте. Снос стирает план.")
 	v.add_child(UITheme.label(txt, 12, UITheme.MUTED))
 	h.add_child(v)
 	var ab := UITheme.primary("Утвердить план", func() -> void:
 		var res := sim.plan.approve()
-		var msg := "План утверждён: пол %d кл., стены %d, объектов заказано %d." % [int(res["floors"]), int(res["walls"]), int(res["objs"])]
+		var msg := tr("План утверждён: пол %d кл., стены %d, объектов заказано %d.") % [int(res["floors"]), int(res["walls"]), int(res["objs"])]
 		if int(res["wait"]) > 0:
-			msg += " Ещё %d объектов ждут пола и стен — поставим сами, когда достроят." % int(res["wait"])
+			msg += " " + tr("Ещё %d объектов ждут пола и стен — поставим сами, когда достроят.") % int(res["wait"])
 		if bool(res["broke"]):
-			msg += " Денег хватило не на всё — остаток остался на плане."
+			msg += " " + tr("Денег хватило не на всё — остаток остался на плане.")
 		toast(msg, Sim.LVL_WARN if bool(res["broke"]) else Sim.LVL_GOOD, 6.0)
 		_plan_sig = ""
 		_refresh_plan_panel(), "Превратить план в чертежи: рабочие начнут строить, деньги спишутся по смете")
@@ -1006,18 +1008,18 @@ func _refresh_hint() -> void:
 	var txt := ""
 	match t.mode:
 		"floor":
-			txt = "%s: зажмите ЛКМ и протяните прямоугольник" % str(Defs.floor_by_id[int(t.arg)]["name"])
+			txt = tr("%s: зажмите ЛКМ и протяните прямоугольник") % tr(str(Defs.floor_by_id[int(t.arg)]["name"]))
 		"wall":
 			txt = "Стены: протяните контур будущего помещения"
 		"door", "window", "gate":
-			txt = "%s: протяните вдоль существующей стены или чертежа" % str(Defs.wall_by_id[int(t.arg)]["name"])
+			txt = tr("%s: протяните вдоль существующей стены или чертежа") % tr(str(Defs.wall_by_id[int(t.arg)]["name"]))
 		"object":
-			txt = "%s: щёлкните, чтобы поставить" % str(Defs.objects[str(t.arg)]["name"])
+			txt = tr("%s: щёлкните, чтобы поставить") % L.dt("object.%s.name" % str(t.arg), str(Defs.objects[str(t.arg)]["name"]))
 			if Thing.rotations(str(t.arg)) > 1:
-				txt += " · R — повернуть"
+				txt += " · " + tr("R — повернуть")
 		"template":
 			var td: Dictionary = Templates.def(str(t.arg))
-			txt = "%s: щёлкните — помещение встанет центром под курсором (внутри %d×%d)" % [str(td.get("name", "")), Templates.inner(str(t.arg)).x, Templates.inner(str(t.arg)).y]
+			txt = tr("%s: щёлкните — помещение встанет центром под курсором (внутри %d×%d)") % [L.dt("template.%s.name" % str(t.arg), str(td.get("name", ""))), Templates.inner(str(t.arg)).x, Templates.inner(str(t.arg)).y]
 		"demolish":
 			txt = "Снос: выделите область. Объекты упакуют в ящики и унесут на склад оборудования"
 		"cancel":
@@ -1026,7 +1028,7 @@ func _refresh_hint() -> void:
 			if t.arg is String and str(t.arg) == "_erase":
 				txt = "Стереть разметку: протяните прямоугольник или щёлкните по зоне"
 			elif t.arg is String and str(t.arg) != "":
-				txt = "Зона «%s»: протяните прямоугольник или щёлкните по помещению — зальёт целиком" % str(Defs.rooms.get(str(t.arg), {}).get("name", ""))
+				txt = tr("Зона «%s»: протяните прямоугольник или щёлкните по помещению — зальёт целиком") % _room_name(str(t.arg))
 			else:
 				txt = "Зоны: выберите зону в меню или щёлкните по помещению — откроется его карточка"
 		"cable":
@@ -1047,11 +1049,13 @@ func _refresh_hint() -> void:
 			txt = "Снять пневмомагистраль: выделите область"
 		"zone":
 			txt = ["Убрать зону на улице: выделите область", "Зона разгрузки: протяните прямоугольник у ворот", "Зона отгрузки: протяните прямоугольник у ворот"][clampi(int(t.arg), 0, 2)]
+	if L.has_cyr(txt) and txt.find("%") < 0:
+		txt = tr(txt)   # 1.39: подсказки без подстановки (с подстановкой переведены выше)
 	if t.plan_mode:
-		txt = "ПЛАН · " + txt
+		txt = tr("ПЛАН") + " · " + txt
 	elif t.preview_cost > 0.0:
 		txt += " · " + Defs.money_str(t.preview_cost)
-	txt += " · ПКМ или Esc — выйти"
+	txt += " · " + tr("ПКМ или Esc — выйти")
 	if hint_l.text != txt:
 		hint_l.text = txt
 		hint_panel.offset_left = 0
@@ -1093,10 +1097,19 @@ func _process(delta: float) -> void:
 	_check_letters()
 
 
+## 1.39: название помещения и этапа на языке игры (данные — по-русски, перевод по ключу).
+func _room_name(type: String, dflt: String = "") -> String:
+	return L.dt("room.%s.name" % type, str(Defs.rooms.get(type, {}).get("name", dflt)))
+
+
+func _stage_name(st: int) -> String:
+	return L.dt("stage.%s.name" % str(sim.progress.stage_def(st).get("id", "")), sim.progress.stage_name(st))
+
+
 func on_room_clicked(room_id: int) -> void:
 	if room_id < 0:
 		info.visible = false
-		toast("Здесь нет помещения: нужен пол, обнесённый стенами с дверью.", Sim.LVL_INFO, 4.0)
+		toast(tr("Здесь нет помещения: нужен пол, обнесённый стенами с дверью."), Sim.LVL_INFO, 4.0)
 		return
 	info.show_room(sim, room_id)
 
@@ -1263,7 +1276,7 @@ func show_letter(l: Dictionary) -> void:
 	var form := UITheme.hbox(8)
 	form.add_child(UITheme.label("СЛУЖЕБНАЯ ЗАПИСКА", 11, InfoPanel.FORM_RED, UITheme.f_caps))
 	form.add_child(UITheme.spacer())
-	form.add_child(UITheme.label("№ %03d · %s · %s" % [letter_id % 1000, sim.date_str(), sim.time_str()], 11, UITheme.MUTED, UITheme.f_caps))
+	form.add_child(UITheme.label(tr("№ %03d · %s · %s") % [letter_id % 1000, sim.date_str(), sim.time_str()], 11, UITheme.MUTED, UITheme.f_caps))
 	v.add_child(form)
 	v.add_child(InfoPanel.form_rule())
 	var head := UITheme.hbox(12)
@@ -1280,19 +1293,20 @@ func show_letter(l: Dictionary) -> void:
 	icp.add_child(ic)
 	icp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(icp)
-	var tl := UITheme.title(str(l["title"]), 22)
+	var tl := UITheme.title(tr(str(l["title"])), 22)
 	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(tl)
 	if choices.size() > 1:
 		var sc := Control.new()
-		sc.custom_minimum_size = Vector2(Stamp.fit_w("К РЕШЕНИЮ", 13), 40)
-		var stp := Stamp.box_stamp(PackedStringArray(["К РЕШЕНИЮ"]), Color("#e0574a"), Stamp.fit_w("К РЕШЕНИЮ", 13), 30.0, 6.0)
+		var stw := tr("К РЕШЕНИЮ")
+		sc.custom_minimum_size = Vector2(Stamp.fit_w(stw, 13), 40)
+		var stp := Stamp.box_stamp(PackedStringArray([stw]), Color("#e0574a"), Stamp.fit_w(stw, 13), 30.0, 6.0)
 		sc.add_child(stp)
 		head.add_child(sc)
 	v.add_child(head)
-	var txt := UITheme.label(str(l["text"]), 15)
+	var txt := UITheme.label(tr(str(l["text"])), 15)
 	txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	txt.custom_minimum_size = Vector2(552, 0)
 	v.add_child(txt)
@@ -1362,10 +1376,10 @@ func show_letter(l: Dictionary) -> void:
 	foot.add_child(UITheme.spacer())
 	var rest := sim.story.letters.size() - 1
 	if rest > 0:
-		foot.add_child(UITheme.chip("ещё ждут решения: %d" % rest, UITheme.WARN))
+		foot.add_child(UITheme.chip(tr("ещё ждут решения: %d") % rest, UITheme.WARN))
 	v.add_child(foot)
 	if choices.size() > 1:
-		v.add_child(UITheme.label("Если не решить за %d игровых часов, будет выбран вариант «%s»." % [int(Defs.ev("decision_hours")), str(choices[int(l["def"])]["text"])], 12, UITheme.DIM))
+		v.add_child(UITheme.label(tr("Если не решить за %d игровых часов, будет выбран вариант «%s».") % [int(Defs.ev("decision_hours")), tr(str(choices[int(l["def"])]["text"]))], 12, UITheme.DIM))
 
 
 func _close_letter() -> void:
@@ -1414,7 +1428,7 @@ func _open_modal(w: float = 420.0) -> VBoxContainer:
 func show_drawing(o: Dictionary) -> void:
 	var v := _open_modal(880)
 	var head := UITheme.hbox(10)
-	head.add_child(UITheme.title("Чертёж: %s" % Defs.product_name(str(o.get("product", ""))), 20))
+	head.add_child(UITheme.title(tr("Чертёж: %s") % Defs.product_name(str(o.get("product", ""))), 20))
 	head.add_child(UITheme.spacer())
 	head.add_child(UITheme.button("×", func() -> void:
 		close_modal()
@@ -1478,19 +1492,19 @@ func confirm_start_early() -> void:
 	var v := _open_modal(520)
 	v.add_child(UITheme.title("Начать производство раньше?", 22))
 	var ql := sim.progress.quiet_left()
-	var lines: Array[String] = ["До конца недели стройки ещё %d %s. Если цех готов, можно начать раньше: отдел сбыта примет первые заявки уже сегодня." % [ql, Defs.plural(ql, "день", "дня", "дней")]]
+	var lines: Array[String] = [tr("До конца недели стройки ещё %d %s. Если цех готов, можно начать раньше: отдел сбыта примет первые заявки уже сегодня.") % [ql, Defs.plural(ql, "день", "дня", "дней")]]
 	var miss: Array[String] = []
 	if sim.things_of("machine").filter(func(m: Thing) -> bool: return m.built).is_empty():
-		miss.append("нет ни одного станка")
+		miss.append(tr("нет ни одного станка"))
 	elif sim.things_of("machine").filter(func(m2: Thing) -> bool: return m2.built and sim.power.powered(m2)).is_empty():
-		miss.append("станки без тока — протяните кабель от подстанции в их розетки")
+		miss.append(tr("станки без тока — протяните кабель от подстанции в их розетки"))
 	if sim.workers.filter(func(w: Worker) -> bool: return not w.visitor and w.prof != "builder").is_empty():
-		miss.append("нет станочников — наймите в «Людях»")
+		miss.append(tr("нет станочников — наймите в «Людях»"))
 	if sim.things_of("storage").is_empty():
-		miss.append("нет стеллажа под металл")
+		miss.append(tr("нет стеллажа под металл"))
 	v.add_child(UITheme.para(lines[0], 14, UITheme.TEXT))
 	if not miss.is_empty():
-		v.add_child(UITheme.para("Пока что: " + "; ".join(miss) + ". Заказы будут ждать, пока это не исправите.", 13, UITheme.WARN))
+		v.add_child(UITheme.para(tr("Пока что: %s. Заказы будут ждать, пока это не исправите.") % "; ".join(miss), 13, UITheme.WARN))
 	var bh := UITheme.hbox(10)
 	bh.add_child(UITheme.spacer())
 	bh.add_child(UITheme.button("Ещё построю", close_modal))
@@ -1509,7 +1523,7 @@ func show_passport() -> void:
 	head.add_child(UITheme.button("×", close_modal))
 	v.add_child(head)
 	var pg := sim.progress
-	var info_t := "%s · этап «%s» %s · в штате %d · основан %s" % [Company.title(sim), pg.stage_name(), pg.stars_text(), sim.workers.filter(func(w: Worker) -> bool: return not w.visitor).size(), sim.season.short_date(maxi(0, pg.start_day)) if pg.start_day >= 0 else "—"]
+	var info_t := tr("%s · этап «%s» %s · в штате %d · основан %s") % [Company.title(sim), _stage_name(pg.stage), pg.stars_text(), sim.workers.filter(func(w: Worker) -> bool: return not w.visitor).size(), sim.season.short_date(maxi(0, pg.start_day)) if pg.start_day >= 0 else "—"]
 	v.add_child(UITheme.label(info_t, 13, UITheme.MUTED))
 	var data := {"name": Company.name_of(sim), "emblem": Company.emblem_of(sim).duplicate()}
 	var ed := EmblemEditor.new(data, sim.progress.ooo, sim.progress.profile)
@@ -1520,12 +1534,12 @@ func show_passport() -> void:
 	bh.add_child(UITheme.primary("Сохранить", func() -> void:
 		var old := Company.name_of(sim)
 		Company.set_data(sim, str(data.get("name", "")), data["emblem"])
-		DisplayServer.window_set_title("Промзона — %s" % Company.title(sim))
+		DisplayServer.window_set_title(tr("Промзона — %s") % Company.title(sim))
 		close_modal()
 		if Company.name_of(sim) != old:
-			sim.notify("Завод переименован: теперь он называется %s. Новая вывеска уже у ворот." % Company.title(sim), Sim.LVL_GOOD)
+			sim.notify(tr("Завод переименован: теперь он называется %s. Новая вывеска уже у ворот.") % Company.title(sim), Sim.LVL_GOOD)
 		else:
-			toast("Эмблема обновлена.", Sim.LVL_GOOD, 2.5)))
+			toast(tr("Эмблема обновлена."), Sim.LVL_GOOD, 2.5)))
 	v.add_child(bh)
 
 
@@ -1579,8 +1593,9 @@ func _save_list(saves: Array, overwrite: bool) -> Control:
 			h.add_child(Emblem.View.new(em, 40.0))
 		var info_v := UITheme.vbox(0)
 		info_v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		info_v.add_child(UITheme.label(str(s.get("title", slot)) + ((" · " + str(s["company"])) if s.has("company") else ""), 15, UITheme.TEXT, UITheme.f_med))
-		info_v.add_child(UITheme.label("Сохранено %s · в игре %s %s · %s" % [Game.pc_time(str(s.get("saved_at", ""))), str(s.get("date", "")), str(s.get("time", "")), Defs.money_str(float(s.get("money", 0)))], 12, UITheme.MUTED))
+		var rows := L.save_rows(s, slot)   # 1.39: метка сохранения — на языке игры
+		info_v.add_child(UITheme.label(rows[0], 15, UITheme.TEXT, UITheme.f_med))
+		info_v.add_child(UITheme.label(rows[1], 12, UITheme.MUTED))
 		h.add_child(info_v)
 		if overwrite:
 			h.add_child(UITheme.button("Перезаписать", func() -> void:
@@ -1603,7 +1618,7 @@ func show_settings() -> void:
 	v.add_child(UITheme.title("Настройки", 22))
 	SettingsUI.build(v, func(key: String, val: bool) -> void:
 		if key == "edge_scroll":
-			g.cam.edge_scroll = val)
+			g.cam.edge_scroll = val, show_settings)   # 1.39: сменили язык — пересобрать окно
 	_menu_button(v, "Назад", show_pause_menu)
 
 
@@ -1656,8 +1671,8 @@ func show_achievement(a: Dictionary) -> void:
 	h.add_child(ic)
 	var v := UITheme.vbox(1)
 	v.add_child(UITheme.label("Достижение получено", 12, Color("#e2b33c"), UITheme.f_semi))
-	v.add_child(UITheme.label(str(a.get("name", "")), 17, UITheme.TEXT, UITheme.f_semi))
-	v.add_child(UITheme.label(str(a.get("desc", "")), 13, UITheme.MUTED))
+	v.add_child(UITheme.label(Achievements.name_of(a), 17, UITheme.TEXT, UITheme.f_semi))
+	v.add_child(UITheme.label(Achievements.desc_of(a), 13, UITheme.MUTED))
 	h.add_child(v)
 	p.add_child(h)
 	_ach_box.add_child(p)
@@ -1682,33 +1697,33 @@ func show_stage_up(st: int) -> void:
 	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	ic.modulate = UITheme.GOOD
 	head.add_child(ic)
-	head.add_child(UITheme.title("Новый этап: «%s»!" % pg.stage_name(st), 24))
+	head.add_child(UITheme.title(tr("Новый этап: «%s»!") % _stage_name(st), 24))
 	v.add_child(head)
 	var names: Array[String] = []
 	for k in Defs.objects.keys():
 		if int(Defs.objects[k].get("stage", 1)) == st and not Defs.objects[k].has("dev"):
-			names.append(str(Defs.objects[k]["name"]))
+			names.append(L.dt("object.%s.name" % str(k), str(Defs.objects[k]["name"])))
 	for d in Defs.departments.keys():
 		if int(Defs.departments[d].get("stage", 1)) == st:
-			names.append("отдел: " + str(Defs.departments[d]["name"]).to_lower())
-	var txt := "Завод вырос! Открылось: %s." % (", ".join(names) if not names.is_empty() else str(pg.stage_def(st).get("opens", "")).to_lower())
+			names.append(tr("отдел: %s") % L.dt("department.%s.name" % str(d), str(Defs.departments[d]["name"])).to_lower())
+	var txt := tr("Завод вырос! Открылось: %s.") % (", ".join(names) if not names.is_empty() else L.dt("stage.%s.opens" % str(pg.stage_def(st).get("id", "")), str(pg.stage_def(st).get("opens", ""))).to_lower())
 	var steps: Array[String] = []
 	for id in Develop.all_ids():
 		var sd := Develop.step_def(id)
 		if not sd.has("dept") and int(sd.get("stage", 1)) == st:
-			steps.append("«%s»" % str(sd["name"]))
+			steps.append(tr("«%s»") % L.dt("develop.%s.name" % str(id), str(sd["name"])))
 	if not steps.is_empty():
-		txt += "\n\nВ «Развитии» можно исследовать: %s (Управление → Развитие, нужен кабинет директора)." % ", ".join(steps)
+		txt += "\n\n" + tr("В «Развитии» можно исследовать: %s (Управление → Развитие, нужен кабинет директора).") % ", ".join(steps)
 	if st < Progress.STAGE_COUNT:
 		var gl: Array[String] = []
 		for g: Dictionary in pg.stage_goals():
-			gl.append(str(g.get("text", "")))
-		txt += "\n\nДальше — «%s». Цели: %s." % [pg.stage_name(st + 1), "; ".join(gl)]
+			gl.append(tr(str(g.get("text", ""))))
+		txt += "\n\n" + tr("Дальше — «%s». Цели: %s.") % [_stage_name(st + 1), "; ".join(gl)]
 		if pg.choice_need() > 0:
 			var cl: Array[String] = []
 			for g4: Dictionary in pg.stage_choice().get("list", []):
-				cl.append("%s — %s" % [str(g4.get("route", "")), str(g4.get("text", "")).to_lower()])
-			txt += " И любые %d на выбор: %s." % [pg.choice_need(), "; ".join(cl)]
+				cl.append("%s — %s" % [tr(str(g4.get("route", ""))), tr(str(g4.get("text", ""))).to_lower()])
+			txt += " " + tr("И любые %d на выбор: %s.") % [pg.choice_need(), "; ".join(cl)]
 	var l := UITheme.label(txt, 15)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size = Vector2(570, 0)
@@ -1720,8 +1735,8 @@ func show_stage_up(st: int) -> void:
 
 func show_scenario_done() -> void:
 	var v := _open_modal(560)
-	v.add_child(UITheme.title("Сценарий «%s» пройден!" % str(sim.progress.sdef().get("name", "")), 24))
-	var l := UITheme.label("Все цели выполнены, рейтинг завода — %s. Можно продолжать без ограничений: растите до градообразующего предприятия или начните другой сценарий с другим профилем завода." % sim.progress.stars_text(), 15)
+	v.add_child(UITheme.title(tr("Сценарий «%s» пройден!") % L.dt("scn.%s.name" % sim.scenario, str(sim.progress.sdef().get("name", ""))), 24))
+	var l := UITheme.label(tr("Все цели выполнены, рейтинг завода — %s. Можно продолжать без ограничений: растите до градообразующего предприятия или начните другой сценарий с другим профилем завода.") % sim.progress.stars_text(), 15)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size = Vector2(510, 0)
 	v.add_child(l)
@@ -1738,10 +1753,10 @@ func show_game_over() -> void:
 	var pl := FactoryUI.plate("Завод закрыт", "strike", 18)
 	pl.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(pl)
-	v.add_child(UITheme.title(str(c.get("title", "Конец игры")), 24))
-	v.add_child(UITheme.para(str(c.get("text", "")), 15, UITheme.TEXT))
+	v.add_child(UITheme.title(tr(str(c.get("title", "Конец игры"))), 24))
+	v.add_child(UITheme.para(tr(str(c.get("text", ""))), 15, UITheme.TEXT))
 	var days := sim.day() + 1
-	v.add_child(UITheme.para("%s проработал %d %s (до %s). Выполнено заказов: %d, репутация %d." % [Company.title(sim), days, Defs.plural(days, "день", "дня", "дней"), str(c.get("date", sim.date_str())), int(sim.stats.get("orders_done", 0)), int(sim.reputation)], 13, UITheme.MUTED))
+	v.add_child(UITheme.para(tr("%s проработал %d %s (до %s). Выполнено заказов: %d, репутация %d.") % [Company.title(sim), days, Defs.plural(days, "день", "дня", "дней"), str(c.get("date", sim.date_str())), int(sim.stats.get("orders_done", 0)), int(sim.reputation)], 13, UITheme.MUTED))
 	v.add_child(UITheme.para("Чтобы такого не было: платите зарплату вовремя (в долг — не чаще раза в 3 месяца), не набирайте заказов больше, чем успеваете, и держите запас денег на две зарплаты.", 13, UITheme.WARN))
 	_menu_button(v, "Загрузить сохранение", show_load_dialog, "load")
 	_menu_button(v, "Начать заново", func() -> void: Game.start_new_game())
@@ -1758,11 +1773,11 @@ func show_fix(what: String, fix: String, cell: Vector2i = Vector2i(-1, -1)) -> v
 	var v := UITheme.vbox(8)
 	p.add_child(v)
 	v.add_child(UITheme.label("Что не так", 12, UITheme.MUTED, UITheme.f_semi))
-	var wl := UITheme.para(what, 15, UITheme.BAD)
+	var wl := UITheme.para(tr(what), 15, UITheme.BAD)
 	wl.custom_minimum_size = Vector2(408, 0)
 	v.add_child(wl)
 	v.add_child(UITheme.label("Как исправить", 12, UITheme.MUTED, UITheme.f_semi))
-	var fl := UITheme.para(fix if fix != "" else "Устраните причину — после этого строка пропадёт.", 14, UITheme.TEXT)
+	var fl := UITheme.para(tr(fix) if fix != "" else tr("Устраните причину — после этого строка пропадёт."), 14, UITheme.TEXT)
 	fl.custom_minimum_size = Vector2(408, 0)
 	v.add_child(fl)
 	var h := UITheme.hbox(8)
@@ -1789,8 +1804,8 @@ func show_fix(what: String, fix: String, cell: Vector2i = Vector2i(-1, -1)) -> v
 ## 1.20: увольнение — выбрать причину. Законная — без последствий (или с выплатой); нет оснований — суд и жалоба.
 func show_fire_dialog(w: Worker, done: Callable = Callable()) -> void:
 	var v := _open_modal(560)
-	v.add_child(UITheme.title("Уволить: %s" % w.full_name(), 20))
-	v.add_child(UITheme.para("%s · в штате %d дн. Выберите причину — от неё зависит, будут ли последствия. Расчёт за отработанные дни выплачивается всегда." % [w.prof_name(), maxi(0, sim.day() - w.hired_day)], 13, UITheme.MUTED))
+	v.add_child(UITheme.title(tr("Уволить: %s") % w.full_name(), 20))
+	v.add_child(UITheme.para(tr("%s · в штате %d дн. Выберите причину — от неё зависит, будут ли последствия. Расчёт за отработанные дни выплачивается всегда.") % [w.prof_name(), maxi(0, sim.day() - w.hired_day)], 13, UITheme.MUTED))
 	for r: Dictionary in sim.crisis.fire_reasons(w):
 		var legal := bool(r["legal"])
 		var key := str(r["key"])
@@ -1828,7 +1843,7 @@ func show_fire_dialog(w: Worker, done: Callable = Callable()) -> void:
 func show_bankrupt() -> void:
 	var v := _open_modal(520)
 	v.add_child(UITheme.title("Долги растут", 24))
-	var l := UITheme.label("На счёте %s. Кредиторы звонят каждый день. Можно продолжать в надежде выправить положение — или начать заново." % Defs.money_str(sim.money), 15)
+	var l := UITheme.label(tr("На счёте %s. Кредиторы звонят каждый день. Можно продолжать в надежде выправить положение — или начать заново.") % Defs.money_str(sim.money), 15)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size = Vector2(470, 0)
 	v.add_child(l)

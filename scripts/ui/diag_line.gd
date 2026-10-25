@@ -39,8 +39,8 @@ func _process(_d: float) -> void:
 
 static func line(avg_ms: float, max_ms: float) -> String:
 	var st := Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
-	return "%d FPS · кадр %.1f мс (макс %.0f) · узлов %d · сирот %d · объектов %d · текстуры %.0f МБ · видео %.0f МБ · ОЗУ %s" % [
+	return L.t("%d FPS · кадр %.1f мс (макс %.0f) · узлов %d · сирот %d · объектов %d · текстуры %.0f МБ · видео %.0f МБ · ОЗУ %s") % [
 		int(Performance.get_monitor(Performance.TIME_FPS)), avg_ms, max_ms,
 		int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)), int(Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT)),
 		int(Performance.get_monitor(Performance.OBJECT_COUNT)), Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0,
-		Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0, ("%.0f МБ" % st) if st > 0.0 else "—"]
+		Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0, (L.t("%.0f МБ") % st) if st > 0.0 else "—"]

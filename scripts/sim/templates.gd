@@ -104,17 +104,17 @@ static func check(sim: Sim, id: String, o: Vector2i) -> String:
 		for x in s.x:
 			var c := o + Vector2i(x, y)
 			if not w.in_plot(c):
-				return "Помещение не помещается на участке"
+				return L.t("Помещение не помещается на участке")
 			var i := w.idx(c)
 			var edge := x == 0 or y == 0 or x == s.x - 1 or y == s.y - 1
 			if edge and shared(sim, c) and w.occ[i] < 0:
 				continue   # 1.21: пристраиваемся к готовой стене — она станет общей
 			if w.wall[i] != World.W_NONE or w.bp_wall[i] != World.BP_NONE:
-				return "Мешает стена — пристройте помещение вплотную к стене (общая стена) или выберите свободное место"
+				return L.t("Мешает стена — пристройте помещение вплотную к стене (общая стена) или выберите свободное место")
 			if w.occ[i] >= 0:
-				return "Мешает объект — освободите место"
+				return L.t("Мешает объект — освободите место")
 			if w.bp_floor[i] != World.BP_NONE or sim.plan.ok_zones.has(i):
-				return "Здесь уже строится другое помещение"
+				return L.t("Здесь уже строится другое помещение")
 	return locked(sim, id)
 
 
@@ -122,7 +122,7 @@ static func check(sim: Sim, id: String, o: Vector2i) -> String:
 static func place(sim: Sim, id: String, o: Vector2i, to_plan: bool = false) -> String:
 	var d := def(id)
 	if d.is_empty():
-		return "Нет такого шаблона"
+		return L.t("Нет такого шаблона")
 	var w := sim.world
 	var fid := floor_id(id)
 	var zone := str(d.get("zone", ""))
@@ -131,7 +131,7 @@ static func place(sim: Sim, id: String, o: Vector2i, to_plan: bool = false) -> S
 		for y in s.y:
 			for x in s.x:
 				if not w.in_plot(o + Vector2i(x, y)):
-					return "Помещение не помещается на участке"
+					return L.t("Помещение не помещается на участке")
 		for c in floor_cells(id, o):
 			sim.plan.add_floor(c, fid)
 		var wc := wall_cells(id, o)
@@ -147,7 +147,7 @@ static func place(sim: Sim, id: String, o: Vector2i, to_plan: bool = false) -> S
 		return err
 	var total := cost(sim, id, o)
 	if not sim.can_afford(total):
-		return "Не хватает денег: нужно %s" % Defs.money_str(total)
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(total)
 	# деревья и кусты внутри — под снос
 	var s2 := size(id)
 	for y2 in s2.y:

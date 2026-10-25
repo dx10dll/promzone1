@@ -50,7 +50,7 @@ func _draw() -> void:
 	var spec := Company.emblem_of(sim)
 	var lit := _is_lit()
 	var col := Color("#fff4d6") if lit else Color("#f2efe6")
-	Emblem.draw_sign_plate(self, inner, spec, Company.name_of(sim), "ООО" if sim.progress.ooo else "МАСТЕРСКАЯ", col)
+	Emblem.draw_sign_plate(self, inner, spec, Company.name_of(sim), L.t("ООО") if sim.progress.ooo else L.t("МАСТЕРСКАЯ"), col)
 	if lit:
 		draw_rect(r.grow(6.0), Color(1.0, 0.85, 0.5, 0.06))
 		draw_rect(r.grow(2.0), Color(1.0, 0.85, 0.5, 0.08))

@@ -1,143 +1,205 @@
 extends SceneTree
-## Инструмент баланса: гоняет гараж и цех по N дней, принимая выгодные заказы, и печатает
-## недельные статьи доходов и расходов. Не тест — ничего не проверяет.
-## godot --headless --path . -s res://tests/econ_probe.gd -- [garage|shop] [дней]
+## 1.39: замер начала игры. Играет первые дни каждого сценария «как обычный игрок»: строит
+## готовые помещения (цех 10×6, раздевалка, туалет; в гараже ещё и склад 6×4 из обучения),
+## покупает базовые объекты (стеллаж, верстак, недорогой станок), нанимает людей под станок,
+## заказы берёт сбыт сам. Печатает деньги по дням, траты по статьям, день ухода в минус и день
+## первой оплаты. Функцию run() использует регрессионный тест stage139_test.
+## godot --headless --path . --audio-driver Dummy -s res://tests/econ_probe.gd -- [дней] [сид] [режимы,через,запятую] [build|nobuild] [сценарии]
+## (Недельные статьи с ботом-директором — tests/econ_weeks.gd.)
 
-const S := preload("res://tests/setups.gd")
-
-
-func _accept_all(sim: Sim) -> void:
-	for o: Dictionary in sim.orders.by_status(["offer"]):
-		if sim.orders.active_count() >= sim.orders.max_active():
-			break
-		if not sim.prod.can_make(str(o["product"])):
-			continue
-		if sim.office.load_days(str(o["product"]), int(o["qty"])) > float(int(o.get("lead", 3))) * 0.85:
-			continue
-		sim.orders.accept(int(o["id"]), true)
+const SCNS := ["garage", "field", "sandbox"]
+const MODES := ["calm", "market", "wild"]
 
 
-## Бот-директор (РП-33): раз в день смотрит узкое место и, если у станков узкого места
-## не хватает людей, нанимает станочника. Ничего не строит — только кадры.
-const MACHINE_OF := {"turning": "lathe", "milling": "mill", "drilling": "drill", "welding": "weld_post", "heat": "furnace", "paint": "paint_booth", "assembly": "assembly_table"}
-const SKILL_OF := {"turning": ["turner", "turning"], "milling": ["miller", "milling"], "drilling": ["miller", "milling"],
-	"welding": ["welder", "welding"], "heat": ["heat_treater", "heat"], "paint": ["painter", "paint"], "assembly": ["assembler", "assembly"]}
+## Свободное место под шаблон: контур и клетка вокруг на участке, без стен, объектов, зон и чертежей,
+## не на проезде от ворот. Ближайшее к anchor.
+static func find_spot(sim: Sim, tid: String, anchor: Vector2) -> Vector2i:
+	var w := sim.world
+	var s := Templates.size(tid)
+	var lane := Rect2i(sim.gate_x - 2, w.plot.position.y, 8, w.plot.size.y)
+	var best := Vector2i(-1, -1)
+	var bd := INF
+	for y in range(w.plot.position.y + 1, w.plot.end.y - s.y - 2):
+		for x in range(w.plot.position.x + 1, w.plot.end.x - s.x - 1):
+			var r := Rect2i(x, y, s.x, s.y)
+			var d := (Vector2(r.get_center()) - anchor).length_squared()
+			if d >= bd or r.intersects(lane):
+				continue
+			if not _free(sim, r.grow(1)):
+				continue
+			if Templates.check(sim, tid, r.position) != "":
+				continue
+			bd = d
+			best = r.position
+	return best
 
 
-func _bot_day(sim: Sim) -> void:
-	var li := sim.office.load_info()
-	var pr := str(li[1])
-	if pr == "" or float(li[0]) < 2.0 or not SKILL_OF.has(pr):
+static func _free(sim: Sim, r: Rect2i) -> bool:
+	var w := sim.world
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			var c := Vector2i(x, y)
+			if not w.in_plot(c):
+				return false
+			var i := w.idx(c)
+			if w.wall[i] != World.W_NONE or w.occ[i] >= 0 or w.area[i] != 0 or sim.bp_cells.has(i):
+				return false
+			if w.bp_floor[i] != World.BP_NONE or w.bp_wall[i] != World.BP_NONE or sim.plan.ok_zones.has(i):
+				return false
+	return true
+
+
+## Поставить шаблон у anchor. Возвращает начало контура или (-1,-1).
+static func put_template(sim: Sim, tid: String, anchor: Vector2, log: Array) -> Vector2i:
+	var o := find_spot(sim, tid, anchor)
+	if o.x < 0:
+		log.append("нет места под %s" % tid)
+		return o
+	var cost := Templates.cost(sim, tid, o)
+	var err := Templates.place(sim, tid, o)
+	log.append("%s в %s: %s (%s)" % [str(Defs.templates[tid]["name"]), str(o), Defs.money_str(cost), "ok" if err == "" else err])
+	return o if err == "" else Vector2i(-1, -1)
+
+
+## Купить объект в первой свободной клетке прямоугольника (внутри помещения).
+static func buy_in(sim: Sim, def_id: String, r: Rect2i, log: Array) -> bool:
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			var c := Vector2i(x, y)
+			if sim.can_place(def_id, c) == "":
+				var cost := sim.thing_cost(def_id)
+				if not sim.can_afford(cost):
+					log.append("не хватает на %s (%s)" % [def_id, Defs.money_str(cost)])
+					return false
+				sim.place_thing(def_id, c, false, true)
+				log.append("куплен %s за %s" % [str(Defs.objects[def_id]["name"]), Defs.money_str(cost)])
+				return true
+	log.append("нет места под %s" % def_id)
+	return false
+
+
+static func _cand(sim: Sim, prof: String) -> int:
+	for i in sim.candidates.size():
+		if str((sim.candidates[i] as Dictionary).get("prof", "")) == prof:
+			return i
+	return -1
+
+
+static func hire_prof(sim: Sim, prof: String, log: Array) -> void:
+	var idx := _cand(sim, prof)
+	if idx < 0:
+		sim.post_ad(prof)
+		idx = _cand(sim, prof)
+	if idx < 0 and not sim.candidates.is_empty():
+		idx = 0
+	if idx < 0:
+		log.append("некого нанять (%s)" % prof)
 		return
-	var machines := 0
-	for m in sim.things_of("machine"):
-		if m.process() == pr and m.enabled and not m.broken:
-			machines += 1
-	var ops := 0
-	for w in sim.workers:
-		if sim.prod.is_operator_for(w, pr):
-			ops += 1
-	if ops < machines and sim.money > 150000.0:
-		var sk: Array = SKILL_OF[pr]
-		var w := S.hire(sim, str(sk[0]), str(sk[1]), 5)
-		print("  [бот] день %d: узкое место %s (%.1f дн.), нанят %s %s" % [sim.day(), pr, float(li[0]), w.prof_name(), w.first])
-		return
-	# людей хватает — нужен ещё станок (если есть деньги и место в цеху)
-	var def := str(MACHINE_OF.get(pr, ""))
-	if def == "" or not Defs.objects.has(def):
-		return
-	var cost := float(Defs.objects[def].get("cost", 100000))
-	if sim.money < cost + 250000.0 or machines >= 4:
-		return
-	# свободный низ цеха, не перекрывая проходов от дверей
-	for c: Vector2i in [Vector2i(31, 17), Vector2i(35, 17), Vector2i(31, 16), Vector2i(35, 16)]:
-		if sim.can_place(def, c) == "":
-			sim.place_thing(def, c, true, false)
-			sim.spend(cost, "Покупка: " + str(Defs.objects[def]["name"]))
-			Scenario.autowire(sim)
-			sim.world.cable_rev += 1
-			print("  [бот] день %d: узкое место %s (%.1f дн.), куплен %s" % [sim.day(), pr, float(li[0]), str(Defs.objects[def]["name"])])
-			return
+	var nm := str(Worker.PROF_NAMES.get(str((sim.candidates[idx] as Dictionary).get("prof", "")), "?"))
+	var err := sim.hire(idx)
+	log.append("нанят: %s%s" % [nm, "" if err == "" else " — " + err])
 
 
-func _init() -> void:
-	var args := OS.get_cmdline_user_args()
-	var mode := str(args[0]) if args.size() > 0 else "garage"
-	var days := int(args[1]) if args.size() > 1 else 28
-	var seed := int(args[2]) if args.size() > 2 else 3
-	var sim: Sim
-	if mode == "garage":
-		sim = Scenario.new_game("garage", "mech", "calm", seed)
-	elif mode == "garage2":
-		sim = Scenario.new_game("garage", "mech", "calm", seed)
-		var spot := Vector2i(20, 13)
-		print("  место: ", sim.can_place("lathe", spot))
-		sim.place_thing("lathe", spot, true, false)
-		sim.money -= 160000.0 + 90000.0
-		sim.power.grid_level = 1
-		Scenario.autowire(sim)
-		var t2 := S.hire(sim, "turner", "turning", 5)
-		print("  второй токарный в ", spot, ", подключён: ", sim.power.connected(sim.things_of("machine")[-1]))
-	else:
-		sim = Scenario.new_game("garage", "mech", "calm", seed)
-		S.big_shop(sim, true)
-		sim.money = 600000.0
-	sim.story.enabled = false
-	sim.progress.tutorial = -1
-	sim.auto_supply = true
-	var wages := 0
-	for w in sim.workers:
-		wages += w.wage
-		print("  %s %s: ставка %d, разряд %d" % [w.prof_name(), w.first, w.wage, w.grade()])
-	print("людей %d, ставки за смену %d ₽, неделя ≈ %d ₽" % [sim.workers.size(), wages, wages * 5])
-	var bot := args.size() > 3 and str(args[3]) == "bot"
-	var m0 := sim.money
-	var last_day := -1
+## Сыграть сценарий. Возвращает {money: [на утро каждого дня], cats, neg_day, first_pay, min, log, start, staff, done}.
+static func run(scn: String, mode: String, seed_value: int, days: int, build: bool = true) -> Dictionary:
+	var sim := Scenario.new_game(scn, "mech", mode, seed_value, {"tutorial": scn == "garage", "money": 1000000, "lots": true, "flora": true})
+	sim.progress.tutorial = -1   # подсказки не нужны, стройку обучения повторяем руками
+	var log: Array = []
+	var start := sim.money
+	var anchor := Vector2(Scenario.GARAGE.get_center()) if scn == "garage" else Vector2(sim.world.plot.get_center())
+	if scn == "field":
+		anchor = Vector2(16, 20)
+	var shop_o := Vector2i(-1, -1)
+	if build:
+		if scn == "garage":
+			# обучение: стеллаж в гараже и «Склад 6×4», найм одного человека
+			buy_in(sim, "rack", Rect2i(Scenario.GARAGE.position + Vector2i(1, 1), Scenario.GARAGE.size - Vector2i(2, 2)), log)
+			put_template(sim, "storage", anchor, log)
+			hire_prof(sim, "laborer", log)
+		shop_o = put_template(sim, "workshop", anchor, log)
+		put_template(sim, "locker", anchor, log)
+		put_template(sim, "wc", anchor, log)
+	var money_days: Array = [sim.money]
+	var neg_day := -1
+	var first_pay := -1
+	var mn := sim.money
+	var last := sim.day()
+	var bought := false
 	while sim.day() <= days:
 		sim.tick(0.5)
-		if sim.day() != last_day and sim.tod() > 480.0:
-			last_day = sim.day()
-			_accept_all(sim)
-			if bot:
-				_bot_day(sim)
-	var tot := {}
+		mn = minf(mn, sim.money)
+		if sim.money < 0.0 and neg_day < 0:
+			neg_day = sim.day()
+		if first_pay < 0 and _sales(sim) > 0.0:
+			first_pay = sim.day()
+		if sim.day() == last:
+			continue
+		last = sim.day()
+		money_days.append(sim.money)
+		# день 2: обставляем новый цех — верстак, недорогой станок, стеллаж; люди под станок
+		if build and not bought and shop_o.x >= 0:
+			bought = true
+			var inner := Rect2i(shop_o + Vector2i(2, 2), Templates.inner("workshop") - Vector2i(2, 2))
+			buy_in(sim, "workbench", inner, log)
+			buy_in(sim, "lathe_tv4", inner, log)
+			buy_in(sim, "rack", inner, log)
+			Scenario.autowire(sim)
+			Scenario.autopipe(sim)
+			sim.world.cable_rev += 1
+			hire_prof(sim, "turner", log)
+			if scn != "garage":
+				hire_prof(sim, "turner", log)
+				hire_prof(sim, "qc", log)
+	var cats := {}
 	for wk: Dictionary in sim.office.weeks:
-		var cats: Dictionary = wk["cats"]
-		var parts: PackedStringArray = []
-		for c in Office.CAT_ORDER:
-			if cats.has(c):
-				parts.append("%s %+d" % [c, int(cats[c])])
-				tot[c] = float(tot.get(c, 0.0)) + float(cats[c])
-		print("неделя %d: %s" % [int(wk["week"]), ", ".join(parts)])
-	var parts2: PackedStringArray = []
-	for c in Office.CAT_ORDER:
-		if tot.has(c):
-			parts2.append("%s %+d" % [c, int(tot[c])])
-	print("ИТОГО: ", ", ".join(parts2))
-	print("деньги: %d → %d (%+d), заказы: выполнено %d, сорвано %d, в работе %d, репутация %.0f" % [int(m0), int(sim.money), int(sim.money - m0), sim.orders.by_status(["done"]).size(), sim.orders.by_status(["failed"]).size(), sim.orders.active_count(), sim.reputation])
-	for m in sim.things_of("machine"):
-		print("  станок %s: загрузка %.0f%%, питание %s/%s, люди %s, изделие '%s'" % [m.title(), m.util * 100.0, sim.power.connected(m), sim.power.powered(m), sim.planner.staffed(m), m.product])
-	for o: Dictionary in sim.orders.list:
-		if str(o["status"]) == "failed" or str(o["status"]) == "active":
-			print("  %s: %s ×%d, срок %d, принят день %d, отгружено %d" % [o["status"], o["product"], int(o["qty"]), int(o.get("lead", 0)), int(float(o.get("accepted", 0.0)) / 1440.0) + 1, int(o.get("shipped", 0))])
-	var s14 := sim.sales.summary(14)
-	print("  сбыт за 14 дн: взято %d на %d, отказано %d на %d" % [int(s14["taken"]), int(s14["taken_sum"]), int(s14["lost"]), int(s14["lost_sum"])])
-	var whys := {}
-	for e: Dictionary in sim.sales.log:
-		var k := str(e["why"]).split(":")[0] if not bool(e["ok"]) else "ВЗЯТО"
-		whys[k] = int(whys.get(k, 0)) + 1
-	print("  причины: ", whys)
-	var fines := 0.0
-	for e: Dictionary in sim.ledger:
-		if str(e["text"]).contains("Штраф") or str(e["text"]).contains("штраф"):
-			fines += float(e["v"])
-	print("  штрафы: %d" % int(fines))
-	var fk := {}
-	for e: Dictionary in sim.ledger:
-		var tx := str(e["text"])
-		if tx.contains("Штраф") or tx.contains("штраф") or tx.contains("Пени"):
-			var key := tx.substr(0, 48)
-			fk[key] = float(fk.get(key, 0.0)) + float(e["v"])
-	for k in fk.keys():
-		print("    %s: %d" % [k, int(fk[k])])
+		var wc: Dictionary = wk["cats"]
+		for c: String in wc.keys():
+			cats[c] = float(cats.get(c, 0.0)) + float(wc[c])
+	return {"money": money_days, "cats": cats, "neg_day": neg_day, "first_pay": first_pay, "min": mn, "log": log, "start": start,
+		"staff": sim.workers.size(), "done": sim.orders.by_status(["done"]).size()}
+
+
+static func _sales(sim: Sim) -> float:
+	var t := 0.0
+	for wk: Dictionary in sim.office.weeks:
+		t += float((wk["cats"] as Dictionary).get("sales", 0.0))
+	return t
+
+
+static func kr(v: float) -> String:
+	return "%d" % int(round(v / 1000.0))
+
+
+func _initialize() -> void:
+	Defs.load_all()
+	var args := OS.get_cmdline_user_args()
+	var days := int(args[0]) if args.size() > 0 else 14
+	var seed_value := int(args[1]) if args.size() > 1 else 3
+	var modes: Array = MODES
+	if args.size() > 2:
+		modes = Array(str(args[2]).split(","))
+	var build := not (args.size() > 3 and str(args[3]) == "nobuild")
+	var scns: Array = SCNS
+	if args.size() > 4:
+		scns = Array(str(args[4]).split(","))
+	print("ЗАМЕР НАЧАЛА ИГРЫ: %d дн., сид %d (деньги в тыс. ₽ на утро дня)" % [days, seed_value])
+	for scn: String in scns:
+		for mode: String in modes:
+			var r := run(scn, mode, seed_value, days, build)
+			print("\n== %s / %s: старт %s" % [scn, mode, Defs.money_str(float(r["start"]))])
+			for l: String in r["log"]:
+				print("   " + l)
+			var md: PackedStringArray = []
+			for v: float in r["money"]:
+				md.append(kr(v))
+			print("   деньги: " + " ".join(md))
+			var parts: PackedStringArray = []
+			for c: String in Office.CAT_ORDER:
+				if (r["cats"] as Dictionary).has(c):
+					parts.append("%s %s" % [c, kr(float(r["cats"][c]))])
+			print("   статьи: " + ", ".join(parts))
+			var nd := int(r["neg_day"])
+			var fp := int(r["first_pay"])
+			print("   минимум %s, в минус: %s, первая оплата: %s, людей %d, заказов выполнено %d" % [kr(float(r["min"])),
+				("день %d" % nd) if nd > 0 else "нет", ("день %d" % fp) if fp > 0 else "нет", int(r["staff"]), int(r["done"])])
 	quit(0)

@@ -40,7 +40,7 @@ func request() -> void:
 	if vid >= 0 or dispatch_at >= 0.0:
 		return
 	dispatch_at = sim.minute + DISPATCH
-	sim.notify("Огонь не удержать — вызвали пожарных (01). Расчёт будет минут через десять.", Sim.LVL_BAD)
+	sim.notify(L.t("Огонь не удержать — вызвали пожарных (01). Расчёт будет минут через десять."), Sim.LVL_BAD)
 
 
 ## Гость завода в своей форме: пожарный, водитель ломовоза. Облик — из sim.rng (детерминированно).
@@ -61,8 +61,8 @@ static func make_guest(s: Sim, who: String, outfit: String, col: String, hat: St
 	v.dressed = true
 	v.prop = prop
 	v.present = true
-	v.activity = who
-	v.set_meta("who", who)
+	v.activity = L.t(who)
+	v.set_meta("who", who)   # по-русски: info_panel сравнивает с «Пожарный»
 	v.set_meta("veh", true)   # приехал на своей машине (уличная толпа его не уводит на автобус)
 	return v
 
@@ -72,7 +72,7 @@ func tick(dt: float) -> void:
 	if dispatch_at >= 0.0 and vid < 0 and sim.minute >= dispatch_at:
 		dispatch_at = -1.0
 		if st.fires.is_empty():
-			sim.notify("Огонь потушили до приезда пожарных — вызов отменили.", Sim.LVL_INFO)
+			sim.notify(L.t("Огонь потушили до приезда пожарных — вызов отменили."), Sim.LVL_INFO)
 		else:
 			_send_truck()
 	var v := truck()
@@ -106,7 +106,7 @@ func _send_truck() -> void:
 	v.lane = 1
 	v.color = 0
 	v.hold = true
-	v.cargo_desc = "Пожарная охрана"
+	v.cargo_desc = L.t("Пожарная охрана")
 	v.x = float(w.w) + 8.0
 	# машина встаёт серединой напротив очага (x — задний край; едет влево, кабина слева)
 	v.park_x = clampf(float(fc.x) + 0.5 + TRUCK_LEN * 0.5, TRUCK_LEN + 1.0, float(w.w) - 1.0)
@@ -136,7 +136,7 @@ func door_pos(v: Vehicle, k: int = 0) -> Vector2:
 ## Машина встала: расчёт выходит.
 func on_park(v: Vehicle) -> void:
 	if sim.story.fires.is_empty():
-		sim.notify("Пожарные приехали, но огонь уже потушили — расчёт уехал обратно.", Sim.LVL_INFO, Vector2i(int(v.x - 2.0), sim.world.road_row))
+		sim.notify(L.t("Пожарные приехали, но огонь уже потушили — расчёт уехал обратно."), Sim.LVL_INFO, Vector2i(int(v.x - 2.0), sim.world.road_row))
 		_leave(v)
 		return
 	_clear_crew()
@@ -147,7 +147,7 @@ func on_park(v: Vehicle) -> void:
 		f.dir = "up"
 		sim.visitors.append(f)
 		crew.append({"w": f, "st": "run", "fire": -1, "stand": [-1, -1]})
-	sim.notify("Приехали пожарные: расчёт тянет рукава к огню.", Sim.LVL_WARN, _fire_center())
+	sim.notify(L.t("Приехали пожарные: расчёт тянет рукава к огню."), Sim.LVL_WARN, _fire_center())
 
 
 func _tick_man(c: Dictionary, dt: float, v: Vehicle) -> void:
@@ -167,7 +167,7 @@ func _tick_man(c: Dictionary, dt: float, v: Vehicle) -> void:
 			if stand.x < 0 or st.fires.has(sim.world.idx(stand)):
 				stand = _stand_for(f)
 				c["stand"] = [stand.x, stand.y]
-			f.activity = "Бежит к огню с рукавом"
+			f.activity = L.t("Бежит к огню с рукавом")
 			f.bubble = "fire"
 			var r := sim.brain.move_to(f, stand, dt * 1.35)
 			if r == 1:
@@ -186,7 +186,7 @@ func _tick_man(c: Dictionary, dt: float, v: Vehicle) -> void:
 			var fc := sim.world.cell_of(fi)
 			sim.brain._set_dir(f, Vector2(fc) + Vector2(0.5, 0.5) - f.pos)
 			f.anim = "work"
-			f.activity = "Тушит пожар из рукава"
+			f.activity = L.t("Тушит пожар из рукава")
 			f.bubble = ""
 			st.extinguish(fi, RATE * dt)
 			# струя проливает и соседние клетки
@@ -197,7 +197,7 @@ func _tick_man(c: Dictionary, dt: float, v: Vehicle) -> void:
 		"back":
 			c["fire"] = -1
 			f.bubble = ""
-			f.activity = "Сматывает рукав"
+			f.activity = L.t("Сматывает рукав")
 			var dp := door_pos(v, crew.find(c))
 			var cell := Vector2i(floori(dp.x), floori(dp.y))
 			var r2 := sim.brain.move_to(f, cell, dt * 1.1)
@@ -269,7 +269,7 @@ func los(a: Vector2, b: Vector2) -> bool:
 
 func _leave(v: Vehicle) -> void:
 	if deployed():
-		sim.notify("Пожарные смотали рукава и уехали.", Sim.LVL_INFO, Vector2i(int(v.x - 2.0), sim.world.road_row))
+		sim.notify(L.t("Пожарные смотали рукава и уехали."), Sim.LVL_INFO, Vector2i(int(v.x - 2.0), sim.world.road_row))
 	_clear_crew()
 	v.hold = false
 	v.state = "leaving"
@@ -306,7 +306,7 @@ func from_dict(d: Dictionary) -> void:
 		var f := Worker.from_dict(wd)
 		f.visitor = true
 		f.prop = str(wd.get("prop_", "nozzle"))
-		f.activity = "Пожарный"
+		f.activity = L.t("Пожарный")
 		f.set_meta("who", "Пожарный")
 		f.set_meta("veh", true)
 		var stn: Array = cd.get("stand", [-1, -1])

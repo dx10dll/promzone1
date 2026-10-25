@@ -3,7 +3,7 @@
 		"concrete": {
 			"id": 1,
 			"name": "Бетонный пол",
-			"cost": 600,
+			"cost": 300,
 			"build_time": 4,
 			"desc": "Основа любого цеха. Дёшево и сердито.",
 			"tex": "concrete",
@@ -12,7 +12,7 @@
 		"tile": {
 			"id": 2,
 			"name": "Кафельная плитка",
-			"cost": 1400,
+			"cost": 700,
 			"build_time": 7,
 			"desc": "Для бытовок, туалетов и столовой.",
 			"tex": "tile",
@@ -21,7 +21,7 @@
 		"lino": {
 			"id": 3,
 			"name": "Линолеум",
-			"cost": 900,
+			"cost": 450,
 			"build_time": 5,
 			"desc": "Для кабинетов и комнат отдыха.",
 			"tex": "lino",
@@ -30,7 +30,7 @@
 		"epoxy": {
 			"id": 4,
 			"name": "Наливной пол",
-			"cost": 1100,
+			"cost": 600,
 			"build_time": 6,
 			"tex": "epoxy",
 			"desc": "Гладкий полимерный пол для цеха: стружка и грязь копятся на треть медленнее.",
@@ -39,7 +39,7 @@
 		"tile_blue": {
 			"id": 5,
 			"name": "Голубая плитка",
-			"cost": 1500,
+			"cost": 750,
 			"build_time": 7,
 			"tex": "tile_blue",
 			"desc": "Кафель для душевых, медпункта и столовой.",
@@ -48,7 +48,7 @@
 		"parquet": {
 			"id": 6,
 			"name": "Паркет",
-			"cost": 1800,
+			"cost": 900,
 			"build_time": 8,
 			"tex": "parquet",
 			"desc": "Для кабинета директора и контор: уютнее линолеума.",
@@ -59,7 +59,7 @@
 		"brick": {
 			"id": 1,
 			"name": "Кирпичная стена",
-			"cost": 2200,
+			"cost": 1100,
 			"build_time": 9,
 			"solid": true,
 			"buildable": true,
@@ -71,7 +71,7 @@
 		"window": {
 			"id": 2,
 			"name": "Окно",
-			"cost": 5200,
+			"cost": 2600,
 			"build_time": 13,
 			"solid": true,
 			"buildable": true,
@@ -82,7 +82,7 @@
 		"door": {
 			"id": 3,
 			"name": "Дверь",
-			"cost": 7000,
+			"cost": 3500,
 			"build_time": 11,
 			"solid": false,
 			"buildable": true,
@@ -93,7 +93,7 @@
 		"gate": {
 			"id": 4,
 			"name": "Ворота",
-			"cost": 24000,
+			"cost": 12000,
 			"build_time": 22,
 			"solid": false,
 			"buildable": true,
@@ -124,7 +124,7 @@
 		"concrete_wall": {
 			"id": 7,
 			"name": "Бетонная стена",
-			"cost": 1800,
+			"cost": 900,
 			"build_time": 8,
 			"solid": true,
 			"buildable": true,
@@ -136,7 +136,7 @@
 		"sandwich": {
 			"id": 8,
 			"name": "Сэндвич-панель",
-			"cost": 1500,
+			"cost": 750,
 			"build_time": 5,
 			"solid": true,
 			"buildable": true,
@@ -148,7 +148,7 @@
 		"partition": {
 			"id": 9,
 			"name": "Перегородка",
-			"cost": 900,
+			"cost": 450,
 			"build_time": 4,
 			"solid": true,
 			"buildable": true,
@@ -160,7 +160,7 @@
 		"metal_door": {
 			"id": 10,
 			"name": "Металлическая дверь",
-			"cost": 9500,
+			"cost": 4800,
 			"build_time": 12,
 			"solid": false,
 			"buildable": true,
@@ -172,7 +172,7 @@
 		"silicate": {
 			"id": 11,
 			"name": "Силикатный кирпич",
-			"cost": 2400,
+			"cost": 1200,
 			"build_time": 9,
 			"solid": true,
 			"buildable": true,
@@ -184,7 +184,7 @@
 		"gasblock": {
 			"id": 12,
 			"name": "Газобетон",
-			"cost": 1700,
+			"cost": 850,
 			"build_time": 6,
 			"solid": true,
 			"buildable": true,
@@ -196,7 +196,7 @@
 		"glass_door": {
 			"id": 13,
 			"name": "Остеклённая дверь",
-			"cost": 12000,
+			"cost": 6000,
 			"build_time": 12,
 			"solid": false,
 			"buildable": true,
@@ -208,7 +208,7 @@
 		"gate_warm": {
 			"id": 14,
 			"name": "Ворота синие",
-			"cost": 28000,
+			"cost": 14000,
 			"build_time": 22,
 			"solid": false,
 			"buildable": true,

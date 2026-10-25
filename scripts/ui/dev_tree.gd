@@ -89,8 +89,8 @@ static func build(win: GameWindow) -> void:
 	for d0 in Defs.departments.keys():
 		if sim.office.eff(str(d0)) > 0.0:
 			working += 1
-	win._info("открыто ступеней: %d из %d · работают %d из %d отделов" % [dv.count_on(), Develop.all_ids().size(), working, Defs.departments.size()])
-	win._intro("Первую ступень ветки открывает найм специалиста. Остальные директор исследует из своего кабинета — по одной, за деньги и время. Этап разрешает ступень, а не дарит её; ступень держат люди. Щёлкните по ступени — внизу подробности.")
+	win._info(L.t("открыто ступеней: %d из %d · работают %d из %d отделов") % [dv.count_on(), Develop.all_ids().size(), working, Defs.departments.size()])
+	win._intro(L.t("Первую ступень ветки открывает найм специалиста. Остальные директор исследует из своего кабинета — по одной, за деньги и время. Этап разрешает ступень, а не дарит её; ступень держат люди. Щёлкните по ступени — внизу подробности."))
 	var tv := TreeView.new()
 	tv.dv = dv
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -104,7 +104,7 @@ static func build(win: GameWindow) -> void:
 		var ic := win._icon(Tex.ui(str(br.get("icon", "office"))), 20)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		hv.add_child(ic)
-		var nl := UITheme.label(str(br["name"]), 12, UITheme.TEXT, UITheme.f_semi)
+		var nl := UITheme.label(L.t(str(br["name"])), 12, UITheme.TEXT, UITheme.f_semi)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.clip_text = true
 		nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -136,18 +136,18 @@ static func _orders(win: GameWindow) -> PanelContainer:
 	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var h := UITheme.hbox(14)
 	c.add_child(h)
-	h.add_child(UITheme.label("Приказы директора", 13, UITheme.TEXT, UITheme.f_semi))
+	h.add_child(UITheme.label(L.t("Приказы директора"), 13, UITheme.TEXT, UITheme.f_semi))
 	var ch_on := sim.office.eff("chief") > 0.0
 	var a := win._policy("rush", "Аврал: +25% к скорости, брака больше", ch_on)
 	var b := win._policy("overtime", "Сверхурочные: +2 часа за полуторную оплату", ch_on)
 	for cb: CheckBox in [a, b]:
 		if not ch_on:
-			cb.text = cb.text.replace(" (нужен отдел)", "")
-			cb.tooltip_text = "Нужен начальник цеха (ветка «Производство»)"
+			cb.text = cb.text.replace(L.t(" (нужен отдел)"), "").replace(" (нужен отдел)", "")
+			cb.tooltip_text = L.t("Нужен начальник цеха (ветка «Производство»)")
 		h.add_child(cb)
 	var hr := win._policy("auto_hire", "Автонайм замены", sim.dev.on("hr3"))
-	hr.text = "Кадровик сам нанимает замену"
-	hr.tooltip_text = "Уволился человек — кадровик сам найдёт такого же" if sim.dev.on("hr3") else "Нужна ступень «Кадровый резерв» (ветка «Кадры»)"
+	hr.text = L.t("Кадровик сам нанимает замену")
+	hr.tooltip_text = L.t("Уволился человек — кадровик сам найдёт такого же") if sim.dev.on("hr3") else L.t("Нужна ступень «Кадровый резерв» (ветка «Кадры»)")
 	h.add_child(hr)
 	return c
 
@@ -205,7 +205,7 @@ static func _root_node(win: GameWindow) -> Button:
 	var st := "works" if dv.root_ok() else "locked"
 	if dv.cur != "":
 		st = "busy"
-	var b := _btn(st, sel == "root", "Кабинет директора: отсюда исследуются ступени", func() -> void:
+	var b := _btn(st, sel == "root", L.t("Кабинет директора: отсюда исследуются ступени"), func() -> void:
 		sel = "root"
 		win.rebuild(true))
 	var v := _inner(b)
@@ -215,16 +215,16 @@ static func _root_node(win: GameWindow) -> Button:
 	var ic := win._icon(Tex.ui("develop"), 22)
 	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hh.add_child(ic)
-	var rl := _lab("Кабинет директора", 14, UITheme.TEXT, UITheme.f_semi)
+	var rl := _lab(L.t("Кабинет директора"), 14, UITheme.TEXT, UITheme.f_semi)
 	rl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hh.add_child(rl)
 	v.add_child(hh)
 	if dv.cur != "":
-		v.add_child(_lab("занят: «%s» · %.1f дн." % [str(Develop.step_def(dv.cur)["name"]), dv.days_left()], 12, UITheme.ACCENT))
+		v.add_child(_lab(L.t("занят: «%s» · %.1f дн.") % [L.t(str(Develop.step_def(dv.cur)["name"])), dv.days_left()], 12, UITheme.ACCENT))
 	elif dv.root_ok():
-		v.add_child(_lab("✓ свободен — можно исследовать", 12, UITheme.GOOD))
+		v.add_child(_lab(L.t("✓ свободен — можно исследовать"), 12, UITheme.GOOD))
 	else:
-		v.add_child(_lab("нет кабинета — ступени не исследуются", 12, UITheme.WARN))
+		v.add_child(_lab(L.t("нет кабинета — ступени не исследуются"), 12, UITheme.WARN))
 	return b
 
 
@@ -233,11 +233,11 @@ static func _node(win: GameWindow, id: String, _n: int) -> Button:
 	var dv := sim.dev
 	var sd := Develop.step_def(id)
 	var st := dv.status(id)
-	var b := _btn(st, sel == id, str(sd.get("desc", "")), func() -> void:
+	var b := _btn(st, sel == id, L.t(str(sd.get("desc", ""))), func() -> void:
 		sel = id
 		win.rebuild(true))
 	var v := _inner(b)
-	var nm := str(sd["name"])
+	var nm := L.t(str(sd["name"]))
 	v.add_child(_lab(nm, 12 if nm.length() <= 12 else (11 if nm.length() <= 14 else 10), UITheme.TEXT if st != "locked" else UITheme.MUTED, UITheme.f_semi, true))
 	var sp := Control.new()
 	sp.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -248,30 +248,30 @@ static func _node(win: GameWindow, id: String, _n: int) -> Button:
 	if sd.has("dept"):
 		var d := str(sd["dept"])
 		if st == "works":
-			txt = "✓ работает"
+			txt = L.t("✓ работает")
 			col = UITheme.GOOD
 		elif not sim.progress.dept_open(d):
-			txt = "этап «%s»" % sim.progress.stage_name(int(Defs.departments.get(d, {}).get("stage", 1)))
+			txt = L.t("этап «%s»") % sim.progress.stage_name(int(Defs.departments.get(d, {}).get("stage", 1)))
 			col = UITheme.DIM
 		else:
-			txt = "нанять: " + Worker.lc(str(Worker.PROF_NAMES.get(str(Defs.departments[d]["prof"]), "")))
+			txt = L.t("нанять: %s") % Worker.lc(L.t(str(Worker.PROF_NAMES.get(str(Defs.departments[d]["prof"]), ""))))
 			col = Color("#9ab4cc")
 	else:
 		match st:
 			"works":
-				txt = "✓ работает"
+				txt = L.t("✓ работает")
 				col = UITheme.GOOD
 			"idle":
-				txt = "нет человека"
+				txt = L.t("нет человека")
 				col = UITheme.WARN
 			"busy":
-				txt = "идёт · %.1f дн." % dv.days_left()
+				txt = L.t("идёт · %.1f дн.") % dv.days_left()
 				col = UITheme.ACCENT
 			"ready":
-				txt = "%d тыс. · %d дн." % [int(dv.cost_of(id) / 1000.0), int(sd.get("days", 1))]
+				txt = L.t("%d тыс. · %d дн.") % [int(dv.cost_of(id) / 1000.0), int(sd.get("days", 1))]
 				col = Color("#9ab4cc")
 			_:
-				txt = ("%d тыс. · %d дн." % [int(dv.cost_of(id) / 1000.0), int(sd.get("days", 1))]) if not (Develop.is_lot_step(id) and int(sd["lot"]) >= sim.world.lots.size()) else "нет на карте"
+				txt = (L.t("%d тыс. · %d дн.") % [int(dv.cost_of(id) / 1000.0), int(sd.get("days", 1))]) if not (Develop.is_lot_step(id) and int(sd["lot"]) >= sim.world.lots.size()) else L.t("нет на карте")
 				col = UITheme.DIM
 	v.add_child(_lab(txt, 11, col, null, true))
 	if st == "busy":
@@ -280,7 +280,7 @@ static func _node(win: GameWindow, id: String, _n: int) -> Button:
 		pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		v.add_child(pb)
 	if id == "tech1":
-		b.tooltip_text += "\nРазработки технолога: изучено %d из %d — выберите ступень, они внизу." % [sim.office.research_done.size(), Defs.research.size()]
+		b.tooltip_text += L.t("\nРазработки технолога: изучено %d из %d — выберите ступень, они внизу.") % [sim.office.research_done.size(), Defs.research.size()]
 	return b
 
 
@@ -293,19 +293,19 @@ static func _details(win: GameWindow) -> PanelContainer:
 	var v := UITheme.vbox(6)
 	c.add_child(v)
 	if sel == "root":
-		v.add_child(UITheme.label("Кабинет директора", 17, UITheme.TEXT, UITheme.f_semi))
-		v.add_child(UITheme.para("Корень дерева. Директор исследует ступени по одной: деньги списываются сразу, ступень открывается через несколько дней. Кабинет — комната с линолеумом, столом директора (Объекты → Офис), назначенная «Кабинетом директора».", 13))
+		v.add_child(UITheme.label(L.t("Кабинет директора"), 17, UITheme.TEXT, UITheme.f_semi))
+		v.add_child(UITheme.para(L.t("Корень дерева. Директор исследует ступени по одной: деньги списываются сразу, ступень открывается через несколько дней. Кабинет — комната с линолеумом, столом директора (Объекты → Офис), назначенная «Кабинетом директора»."), 13))
 		if dv.root_ok():
-			v.add_child(win._cl("✓ кабинет есть", 13, UITheme.GOOD))
+			v.add_child(win._cl(L.t("✓ кабинет есть"), 13, UITheme.GOOD))
 		else:
-			v.add_child(UITheme.primary("Построить кабинет директора", func() -> void:
+			v.add_child(UITheme.primary(L.t("Построить кабинет директора"), func() -> void:
 				win.closed.emit()
-				win.hud.open_rooms_type(Develop.ROOT_ROOM), "Откроется каталог помещений с этим типом"))
+				win.hud.open_rooms_type(Develop.ROOT_ROOM), L.t("Откроется каталог помещений с этим типом")))
 		if dv.cur != "":
 			var hh := UITheme.hbox(8)
-			hh.add_child(win._cl("Сейчас: «%s» — осталось %.1f дн." % [str(Develop.step_def(dv.cur)["name"]), dv.days_left()], 13, UITheme.ACCENT))
+			hh.add_child(win._cl(L.t("Сейчас: «%s» — осталось %.1f дн.") % [L.t(str(Develop.step_def(dv.cur)["name"])), dv.days_left()], 13, UITheme.ACCENT))
 			hh.add_child(UITheme.spacer())
-			hh.add_child(UITheme.small("Отложить (вернут половину)", func() -> void:
+			hh.add_child(UITheme.small(L.t("Отложить (вернут половину)"), func() -> void:
 				dv.cancel()
 				win.rebuild(true)))
 			v.add_child(hh)
@@ -321,17 +321,17 @@ static func _details(win: GameWindow) -> PanelContainer:
 	var th := UITheme.hbox(10)
 	th.add_child(win._icon(Tex.ui(str(br.get("icon", "office"))), 28))
 	var tv := UITheme.vbox(0)
-	tv.add_child(UITheme.label("«%s»" % str(sd["name"]), 17, UITheme.TEXT, UITheme.f_semi))
-	var sub := "ветка «%s» · ступень %d" % [str(br.get("name", "")), num]
+	tv.add_child(UITheme.label(L.t("«%s»") % L.t(str(sd["name"])), 17, UITheme.TEXT, UITheme.f_semi))
+	var sub := L.t("ветка «%s» · ступень %d") % [L.t(str(br.get("name", ""))), num]
 	if not sd.has("dept"):
 		sub += " · %s · %d %s" % [Defs.money_str(dv.cost_of(sel)), int(sd.get("days", 1)), Defs.plural(int(sd.get("days", 1)), "день", "дня", "дней")]
 	tv.add_child(UITheme.label(sub, 12, UITheme.MUTED))
 	th.add_child(tv)
 	th.add_child(UITheme.spacer())
 	var chips := {"works": ["работает", UITheme.GOOD], "idle": ["открыто, не работает", UITheme.WARN], "busy": ["исследуется", UITheme.ACCENT], "ready": ["можно начать", UITheme.INFO], "locked": ["закрыто", UITheme.MUTED]}
-	th.add_child(UITheme.chip(str(chips[st][0]), chips[st][1]))
+	th.add_child(UITheme.chip(L.t(str(chips[st][0])), chips[st][1]))
 	v.add_child(th)
-	v.add_child(UITheme.para(str(sd.get("desc", "")), 13, UITheme.TEXT))
+	v.add_child(UITheme.para(L.t(str(sd.get("desc", ""))), 13, UITheme.TEXT))
 	# что нужно
 	var req := UITheme.vbox(2)
 	v.add_child(req)
@@ -339,74 +339,74 @@ static func _details(win: GameWindow) -> PanelContainer:
 		var d := str(sd["dept"])
 		var dd: Dictionary = Defs.departments.get(d, {})
 		var prof := str(dd.get("prof", ""))
-		_req(req, sim.progress.dept_open(d), "этап «%s»" % sim.progress.stage_name(int(dd.get("stage", 1))))
+		_req(req, sim.progress.dept_open(d), L.t("этап «%s»") % sim.progress.stage_name(int(dd.get("stage", 1))))
 		var rs := sim.office.room_status(d)
-		_req(req, int(rs[0]) >= 0, "кабинет: " + str(rs[1]).trim_prefix("✓ ").trim_prefix("× "))
+		_req(req, int(rs[0]) >= 0, L.t("кабинет: %s") % str(rs[1]).trim_prefix("✓ ").trim_prefix("× "))
 		var staff := sim.office.staff(d)
-		_req(req, not staff.is_empty(), ("специалист: " + staff[0].full_name()) if not staff.is_empty() else "специалист: " + Worker.lc(str(Worker.PROF_NAMES.get(prof, prof))))
+		_req(req, not staff.is_empty(), (L.t("специалист: %s") % staff[0].full_name()) if not staff.is_empty() else L.t("специалист: %s") % Worker.lc(L.t(str(Worker.PROF_NAMES.get(prof, prof)))))
 		if st != "works" and sim.progress.dept_open(d):
 			var row := UITheme.hbox(8)
 			if staff.is_empty():
-				row.add_child(UITheme.primary("Найти: %s · %s" % [Worker.lc(str(Worker.PROF_NAMES.get(prof, prof))), Defs.money_str(sim.ad_price(prof))], func() -> void:
+				row.add_child(UITheme.primary(L.t("Найти: %s · %s") % [Worker.lc(L.t(str(Worker.PROF_NAMES.get(prof, prof)))), Defs.money_str(sim.ad_price(prof))], func() -> void:
 					var err := sim.post_ad(prof)
 					if err != "":
 						win.hud.toast(err, Sim.LVL_WARN)
 						return
 					win.hud.open_window("staff")
 					if win.hud.win:
-						win.hud.win.select_tab("hire"), "Объявление по профессии — откроется найм"))
+						win.hud.win.select_tab("hire"), L.t("Объявление по профессии — откроется найм")))
 			if int(rs[0]) < 1:
 				var room := str(dd.get("room", ""))
-				row.add_child(UITheme.button("Построить кабинет", func() -> void:
+				row.add_child(UITheme.button(L.t("Построить кабинет"), func() -> void:
 					win.closed.emit()
-					win.hud.open_rooms_type(room), "Откроется каталог помещений с этим типом"))
+					win.hud.open_rooms_type(room), L.t("Откроется каталог помещений с этим типом")))
 			v.add_child(row)
 		return c
 	var stg := int(sd.get("stage", 1))
 	if stg > 1:
-		_req(req, sim.progress.stage >= stg or sim.progress.all_open, "этап «%s»" % sim.progress.stage_name(stg))
+		_req(req, sim.progress.stage >= stg or sim.progress.all_open, L.t("этап «%s»") % sim.progress.stage_name(stg))
 	var pv := Develop.prev_of(sel)
 	if pv != "":
-		_req(req, dv.on(pv), "предыдущая ступень «%s» работает" % str(Develop.step_def(pv)["name"]))
+		_req(req, dv.on(pv), L.t("предыдущая ступень «%s» работает") % L.t(str(Develop.step_def(pv)["name"])))
 	var holder := str(sd.get("holder", ""))
 	if holder != "":
-		_req(req, sim.office.active(holder), "отдел «%s» работает — он держит ступень" % str(Defs.departments.get(holder, {}).get("name", holder)))
+		_req(req, sim.office.active(holder), L.t("отдел «%s» работает — он держит ступень") % L.t(str(Defs.departments.get(holder, {}).get("name", holder))))
 		if bool(sd.get("own_room", false)):
 			var room2 := str(Defs.departments.get(holder, {}).get("room", ""))
-			_req(req, int(sim.office.room_status(holder)[0]) == 1, "свой кабинет «%s» (общей конторы мало)" % str(Defs.rooms.get(room2, {}).get("name", room2)))
+			_req(req, int(sim.office.room_status(holder)[0]) == 1, L.t("свой кабинет «%s» (общей конторы мало)") % L.t(str(Defs.rooms.get(room2, {}).get("name", room2))))
 	if int(sd.get("staff", 0)) > 0:
-		_req(req, sim.workers.size() >= int(sd["staff"]), "%d человек в штате" % int(sd["staff"]))
+		_req(req, sim.workers.size() >= int(sd["staff"]), L.t("%d человек в штате") % int(sd["staff"]))
 	if Develop.is_lot_step(sel):
 		var k := int(sd["lot"])
 		if k < sim.world.lots.size():
 			var lr := sim.world.lot_rect(k)
-			_req(req, true, "участок %s: %d×%d клеток" % [sim.world.lot_side(k), lr.size.x, lr.size.y])
+			_req(req, true, L.t("участок %s: %d×%d клеток") % [L.t(sim.world.lot_side(k)), lr.size.x, lr.size.y])
 		else:
-			_req(req, false, "на этой карте такого участка нет")
-	_req(req, dv.root_ok(), "кабинет директора")
+			_req(req, false, L.t("на этой карте такого участка нет"))
+	_req(req, dv.root_ok(), L.t("кабинет директора"))
 	if st != "works" and st != "idle":
-		_req(req, dv.cur == "" or dv.cur == sel, "директор свободен" + (" (занят: «%s»)" % str(Develop.step_def(dv.cur)["name"]) if dv.cur != "" and dv.cur != sel else ""))
-		_req(req, sim.money >= dv.cost_of(sel) or dv.cur == sel, "деньги: %s" % Defs.money_str(dv.cost_of(sel)))
+		_req(req, dv.cur == "" or dv.cur == sel, L.t("директор свободен") + (L.t(" (занят: «%s»)") % L.t(str(Develop.step_def(dv.cur)["name"])) if dv.cur != "" and dv.cur != sel else ""))
+		_req(req, sim.money >= dv.cost_of(sel) or dv.cur == sel, L.t("деньги: %s") % Defs.money_str(dv.cost_of(sel)))
 	var row2 := UITheme.hbox(8)
 	match st:
 		"ready":
-			row2.add_child(UITheme.primary(("Купить · %s · %d %s" if Develop.is_lot_step(sel) else "Начать · %s · %d %s") % [Defs.money_str(dv.cost_of(sel)), int(sd.get("days", 1)), Defs.plural(int(sd.get("days", 1)), "день", "дня", "дней")], func() -> void:
+			row2.add_child(UITheme.primary(L.t("Купить · %s · %d %s" if Develop.is_lot_step(sel) else "Начать · %s · %d %s") % [Defs.money_str(dv.cost_of(sel)), int(sd.get("days", 1)), Defs.plural(int(sd.get("days", 1)), "день", "дня", "дней")], func() -> void:
 				var err2 := dv.start(sel)
 				if err2 != "":
 					win.hud.toast(err2, Sim.LVL_WARN)
-				win.rebuild(true), "Деньги спишутся сразу"))
+				win.rebuild(true), L.t("Деньги спишутся сразу")))
 		"busy":
 			var pb := UITheme.bar(dv.progress01() * 100.0, UITheme.ACCENT, 260, 8)
 			row2.add_child(pb)
-			row2.add_child(win._cl("осталось %.1f дн." % dv.days_left(), 13, UITheme.ACCENT))
-			row2.add_child(UITheme.small("Отложить (вернут половину)", func() -> void:
+			row2.add_child(win._cl(L.t("осталось %.1f дн.") % dv.days_left(), 13, UITheme.ACCENT))
+			row2.add_child(UITheme.small(L.t("Отложить (вернут половину)"), func() -> void:
 				dv.cancel()
 				win.rebuild(true)))
 		"idle":
-			row2.add_child(win._cl("Ступень открыта, но не работает, пока в отделе «%s» нет человека." % str(Defs.departments.get(holder, {}).get("name", holder)), 13, UITheme.WARN))
+			row2.add_child(win._cl(L.t("Ступень открыта, но не работает, пока в отделе «%s» нет человека.") % L.t(str(Defs.departments.get(holder, {}).get("name", holder))), 13, UITheme.WARN))
 		"locked":
 			if not dv.root_ok():
-				row2.add_child(UITheme.button("Построить кабинет директора", func() -> void:
+				row2.add_child(UITheme.button(L.t("Построить кабинет директора"), func() -> void:
 					win.closed.emit()
 					win.hud.open_rooms_type(Develop.ROOT_ROOM)))
 	if row2.get_child_count() > 0:
@@ -417,5 +417,5 @@ static func _details(win: GameWindow) -> PanelContainer:
 static func _req(host: Control, ok: bool, text: String) -> void:
 	var h := UITheme.hbox(6)
 	h.add_child(UITheme.label("✓" if ok else "×", 13, UITheme.GOOD if ok else UITheme.BAD, UITheme.f_semi))
-	h.add_child(UITheme.label(text, 13, UITheme.TEXT if ok else UITheme.MUTED))
+	h.add_child(UITheme.label(L.t(text), 13, UITheme.TEXT if ok else UITheme.MUTED))
 	host.add_child(h)

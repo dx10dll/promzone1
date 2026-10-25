@@ -110,8 +110,8 @@ static func op(p: String, step: int) -> Dictionary:
 
 static func process_name(pr: String) -> String:
 	if pr == "qc":
-		return "ОТК"
-	return str(processes.get(pr, {}).get("name", pr))
+		return L.t("ОТК")
+	return L.dt("process.%s.name" % pr, str(processes.get(pr, {}).get("name", pr)))   # 1.39: на языке игры
 
 
 static func route_text(p: String) -> String:
@@ -149,10 +149,10 @@ static func machine_parts_text(def_id: String) -> String:
 	var r := machine_rank(def_id)
 	match r:
 		0:
-			return "только мелкие детали"
+			return L.t("только мелкие детали")
 		1:
-			return "мелкие и средние детали"
-	return "детали любого размера"
+			return L.t("мелкие и средние детали")
+	return L.t("детали любого размера")
 
 
 ## Короткий паспорт станка: «детали: мелкие и средние · быстрее на 18% · брака −50%».
@@ -160,23 +160,24 @@ static func machine_spec(def_id: String) -> String:
 	var md: Dictionary = objects.get(def_id, {}).get("machine", {})
 	if md.is_empty():
 		return ""
-	var parts: Array[String] = ["детали: " + ["только мелкие", "мелкие и средние", "любого размера"][machine_rank(def_id)]]
+	var parts: Array[String] = [L.t("детали: ") + [L.t("только мелкие"), L.t("мелкие и средние"), L.t("любого размера")][machine_rank(def_id)]]
 	var sp := float(md.get("speed_k", 1.0))
 	if absf(sp - 1.0) > 0.01:
 		var pct := int(round((1.0 / sp - 1.0) * 100.0))
 		if 1.0 / sp >= 1.5:
-			parts.append(("быстрее в %.1f раза" % (1.0 / sp)).replace(".", ","))
+			var fs := L.t("быстрее в %.1f раза") % (1.0 / sp)
+			parts.append(fs if L.is_en() else fs.replace(".", ","))
 		else:
-			parts.append(("быстрее на %d%%" % pct) if pct > 0 else ("медленнее на %d%%" % -pct))
+			parts.append((L.t("быстрее на %d%%") % pct) if pct > 0 else (L.t("медленнее на %d%%") % -pct))
 	var dk := float(md.get("defect_k", 1.0))
 	if absf(dk - 1.0) > 0.01:
-		parts.append("брака %s%d%%" % ["−" if dk < 1.0 else "+", int(round(absf(dk - 1.0) * 100.0))])
+		parts.append(L.t("брака %s%d%%") % ["−" if dk < 1.0 else "+", int(round(absf(dk - 1.0) * 100.0))])
 	if bool(md.get("batch", false)):
-		parts.append("партия до %d" % int(md.get("in_cap", 6)))
+		parts.append(L.t("партия до %d") % int(md.get("in_cap", 6)))
 	if md.has("cons_k"):
-		parts.append("расход −%d%%" % int(round((1.0 - float(md["cons_k"])) * 100.0)))
+		parts.append(L.t("расход −%d%%") % int(round((1.0 - float(md["cons_k"])) * 100.0)))
 	if int(md.get("min_skill", 1)) > 1:
-		parts.append("разряд от %d" % int(md["min_skill"]))
+		parts.append(L.t("разряд от %d") % int(md["min_skill"]))
 	var txt := " · ".join(parts)
 	return txt.left(1).to_upper() + txt.substr(1)
 
@@ -213,12 +214,33 @@ static func ev(key: String) -> float:
 	return float(events.get(key, 0.0))
 
 
+## 1.39: название объекта на языке игры.
+static func obj_name(id: String) -> String:
+	return L.dt("object.%s.name" % id, str(objects.get(id, {}).get("name", id)))
+
+
+static func room_name(id: String) -> String:
+	return L.dt("room.%s.name" % id, str(rooms.get(id, {}).get("name", id)))
+
+
+static func dept_name(id: String) -> String:
+	return L.dt("department.%s.name" % id, str(departments.get(id, {}).get("name", id)))
+
+
+static func research_name(id: String) -> String:
+	return L.dt("research.%s.name" % id, str(research.get(id, {}).get("name", "")))
+
+
+static func research_desc(id: String) -> String:
+	return L.dt("research.%s.desc" % id, str(research.get(id, {}).get("desc", "")))
+
+
 static func product_name(p: String) -> String:
-	return str(products.get(p, {}).get("name", p))
+	return L.dt("product.%s.name" % p, str(products.get(p, {}).get("name", p)))
 
 
 static func material_name(m: String) -> String:
-	return str(materials.get(m, {}).get("name", m))
+	return L.dt("material.%s.name" % m, str(materials.get(m, {}).get("name", m)))
 
 
 static func wall_solid(wid: int) -> bool:
@@ -228,7 +250,10 @@ static func wall_solid(wid: int) -> bool:
 
 
 ## Русское склонение: plural(3, "день", "дня", "дней") -> "дня".
+## 1.39: в английском — по строке перевода «одна|две|пять» → «one|many» (L.pl), если она есть.
 static func plural(n: int, one: String, few: String, many: String) -> String:
+	if L.is_en():
+		return L.pl(n, one + "|" + few + "|" + many)
 	var n10 := absi(n) % 10
 	var n100 := absi(n) % 100
 	if n10 == 1 and n100 != 11:

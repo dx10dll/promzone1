@@ -32,7 +32,7 @@ var fed_day := -1
 var fed_times := 0
 var since := 1              ## день, когда прибился
 var mice := 0
-var activity := "Осматривается"
+var activity := L.t("Осматривается")
 var prey: Dictionary = {}     ## 1.22: за кем охотится (голубь или мышь из sim.fauna)
 
 
@@ -57,11 +57,18 @@ func fur_color() -> Color:
 
 func fur_name() -> String:
 	var s := str(FURS.get(fur, FURS["ginger"])[0])
+	if L.is_en():
+		return L.t(s)
 	return s.left(-2) + "ая" if female else s
 
 
 func title() -> String:
-	return ("Кошка " if female else "Кот ") + name
+	return (L.t("Кошка %s") if female else L.t("Кот %s")) % shown_name()
+
+
+## Кличка на языке игры (в английском — латиницей: «Васька» → «Vaska»).
+func shown_name() -> String:
+	return L.name(name)
 
 
 func cell() -> Vector2i:
@@ -93,7 +100,7 @@ func hunt(c: Vector2i, kind: String) -> bool:
 	var dst := c
 	if not sim.world.passable(dst):
 		return false
-	if _go(dst, "hunt", "Охотится на мышь" if kind == "mouse" else "Подкрадывается к голубю"):
+	if _go(dst, "hunt", L.t("Охотится на мышь") if kind == "mouse" else L.t("Подкрадывается к голубю")):
 		return true
 	return false
 
@@ -148,24 +155,24 @@ func _arrive() -> void:
 		"hunt":
 			state = "pounce"
 			until = sim.minute + 0.5
-			activity = "Прыжок!"
+			activity = L.t("Прыжок!")
 		"sleep":
 			until = sim.minute + sim.rng.randf_range(60.0, 160.0) * (1.6 if _night() else 1.0)
-			activity = "Спит" + (" у тёплого места" if _warm_near(cell()) else "")
+			activity = L.t("Спит у тёплого места") if _warm_near(cell()) else L.t("Спит")
 		"eat":
 			until = sim.minute + 8.0
-			activity = "Ест из миски"
+			activity = L.t("Ест из миски")
 			if sim.day() != fed_day:
 				fed_day = sim.day()
 				fed_times = 0
 			fed_times += 1
 		"beg":
 			until = sim.minute + sim.rng.randf_range(10.0, 25.0)
-			activity = "Клянчит у обедающих"
+			activity = L.t("Клянчит у обедающих")
 		_:
 			state = "sit"
 			until = sim.minute + sim.rng.randf_range(4.0, 18.0)
-			activity = ["Умывается", "Смотрит на станок", "Сидит и наблюдает", "Ловит солнечного зайчика"][sim.rng.randi_range(0, 3)]
+			activity = [L.t("Умывается"), L.t("Смотрит на станок"), L.t("Сидит и наблюдает"), L.t("Ловит солнечного зайчика")][sim.rng.randi_range(0, 3)]
 
 
 func _night() -> bool:
@@ -179,22 +186,22 @@ func _decide() -> void:
 	var bowl := _bowl()
 	# поесть утром и вечером
 	if bowl and (t >= 420.0 and t < 600.0 or t >= 1080.0 and t < 1260.0) and (fed_day != sim.day() or fed_times < (1 if t < 600.0 else 2)):
-		if _go(_access(bowl), "eat", "Идёт к миске"):
+		if _go(_access(bowl), "eat", L.t("Идёт к миске")):
 			return
 	# в обед — в столовую, клянчить
 	if sim.rng.randf() < 0.6:
 		var eater := _lunch_eater()
-		if eater and _go(_near(eater.cell()), "beg", "Бежит в столовую"):
+		if eater and _go(_near(eater.cell()), "beg", L.t("Бежит в столовую")):
 			return
 	# спать: ночью почти всегда, днём — часто
 	if sim.rng.randf() < (0.8 if _night() else 0.35):
 		var sp := _sleep_spot()
-		if sp.x >= 0 and _go(sp, "sleep", "Ищет, где поспать"):
+		if sp.x >= 0 and _go(sp, "sleep", L.t("Ищет, где поспать")):
 			return
 	# погулять
 	for k in 8:
 		var c := _random_cell()
-		if c.x >= 0 and _go(c, "sit", "Гуляет по заводу"):
+		if c.x >= 0 and _go(c, "sit", L.t("Гуляет по заводу")):
 			return
 	state = "sit"
 	until = sim.minute + 10.0

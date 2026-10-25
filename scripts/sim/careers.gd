@@ -37,15 +37,15 @@ func init_calendar() -> void:
 ## Почему нельзя сдавать сейчас ("" — можно).
 func exam_block(w: Worker) -> String:
 	if not w.has_grade():
-		return "У этой профессии нет разрядов"
+		return L.t("У этой профессии нет разрядов")
 	if w.grade() >= 6:
-		return "Высший, 6-й разряд уже есть"
+		return L.t("Высший, 6-й разряд уже есть")
 	if w.pot_grade() <= w.grade():
-		return "Навыка пока мало: нужно «%s» от %d" % [str(Worker.SKILL_NAMES.get(w.main_skill(), "")).to_lower(), 2 * w.grade()]
+		return L.t("Навыка пока мало: нужно «%s» от %d") % [L.t(str(Worker.SKILL_NAMES.get(w.main_skill(), ""))).to_lower(), 2 * w.grade()]
 	if exams.has(w.id):
-		return "Уже сдаёт — сделает пробную деталь на смене"
+		return L.t("Уже сдаёт — сделает пробную деталь на смене")
 	if w.exam_cd > sim.day():
-		return "Пересдача — с дня %d" % w.exam_cd
+		return L.t("Пересдача — с дня %d") % w.exam_cd
 	return ""
 
 
@@ -54,7 +54,7 @@ func request_exam(w: Worker) -> String:
 	if why != "":
 		return why
 	exams[w.id] = sim.day()
-	sim.notify(Nicks.gendered("%s сдаёт на %d-й разряд: на смене сделает пробную деталь, мастер примет.", w.female) % [w.full_name(), w.grade() + 1], Sim.LVL_INFO, w.cell())
+	sim.notify(Nicks.gendered(L.t("%s сдаёт на %d-й разряд: на смене сделает пробную деталь, мастер примет."), w.female) % [w.full_name(), w.grade() + 1], Sim.LVL_INFO, w.cell())
 	return ""
 
 
@@ -96,18 +96,18 @@ func finish_exam(w: Worker) -> void:
 	var need := 2 * (to - 1)
 	var fm := foreman()
 	var p := clampf(0.55 + 0.12 * float(w.skill(w.main_skill()) - need) + (0.1 if fm else 0.0) + (w.mood - 50.0) / 400.0, 0.15, 0.95)
-	var who := ("мастер %s" % fm.full_name()) if fm else "контролёр ОТК"
+	var who := (L.t("мастер %s") % fm.full_name()) if fm else L.t("контролёр ОТК")
 	if sim.rng.randf() < p:
 		w.grade_n = to
-		w.add_history(sim.day(), "Сдал{|а} экзамен на %d-й разряд".replace("{|а}", "а" if w.female else "") % to)
+		w.add_history(sim.day(), Nicks.gendered(L.t("Сдал{|а} экзамен на %d-й разряд"), w.female) % to)
 		Mood.add(sim, w, "grade_up")
 		sim.stats["exams"] = int(sim.stats.get("exams", 0)) + 1
-		sim.notify(Nicks.gendered("%s сдал{|а} на %d-й разряд — пробную деталь принял %s.", w.female) % [w.full_name(), to, who], Sim.LVL_GOOD, w.cell())
+		sim.notify(Nicks.gendered(L.t("%s сдал{|а} на %d-й разряд — пробную деталь принял %s."), w.female) % [w.full_name(), to, who], Sim.LVL_GOOD, w.cell())
 		_ask_raise(w)
 	else:
 		w.exam_cd = sim.day() + EXAM_CD_DAYS
 		Mood.add(sim, w, "exam_failed")
-		sim.notify(Nicks.gendered("%s не сдал{|а} на %d-й разряд: %s забраковал пробную деталь. Пересдача через неделю.", w.female) % [w.full_name(), to, who], Sim.LVL_WARN, w.cell())
+		sim.notify(Nicks.gendered(L.t("%s не сдал{|а} на %d-й разряд: %s забраковал пробную деталь. Пересдача через неделю."), w.female) % [w.full_name(), to, who], Sim.LVL_WARN, w.cell())
 
 
 # ================================================================ РП-9: зарплата
@@ -118,10 +118,10 @@ func _ask_raise(w: Worker) -> void:
 	if want <= w.wage:
 		return
 	var half := int(round((w.wage + want) * 0.5 / 10.0)) * 10
-	sim.story.letter("raise_ask", "Просит прибавку", "%s сдал%s на %d-й разряд и просит ставку по разряду: %s вместо %s за смену." % [w.full_name(), "а" if w.female else "", w.grade(), Defs.money_str(want), Defs.money_str(w.wage)], "money", Sim.LVL_INFO,
-		[{"text": "Ставка по разряду: %s" % Defs.money_str(want), "hint": "Человек доволен"},
-		 {"text": "Половину: %s" % Defs.money_str(half), "hint": "Без восторга, но и без обиды"},
-		 {"text": "Отказать", "hint": "Обидится; может начать искать другое место"}], 0, {"w": w.id, "want": want, "half": half})
+	sim.story.letter("raise_ask", L.t("Просит прибавку"), Nicks.gendered(L.t("%s сдал{|а} на %d-й разряд и просит ставку по разряду: %s вместо %s за смену."), w.female) % [w.full_name(), w.grade(), Defs.money_str(want), Defs.money_str(w.wage)], "money", Sim.LVL_INFO,
+		[{"text": L.t("Ставка по разряду: %s") % Defs.money_str(want), "hint": L.t("Человек доволен")},
+		 {"text": L.t("Половину: %s") % Defs.money_str(half), "hint": L.t("Без восторга, но и без обиды")},
+		 {"text": L.t("Отказать"), "hint": L.t("Обидится; может начать искать другое место")}], 0, {"w": w.id, "want": want, "half": half})
 
 
 func on_letter(ev: String, d: Dictionary, choice: int) -> void:
@@ -138,7 +138,7 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 					w.wage = int(d["half"])
 				_:
 					Mood.add(sim, w, "raise_refused")
-					w.add_history(sim.day(), "Отказали в прибавке за разряд")
+					w.add_history(sim.day(), L.t("Отказали в прибавке за разряд"))
 		"indexation":
 			var k := float(d.get("k", INDEX_K))
 			for w2 in sim.workers:
@@ -149,7 +149,7 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 				else:
 					Mood.add(sim, w2, "no_index")
 			if choice == 0:
-				sim.notify("Зарплаты проиндексированы на %d%%." % int(round((k - 1.0) * 100.0)), Sim.LVL_GOOD)
+				sim.notify(L.t("Зарплаты проиндексированы на %d%%.") % int(round((k - 1.0) * 100.0)), Sim.LVL_GOOD)
 		"rational2":
 			_res_rational(d, choice)
 
@@ -171,10 +171,10 @@ func _quarter() -> void:
 	for w in sim.workers:
 		week += float(w.wage) * (INDEX_K - 1.0) * 5.0
 	var itr_n := sim.workers.filter(func(x: Worker) -> bool: return x.is_itr()).size()
-	sim.story.letter("indexation", "Индексация зарплат", "Цены за квартал выросли примерно на %d%%: на рынке ставки уже подняли. Люди ждут индексации — иначе начнут считать, что платят меньше, чем везде." % int(round((INDEX_K - 1.0) * 100.0)), "money", Sim.LVL_INFO,
-		[{"text": "Проиндексировать всем на %d%%" % int(round((INDEX_K - 1.0) * 100.0)), "hint": "≈ %s в неделю" % Defs.money_str(week)},
-		 {"text": "Только рабочим", "hint": "ИТР (%d чел.) обидятся" % itr_n},
-		 {"text": "Не индексировать", "hint": "Все расстроятся; ставка отстанет от рынка"}], 2, {"k": INDEX_K})
+	sim.story.letter("indexation", L.t("Индексация зарплат"), L.t("Цены за квартал выросли примерно на %d%%: на рынке ставки уже подняли. Люди ждут индексации — иначе начнут считать, что платят меньше, чем везде.") % int(round((INDEX_K - 1.0) * 100.0)), "money", Sim.LVL_INFO,
+		[{"text": L.t("Проиндексировать всем на %d%%") % int(round((INDEX_K - 1.0) * 100.0)), "hint": L.t("≈ %s в неделю") % Defs.money_str(week)},
+		 {"text": L.t("Только рабочим"), "hint": L.t("ИТР (%d чел.) обидятся") % itr_n},
+		 {"text": L.t("Не индексировать"), "hint": L.t("Все расстроятся; ставка отстанет от рынка")}], 2, {"k": INDEX_K})
 
 
 # ================================================================ РП-11: стаж, возраст, пенсия
@@ -211,7 +211,7 @@ func _year() -> void:
 		w.age += 1
 		if w.age == pension_age(w):
 			reached.append(w.full_name())
-	sim.notify("Новый год — все стали на год старше.%s" % ((" Пенсионного возраста достигли: " + ", ".join(reached) + ".") if not reached.is_empty() else ""), Sim.LVL_INFO)
+	sim.notify(L.t("Новый год — все стали на год старше.%s") % ((L.t(" Пенсионного возраста достигли: %s.") % ", ".join(reached)) if not reached.is_empty() else ""), Sim.LVL_INFO)
 
 
 func _veterans() -> void:
@@ -221,10 +221,10 @@ func _veterans() -> void:
 			continue
 		if sim.day() - w.hired_day >= dpy:
 			veterans[w.id] = sim.day()
-			w.add_history(sim.day(), "Ветеран завода — год на предприятии")
+			w.add_history(sim.day(), L.t("Ветеран завода — год на предприятии"))
 			Mood.add(sim, w, "veteran_honor")
-			sim.notify("%s — год на заводе! Теперь ветеран завода: уважают, учит молодых охотнее." % w.full_name(), Sim.LVL_GOOD, w.cell())
-			sim.paper.add("Наши ветераны", "Год на заводе: " + w.full_name(), "Спасибо за верность заводу! Молодёжь, берите пример.")
+			sim.notify(L.t("%s — год на заводе! Теперь ветеран завода: уважают, учит молодых охотнее.") % w.full_name(), Sim.LVL_GOOD, w.cell())
+			sim.paper.add(L.t("Наши ветераны"), L.t("Год на заводе: %s") % w.full_name(), L.t("Спасибо за верность заводу! Молодёжь, берите пример."))
 
 
 func is_veteran(w: Worker) -> bool:
@@ -237,7 +237,7 @@ func morning() -> void:
 	_veterans()
 	for w in sim.workers:
 		if exam_block(w) == "":
-			sim.notify_once("examready%d" % w.id, "%s готов%s сдавать на %d-й разряд — в карточке кнопка «Экзамен»." % [w.full_name(), "а" if w.female else "", w.grade() + 1], Sim.LVL_INFO, Vector2i(-1, -1), 1440.0 * 7.0)
+			sim.notify_once("examready%d" % w.id, Nicks.gendered(L.t("%s готов{|а} сдавать на %d-й разряд — в карточке кнопка «Экзамен»."), w.female) % [w.full_name(), w.grade() + 1], Sim.LVL_INFO, Vector2i(-1, -1), 1440.0 * 7.0)
 
 
 func on_leave(w: Worker) -> void:
@@ -271,13 +271,13 @@ func rational_specific() -> Array:
 	var opts: Array = []
 	var k_op := "op:%s:%s" % [m2.def_id, m2.product]
 	if sim.story.perk(k_op) > 0.75:
-		opts.append([k_op, 0.88, "приспособление для «%s» на станке «%s»" % [pn, m2.title()], "операция на 12% быстрее", 12000.0])
+		opts.append([k_op, 0.88, L.t("приспособление для «%s» на станке «%s»") % [pn, m2.title()], L.t("операция на 12% быстрее"), 12000.0])
 	var k_df := "df:" + m2.product
 	if sim.story.perk(k_df) > 0.65:
-		opts.append([k_df, 0.8, "шаблон для контроля «%s»" % pn, "брака по этой детали на 20% меньше", 9000.0])
+		opts.append([k_df, 0.8, L.t("шаблон для контроля «%s»") % pn, L.t("брака по этой детали на 20% меньше"), 9000.0])
 	var k_wr := "wr:%d" % m2.id
 	if sim.story.perk(k_wr) > 0.6:
-		opts.append([k_wr, 0.75, "свою схему смазки и ухода за станком «%s» (инв. № %05d)" % [m2.title(), (m2.id * 7919) % 99000 + 1000], "этот станок изнашивается на 25% медленнее", 8000.0])
+		opts.append([k_wr, 0.75, L.t("свою схему смазки и ухода за станком «%s» (инв. № %05d)") % [m2.title(), (m2.id * 7919) % 99000 + 1000], L.t("этот станок изнашивается на 25% медленнее"), 8000.0])
 	if opts.is_empty():
 		return []
 	var o: Array = opts[sim.rng.randi_range(0, opts.size() - 1)]
@@ -290,8 +290,8 @@ func propose_rational() -> bool:
 		return false
 	var w: Worker = r[4]
 	var m: Thing = r[6]
-	sim.story.letter("rational2", "Рацпредложение", "%s предлагает %s: %s. Автор просит вознаграждение %s." % [w.full_name(), str(r[2]), str(r[3]), Defs.money_str(float(r[5]))], "idea", Sim.LVL_GOOD,
-		[{"text": "Внедрить и заплатить %s" % Defs.money_str(float(r[5])), "hint": "Улучшение навсегда"}, {"text": "Отклонить", "hint": "Автор обидится"}], 1,
+	sim.story.letter("rational2", L.t("Рацпредложение"), L.t("%s предлагает %s: %s. Автор просит вознаграждение %s.") % [w.full_name(), str(r[2]), str(r[3]), Defs.money_str(float(r[5]))], "idea", Sim.LVL_GOOD,
+		[{"text": L.t("Внедрить и заплатить %s") % Defs.money_str(float(r[5])), "hint": L.t("Улучшение навсегда")}, {"text": L.t("Отклонить"), "hint": L.t("Автор обидится")}], 1,
 		{"w": w.id, "key": str(r[0]), "v": float(r[1]), "what": str(r[2]), "pay": float(r[5]), "cx": m.cell.x, "cy": m.cell.y})
 	return true
 
@@ -305,8 +305,8 @@ func _res_rational(d: Dictionary, choice: int) -> void:
 		sim.stats["rational"] = int(sim.stats.get("rational", 0)) + 1
 		if w:
 			Mood.add(sim, w, "rational_paid")
-			w.add_history(sim.day(), "Рацпредложение внедрено: " + str(d["what"]))
-			sim.paper.add("Новаторы", "Рацпредложение: " + str(d["what"]), "Автор — %s. Внедрено в производство, автору выплачено вознаграждение." % w.full_name())
+			w.add_history(sim.day(), L.t("Рацпредложение внедрено: %s") % str(d["what"]))
+			sim.paper.add(L.t("Новаторы"), L.t("Рацпредложение: %s") % str(d["what"]), L.t("Автор — %s. Внедрено в производство, автору выплачено вознаграждение.") % w.full_name())
 	elif w:
 		Mood.add(sim, w, "rational_ignored")
 

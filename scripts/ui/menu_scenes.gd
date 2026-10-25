@@ -25,7 +25,7 @@ static func key(i: int) -> String:
 
 
 static func caption(i: int) -> String:
-	return str(SHOTS[i % SHOTS.size()][5])
+	return L.t(str(SHOTS[i % SHOTS.size()][5]))
 
 
 static func tod_of(i: int) -> float:

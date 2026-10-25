@@ -235,7 +235,7 @@ func _next() -> void:
 		hud.g.set_speed(1)   # прочитали карточку — время пошло
 	if sim.progress.tutorial >= STEPS.size():
 		sim.progress.tutorial = -1
-		hud.toast("Обучение пройдено! Справка — F1, цели — G.", Sim.LVL_GOOD, 6.0)
+		hud.toast(L.t("Обучение пройдено! Справка — F1, цели — G."), Sim.LVL_GOOD, 6.0)
 	Snd.play("ui_click", -6.0)
 	_show()
 
@@ -264,10 +264,10 @@ func _show() -> void:
 		hud.g.set_speed(0)   # 1.17: пока читают карточку — пауза
 	var ch := _chapter(i)
 	var n_ch := _chapter(STEPS.size() - 1) + 1
-	step_l.text = "ОБУЧЕНИЕ · ШАГ %d ИЗ %d" % [ch + 1, n_ch]
-	title_l.text = str(st["title"])
-	text_l.text = str(st["text"])
-	do_l.text = ("▶ " if not is_card else "") + str(st.get("do", ""))
+	step_l.text = L.t("ОБУЧЕНИЕ · ШАГ %d ИЗ %d") % [ch + 1, n_ch]
+	title_l.text = L.t(str(st["title"]))   # 1.40: тексты шагов — ключи перевода
+	text_l.text = L.t(str(st["text"]))
+	do_l.text = ("▶ " if not is_card else "") + L.t(str(st.get("do", "")))
 	next_b.visible = is_card or bool(st.get("next", false))
 	next_b.text = "Начать обучение  →" if str(st["id"]) == "intro" else ("Играть" if str(st["id"]) == "end" else "Далее  →")
 	UITheme.clear(card_box)
@@ -546,7 +546,7 @@ func _find_text(n: Node, text: String) -> Control:
 	if n == null:
 		return null
 	for c in n.get_children():
-		if c is Button and (c as Button).text == text and (c as Control).is_visible_in_tree():
+		if c is Button and ((c as Button).text == text or (c as Button).text == L.t(text)) and (c as Control).is_visible_in_tree():
 			return c
 		var r := _find_text(c, text)
 		if r:

@@ -39,11 +39,11 @@ func display_name() -> String:
 	match q:
 		"wip":
 			var o := Defs.op(def_id, step)
-			return n + " (ждёт: %s)" % Defs.process_name(str(o.get("op", ""))).to_lower()
+			return n + L.t(" (ждёт: %s)") % Defs.process_name(str(o.get("op", ""))).to_lower()
 		"machined":
-			return n + " (ждёт ОТК)"
+			return n + L.t(" (ждёт ОТК)")
 		"scrap":
-			return n + " (брак)"
+			return n + L.t(" (брак)")
 	return n
 
 

@@ -27,7 +27,7 @@ const SECTIONS: Array = [
 Ваше дело — не точить самому, а строить, нанимать, решать письма и выбирать стратегию. Эта книга открывается клавишей [b]F1[/b] или кнопкой [b]«?»[/b] вверху; пока она открыта, игра стоит на паузе."""},
 		{"id": "scenarios", "title": "Сценарии и профили завода", "icon": "ui:scn_garage", "see": ["company", "stages", "first_steps"],
 			"text": """[b]Сценарии[/b]
-• [b]Гараж[/b] — бокс в промзоне, старый токарный станок, трое работников и 300 000 ₽. Учит основам с подсказками по шагам.
+• [b]Гараж[/b] — бокс в промзоне, старый токарный станок, трое работников и 600 000 ₽ (на спокойной сложности больше, на хардкоре меньше). Учит основам с подсказками по шагам.
 • [b]Чистое поле[/b] — голый участок, вагончик-прорабская, бригада из трёх строителей и 1,3 млн ₽. Стройку помогают оплатить гранты «Цех с нуля», «Санитарно-бытовые условия», «Создание рабочих мест».
 • [b]Песочница[/b] — пустой участок, свои деньги и сложность, всё открыто сразу, целей нет.
 В «Чистом поле» и «Песочнице» первая неделя — на стройку: заявок нет. Готовы раньше — «Начать производство раньше» в списке задач.
@@ -528,7 +528,7 @@ const SECTIONS: Array = [
 			"text": """• Доход — оплата заказов после погрузки, контракты, металлолом.
 • Расходы — зарплата за каждую смену, металл и расходники, электроэнергия (7,5 ₽ за кВт·ч), отопление, стройка, проверки и штрафы.
 • [b]Налог[/b] — 6% с выручки каждую пятницу (5% с бухгалтерией). Когда в штате больше 8 человек, без бухгалтерии налоговая штрафует.
-• Старт в «Гараже» — 300 000 ₽."""},
+• Старт в «Гараже» — 600 000 ₽ (спокойная пятилетка +30%, лихие девяностые −15%). Первые две недели обычные клиенты платят аванс 30%."""},
 		{"id": "loans", "title": "Кредиты и лизинг", "icon": "ui:money", "see": ["finance", "develop_list"],
 			"text": """Финансы → Кредиты и лизинг. Банк даёт кредиты с этапа «Мастерская»: под 22%, с бухгалтерией — под 17%, со ступенью «Банк и лизинг» — до 3 млн ₽ под 14%.
 [b]Лизинг[/b]: станок от 40 000 ₽ — 20% сразу, остальное платежами 12 недель (+18%)."""},
@@ -696,6 +696,32 @@ static func _build_index() -> void:
 			_order.append(str(a["id"]))
 
 
+## 1.40: заголовки и тексты на языке игры — по ключам help.<id>.title / help.<id>.text / help.sec.<id>.
+static func title_of(id: String) -> String:
+	_build_index()
+	return L.dt("help.%s.title" % id, str(_index.get(id, {}).get("title", "")))
+
+
+static func text_of(id: String) -> String:
+	_build_index()
+	return L.dt("help.%s.text" % id, str(_index.get(id, {}).get("text", "")))
+
+
+static func sec_title(sid: String) -> String:
+	_build_index()
+	return L.dt("help.sec.%s" % sid, str(_sec_index.get(sid, {}).get("title", "")))
+
+
+## Текст для поиска на языке игры (русский — заранее посчитан в индексе).
+static func _plain_of(id: String) -> String:
+	var a: Dictionary = _index[id]
+	if not L.is_en():
+		return str(a["plain"])
+	if not a.has("plain_en"):
+		a["plain_en"] = _norm(title_of(id) + " " + plain_text(text_of(id)))
+	return str(a["plain_en"])
+
+
 static func section_count() -> int:
 	return SECTIONS.size()
 
@@ -738,10 +764,9 @@ static func search(q: String) -> Array[String]:
 		return res
 	var tail: Array[String] = []
 	for id in _order:
-		var a: Dictionary = _index[id]
-		if _norm(str(a["title"])).contains(nq):
+		if _norm(title_of(id)).contains(nq):
 			res.append(id)
-		elif str(a["plain"]).contains(nq):
+		elif _plain_of(id).contains(nq):
 			tail.append(id)
 	res.append_array(tail)
 	return res
@@ -956,13 +981,13 @@ func open(id: String) -> void:
 		open_sec = str(a["sec"])
 		if _search.text.strip_edges() == "":
 			_fill_list()
-	_crumb.text = str(sec["title"]).to_upper()
-	_title.text = str(a["title"])
+	_crumb.text = sec_title(str(sec["id"])).to_upper()
+	_title.text = title_of(id)
 	var tex := icon_of(str(a.get("icon", "")))
 	if tex == null:
 		tex = Tex.ui(str(sec["icon"]))
 	_icon.texture = tex
-	_text.text = str(a["text"])
+	_text.text = text_of(id)
 	_text.scroll_to_line(0)
 	UITheme.clear(_see_box)
 	var see: Array = a.get("see", [])
@@ -971,7 +996,7 @@ func open(id: String) -> void:
 		if not _index.has(l):
 			continue
 		var lid := l
-		var b := UITheme.small(str(_index[l]["title"]), func() -> void: open(lid), str(_sec_index[str(_index[l]["sec"])]["title"]))
+		var b := UITheme.small(title_of(l), func() -> void: open(lid), sec_title(str(_index[l]["sec"])))
 		_see_box.add_child(b)
 	var i := _order.find(id)
 	_prev_b.disabled = i <= 0
@@ -990,7 +1015,7 @@ func _fill_list() -> void:
 	var q := _search.text.strip_edges() if _search else ""
 	if q != "":
 		var found := search(q)
-		_count_l.text = "Найдено: %d" % found.size()
+		_count_l.text = L.t("Найдено: %d") % found.size()
 		if found.is_empty():
 			var e := UITheme.para("Ничего не найдено. Попробуйте другое слово: «ток», «зарплата», «склад».", 13, UITheme.MUTED)
 			_list.add_child(e)
@@ -1000,17 +1025,17 @@ func _fill_list() -> void:
 			var a: Dictionary = _index[id]
 			if str(a["sec"]) != last_sec:
 				last_sec = str(a["sec"])
-				var cap := UITheme.caption(str(_sec_index[last_sec]["title"]), UITheme.DIM)
+				var cap := UITheme.caption(sec_title(last_sec), UITheme.DIM)
 				_list.add_child(cap)
 			_list.add_child(_art_button(id))
 		_mark_list()
 		return
-	_count_l.text = "%d разделов · %d статей" % [SECTIONS.size(), _order.size()]
+	_count_l.text = L.t("%d разделов · %d статей") % [SECTIONS.size(), _order.size()]
 	for s: Dictionary in SECTIONS:
 		var sid := str(s["id"])
 		var is_open := sid == open_sec
 		var sb := Button.new()
-		sb.text = "%s  (%d)" % [str(s["title"]), (s["arts"] as Array).size()]
+		sb.text = "%s  (%d)" % [sec_title(sid), (s["arts"] as Array).size()]
 		sb.icon = Tex.ui(str(s["icon"]))
 		sb.expand_icon = false
 		sb.add_theme_constant_override("icon_max_width", 22 if Tex.is_color(sb.icon) else 20)
@@ -1046,12 +1071,12 @@ func _fill_list() -> void:
 
 func _art_button(id: String) -> Button:
 	var b := Button.new()
-	b.text = str(_index[id]["title"])
+	b.text = title_of(id)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.focus_mode = Control.FOCUS_NONE
 	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	b.clip_text = true
-	b.tooltip_text = str(_index[id]["title"])
+	b.tooltip_text = title_of(id)
 	b.add_theme_font_size_override("font_size", 13)
 	b.set_meta("art", id)
 	b.pressed.connect(func() -> void: open(id))

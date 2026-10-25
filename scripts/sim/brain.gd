@@ -25,6 +25,14 @@ func tick(dt: float) -> void:
 
 # ================================================================ основной цикл
 
+## Где человек, если не на смене: «на больничном» → «На больничном» (away_why хранится по-русски).
+static func _away_text(why: String) -> String:
+	if not L.is_en():
+		return why.capitalize()
+	var t := L.t(why)
+	return t.left(1).to_upper() + t.substr(1)
+
+
 func _tick_worker(w: Worker, dt: float) -> void:
 	var m := sim.minute
 	var win := sim.shift_window(w, m)
@@ -34,16 +42,16 @@ func _tick_worker(w: Worker, dt: float) -> void:
 			return  # уволился
 	if not w.present:
 		if w.sick_until > m:
-			w.activity = w.away_why.capitalize() if w.away_why != "" else "Не вышел на работу"
+			w.activity = _away_text(w.away_why) if w.away_why != "" else L.t("Не вышел на работу")
 			return
 		if w.skip_shift:
-			w.activity = "Не вышел на работу"
+			w.activity = L.t("Не вышел на работу")
 			if m >= win.x and int(w.get_meta("skip_note", -1)) != int(win.x):
 				w.set_meta("skip_note", int(win.x))
-				var why := str(w.get_meta("skip_why", "плохое настроение"))
-				sim.notify(Nicks.gendered("%s не вышел{|а} на смену: %s.", w.female) % [w.full_name(), why], Sim.LVL_WARN)
+				var why := L.t(str(w.get_meta("skip_why", "плохое настроение")))
+				sim.notify(Nicks.gendered(L.t("%s не вышел{|а} на смену: %s."), w.female) % [w.full_name(), why], Sim.LVL_WARN)
 		else:
-			w.activity = "Дома"
+			w.activity = L.t("Дома")
 		if sim.shift_is_workday(win) and not w.skip_shift and w.gone_anchor != win.x \
 				and m >= win.x + w.arrive_off and m < win.y - 30.0:
 			_spawn(w)
@@ -62,9 +70,9 @@ func _tick_worker(w: Worker, dt: float) -> void:
 				# заперт в помещении без выхода: ждём двери, потом «уходит через окно»
 				var trap := float(w.get_meta("trap", 0.0)) + dt
 				w.set_meta("trap", trap)
-				w.activity = "Заперт: нет выхода"
+				w.activity = L.t("Заперт: нет выхода")
 				w.anim = "idle"
-				sim.notify_once("trap%d" % w.id, "%s не может уйти домой: помещение без выхода. Поставьте дверь!" % w.full_name(), Sim.LVL_BAD, w.cell(), 600.0)
+				sim.notify_once("trap%d" % w.id, L.t("%s не может уйти домой: помещение без выхода. Поставьте дверь!") % w.full_name(), Sim.LVL_BAD, w.cell(), 600.0)
 				if trap > 90.0:
 					w.set_meta("trap", 0.0)
 					w.dressed = false
@@ -150,7 +158,7 @@ func _new_shift(w: Worker, win: Vector2) -> void:
 	if w.away_why != "":
 		w.away_why = ""
 		w.bubble = ""
-		w.add_history(sim.day(), Nicks.gendered("Вернул{ся|ась} на работу", w.female))
+		w.add_history(sim.day(), Nicks.gendered(L.t("Вернул{ся|ась} на работу"), w.female))
 	if Mood.has_trait(w, "early_bird"):
 		w.arrive_off = -sim.rng.randf_range(35.0, 70.0)
 	else:
@@ -182,7 +190,7 @@ func _new_shift(w: Worker, win: Vector2) -> void:
 	if w.low_mood_days >= int(Defs.b("quit_days")):
 		sim.fire(w, true)
 	elif w.low_mood_days == int(Defs.b("quit_days")) - 1:
-		sim.notify("%s на грани увольнения: настроение %d. Посмотрите его мысли в карточке." % [w.full_name(), int(w.mood)], Sim.LVL_BAD)
+		sim.notify(L.t("%s на грани увольнения: настроение %d. Посмотрите его мысли в карточке.") % [w.full_name(), int(w.mood)], Sim.LVL_BAD)
 
 
 ## Числовое значение черты (сумма по всем чертам) — для вероятностей и сдвигов.
@@ -239,7 +247,7 @@ func _spawn(w: Worker) -> void:
 	w.carrying = -1
 	w.hidden = false
 	w.dressed = w.is_itr()   # ИТР приходят в костюме, спецовка не нужна
-	w.activity = "Пришёл на смену"
+	w.activity = L.t("Пришёл на смену")
 	w.days_worked += 1
 	w.last_smoke = sim.minute - sim.rng.randf_range(0.0, 60.0)
 	var pay := float(w.wage) * (1.0 + (Defs.b("night_bonus") if w.shift == 1 else 0.0))
@@ -256,7 +264,7 @@ func _go_home(w: Worker) -> void:
 	sim.crew.try_steal(w)
 	var t := Task.new()
 	t.kind = "go_home"
-	t.label = "Идёт домой"
+	t.label = L.t("Идёт домой")
 	if w.dressed and not w.is_itr():
 		# 1.14: после грязной работы — в душ, если он есть
 		if DIRTY_PROFS.has(w.prof):
@@ -264,7 +272,7 @@ func _go_home(w: Worker) -> void:
 			if sh:
 				sh.spot_users[0] = w.id
 				t.res_spots.append([sh.id, 0])
-				t.label = "Моется в душе после смены"
+				t.label = L.t("Моется в душе после смены")
 				t.add({"t": "goto", "cell": sh.cell, "face": "down"})
 				t.add({"t": "work", "what": "shower", "thing": sh.id, "dur": 6.0, "anim": "hidden"})
 			elif sim.progress.stage >= 2 or not sim.things_of("shower").is_empty():
@@ -272,8 +280,8 @@ func _go_home(w: Worker) -> void:
 		var lk := _locker_for(w)
 		var acc := _locker_spot(lk, w) if lk else Vector2i(-1, -1)
 		if acc.x >= 0:
-			if t.label == "Идёт домой":
-				t.label = "Переодевается после смены"
+			if t.label == L.t("Идёт домой"):
+				t.label = L.t("Переодевается после смены")
 			t.add({"t": "goto", "cell": acc, "face": "up"})
 			t.add({"t": "work", "what": "undress", "dur": 4.0, "anim": "work"})
 		else:
@@ -304,7 +312,7 @@ func _free_shower(w: Worker) -> Thing:
 func escort_task(w: Worker) -> Task:
 	var t := Task.new()
 	t.kind = "escort"
-	t.label = "Сопровождает инспектора"
+	t.label = L.t("Сопровождает инспектора")
 	t.data["prop"] = "folder"
 	t.add({"t": "follow"})
 	return t
@@ -317,7 +325,7 @@ func _brief_task(w: Worker) -> Task:
 		return null
 	var t := Task.new()
 	t.kind = "brief"
-	t.label = "Проводит инструктаж по охране труда"
+	t.label = L.t("Проводит инструктаж по охране труда")
 	t.data["prop"] = "folder"
 	t.data["bubble"] = "talk"
 	t.add({"t": "goto", "cell": spot, "face": "down"})
@@ -346,7 +354,7 @@ func _despawn(w: Worker) -> void:
 	w.present = false
 	w.gone_today = true
 	w.dressed = false
-	w.activity = "Дома"
+	w.activity = L.t("Дома")
 	w.anim = "idle"
 	if w.pending_shift >= 0:
 		w.shift = w.pending_shift
@@ -393,7 +401,7 @@ func _locker_spot(lk: Thing, w: Worker) -> Vector2i:
 func _dress_task(w: Worker) -> Task:
 	var t := Task.new()
 	t.kind = "dress"
-	t.label = "Переодевается в спецовку"
+	t.label = L.t("Переодевается в спецовку")
 	var lk := _locker_for(w)
 	var acc := _locker_spot(lk, w) if lk else Vector2i(-1, -1)
 	if acc.x >= 0:
@@ -423,7 +431,7 @@ func _ppe_task(w: Worker) -> Task:
 		return null
 	var t := Task.new()
 	t.kind = "ppe"
-	t.label = "Получает СИЗ"
+	t.label = L.t("Получает СИЗ")
 	best.spot_users[int(bsp["idx"])] = w.id
 	t.res_spots.append([best.id, int(bsp["idx"])])
 	t.add({"t": "goto", "cell": bsp["cell"], "face": bsp["face"]})
@@ -447,7 +455,7 @@ func _smoke_task(w: Worker) -> Task:
 		return null
 	var t := Task.new()
 	t.kind = "smoke"
-	t.label = "Перекур"
+	t.label = L.t("Перекур")
 	t.add({"t": "goto", "cell": acc, "face": _face_to_rect(acc, best.rect())})
 	t.add({"t": "work", "what": "smoke", "dur": sim.rng.randf_range(6.0, 9.0), "anim": "smoke"})
 	Nicks.count(w, "smoke")
@@ -535,7 +543,7 @@ func _choose(w: Worker) -> Task:
 		# 1.19: под управлением — стоит и ждёт команды игрока
 		var hold := Task.new()
 		hold.kind = "order"
-		hold.label = "Ждёт вашей команды"
+		hold.label = L.t("Ждёт вашей команды")
 		hold.add({"t": "work", "what": "order_wait", "dur": 3.0, "anim": "idle", "finish": false})
 		return hold
 	if w.is_itr():
@@ -561,7 +569,7 @@ func _choose(w: Worker) -> Task:
 func _cook_task(w: Worker) -> Task:
 	var st := sim.town.kitchen()
 	if st == null or not sim.town.kitchen_ready():
-		sim.notify_once("cook_idle", "Повару негде готовить: в столовой нужны плита (под током) и линия раздачи.", Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("cook_idle", L.t("Повару негде готовить: в столовой нужны плита (под током) и линия раздачи."), Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
 		return null
 	var t := Task.new()
 	t.kind = "cook"
@@ -569,7 +577,7 @@ func _cook_task(w: Worker) -> Task:
 		var acc := best_access(st, w.cell())
 		if acc.x < 0 or not sim.world.reachable(w.cell(), acc):
 			return null
-		t.label = "Готовит обед"
+		t.label = L.t("Готовит обед")
 		t.data["bubble"] = "food"
 		t.add({"t": "goto", "cell": acc, "face": _face_to_rect(acc, st.rect())})
 		t.add({"t": "work", "what": "cook", "dur": 30.0, "anim": "work"})
@@ -582,7 +590,7 @@ func _cook_task(w: Worker) -> Task:
 	var spot := best_access(sv, w.cell()) if sv else Vector2i(-1, -1)
 	if spot.x < 0 or not sim.world.reachable(w.cell(), spot):
 		return null
-	t.label = "На раздаче" if _lunch_now() else "Моет посуду и протирает раздачу"
+	t.label = L.t("На раздаче") if _lunch_now() else L.t("Моет посуду и протирает раздачу")
 	t.add({"t": "goto", "cell": spot, "face": _face_to_rect(spot, sv.rect())})
 	t.add({"t": "work", "what": "wait", "dur": 20.0, "anim": "work"})
 	return t
@@ -603,14 +611,14 @@ func _nurse_task(w: Worker) -> Task:
 			cab = c
 			break
 	if cab == null:
-		sim.notify_once("nurse_idle", "Фельдшеру негде принимать: оборудуйте медпункт (кушетка, шкаф с лекарствами, раковина).", Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("nurse_idle", L.t("Фельдшеру негде принимать: оборудуйте медпункт (кушетка, шкаф с лекарствами, раковина)."), Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
 		return null
 	var acc := best_access(cab, w.cell())
 	if acc.x < 0 or not sim.world.reachable(w.cell(), acc):
 		return null
 	var t := Task.new()
 	t.kind = "nurse"
-	t.label = ["Ведёт приём", "Заполняет журнал медосмотров", "Меряет давление сменщикам", "Проверяет аптечки"][sim.rng.randi_range(0, 3)]
+	t.label = [L.t("Ведёт приём"), L.t("Заполняет журнал медосмотров"), L.t("Меряет давление сменщикам"), L.t("Проверяет аптечки")][sim.rng.randi_range(0, 3)]
 	t.add({"t": "goto", "cell": acc, "face": _face_to_rect(acc, cab.rect())})
 	t.add({"t": "work", "what": "wait", "dur": 45.0, "anim": "work"})
 	return t
@@ -631,11 +639,11 @@ func _break_task(w: Worker) -> Task:
 	var rt := _rest_task(w)
 	if rt:
 		(rt.toils[-1] as Dictionary)["dur"] = left
-		rt.label = "Перерыв на чай"
+		rt.label = L.t("Перерыв на чай")
 		return rt
 	var t := Task.new()
 	t.kind = "wander"
-	t.label = "Перерыв"
+	t.label = L.t("Перерыв")
 	t.add({"t": "work", "what": "wait", "dur": minf(left, 15.0), "anim": "idle"})
 	return t
 
@@ -658,7 +666,7 @@ func _meet_task(w: Worker) -> Task:
 	var t := Task.new()
 	t.kind = "meet"
 	var lead := sim.crew.is_lead(w)
-	t.label = "Проводит планёрку" if lead or w.prof in ["foreman", "chief"] else "На планёрке"
+	t.label = L.t("Проводит планёрку") if lead or w.prof in ["foreman", "chief"] else L.t("На планёрке")
 	if lead or w.prof in ["foreman", "chief"]:
 		t.data["prop"] = "folder"
 		t.data["bubble"] = "idea"
@@ -680,14 +688,14 @@ func _shift_clean_task(w: Worker) -> Task:
 			sim.shuffle(cells)
 			var ct := _make_task(w, {"k": "clean", "cells": cells.slice(0, 6), "s": 0.0})
 			if ct:
-				ct.label = "Уборка участка по графику"
+				ct.label = L.t("Уборка участка по графику")
 				return ct
 	if int(w.get_meta("handover", -1)) != int(w.shift_anchor):
 		w.set_meta("handover", int(w.shift_anchor))
 		Mood.add(sim, w, "clean_handover")
 	var t := Task.new()
 	t.kind = "wander"
-	t.label = "Сдаёт смену: протирает станок"
+	t.label = L.t("Сдаёт смену: протирает станок")
 	var spot := w.cell()
 	if m:
 		var acc := best_access(m, w.cell())
@@ -719,7 +727,7 @@ func _guard_task(w: Worker) -> Task:
 					door = wc
 					break
 			if door.x >= 0 and sim.world.reachable(w.cell(), door):
-				t.label = "Дежурит в будке на проходной"
+				t.label = L.t("Дежурит в будке на проходной")
 				t.data["post"] = "1"
 				t.add({"t": "goto", "cell": door})
 				t.add({"t": "seat", "thing": cp.id, "back": door, "face": Thing.rot_face("down", cp.rot)})
@@ -727,7 +735,7 @@ func _guard_task(w: Worker) -> Task:
 				return t
 			var acc := best_access(cp, w.cell())
 			if acc.x >= 0 and sim.world.reachable(w.cell(), acc):
-				t.label = "Дежурит на проходной"
+				t.label = L.t("Дежурит на проходной")
 				t.data["post"] = "1"
 				t.add({"t": "goto", "cell": acc, "face": _face_to_rect(acc, cp.rect())})
 				t.add({"t": "work", "what": "guard", "dur": sim.rng.randf_range(40.0, 70.0), "anim": "idle"})
@@ -749,7 +757,7 @@ func _guard_task(w: Worker) -> Task:
 	var target: Vector2i = pts[sim.rng.randi_range(0, pts.size() - 1)]
 	if not sim.world.reachable(w.cell(), target):
 		return null
-	t.label = "Обход территории"
+	t.label = L.t("Обход территории")
 	t.add({"t": "goto", "cell": target})
 	t.add({"t": "work", "what": "guard", "dur": sim.rng.randf_range(2.0, 5.0), "anim": "idle"})
 	return t
@@ -769,7 +777,7 @@ func _union_task(w: Worker) -> Task:
 			continue
 		var t := Task.new()
 		t.kind = "office"
-		t.label = "Профсоюзная работа"
+		t.label = L.t("Профсоюзная работа")
 		t.data["prop"] = "folder"
 		desk.spot_users[int(sp["idx"])] = w.id
 		t.res_spots.append([desk.id, int(sp["idx"])])
@@ -790,7 +798,7 @@ func _study_task(w: Worker) -> Task:
 			continue
 		var t := Task.new()
 		t.kind = "study"
-		t.label = "На курсах: " + str(Worker.SKILL_NAMES.get(str(c.get("skill", "")), "")).to_lower()
+		t.label = L.t("На курсах: %s") % L.t(str(Worker.SKILL_NAMES.get(str(c.get("skill", "")), ""))).to_lower()
 		desk.spot_users[int(sp["idx"])] = w.id
 		t.res_spots.append([desk.id, int(sp["idx"])])
 		t.data["prop"] = "folder"
@@ -845,7 +853,7 @@ func _tb_task(w: Worker) -> Task:
 		target = w.cell()
 	var t := Task.new()
 	t.kind = "study"
-	t.label = "Инструктаж по охране труда"
+	t.label = L.t("Инструктаж по охране труда")
 	t.data["bubble"] = "idea"
 	t.data["tb_cell"] = target
 	t.add({"t": "goto", "cell": target, "face": face})
@@ -863,14 +871,14 @@ func _office_task(w: Worker) -> Task:
 	if desk == null:
 		Mood.add(sim, w, "no_desk")
 		var room := str(Defs.departments.get(w.dept(), {}).get("room", ""))
-		sim.notify_once("nodesk_" + w.prof, "%s (%s) без рабочего места: поставьте стол ИТР в помещении «%s» или в общей конторе." % [w.full_name(), w.prof_lc(), str(Defs.rooms.get(room, {}).get("name", room))], Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
+		sim.notify_once("nodesk_" + w.prof, L.t("%s (%s) без рабочего места: поставьте стол ИТР в помещении «%s» или в общей конторе.") % [w.full_name(), w.prof_lc(), str(Defs.rooms.get(room, {}).get("name", room))], Sim.LVL_WARN, Vector2i(-1, -1), 1440.0)
 		return null
 	var sp := _free_spot(desk, w)
 	if sp.is_empty() or not sim.world.reachable(w.cell(), sp["cell"]):
 		return null
 	var t := Task.new()
 	t.kind = "office"
-	t.label = str(Office.DESK_LABELS.get(w.prof, "Работает с документами"))
+	t.label = L.t(str(Office.DESK_LABELS.get(w.prof, "Работает с документами")))
 	desk.spot_users[int(sp["idx"])] = w.id
 	t.res_spots.append([desk.id, int(sp["idx"])])
 	t.data["desk"] = desk.id
@@ -893,7 +901,7 @@ func _patrol_task(w: Worker) -> Task:
 		return null
 	var t := Task.new()
 	t.kind = "patrol"
-	t.label = "Обходит участок, раздаёт задания"
+	t.label = L.t("Обходит участок, раздаёт задания")
 	t.add({"t": "goto", "cell": target})
 	t.add({"t": "work", "what": "patrol", "dur": sim.rng.randf_range(3.0, 6.0), "anim": "idle"})
 	return t
@@ -935,14 +943,14 @@ func _ready_machines(machines: Array[Thing]) -> Array[Thing]:
 			continue
 		if not sim.prod.has_cons(m):
 			var cn := str(sim.prod.cons_need(m)[0])
-			sim.notify_once("nocons_" + cn, "Станок «%s» стоит: закончился %s — ждём поставку." % [m.title(), str(Defs.consumables.get(cn, {}).get("short", cn))], Sim.LVL_WARN, m.cell, 480.0)
+			sim.notify_once("nocons_" + cn, L.t("Станок «%s» стоит: закончился %s — ждём поставку.") % [m.title(), str(Defs.consumables.get(cn, {}).get("short", cn))], Sim.LVL_WARN, m.cell, 480.0)
 			continue
 		_rm.append(m)
 	# 1.26: одно сообщение на всех, а не по штуке на каждый станок
 	if not no_zone.is_empty():
-		sim.notify_once("zonem_all", "%s вне цеха — на %s не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство). Список — «Производство → Простой»." % [_names(no_zone), "нём" if no_zone.size() == 1 else "них"], Sim.LVL_WARN, no_zone[0].cell, 720.0)
+		sim.notify_once("zonem_all", L.t("%s вне цеха — на %s не работают. Разметьте зону «Цех» там, где стоят станки (Зоны → Производство). Список — «Производство → Простой».") % [_names(no_zone), L.t("нём") if no_zone.size() == 1 else L.t("них")], Sim.LVL_WARN, no_zone[0].cell, 720.0)
 	if not no_water.is_empty():
-		sim.notify_once("drym_all", "Нет воды: %s. Протяните трубу от насоса (меню «Сети»)." % _names(no_water), Sim.LVL_WARN, no_water[0].cell, 720.0)
+		sim.notify_once("drym_all", L.t("Нет воды: %s. Протяните трубу от насоса (меню «Сети»).") % _names(no_water), Sim.LVL_WARN, no_water[0].cell, 720.0)
 	return _rm
 
 
@@ -951,7 +959,7 @@ func _names(ms: Array[Thing]) -> String:
 	if ms.size() == 1:
 		return "«%s»" % ms[0].title()
 	var more := ms.size() - 1
-	return "«%s» и ещё %d %s" % [ms[0].title(), more, Defs.plural(more, "станок", "станка", "станков")]
+	return L.t("«%s» и ещё %d %s") % [ms[0].title(), more, Defs.plural(more, "станок", "станка", "станков")]
 
 
 ## 1.23: то же, но строка ключа собирается, только если у человека вообще есть «отказы» —
@@ -1165,9 +1173,9 @@ func _find_work(w: Worker) -> Task:
 			var dst := _route_dest(it2, m.cell)
 			if dst.is_empty():
 				if it2.q == "machined" and sim.things_of("qc").is_empty():
-					sim.notify_once("noqc", "Детали некуда нести на проверку. Поставьте стол ОТК.", Sim.LVL_WARN, m.cell)
+					sim.notify_once("noqc", L.t("Детали некуда нести на проверку. Поставьте стол ОТК."), Sim.LVL_WARN, m.cell)
 				elif it2.q == "wip":
-					sim.notify_once("nowip", "Деталям между операциями некуда деваться: поставьте стеллаж НЗП (меню «Объекты» → «Склад»).", Sim.LVL_WARN, m.cell, 600.0)
+					sim.notify_once("nowip", L.t("Деталям между операциями некуда деваться: поставьте стеллаж НЗП (меню «Объекты» → «Склад»)."), Sim.LVL_WARN, m.cell, 600.0)
 				break
 			var sc4 := 80.0 + urgent + haul_bonus - _dist(wc, m.cell) * 0.3
 			cands.append({"s": sc4, "k": "haul", "item": it2, "dest": dst[0], "slot": dst[1]})
@@ -1395,11 +1403,11 @@ func _find_work(w: Worker) -> Task:
 ## Можно ли вообще командовать человеком. Пустая строка — можно.
 func order_block(w: Worker) -> String:
 	if w.visitor or not w.present:
-		return "%s сейчас не на заводе" % w.full_name()
+		return L.t("%s сейчас не на заводе") % w.full_name()
 	if w.is_itr():
-		return "ИТР работают в кабинетах — управлять можно только рабочими"
+		return L.t("ИТР работают в кабинетах — управлять можно только рабочими")
 	if w.sick_until > sim.minute:
-		return "%s на больничном" % w.full_name()
+		return L.t("%s на больничном") % w.full_name()
 	return ""
 
 
@@ -1421,7 +1429,7 @@ func take_control(w: Worker) -> String:
 			release_control(o)
 	w.controlled = true
 	abort(w)
-	return Nicks.gendered("%s под вашим управлением: щёлкните по стройке, станку, грузу или месту — сделает сейчас.", w.female) % w.full_name()
+	return Nicks.gendered(L.t("%s под вашим управлением: щёлкните по стройке, станку, грузу или месту — сделает сейчас."), w.female) % w.full_name()
 
 
 func release_control(w: Worker) -> void:
@@ -1442,52 +1450,52 @@ func order_options(w: Worker, c: Vector2i) -> Array:
 	# авария и чертежи сетей
 	for layer in ["cable", "pipe", "duct", "air"]:
 		if sim.world.net_at(layer, c) == 2:
-			var nm := str(Sim.NET_NAMES.get(layer, "сеть")).get_slice(": ", 1)
+			var nm := L.t(str(Sim.NET_NAMES.get(layer, "сеть")).get_slice(": ", 1))
 			var fault := sim.faults.at(layer, c)
-			var lab := ("Чинить аварию сейчас: " + str(Faults.LAYERS.get(layer, "")).to_lower()) if fault else ("Проложить сейчас: " + nm)
+			var lab := (L.t("Чинить аварию сейчас: %s") % L.t(str(Faults.LAYERS.get(layer, ""))).to_lower()) if fault else (L.t("Проложить сейчас: %s") % nm)
 			var ok := fault or _can_lay(w, layer)
-			out.append({"key": "net:" + layer, "label": lab, "ok": ok, "why": "" if ok else "%s не умеет — нужен электрик или строитель" % w.first})
+			out.append({"key": "net:" + layer, "label": lab, "ok": ok, "why": "" if ok else L.t("%s не умеет — нужен электрик или строитель") % L.name(w.first)})
 	# чертёж стройки
 	if sim.bp_cells.has(i):
 		var ok2 := sim.bp_ready(i)
 		var why2 := ""
 		if not ok2:
-			why2 = "сначала нужно достроить то, что рядом (пол или соседнюю стену)"
+			why2 = L.t("сначала нужно достроить то, что рядом (пол или соседнюю стену)")
 		elif sim.bmats.enabled and not sim.bmats.ready(i):
 			ok2 = false
-			why2 = "нет стройматериала на участке — закажите в «Стройке»"
-		out.append({"key": "bp", "label": "Строить сейчас: " + _bp_what(i), "ok": ok2, "why": why2})
+			why2 = L.t("нет стройматериала на участке — закажите в «Стройке»")
+		out.append({"key": "bp", "label": L.t("Строить сейчас: %s") % _bp_what(i), "ok": ok2, "why": why2})
 	# объект
 	var th := sim.thing_at(c)
 	if th and th.kind() != "light":
 		var lab3 := ""
 		var why3 := ""
 		if th.demolish:
-			lab3 = "Демонтировать сейчас: " + th.title()
+			lab3 = L.t("Демонтировать сейчас: %s") % th.title()
 		elif not th.built:
-			lab3 = "Собрать сейчас: " + th.title()
+			lab3 = L.t("Собрать сейчас: %s") % th.title()
 			if th.crates_need > 0 and th.crates_in < th.crates_need and th.order_eta >= 0.0:
-				why3 = "ящики с оборудованием ещё в пути"
+				why3 = L.t("ящики с оборудованием ещё в пути")
 		elif th.broken:
-			lab3 = "Чинить сейчас: " + th.title()
+			lab3 = L.t("Чинить сейчас: %s") % th.title()
 		elif th.kind() == "machine":
-			lab3 = "Встать за станок сейчас: " + th.title()
+			lab3 = L.t("Встать за станок сейчас: %s") % th.title()
 			if th.product == "":
-				why3 = "станок без задания — сначала назначьте деталь"
+				why3 = L.t("станок без задания — сначала назначьте деталь")
 			elif not sim.prod.can_operate(w, th):
-				why3 = "%s не умеет работать на этом станке" % w.first
+				why3 = L.t("%s не умеет работать на этом станке") % L.name(w.first)
 		elif not th.spots().is_empty() or th.is_storage():
-			lab3 = "Работать здесь: " + th.title()
+			lab3 = L.t("Работать здесь: %s") % th.title()
 		if lab3 != "":
 			out.append({"key": "thing", "label": lab3, "ok": why3 == "", "why": why3})
 	# груз на полу
 	for it: Item in sim.logi.ground_on(c):
 		if it.reserved_by >= 0 and it.reserved_by != w.id:
 			continue
-		out.append({"key": "item:%d" % it.id, "label": "Отнести сейчас: " + it.display_name(), "ok": true, "why": ""})
+		out.append({"key": "item:%d" % it.id, "label": L.t("Отнести сейчас: %s") % it.display_name(), "ok": true, "why": ""})
 		break
 	if sim.world.passable(c):
-		out.append({"key": "go", "label": "Идти сюда", "ok": true, "why": ""})
+		out.append({"key": "go", "label": L.t("Идти сюда"), "ok": true, "why": ""})
 	return out
 
 
@@ -1502,11 +1510,11 @@ func _bp_what(i: int) -> String:
 	var wv := sim.world.bp_wall[i]
 	if wv != World.BP_NONE:
 		if wv == 0:
-			return "снос стены"
-		return "стена" if WallKinds.is_plain(wv) else str(Defs.wall_by_id.get(wv, {}).get("name", "стена")).to_lower()
+			return L.t("снос стены")
+		return L.t("стена") if WallKinds.is_plain(wv) else str(Defs.wall_by_id.get(wv, {}).get("name", L.t("стена"))).to_lower()
 	if sim.world.flora[i] != 0:
-		return "расчистка"
-	return "пол" if sim.world.bp_floor[i] != 0 else "разборка пола"
+		return L.t("расчистка")
+	return L.t("пол") if sim.world.bp_floor[i] != 0 else L.t("разборка пола")
 
 
 ## Приказ. key — что именно сделать (из order_options); пустой — как раньше: объект, стройка или идти.
@@ -1524,7 +1532,7 @@ func give_order(w: Worker, c: Vector2i, key: String = "") -> String:
 				break
 		if key == "":
 			if not opts.is_empty():
-				return "%s: %s" % [w.first, str(opts[0]["why"])]
+				return "%s: %s" % [L.name(w.first), str(opts[0]["why"])]
 			key = "go"
 	var th := sim.thing_at(c) if key == "thing" else null
 	var bpi := sim.world.idx(c) if key == "bp" else -1
@@ -1537,23 +1545,23 @@ func give_order(w: Worker, c: Vector2i, key: String = "") -> String:
 	elif not sim.world.passable(c):
 		goal = sim.world.nearest_passable(c, 2)
 	if goal.x < 0 or not sim.world.reachable(w.cell(), goal):
-		return "Туда %s не пройти" % w.first
+		return L.t("Туда %s не пройти") % L.name(w.first)
 	abort(w)
 	w.order = {"cx": c.x, "cy": c.y, "thing": th.id if th else -1, "bp": bpi, "item": item_id, "net": layer,
 		"until": sim.minute + (600.0 if w.controlled else 180.0)}
-	var what := "идти сюда"
+	var what := L.t("идти сюда")
 	if th:
-		what = "работать: " + th.title()
+		what = L.t("работать: %s") % th.title()
 	elif bpi >= 0:
-		what = "строить: " + _bp_what(bpi)
+		what = L.t("строить: %s") % _bp_what(bpi)
 	elif item_id >= 0:
 		var it0: Item = sim.items.get(item_id)
-		what = "отнести: " + (it0.display_name() if it0 else "груз")
+		what = L.t("отнести: %s") % (it0.display_name() if it0 else L.t("груз"))
 	elif layer != "":
-		what = str(NET_LABEL.get(layer, "сеть")).to_lower()
+		what = L.t(str(NET_LABEL.get(layer, "сеть"))).to_lower()
 	if w.controlled:
-		return "%s: %s — сейчас." % [w.full_name(), what]
-	return Nicks.gendered("%s получил{|а} приказ — %s. Потом сам{|а} вернётся к обычной работе.", w.female) % [w.full_name(), what]
+		return L.t("%s: %s — сейчас.") % [w.full_name(), what]
+	return Nicks.gendered(L.t("%s получил{|а} приказ — %s. Потом сам{|а} вернётся к обычной работе."), w.female) % [w.full_name(), what]
 
 
 func end_order(w: Worker, why: String) -> void:
@@ -1561,9 +1569,9 @@ func end_order(w: Worker, why: String) -> void:
 		return
 	w.order = {}
 	if w.controlled:
-		sim.notify(Nicks.gendered("%s: %s — ждёт следующей команды.", w.female) % [w.full_name(), why], Sim.LVL_INFO, w.cell())
+		sim.notify(Nicks.gendered(L.t("%s: %s — ждёт следующей команды."), w.female) % [w.full_name(), why], Sim.LVL_INFO, w.cell())
 		return
-	sim.notify(Nicks.gendered("%s вернул{ся|ась} к обычной работе: %s.", w.female) % [w.full_name(), why], Sim.LVL_INFO, w.cell())
+	sim.notify(Nicks.gendered(L.t("%s вернул{ся|ась} к обычной работе: %s."), w.female) % [w.full_name(), why], Sim.LVL_INFO, w.cell())
 
 
 ## 1.19: задача по приказу — построить конкретный чертёж, проложить конкретную сеть, унести конкретный груз.
@@ -1614,49 +1622,49 @@ func _order_done(od: Dictionary) -> bool:
 func _order_task(w: Worker) -> Task:
 	var od := w.order
 	if sim.minute > float(od.get("until", 0.0)):
-		end_order(w, "время приказа вышло")
+		end_order(w, L.t("время приказа вышло"))
 		return null
 	var c := Vector2i(int(od["cx"]), int(od["cy"]))
 	var th: Thing = sim.things.get(int(od.get("thing", -1)))
 	var direct := int(od.get("bp", -1)) >= 0 or str(od.get("net", "")) != "" or int(od.get("item", -1)) >= 0
 	if direct:
 		if _order_done(od):
-			end_order(w, "сделано" if bool(od.get("worked", false)) else "уже сделали")
+			end_order(w, L.t("сделано") if bool(od.get("worked", false)) else L.t("уже сделали"))
 			return null
 		var dt := _order_direct(w, od)
 		if dt:
 			od["worked"] = true
-			dt.label += " (по приказу)"
+			dt.label += L.t(" (по приказу)")
 			return dt
 		if int(od.get("idle", 0)) >= 3:
-			end_order(w, "сейчас это сделать нельзя")
+			end_order(w, L.t("сейчас это сделать нельзя"))
 			return null
 		od["idle"] = int(od.get("idle", 0)) + 1
 		var acc0 := _adjacent_access(c, w.cell())
-		return _order_wait(w, acc0 if acc0.x >= 0 else c, "Ждёт по команде у стройки", 5.0, false)
+		return _order_wait(w, acc0 if acc0.x >= 0 else c, L.t("Ждёт по команде у стройки"), 5.0, false)
 	if th:
 		w.set_meta("order_only", th.id)
 		var t := _find_work(w)
 		w.remove_meta("order_only")
 		if t:
 			od["worked"] = true
-			t.label += " (по приказу)"
+			t.label += L.t(" (по приказу)")
 			return t
 		if bool(od.get("worked", false)):
-			end_order(w, "работа на месте закончилась")
+			end_order(w, L.t("работа на месте закончилась"))
 			return null
 		if int(od.get("idle", 0)) >= 2:
-			end_order(w, "там ему делать нечего" if not w.female else "там ей делать нечего")
+			end_order(w, L.t("там ему делать нечего") if not w.female else L.t("там ей делать нечего"))
 			return null
 		od["idle"] = int(od.get("idle", 0)) + 1
 		var acc := best_access(th, w.cell())
-		return _order_wait(w, acc if acc.x >= 0 else c, "Ждёт по команде у «%s»" % th.title(), 8.0, false)
-	return _order_wait(w, c if sim.world.passable(c) else sim.world.nearest_passable(c, 2), "Идёт, куда велели", 30.0 if not w.controlled else 2.0, true)
+		return _order_wait(w, acc if acc.x >= 0 else c, L.t("Ждёт по команде у «%s»") % th.title(), 8.0, false)
+	return _order_wait(w, c if sim.world.passable(c) else sim.world.nearest_passable(c, 2), L.t("Идёт, куда велели"), 30.0 if not w.controlled else 2.0, true)
 
 
 func _order_wait(w: Worker, cell: Vector2i, label: String, mins: float, finish: bool) -> Task:
 	if cell.x < 0 or not sim.world.reachable(w.cell(), cell):
-		end_order(w, "туда не пройти")
+		end_order(w, L.t("туда не пройти"))
 		return null
 	var t := Task.new()
 	t.kind = "order"
@@ -1878,7 +1886,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				n += 1
 			if n == 0:
 				return null
-			t.label = "Чистит снег"
+			t.label = L.t("Чистит снег")
 			t.data["prop"] = "shovel"
 			t.data["cool"] = "sweep"
 			return t
@@ -1905,7 +1913,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				n2 += 1
 			if n2 == 0:
 				return null
-			t.label = "Убирает стружку и мусор"
+			t.label = L.t("Убирает стружку и мусор")
 			t.data["prop"] = "broom"
 			t.data["cool"] = "clean"
 			return t
@@ -1917,7 +1925,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				return null
 			sw.user = w.id
 			t.res_users.append(sw.id)
-			t.label = "Режет заготовки: " + Defs.material_name(str(cd["mat"]))
+			t.label = L.t("Режет заготовки: %s") % Defs.material_name(str(cd["mat"]))
 			t.add({"t": "goto", "cell": spw["cell"], "face": spw["face"]})
 			t.add({"t": "work", "what": "saw", "thing": sw.id, "mat": str(cd["mat"]), "dur": 16.0, "anim": "work"})
 			t.data["cool"] = "th%d" % sw.id
@@ -1930,7 +1938,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				return null
 			et.user = w.id
 			t.res_users.append(et.id)
-			t.label = "Сдаёт на %d-й разряд: пробная деталь" % (w.grade() + 1)
+			t.label = L.t("Сдаёт на %d-й разряд: пробная деталь") % (w.grade() + 1)
 			t.add({"t": "goto", "cell": esp2["cell"], "face": esp2["face"]})
 			t.add({"t": "work", "what": "exam", "thing": et.id, "dur": Careers.EXAM_TIME, "anim": "work"})
 			return t
@@ -1948,13 +1956,13 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 					return null
 				rit.reserved_by = w.id
 				t.res_items.append(rit.id)
-				t.label = "Дорабатывает брак: " + Defs.product_name(rit.def_id)
+				t.label = L.t("Дорабатывает брак: %s") % Defs.product_name(rit.def_id)
 				t.add({"t": "goto", "cell": rsrc})
 				t.add({"t": "pickup", "item": rit.id, "extra": []})
 				t.add({"t": "goto", "cell": spb["cell"], "face": spb["face"]})
 				t.add({"t": "work", "what": "rework", "thing": wb.id, "dur": 22.0 * clampf(1.3 - 0.06 * w.skill("fitting"), 0.6, 1.3), "anim": "work"})
 			else:
-				t.label = "Режет заготовки ножовкой: " + Defs.material_name(str(cd["mat"]))
+				t.label = L.t("Режет заготовки ножовкой: %s") % Defs.material_name(str(cd["mat"]))
 				t.add({"t": "goto", "cell": spb["cell"], "face": spb["face"]})
 				t.add({"t": "work", "what": "hand_saw", "thing": wb.id, "mat": str(cd["mat"]), "dur": 26.0, "anim": "work"})
 			wb.user = w.id
@@ -1969,7 +1977,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				return null
 			pm.user = w.id
 			t.res_users.append(pm.id)
-			t.label = "Налаживает станок: " + Defs.product_name(pm.product)
+			t.label = L.t("Налаживает станок: %s") % Defs.product_name(pm.product)
 			t.add({"t": "goto", "cell": spp["cell"], "face": spp["face"]})
 			t.add({"t": "work", "what": "setup", "thing": pm.id, "key": str(cd["key"]), "dur": sim.office.setup_time() * clampf(0.85 - w.skill("setup") * 0.04, 0.45, 0.85), "anim": "work"})
 			t.data["cool"] = "op%d" % pm.id
@@ -1986,7 +1994,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 			t.add({"t": "goto", "cell": sp["cell"], "face": sp["face"]})
 			var key := "%s:%d" % [m.product, m.job_step]
 			if not m.is_batch() and m.setup_key != key:
-				t.label = "Переналадка: " + Defs.product_name(m.product)
+				t.label = L.t("Переналадка: %s") % Defs.product_name(m.product)
 				t.add({"t": "work", "what": "setup", "thing": m.id, "key": key, "dur": sim.office.setup_time(), "anim": "work"})
 			if m.is_batch():
 				t.add({"t": "work", "what": "start_batch", "thing": m.id, "dur": 6.0, "anim": "work"})
@@ -2004,7 +2012,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 			t.res_users.append(q.id)
 			t.data["qc"] = q.id
 			t.data["cool"] = "qc%d" % q.id
-			t.label = "Проверяет детали (ОТК)"
+			t.label = L.t("Проверяет детали (ОТК)")
 			t.add({"t": "goto", "cell": sp2["cell"], "face": sp2["face"]})
 			t.add({"t": "take_qc", "thing": q.id})
 			t.add({"t": "work", "what": "inspect", "thing": q.id, "dur": 0.0, "anim": "work"})
@@ -2041,17 +2049,17 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				sim.reserve_incoming(dest, slot, it.stack_key())
 				t.res_incoming.append([dest.id, slot])
 			var n := 1 + extra.size()
-			var verb := "Везёт на погрузчике" if t.data.get("veh", "") == "forklift" else ("Везёт на тележке" if t.data.has("veh") else "Несёт")
+			var verb := L.t("Везёт на погрузчике") if t.data.get("veh", "") == "forklift" else (L.t("Везёт на тележке") if t.data.has("veh") else L.t("Несёт"))
 			if Production.is_heavy(it) and not t.data.has("veh"):
 				# 1.14: тяжёлую деталь в зале с кран-балкой несёт кран, человек ведёт пультом
 				var cr := sim.prod.crane_at(src)
 				if cr and sim.prod.crane_at(dst) == cr:
-					verb = "Ведёт краном"
+					verb = L.t("Ведёт краном")
 					t.data["prop"] = "pendant"
 					t.data["crane"] = cr.id
 				else:
-					verb = "Тащит"
-			t.label = verb + ": " + it.display_name() + (" ×%d" % n if n > 1 else "")
+					verb = L.t("Тащит")
+			t.label = "%s: %s" % [verb, it.display_name()] + (" ×%d" % n if n > 1 else "")
 			t.data["cool"] = "item%d" % it.id
 			t.add({"t": "goto", "cell": src})
 			t.add({"t": "pickup", "item": it.id, "extra": extra})
@@ -2076,7 +2084,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 			v.reserved_load += n2
 			t.res_load = v.id
 			t.data["load_n"] = n2
-			t.label = "Грузит заказ в машину" + (" ×%d" % n2 if n2 > 1 else "")
+			t.label = L.t("Грузит заказ в машину") + (" ×%d" % n2 if n2 > 1 else "")
 			t.data["cool"] = "item%d" % it2.id
 			t.add({"t": "goto", "cell": src2})
 			t.add({"t": "pickup", "item": it2.id, "extra": extra2})
@@ -2096,27 +2104,27 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				return null
 			sim.bp_res[i] = w.id
 			t.res_bp.append(i)
-			var what := "Строит"
+			var what := L.t("Строит")
 			var nm := ""
 			if wv != World.BP_NONE:
-				nm = "стену" if WallKinds.is_plain(wv) else str(Defs.wall_by_id.get(wv, {}).get("name", "")).to_lower()
+				nm = L.t("стену") if WallKinds.is_plain(wv) else str(Defs.wall_by_id.get(wv, {}).get("name", "")).to_lower()
 				if wv == 0:
-					what = "Сносит"
-					nm = "стену"
+					what = L.t("Сносит")
+					nm = L.t("стену")
 			else:
 				var fv := sim.world.bp_floor[i]
-				nm = "пол"
+				nm = L.t("пол")
 				if fv == 0:
-					what = "Разбирает"
+					what = L.t("Разбирает")
 				var fl := sim.world.flora[i]
 				if fl != 0 and (fv == 0 and sim.world.flr[i] == 0):
-					what = "Спиливает" if fl <= 3 else "Выкорчёвывает"
-					nm = "дерево" if fl <= 3 else "куст"
+					what = L.t("Спиливает") if fl <= 3 else L.t("Выкорчёвывает")
+					nm = L.t("дерево") if fl <= 3 else L.t("куст")
 				elif fl != 0:
-					what = "Расчищает место под"
+					what = L.t("Расчищает место под")
 			t.label = "%s %s" % [what, nm]
 			t.data["cool"] = "bp%d" % i
-			if what == "Строит":
+			if what == L.t("Строит"):
 				t.data["prop"] = "hammer"   # 1.15: строитель с понятным молотком
 			var mat := sim.bmats.mat_for(i) if sim.bmats.enabled else ""
 			if mat != "":
@@ -2145,25 +2153,25 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 			if t.kind == "demolish":
 				dur *= 0.5
 				what = "demolish_thing"
-				t.label = "Демонтирует: " + th.title()
+				t.label = L.t("Демонтирует: %s") % th.title()
 			elif t.kind == "repair":
 				dur = Defs.b("service_time") * (0.8 if w.prof in ["turner", "electrician"] else (0.7 if w.prof == "fitter" else 1.0)) * _build_k(w)
 				if w.prof == "fitter" and sim.office.has_tech("fit_jigs"):
 					dur *= 0.8
 				what = "repair"
-				t.label = "Обслуживает станок"
+				t.label = L.t("Обслуживает станок")
 			elif t.kind == "fix":
 				dur = Defs.b("repair_time") * (0.75 if w.prof in ["electrician", "turner", "miller"] else (0.65 if w.prof == "fitter" else 1.0)) * _build_k(w)
 				if w.prof == "fitter" and sim.office.has_tech("fit_jigs"):
 					dur *= 0.8
 				what = "fix"
-				t.label = "Ремонтирует станок"
+				t.label = L.t("Ремонтирует станок")
 			elif t.kind == "reset":
 				dur = Defs.b("breaker_reset_time") * (0.6 if w.prof == "electrician" else 1.0)
 				what = "reset"
-				t.label = "Сбрасывает автомат на подстанции"
+				t.label = L.t("Сбрасывает автомат на подстанции")
 			else:
-				t.label = "Монтирует: " + th.title()
+				t.label = L.t("Монтирует: %s") % th.title()
 			t.add({"t": "goto", "cell": acc, "face": _face_to_rect(acc, th.rect())})
 			t.add({"t": "work", "what": what, "thing": th.id, "dur": dur, "anim": "work"})
 			return t
@@ -2242,7 +2250,7 @@ func _build_with_mat(w: Worker, t: Task, i0: int, mat: String, stand0: Vector2i)
 		t.add({"t": "work", "what": "build_bp", "idx": ci, "mat": mat, "dur": sim.bp_work_time(ci) * _build_k(w), "anim": "work"})
 		cur = st
 	t.add({"t": "drop_left"})
-	t.label = t.label + " · несёт: " + BuildMats.mat_name(mat).to_lower()
+	t.label = L.t("%s · несёт: %s") % [t.label, BuildMats.mat_name(mat).to_lower()]
 	return t
 
 
@@ -2272,7 +2280,7 @@ func _lay_net_task(w: Worker, t: Task, lay: String, i0: int) -> Task:
 	t.data["nets"] = keys
 	t.data["cool"] = "net%d" % i0
 	t.data["prop"] = "reel" if lay == "cable" else "toolbox"
-	t.label = str(NET_LABEL.get(lay, "Прокладывает сеть"))
+	t.label = L.t(str(NET_LABEL.get(lay, "Прокладывает сеть")))
 	return t
 
 
@@ -2356,18 +2364,18 @@ func _toilet_task(w: Worker) -> Task:
 			best = th
 	if best == null:
 		if sim.things_of("toilet").is_empty():
-			sim.notify_once("notoilet", "Людям некуда сходить в туалет! Поставьте туалетную кабинку.", Sim.LVL_WARN, w.cell(), 600.0)
+			sim.notify_once("notoilet", L.t("Людям некуда сходить в туалет! Поставьте туалетную кабинку."), Sim.LVL_WARN, w.cell(), 600.0)
 		elif sim.usable_of("toilet").is_empty():
-			sim.notify_once("zonetoilet", "Туалетом не пользуются: он стоит вне зоны «Туалет». Разметьте её вокруг кабинки (Зоны → Быт и здоровье).", Sim.LVL_WARN, w.cell(), 600.0)
+			sim.notify_once("zonetoilet", L.t("Туалетом не пользуются: он стоит вне зоны «Туалет». Разметьте её вокруг кабинки (Зоны → Быт и здоровье)."), Sim.LVL_WARN, w.cell(), 600.0)
 		elif dry > 0 and sim.usable_of("toilet").any(func(x: Thing) -> bool: return sim.water.weak(x)):
-			sim.notify_once("weaktoilet", "Не хватает воды: один насос тянет %d приборов. Поставьте ещё насос или насосную станцию (Сети → Водопровод)." % Water.CITY_FIXTURES, Sim.LVL_WARN, w.cell(), 600.0)
+			sim.notify_once("weaktoilet", L.t("Не хватает воды: один насос тянет %d приборов. Поставьте ещё насос или насосную станцию (Сети → Водопровод).") % Water.CITY_FIXTURES, Sim.LVL_WARN, w.cell(), 600.0)
 		elif dry > 0:
-			sim.notify_once("drytoilet", "В туалете нет воды — кабинкой пользоваться нельзя. Поставьте насос и протяните от него трубу (меню «Сети», W).", Sim.LVL_WARN, w.cell(), 600.0)
+			sim.notify_once("drytoilet", L.t("В туалете нет воды — кабинкой пользоваться нельзя. Поставьте насос и протяните от него трубу (меню «Сети», W)."), Sim.LVL_WARN, w.cell(), 600.0)
 		_set_cool(w, "wc0", 2.0)
 		return null
 	var t := Task.new()
 	t.kind = "toilet"
-	t.label = "В туалете"
+	t.label = L.t("В туалете")
 	t.data["toilet"] = best.id
 	best.spot_users[0] = w.id
 	t.res_spots.append([best.id, 0])
@@ -2401,7 +2409,7 @@ func _eat_task(w: Worker) -> Task:
 		t.res_spots.append([best.id, 0])
 		var in_canteen := sim.rooms.thing_in(best, "canteen")
 		t.data["eat"] = "canteen" if in_canteen else "table"
-		t.label = "Обедает в столовой" if in_canteen else "Обедает"
+		t.label = L.t("Обедает в столовой") if in_canteen else L.t("Обедает")
 		t.add({"t": "goto", "cell": best.cell, "face": "auto"})
 		t.add({"t": "work", "what": "eat", "dur": Defs.b("eat_time"), "anim": "sit"})
 		return t
@@ -2410,13 +2418,13 @@ func _eat_task(w: Worker) -> Task:
 		var bt: Thing = bench["t"]
 		bt.spot_users[int(bench["idx"])] = w.id
 		t.res_spots.append([bt.id, int(bench["idx"])])
-		t.label = "Обедает на скамейке"
+		t.label = L.t("Обедает на скамейке")
 		t.data["eat"] = "bench"
 		t.add({"t": "goto", "cell": bench["cell"], "face": "down"})
 		t.add({"t": "work", "what": "eat", "dur": Defs.b("eat_time"), "anim": "sit"})
 		return t
-	sim.notify_once("notable", "Негде пообедать. Поставьте обеденный стол и стулья вплотную к нему.", Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
-	t.label = "Обедает стоя"
+	sim.notify_once("notable", L.t("Негде пообедать. Поставьте обеденный стол и стулья вплотную к нему."), Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
+	t.label = L.t("Обедает стоя")
 	t.data["eat"] = "standing"
 	t.add({"t": "work", "what": "eat", "dur": Defs.b("eat_time") + 5.0, "anim": "idle"})
 	return t
@@ -2449,7 +2457,7 @@ func _rest_task(w: Worker) -> Task:
 	var th: Thing = seat["t"]
 	var t := Task.new()
 	t.kind = "rest"
-	t.label = "Отдыхает"
+	t.label = L.t("Отдыхает")
 	th.spot_users[int(seat["idx"])] = w.id
 	t.res_spots.append([th.id, int(seat["idx"])])
 	var dur := Defs.b("rest_time") * Mood.trait_val(w, "rest_k", 1.0)
@@ -2478,7 +2486,7 @@ func _wander(w: Worker) -> void:
 		if sim.world.reachable(c, cand):
 			target = cand
 			break
-	t.label = "Без дела"
+	t.label = L.t("Без дела")
 	t.add({"t": "goto", "cell": target})
 	t.add({"t": "work", "what": "wait", "dur": sim.rng.randf_range(4.0, 10.0), "anim": "idle"})
 	assign(w, t)
@@ -2652,8 +2660,8 @@ func _route_inspected(w: Worker) -> void:
 		return
 	var dest := sim.find_storage(it, w.cell())
 	if dest.is_empty():
-		var what := "тару для брака" if it.q == "scrap" else "ещё один поддон для готовой продукции"
-		sim.notify_once("store_" + it.cat(), "Некуда положить «%s». Поставьте %s." % [it.display_name(), what], Sim.LVL_WARN, w.cell())
+		var what := L.t("тару для брака") if it.q == "scrap" else L.t("ещё один поддон для готовой продукции")
+		sim.notify_once("store_" + it.cat(), L.t("Некуда положить «%s». Поставьте %s.") % [it.display_name(), what], Sim.LVL_WARN, w.cell())
 		sim.put_on_ground(it, _off_wall_bp(w.cell()))
 		it.reserved_by = -1
 		w.task.res_items.erase(it.id)
@@ -2664,7 +2672,7 @@ func _route_inspected(w: Worker) -> void:
 	sim.reserve_incoming(t, s, it.stack_key())
 	w.task.res_incoming.append([t.id, s])
 	var acc := best_access(t, w.cell())
-	w.task.label = "Несёт: " + it.display_name()
+	w.task.label = L.t("Несёт: %s") % it.display_name()
 	w.activity = w.task.label
 	w.task.insert_next([{"t": "goto", "cell": acc}, {"t": "put", "thing": t.id, "slot": s}])
 	w.task.next()
@@ -2767,7 +2775,7 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 				fm.user = -1
 				w.task.res_users.erase(fm.id)
 				w.week_score += 2
-				sim.notify(Nicks.gendered("%s загрузил{|а} печь: %s × %d.", w.female) % [w.full_name(), Defs.product_name(fm.product), sim.count_slot(fm, 0)], Sim.LVL_INFO, fm.cell)
+				sim.notify(Nicks.gendered(L.t("%s загрузил{|а} печь: %s × %d."), w.female) % [w.full_name(), Defs.product_name(fm.product), sim.count_slot(fm, 0)], Sim.LVL_INFO, fm.cell)
 				w.task.next()
 		"inspect":
 			var it: Item = sim.items.get(w.carrying)
@@ -2855,7 +2863,7 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 				w.task.res_users.erase(th5.id)
 				sim.spend(Defs.b("repair_cost"), "Ремонт станка: запчасти")
 				sim.market.claim("property", Defs.b("repair_cost"), "ремонт станка")
-				sim.notify(Nicks.gendered("%s починил{|а} %s.", w.female) % [w.full_name(), th5.title()], Sim.LVL_GOOD, th5.cell)
+				sim.notify(Nicks.gendered(L.t("%s починил{|а} %s."), w.female) % [w.full_name(), th5.title()], Sim.LVL_GOOD, th5.cell)
 				w.week_score += 6
 				w.task.next()
 		"repair":
@@ -2870,7 +2878,7 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 				th3.user = -1
 				w.task.res_users.erase(th3.id)
 				sim.spend(Defs.b("service_cost"), "Обслуживание станка: резцы, масло, запчасти")
-				sim.notify(Nicks.gendered("%s обслужил{|а} станок — он как новый.", w.female) % w.full_name(), Sim.LVL_INFO, th3.cell)
+				sim.notify(Nicks.gendered(L.t("%s обслужил{|а} станок — он как новый."), w.female) % w.full_name(), Sim.LVL_INFO, th3.cell)
 				w.week_score += 3
 				w.task.next()
 		"reset":
@@ -2885,7 +2893,7 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 				w.task.res_users.erase(th4.id)
 				sim.power.reset_source(th4.id)
 				Nicks.count(w, "reset")
-				sim.notify(Nicks.gendered("%s сбросил{|а} автомат — свет и станки снова работают.", w.female) % w.full_name(), Sim.LVL_INFO, th4.cell)
+				sim.notify(Nicks.gendered(L.t("%s сбросил{|а} автомат — свет и станки снова работают."), w.female) % w.full_name(), Sim.LVL_INFO, th4.cell)
 				w.week_score += 2
 				w.task.next()
 		"ppe":
@@ -2973,7 +2981,7 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 					if qd:
 						sim.reserve_incoming(qd, 0, rit.stack_key())
 						w.task.res_incoming.append([qd.id, 0])
-						w.task.label = "Несёт на ОТК: " + rit.display_name()
+						w.task.label = L.t("Несёт на ОТК: %s") % rit.display_name()
 						w.activity = w.task.label
 						w.task.insert_next([{"t": "goto", "cell": best_access(qd, w.cell())}, {"t": "put", "thing": qd.id, "slot": 0}])
 						sim.item_rev += 1
@@ -3002,22 +3010,22 @@ func _work(w: Worker, tl: Dictionary, dt: float) -> void:
 						sim.career.finish_exam(w)
 						w.task.next()
 						return
-					w.task.label = "Несёт пробную деталь мастеру"
+					w.task.label = L.t("Несёт пробную деталь мастеру")
 					w.activity = w.task.label
 					w.task.insert_next([{"t": "goto", "cell": near}, {"t": "work", "what": "exam_check", "dur": 4.0, "anim": "idle"}])
 				else:
 					sim.career.finish_exam(w)
 				w.task.next()
 		"order_wait":
-			if w.task.label == "Идёт, куда велели":
-				w.task.label = "Стоит, где велели"
+			if w.task.label == L.t("Идёт, куда велели"):
+				w.task.label = L.t("Стоит, где велели")
 				w.activity = w.task.label
 			if done >= dur:
 				if bool(tl.get("finish", false)):
 					if w.controlled:
 						w.order = {}   # 1.19: под управлением — молча ждёт следующей команды
 					else:
-						end_order(w, "постоял{|а}, где велели".replace("{|а}", "а" if w.female else ""))
+						end_order(w, Nicks.gendered(L.t("постоял{|а}, где велели"), w.female))
 				w.task.next()
 		"exam_check":
 			if done >= dur:
@@ -3153,7 +3161,7 @@ func _op_skill(m: Thing, w: Worker = null) -> String:
 func _op_label(m: Thing) -> String:
 	var verbs := {"turning": "Точит", "milling": "Фрезерует", "drilling": "Сверлит", "welding": "Варит",
 		"heat": "Загружает печь", "paint": "Красит", "assembly": "Собирает", "casting": "Льёт", "stamping": "Штампует"}
-	return "%s: %s" % [str(verbs.get(m.process(), "Работает")), Defs.product_name(m.product)]
+	return "%s: %s" % [L.t(str(verbs.get(m.process(), "Работает"))), Defs.product_name(m.product)]
 
 
 func _op_time(w: Worker, m: Thing) -> float:
@@ -3221,7 +3229,7 @@ func _complete_part(w: Worker, m: Thing) -> void:
 	sim.roll_breakdown(m)
 	if sim.rng.randf() < 0.015 * sim.office.skill_growth_k() * sim.training.growth_k(w, _op_skill(m, w)) and sk < 10:
 		w.skills[_op_skill(m, w)] = sk + 1
-		w.add_history(sim.day(), "Набрался опыта: %s" % str(Worker.SKILL_NAMES.get(_op_skill(m, w), "")).to_lower())
+		w.add_history(sim.day(), L.t("Набрался опыта: %s") % L.t(str(Worker.SKILL_NAMES.get(_op_skill(m, w), ""))).to_lower())
 
 
 ## Печь можно запускать: полна, или больше ждать нечего, или ждали долго.
@@ -3363,7 +3371,7 @@ func _fire_task(w: Worker) -> Task:
 		return null
 	var t := Task.new()
 	t.kind = "extinguish"
-	t.label = "Тушит пожар"
+	t.label = L.t("Тушит пожар")
 	t.data["bubble"] = "fire"
 	if w.prop != "ext":
 		var ext: Thing = null
@@ -3377,7 +3385,7 @@ func _fire_task(w: Worker) -> Task:
 		if ext:
 			var acc := best_access(ext, wc)
 			if acc.x >= 0 and sim.world.reachable(wc, acc):
-				t.label = "Бежит за огнетушителем"
+				t.label = L.t("Бежит за огнетушителем")
 				t.add({"t": "goto", "cell": acc})
 				t.add({"t": "work", "what": "grab_ext", "dur": 0.5, "anim": "work"})
 	t.add({"t": "goto", "cell": stand, "face": _face_to(stand, fc)})
@@ -3417,7 +3425,7 @@ func _work_extinguish(w: Worker, tl: Dictionary, dt: float) -> void:
 		fi = nxt
 		_face(w, _face_to(wc, sim.world.cell_of(nxt)))
 	var rate := Defs.ev("extinguish_rate") if w.prop == "ext" else Defs.ev("extinguish_bare")
-	w.activity = "Тушит пожар" + ("" if w.prop == "ext" else " подручными средствами")
+	w.activity = L.t("Тушит пожар") if w.prop == "ext" else L.t("Тушит пожар подручными средствами")
 	sim.story.extinguish(fi, rate * dt)
 	if not sim.story.fires.has(fi):
 		Nicks.count(w, "fire")
@@ -3426,7 +3434,7 @@ func _work_extinguish(w: Worker, tl: Dictionary, dt: float) -> void:
 func _strike_task(w: Worker) -> Task:
 	var t := Task.new()
 	t.kind = "strike"
-	t.label = "Бастует у проходной"
+	t.label = L.t("Бастует у проходной")
 	t.data["prop"] = "sign"
 	t.data["bubble"] = "strike"
 	t.add({"t": "goto", "cell": sim.story.rally_cell(w), "face": "down"})
@@ -3521,7 +3529,7 @@ func abort(w: Worker) -> void:
 	w.hidden = false
 	if w.anim != "walk":
 		w.anim = "idle"
-	w.activity = "На месте"
+	w.activity = L.t("На месте")
 
 
 ## 1.26: груз не бросаем на чертёж стены — стену на клетке с грузом не начать, и стройка вставала навсегда

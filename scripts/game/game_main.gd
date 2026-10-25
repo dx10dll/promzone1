@@ -167,7 +167,7 @@ void fragment() {
 		hud.show_help(true)
 	# 1.30: камеру можно увести за край карты — к телебашне, Цне и центру Тамбова (юг дальше всего)
 	cam.bounds = Rect2(-12 * World.T, -10 * World.T, (sim.world.w + 24) * World.T, (sim.world.h + 34) * World.T)
-	DisplayServer.window_set_title("Промзона — %s" % Company.title(sim))
+	DisplayServer.window_set_title(tr("Промзона — %s") % Company.title(sim))
 	if sim.scenario != "garage":
 		cam.focus_cell(Vector2i(int(sim.world.plot.get_center().x), int(sim.world.plot.end.y / 2) + 4))
 
@@ -266,7 +266,7 @@ func _process(delta: float) -> void:
 		_want_autosave = false
 		var err := Game.autosave(sim)
 		if err != "":
-			hud.toast("Автосохранение не удалось: " + err, Sim.LVL_BAD)
+			hud.toast(tr("Автосохранение не удалось: %s") % err, Sim.LVL_BAD)
 	if sim.progress.stage_up > 0 and not hud.modal_open() and hud.letter_box == null:
 		var st := sim.progress.stage_up
 		sim.progress.stage_up = -1
@@ -405,7 +405,7 @@ func _unhandled_input(e: InputEvent) -> void:
 			_toggle_fps()
 		KEY_F5:
 			var err := Game.save_sim(sim, "quicksave", "Быстрое сохранение")
-			hud.toast("Игра сохранена (F9 — загрузить)." if err == "" else err, Sim.LVL_GOOD if err == "" else Sim.LVL_BAD, 3.0)
+			hud.toast(tr("Игра сохранена (F9 — загрузить).") if err == "" else err, Sim.LVL_GOOD if err == "" else Sim.LVL_BAD, 3.0)
 		KEY_F9:
 			if Game.has_save("quicksave"):
 				Game.start_load("quicksave")
@@ -462,7 +462,7 @@ func open_lot(k: int) -> void:
 
 func _on_track(name: String) -> void:
 	if hud and MusicDirector.TITLES.has(name):
-		hud.toast("Музыка: %s" % MusicDirector.TITLES[name], Sim.LVL_INFO, 4.0)
+		hud.toast(tr("Музыка: %s") % L.t(str(MusicDirector.TITLES[name])), Sim.LVL_INFO, 4.0)
 
 
 func _fps_tick(delta: float) -> void:
@@ -477,10 +477,10 @@ func _fps_tick(delta: float) -> void:
 			present += 1
 	# 1.29: вторая строка — чем рисуется и что ограничивает кадры (для поиска «потолка» на разных компьютерах)
 	var vs := DisplayServer.window_get_vsync_mode()
-	fps_label.text = "%d кадр/с · кадр %.1f мс · логика %.1f мс · симуляция %.1f мс/кадр · людей на заводе %d\n%s · %s · V-Sync %s · предел %s · вызовов отрисовки %d" % [
+	fps_label.text = tr("%d кадр/с · кадр %.1f мс · логика %.1f мс · симуляция %.1f мс/кадр · людей на заводе %d\n%s · %s · V-Sync %s · предел %s · вызовов отрисовки %d") % [
 		int(Engine.get_frames_per_second()), _fps_acc * 1000.0 / _fps_n, Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, _fps_sim / _fps_n, present,
 		RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_driver_name(),
-		"выкл." if vs == DisplayServer.VSYNC_DISABLED else "вкл.", str(Engine.max_fps) if Engine.max_fps > 0 else "нет",
+		tr("выкл.") if vs == DisplayServer.VSYNC_DISABLED else tr("вкл."), str(Engine.max_fps) if Engine.max_fps > 0 else tr("нет"),
 		int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))]
 	_fps_acc = 0.0
 	_fps_sim = 0.0

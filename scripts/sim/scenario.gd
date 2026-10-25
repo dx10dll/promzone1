@@ -53,6 +53,11 @@ static func new_game(scn: String, profile: String, story_mode: String, seed_valu
 	return sim
 
 
+## 1.39: множитель стартового капитала для режима рассказчика (data/events.json → modes.*.money_k).
+static func money_k(mode: String) -> float:
+	return float((Defs.events.get("modes", {}) as Dictionary).get(mode, {}).get("money_k", 1.0))
+
+
 ## Общая заготовка: симуляция, участок w×h с забором, тротуаром и дорогой внизу.
 static func _base(seed_value: int, scn: String, profile: String, story_mode: String, mw: int, mh: int) -> Sim:
 	var sim := Sim.new()
@@ -63,7 +68,8 @@ static func _base(seed_value: int, scn: String, profile: String, story_mode: Str
 	sim.story.mode = story_mode if Story.MODES.has(story_mode) else "market"
 	sim.progress.profile = profile if Defs.profiles.has(profile) and not bool(Defs.profiles[profile].get("locked", false)) else "mech"
 	var sd: Dictionary = Defs.scenarios.get(scn, {})
-	sim.money = float(sd.get("money", Defs.b("start_money")))
+	# 1.39: стартовый капитал зависит от сложности (спокойная +30%, лихие −15%); песочница задаёт деньги сама
+	sim.money = float(sd.get("money", Defs.b("start_money"))) * money_k(sim.story.mode)
 	sim.reputation = float(sd.get("reputation", Defs.b("start_reputation")))
 	sim.progress.stage = int(sd.get("stage", 1))
 	sim.minute = 7.0 * 60.0
@@ -104,9 +110,9 @@ static func new_garage(seed_value: int = 0, story_mode: String = "market", profi
 	sim.power.update_topology()
 	add_yard_zones(sim)   # 1.29: обязательные зоны у ворот, поддоны заготовок
 	sim.events.clear()
-	sim.notify("Добро пожаловать в «Промзону»! У вас бокс в промзоне, старый токарный станок и трое работников.", Sim.LVL_GOOD)
-	sim.notify("Первый заказ уже принят: 12 втулок для ИП Сидоренко. Металл лежит на стеллаже.", Sim.LVL_INFO)
-	sim.notify("У ворот отмечены зона разгрузки (сюда фургоны сгружают металл — на поддоны заготовок) и зона отгрузки (сюда несут готовый заказ, отсюда его грузит машина клиента).", Sim.LVL_INFO)
+	sim.notify(L.t("Добро пожаловать в «Промзону»! У вас бокс в промзоне, старый токарный станок и трое работников."), Sim.LVL_GOOD)
+	sim.notify(L.t("Первый заказ уже принят: 12 втулок для ИП Сидоренко. Металл лежит на стеллаже."), Sim.LVL_INFO)
+	sim.notify(L.t("У ворот отмечены зона разгрузки (сюда фургоны сгружают металл — на поддоны заготовок) и зона отгрузки (сюда несут готовый заказ, отсюда его грузит машина клиента)."), Sim.LVL_INFO)
 	return sim
 
 
@@ -391,7 +397,7 @@ static func _hire_crew(sim: Sim) -> void:
 	var a := People.make(sim.rng, "turner")
 	a.first = "Виктор"
 	a.nick = "Батя"
-	a.nick_why = "Сорок лет у станка, всех молодых учил — на старом заводе иначе и не звали."
+	a.nick_why = L.t("Сорок лет у станка, всех молодых учил — на старом заводе иначе и не звали.")
 	a.last = "Громов"
 	a.female = false
 	a.age = 58
@@ -402,7 +408,7 @@ static func _hire_crew(sim: Sim) -> void:
 		"street": "jacket", "street_col": "#3b3f44"}
 	a.wage = People.wage_for(a)
 	sim.add_worker(a)
-	a.add_history(sim.day(), "Сорок лет у станка. Пришёл, потому что «без дела скучно».")
+	a.add_history(sim.day(), L.t("Сорок лет у станка. Пришёл, потому что «без дела скучно»."))
 
 	var b := People.make(sim.rng, "qc")
 	b.first = "Ольга"
@@ -416,7 +422,7 @@ static func _hire_crew(sim: Sim) -> void:
 		"street": "coat", "street_col": "#6a3a3a"}
 	b.wage = People.wage_for(b)
 	sim.add_worker(b)
-	b.add_history(sim.day(), "Двадцать лет в ОТК на моторном заводе.")
+	b.add_history(sim.day(), L.t("Двадцать лет в ОТК на моторном заводе."))
 
 	var c := People.make(sim.rng, "laborer")
 	c.first = "Денис"
@@ -430,7 +436,7 @@ static func _hire_crew(sim: Sim) -> void:
 		"street": "jacket", "street_col": "#2f3a4a"}
 	c.wage = People.wage_for(c)
 	sim.add_worker(c)
-	c.add_history(sim.day(), "После армии. Руки растут откуда надо.")
+	c.add_history(sim.day(), L.t("После армии. Руки растут откуда надо."))
 
 
 static func _start_orders(sim: Sim) -> void:
@@ -676,7 +682,7 @@ static func migrate_v10(sim: Sim) -> void:
 		w.pipe_rev += 1
 		w.duct_rev += 1
 		w.air_rev += 1
-		sim.notify("Сохранение обновлено до 1.18: кабели и трубы теперь заводят прямо в клетку прибора — %d подключений дотянуто автоматически." % n, Sim.LVL_INFO)
+		sim.notify(L.t("Сохранение обновлено до 1.18: кабели и трубы теперь заводят прямо в клетку прибора — %d подключений дотянуто автоматически.") % n, Sim.LVL_INFO)
 	# 1.18: на некупленных участках деревьев вдвое меньше — карта легче
 	var thin := 0
 	for k2 in w.lots.size():
@@ -711,7 +717,7 @@ static func migrate_v11(sim: Sim) -> void:
 		t.setup_key = ""
 		n += 1
 	if n > 0:
-		sim.notify("Сохранение обновлено до 1.19: «Сайдвей ВМ-2215» теперь фрезерный станок — заготовки с него сложены рядом.", Sim.LVL_INFO)
+		sim.notify(L.t("Сохранение обновлено до 1.19: «Сайдвей ВМ-2215» теперь фрезерный станок — заготовки с него сложены рядом."), Sim.LVL_INFO)
 
 
 ## 1.20: батареям нужен электрокотёл у насосной — ставим его бесплатно и дотягиваем кабель.
@@ -722,9 +728,9 @@ static func migrate_v12(sim: Sim) -> void:
 		return
 	var h := add_heater(sim)
 	if h:
-		sim.notify("Сохранение обновлено до 1.20: батареи теперь греет электрокотёл у насосной — поставили его бесплатно и подключили.", Sim.LVL_INFO, h.cell)
+		sim.notify(L.t("Сохранение обновлено до 1.20: батареи теперь греет электрокотёл у насосной — поставили его бесплатно и подключили."), Sim.LVL_INFO, h.cell)
 	elif not sim.things_of("radiator", false).is_empty():
-		sim.notify("Обновление 1.20: батареям нужен электрокотёл вплотную к насосной станции (Объекты → Водопровод). Рядом с насосной нет места — освободите клетку и поставьте его.", Sim.LVL_WARN)
+		sim.notify(L.t("Обновление 1.20: батареям нужен электрокотёл вплотную к насосной станции (Объекты → Водопровод). Рядом с насосной нет места — освободите клетку и поставьте его."), Sim.LVL_WARN)
 
 
 ## Поставить готовый электрокотёл вплотную к насосной и протянуть к нему кабель от соседней клетки.
@@ -786,7 +792,7 @@ static func migrate_v7(sim: Sim) -> void:
 			autopipe(sim)
 	autowire(sim)
 	sim.world.cable_rev += 1
-	sim.notify("Сохранение обновлено до 0.8: в помещения повешено светильников — %d, проложен водопровод к туалетам и раковинам, станки подключены к своим розеткам." % lamps, Sim.LVL_INFO)
+	sim.notify(L.t("Сохранение обновлено до 0.8: в помещения повешено светильников — %d, проложен водопровод к туалетам и раковинам, станки подключены к своим розеткам.") % lamps, Sim.LVL_INFO)
 
 
 ## Старые сохранения (этап 1): проводка, назначение цеха, черты характера.
@@ -814,7 +820,7 @@ static func migrate_v1(sim: Sim) -> void:
 			var cw := Worker.from_dict(cd)
 			cw.traits = People.random_traits(sim.rng, cw)
 			sim.candidates[i] = cw.to_dict()
-	sim.notify("Сохранение из прошлой версии обновлено: проложена проводка, гараж назначен цехом.", Sim.LVL_INFO)
+	sim.notify(L.t("Сохранение из прошлой версии обновлено: проложена проводка, гараж назначен цехом."), Sim.LVL_INFO)
 
 
 
@@ -923,7 +929,7 @@ static func hire_prof(sim: Sim, prof: String, lvl_min: int = 3, lvl_max: int = 6
 	w.skills[sk] = sim.rng.randi_range(lvl_min, lvl_max)
 	w.wage = People.wage_for(w)
 	sim.add_worker(w)
-	w.add_history(sim.day(), Nicks.gendered("Принят{|а} на работу", w.female))
+	w.add_history(sim.day(), Nicks.gendered(L.t("Принят{|а} на работу"), w.female))
 	return w
 
 
@@ -995,9 +1001,9 @@ static func _new_field(seed_value: int, story_mode: String, profile: String) -> 
 	sim.progress.quiet_until = sim.day() + Progress.QUIET_DAYS   # 1.17: неделя на стройку без заказов
 	sim.orders.morning()
 	sim.events.clear()
-	sim.notify("«Чистое поле»: участок у трассы, вагончик и бригада из трёх строителей. Оформите программу «Цех с нуля» (Финансы → Гранты), стройте цех, потом нанимайте станочников.", Sim.LVL_GOOD)
-	sim.notify("Начните с пола и стен будущего цеха (Стройка, B). Ток и вода — из техпомещения: тяните кабель и трубы оттуда (Сети, E).", Sim.LVL_INFO)
-	sim.notify("Первая неделя — на стройку: заказов не будет. Готовы раньше — кнопка «Начать производство» в задачах слева.", Sim.LVL_INFO)
+	sim.notify(L.t("«Чистое поле»: участок у трассы, вагончик и бригада из трёх строителей. Оформите программу «Цех с нуля» (Финансы → Гранты), стройте цех, потом нанимайте станочников."), Sim.LVL_GOOD)
+	sim.notify(L.t("Начните с пола и стен будущего цеха (Стройка, B). Ток и вода — из техпомещения: тяните кабель и трубы оттуда (Сети, E)."), Sim.LVL_INFO)
+	sim.notify(L.t("Первая неделя — на стройку: заказов не будет. Готовы раньше — кнопка «Начать производство» в задачах слева."), Sim.LVL_INFO)
 	return sim
 
 
@@ -1027,8 +1033,8 @@ static func _new_sandbox(seed_value: int, story_mode: String, profile: String, o
 	sim.progress.all_open = bool(opts.get("all_open", true))
 	sim.progress.stage = 3 if sim.progress.all_open else 1
 	sim.progress.ooo = sim.progress.all_open
-	sim.notify("Песочница: пустой участок и бригада строителей. Целей нет — всё на ваше усмотрение.", Sim.LVL_GOOD)
-	sim.notify("Первая неделя — на стройку: заказов не будет. Готовы раньше — кнопка «Начать производство» в задачах слева.", Sim.LVL_INFO)
+	sim.notify(L.t("Песочница: пустой участок и бригада строителей. Целей нет — всё на ваше усмотрение."), Sim.LVL_GOOD)
+	sim.notify(L.t("Первая неделя — на стройку: заказов не будет. Готовы раньше — кнопка «Начать производство» в задачах слева."), Sim.LVL_INFO)
 	return sim
 
 
@@ -1138,11 +1144,11 @@ static func migrate_v13(sim: Sim) -> void:
 	var added := add_yard_zones(sim)
 	var names: Array[String] = []
 	if added.has("unload"):
-		names.append("разгрузки")
+		names.append(L.t("разгрузки"))
 	if added.has("ship"):
-		names.append("отгрузки")
+		names.append(L.t("отгрузки"))
 	if not names.is_empty():
-		var extra := " и поддоны заготовок" if added.has(Logistics.RAW_PALLET) else ""
-		sim.notify("Обновление 1.29: зоны разгрузки и отгрузки теперь обязательны — у ворот отмечена зона %s%s. Фургоны сгружают металл на поддоны заготовок, а машина клиента грузит заказ только из зоны отгрузки. Зоны можно расширить или перенести (Стройка → Зоны на улице)." % [" и ".join(names), extra], Sim.LVL_INFO)
+		var extra := L.t(" и поддоны заготовок") if added.has(Logistics.RAW_PALLET) else ""
+		sim.notify(L.t("Обновление 1.29: зоны разгрузки и отгрузки теперь обязательны — у ворот отмечена зона %s%s. Фургоны сгружают металл на поддоны заготовок, а машина клиента грузит заказ только из зоны отгрузки. Зоны можно расширить или перенести (Стройка → Зоны на улице).") % [L.t(" и ").join(names), extra], Sim.LVL_INFO)
 	if not sim.logi.has_zone() or not sim.logi.has_ship():
-		sim.notify("Обновление 1.29: у ворот нет свободного места под зону %s. Освободите место и отметьте её (Стройка → Зоны на улице)." % ("разгрузки" if not sim.logi.has_zone() else "отгрузки"), Sim.LVL_WARN)
+		sim.notify(L.t("Обновление 1.29: у ворот нет свободного места под зону %s. Освободите место и отметьте её (Стройка → Зоны на улице).") % (L.t("разгрузки") if not sim.logi.has_zone() else L.t("отгрузки")), Sim.LVL_WARN)

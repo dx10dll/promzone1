@@ -1,0 +1,986 @@
+keys,en
+Понятно,Got it
+«Горящий» заказ не принят: ,The “rush” order was not accepted: 
+На проходной ввели досмотр: охрана %s в день.,Bag checks introduced at the gate: security costs %s a day.
+Журнал передачи смены,Shift handover log
+Аврал до конца месяца,Rush until the end of the month
+"Объявлен аврал до конца месяца: работа быстрее, но брака и усталости больше.","Rush declared until the end of the month: work is faster, but there will be more scrap and fatigue."
+Собак увезли. На территории стало тихо — и как-то пусто.,"The dogs were taken away. The grounds are quiet now — a bit empty, somehow."
+У проходной поставили будки. Собаки теперь заводские: лают на чужих.,Kennels went up by the gate. The dogs belong to the plant now: they bark at strangers.
+Электричество дали: горсети устранили аварию.,The power is back: the city grid fixed the fault.
+Цены на металл вернулись к обычным.,Metal prices are back to normal.
+Досмотр на проходной отменён: нет охранника. Наймите охранника (Люди → Найм) и включите досмотр снова.,Gate checks cancelled: there's no security guard. Hire a guard (People → Hiring) and turn the checks on again.
+Загорелась проводка,The wiring caught fire
+Металл подорожал на %d%%,Metal up %d%%
+Металл подорожал,Metal prices up
+Металлобазы подняли цены на %d%%: виноваты курс и «сложная ситуация на рынке». Дорого продержится недели две. Покупайте только под заказы.,Metal depots raised prices by %d%%: blame the exchange rate and “the difficult market situation”. Prices will stay high for about two weeks. Buy only for orders.
+Экономика,Economy
+Снабженцы хватаются за голову: прутки дорожают. Бухгалтерия просит не точить лишнего.,Purchasing is tearing its hair out: bar stock is getting pricier. Accounting asks everyone not to machine anything extra.
+Металл подешевел на 15%,Metal down 15%
+Металл подешевел,Metal prices down
+На рынке избыток проката: металлобазы снизили цены на 15% на ближайшие полторы недели. Хорошее время запастись.,Rolled metal is in surplus: the depots cut prices by 15% for the next week and a half. A good time to stock up.
+Авария в городской сети,City grid failure
+Авария в горсетях,City grid failure
+"Электричество пропало по всему району. Обещают дать через %d ч. Станки стоят, свет только из окон.","The whole district lost power. They promise it back in %d h. The machines are idle, the only light comes through the windows."
+Происшествия,Incidents
+Свет отключили всему району,Power cut to the whole district
+"Станки стоят, чайник холодный. Энергетики горсетей ищут виноватого экскаваторщика.","Machines idle, kettle cold. The grid engineers are hunting for the guilty excavator driver."
+Авария на теплотрассе: батареи от теплосети холодные,Heating main failure: radiators on the city supply are cold
+Авария на теплотрассе,Heating main failure
+Городская теплосеть отключила район на %d %s: батареи от неё холодные. %s,The city heating network has shut the district off for %d %s: its radiators are cold. %s
+Своя котельная греет %d %s как ни в чём не бывало.,Our own boiler room keeps %d %s warm as if nothing happened.
+Своя котельная (газовый котёл) от таких аварий не зависит.,Our own boiler room (gas boiler) doesn't depend on such failures.
+Район без тепла,District without heat
+Теплосеть меняет трубу на перекрёстке. Мастера советуют поддеть тёплое под спецовку.,The heating network is replacing a pipe at the crossroads. The foremen advise wearing something warm under your overalls.
+Ударили морозы,A cold snap
+"Синоптики обещают до %d °C на несколько дней. Счёт за отопление вырастет, в неотапливаемых помещениях работать невозможно.",Forecasters promise down to %d °C for a few days. The heating bill will grow; unheated rooms will be impossible to work in.
+Погода,Weather
+Мороз и солнце,Frost and sunshine
+До %d °C! Не забудьте шапку-ушанку и тёплые портянки.,Down to %d °C! Don't forget your ushanka and warm foot wraps.
+Жара,Heatwave
+На улице за +30. В горячих цехах тяжело: помогут окна и кулер с водой.,It's over +30 outside. Hot shops are hard going: windows and a water cooler will help.
+Жара!,Heatwave!
+Термисты просят выдать им мороженое за вредность. Профсоюз изучает вопрос.,The heat treaters are asking for ice cream as hazard pay. The union is looking into it.
+Паводок размыл дорогу,Flood washed out the road
+Паводок,Flood
+"Талые воды размыли подъездную дорогу: поставки задержатся на сутки, новые — тоже, пока не просохнет.","Meltwater washed out the access road: deliveries will be a day late, and new ones too, until it dries out."
+Поставка задерживается,Delivery delayed
+Машина с металлом сломалась под Тверью. Поставка опоздает на %d %s.,The metal truck broke down near Tver. The delivery will be %d %s late.
+Слухи о сокращении,Layoff rumours
+"В курилке говорят, что завод закрывают, а всех сократят. Люди нервничают и работают спустя рукава.",Word in the smoking room is that the plant is closing and everyone will be laid off. People are nervous and working half-heartedly.
+Собрать коллектив и всё объяснить,Gather the team and explain everything
+Слухи развеются,The rumours will fade
+Не обращать внимания,Ignore it
+Настроение будет плохим ещё три дня,Mood will stay bad for three more days
+Конфликт смен,Shift conflict
+"Первая смена жалуется: вторая оставляет станки грязными, а заготовки — где попало. Дело идёт к скандалу.",The first shift complains: the second leaves the machines dirty and the blanks lying anywhere. A row is brewing.
+Завести журнал передачи смены (5 000 ₽),"Start a shift handover log (5,000 ₽)"
+Конфликты прекратятся,The conflicts will stop
+Пусть разбираются сами,Let them sort it out
+Может повториться,May happen again
+Фонд «Промразвитие»,The “Promrazvitie” Fund
+Областной фонд поддержки промышленности предлагает помощь молодым производствам. Можно выбрать одно.,The regional industry support fund offers help to young businesses. You may choose one.
+Льготный заём 1 500 000 ₽ под 5% на 26 недель,"Soft loan of 1,500,000 ₽ at 5% for 26 weeks"
+Платёж каждый понедельник,Payment every Monday
+Субсидия 30% на следующий станок,30% subsidy on the next machine
+Действует месяц,Valid for a month
+Отказаться,Decline
+Рейдерская попытка,Raider attack
+Неизвестные принесли в налоговую поддельный протокол собрания учредителей и пытаются переоформить завод на себя. Нужно отбиваться.,Unknown persons have filed a forged founders' meeting record with the tax office and are trying to re-register the plant to themselves. You need to fight back.
+"Нанять юристов (80 000 ₽, шанс 85%)","Hire lawyers (80,000 ₽, 85% chance)"
+Отбиваться самим (шанс 40%),Fight back yourselves (40% chance)
+При неудаче — потеря четверти денег,"If it fails, you lose a quarter of your money"
+Откупиться (20% денег на счёте),Pay them off (20% of the money in the account)
+Наверняка,Guaranteed
+на территории,on the grounds
+Пожар!,Fire!
+"%s: огонь %s. Все свободные бегут тушить. С огнетушителем — в разы быстрее; если огонь разойдётся, приедут пожарные — и будет проверка.","%s: fire %s. Everyone free runs to put it out. With an extinguisher it's many times faster; if the fire spreads, the fire brigade will come — and so will an inspection."
+в помещении «%s»,in the “%s”
+Пожар на заводе,Fire at the plant
+"%s. Коллектив бросился тушить, кто с огнетушителем, кто с ведром.","%s. The team rushed to put it out — some with extinguishers, some with buckets."
+Пожар потушен пожарными,Fire put out by the fire brigade
+"Расчёт пожарной охраны потушил огонь, пожар шёл %d мин. Будет внеплановая проверка пожарного надзора.",The fire crew put the fire out; it burned for %d min. Expect an unscheduled fire inspection.
+после пожара,after the fire
+Пожар потушен,Fire put out
+Огонь потушили своими силами за %d мин.,We put the fire out ourselves in %d min.
+Герои,Heroes
+Потушили сами,Put it out ourselves
+"Пожар потушили за %d минут без пожарных. Коллектив молодец, огнетушители — тоже.","The fire was put out in %d minutes without the fire brigade. Well done, team — and well done, extinguishers."
+Недавний пожар,Recent fire
+Огонь повредил станок «%s» — нужен ремонт.,Fire damaged the “%s” machine — it needs repair.
+Загорелось у станка «%s»,Fire at the “%s” machine
+Перегруз: загорелась проводка у подстанции,Overload: the wiring at the substation caught fire
+получил{|а} травму у станка,got injured at a machine
+травмировал{|а} руку на работе,hurt {his|her} hand at work
+поскользнул{ся|ась} на льду,slipped on the ice
+получил{|а} ожог на пожаре,got burned in the fire
+пострадал{|а} в драке,got hurt in a fight
+получил{|а} травму,got injured
+Травма: %s. Больничный %d дн.,Injury: %s. Sick leave %d d.
+Идёт в травмпункт,Going to the first-aid post
+Фельдшер перевязал — домой,The nurse bandaged it — going home
+Травма на производстве,Workplace injury
+%s %s. Больничный — %d %s%s.,%s %s. Sick leave: %d %s%s.
+ (аптечка рядом помогла), (the first-aid kit nearby helped)
+. С аптечкой рядом было бы легче,. A first-aid kit nearby would have helped
+Охрана труда,Workplace safety
+Травма: ,Injury: 
+"Напоминаем: спешка, усталость и изношенный станок — главные враги. Берегите себя.","A reminder: haste, fatigue and worn machines are our main enemies. Look after yourselves."
+после травмы,after an injury
+Бракованная партия металла,Defective metal batch
+ОТК обнаружило: в партии «%s» от поставщика %d прутков с трещинами и раковинами. Детали из них пойдут в брак.,QC found that in the “%s” batch from the supplier %d bars have cracks and voids. Parts made from them will be scrap.
+Вернуть брак поставщику,Return the defects to the supplier
+"Прутки уберут со склада, деньги (%s) вернут через 3 дня","The bars will be removed from the store, the money (%s) refunded in 3 days"
+Пустить в работу,Use them anyway
+Много брака на ОТК,Lots of scrap at QC
+Поставщик (возврат за брак),Supplier (refund for defects)
+%d бракованных прутков отправили обратно поставщику.,%d defective bars sent back to the supplier.
+Прорвало трубу отопления,Heating pipe burst
+"В помещении «%s» прорвало трубу: батареи холодные, на полу лужа. Без ремонта там будет мороз.","A pipe burst in the “%s”: the radiators are cold, there's a puddle on the floor. Without repairs it'll freeze in there."
+Вызвать аварийную службу (18 000 ₽),"Call the emergency service (18,000 ₽)"
+Починят за 3 часа,Fixed in 3 hours
+Чинить своими силами,Repair it ourselves
+"Бесплатно, но сутки без тепла","Free, but a day without heat"
+Обрыв провода,Broken cable
+"Перебило кабель — искрит, дальше по линии тока нет: станки и свет за обрывом стоят. Электрик или любой рабочий заменит кусок кабеля, как при прокладке.","A cable got cut — it's sparking, and there's no power further down the line: machines and lights beyond the break are down. An electrician or any worker will replace the piece of cable, as when laying it."
+Вызвать аварийную бригаду (%s),Call the emergency crew (%s)
+Починят за час,Fixed in an hour
+"Бесплатно: кусок кабеля появится в чертежах, его проложат рабочие","Free: the piece of cable will appear in the blueprints, the workers will lay it"
+Прорвало водопровод,Water main burst
+"Лопнула труба — на полу лужа, дальше по трубе воды нет: туалеты и раковины за прорывом сухие. Рабочие заменят кусок трубы, как при прокладке.","A pipe burst — there's a puddle on the floor and no water further down the pipe: toilets and sinks beyond the break are dry. The workers will replace the piece of pipe, as when laying it."
+"Бесплатно: кусок трубы появится в чертежах, его проложат рабочие","Free: the piece of pipe will appear in the blueprints, the workers will lay it"
+"Сбыт: успеваем, можно брать.","Sales: we'll make it, take it."
+Сбыт против: %s.,Sales are against: %s.
+«Горящий» заказ,A “rush” order
+"%s срочно нужно %d шт. «%s» за %d %s. Платят на 45%% дороже обычного — %s.
+%s","%s urgently needs %d pcs of “%s” in %d %s. They pay 45%% above the usual price — %s.
+%s"
+Взять заказ,Take the order
+Поставит его первым в очередь,It will go first in the queue
+Рискованно: можно не успеть,Risky: we may not make it
+Выплатить компенсацию (%s),Pay compensation (%s)
+Репутация почти не пострадает,Reputation will barely suffer
+Отказать: «Брак не наш»,Refuse: “Not our defect”
+Репутация −6,Reputation −6
+Оспорить через юриста,Dispute through the lawyer
+"Экспертиза: шанс 50% снизить компенсацию вдвое, репутация −2","Expert review: 50% chance to halve the compensation, reputation −2"
+Заменить детали со склада (%d шт.),Replace the parts from stock (%d pcs)
+Готовые детали уйдут клиенту,Finished parts will go to the client
+Рекламация,Complaint
+"%s прислал рекламацию: в партии «%s» нашли %d %s с браком, пропущенных ОТК. Требуют решить вопрос.",%s has sent a complaint: in the “%s” batch they found %d %s with defects that QC missed. They want it sorted out.
+Клиент,Client
+Качество,Quality
+Рекламация от клиента,A complaint from a client
+"Брак дошёл до заказчика. ОТК, это камень в ваш огород!","Defects reached the customer. QC, that one's aimed at you!"
+Бракованные детали заменили со склада. Клиент доволен.,The defective parts were replaced from stock. The client is happy.
+"%s обиделся и рассказал всем, что у вас брак. Репутация упала.",%s took offence and told everyone your parts are defective. Reputation fell.
+Юрист добился экспертизы: часть брака — от неправильного монтажа у заказчика. Компенсация вдвое меньше: %s.,The lawyer won an expert review: some of the defects came from the customer's faulty installation. Compensation halved: %s.
+Экспертиза подтвердила брак: компенсацию пришлось выплатить полностью (%s).,The expert review confirmed the defects: the compensation had to be paid in full (%s).
+Собаки подняли лай,The dogs raised the alarm
+"Ночью кто-то лез через забор к складу, но заводские собаки подняли такой лай, что вор сбежал без металла.","Someone climbed the fence towards the store at night, but the plant dogs barked so hard that the thief fled without the metal."
+Бдительность,Vigilance
+Жучка на страже,Rex on guard
+Заводские собаки отогнали несуна от склада. Профком выделил им по косточке.,The plant dogs chased a pilferer away from the store. The union committee gave them a bone each.
+Вахта задержала несуна,The gate caught a pilferer
+Охранник на проходной нашёл в сумке у рабочего три прутка. Металл вернули на склад.,The security guard at the gate found three bars in a worker's bag. The metal went back to the store.
+Вахта не дремлет,The gate never sleeps
+"Охрана на проходной снова на посту: несун задержан, металл возвращён. Спасибо за бдительность!","Security at the gate is on duty again: a pilferer caught, the metal returned. Thank you for your vigilance!"
+Со склада пропало %d прутков («%s»). Кто-то вынес через забор или проходную.,%d bars (“%s”) went missing from the store. Someone carried them out over the fence or through the gate.
+Кража на складе,Theft from the store
+Ввести досмотр на проходной (%s в день),Introduce gate checks (%s a day)
+"Людям не нравится, но кражи почти прекратятся. Досматривает охранник — без него досмотра нет","People won't like it, but thefts will almost stop. A security guard does the checks — without one there are none"
+Ничего не делать,Do nothing
+ Поставьте у въезда проходную с турникетами (Объекты → Безопасность) и наймите охранника — тогда можно ввести досмотр., Put a gatehouse with turnstiles at the entrance (Objects → Safety) and hire a security guard — then you can introduce checks.
+Несуны снова в деле,Pilferers at it again
+"Со склада ушло %d прутков. Товарищи, металл — народное достояние, а не дачный забор!","%d bars left the store. Comrades, metal is the people's property, not a fence for your dacha!"
+Пьянка и драка,Drinking and a fight
+"%s и %s после обеда «отметили» что-то в бытовке и подрались. Мастера в ступоре, остальные смотрят, что будет.","After lunch %s and %s “celebrated” something in the locker room and got into a fight. The foremen are stunned, the rest are waiting to see what happens."
+Объявить выговор обоим,Reprimand both
+"Настроение у них упадёт, но порядок будет","Their mood will drop, but there will be order"
+Уволить зачинщика (%s),Fire the instigator (%s)
+Остальные запомнят,The others will remember
+Замять,Hush it up
+"Коллектив решит, что можно всё",The team will decide anything goes
+Выговор за пьянку на работе,Reprimand for drinking at work
+Выговор за драку на работе,Reprimand for fighting at work
+"Собрание прошло: слухи развеяны, люди успокоились.","The meeting went well: the rumours are cleared up, people have calmed down."
+ Опыт можно передать ученику — %s., The experience can be passed on to an apprentice — %s.
+Уход на пенсию,Retirement
+"%s, %s, %d лет, собирается на пенсию: «Хватит, внуки ждут». Уйдёт через два дня.%s","%s, %s, %d, is about to retire: “That's enough, the grandkids are waiting.” Leaving in two days.%s"
+Уговорить остаться (премия 30 000 ₽),"Persuade them to stay (30,000 ₽ bonus)"
+Поработает ещё год,Will work one more year
+Проводить с почётом (10 000 ₽ на подарок),"See them off with honours (10,000 ₽ for a gift)"
+Наставник передаст опыт ученику,The mentor will pass the experience to an apprentice
+Коллективу будет приятно,The team will appreciate it
+Просто проводить,Just see them off
+Уговорили не уходить на пенсию,Talked out of retiring
+Наставник %s передал опыт перед пенсией,Mentor %s passed on the experience before retiring
+{ушёл|ушла} на заслуженный отдых. Проводили всем коллективом,retired with honours. The whole team saw {him|her} off
+Наши ветераны,Our veterans
+Проводили на пенсию: ,Seen off into retirement: 
+%d лет у станка. Спасибо за труд! Ученики обещают не подвести.,%d years at the machine. Thank you for your work! The apprentices promise not to let you down.
+{ушёл|ушла} на пенсию,retired
+Переманивают конкуренты,Competitors are poaching
+"%s, %s, получил предложение от «Металлист-Т» — на четверть больше денег. Просит прибавку, иначе уйдёт через день.","%s, %s, got an offer from “Metallist-T” — a quarter more money. Asks for a raise, otherwise leaving in a day."
+Поднять ставку на 20%,Raise the rate by 20%
+%s → %s за смену,%s → %s per shift
+Отпустить,Let them go
+Уйдёт к конкуренту,Will leave for the competitor
+{ушёл|ушла} к конкурентам за длинным рублём,left for the competitors and the big money
+%s {женится|выходит замуж}! Коллектив собирает на подарок.,%s is getting married! The team is collecting for a gift.
+У %s родился ребёнок! В курилке уже выбирают имя.,%s has had a baby! The smoking room is already choosing a name.
+Свадьба,Wedding
+Пополнение в семье,A new arrival
+Подарок от завода (5 000 ₽),"A gift from the plant (5,000 ₽)"
+Человек будет очень рад,They'll be very happy
+Ограничиться поздравлением,Just congratulate
+Поздравляем!,Congratulations!
+Свадьба: %s,Wedding: %s
+Родился малыш у %s,A baby for %s
+Совет да любовь! Коллектив поздравляет и желает счастья.,Love and happiness! The team congratulates the couple.
+Растёт смена! Поздравляем счастливых родителей.,A new generation is growing! Congratulations to the happy parents.
+Завод поздравил: %s,The plant congratulated: %s
+свадьба,wedding
+рождение ребёнка,birth of a child
+Рацпредложение,Improvement proposal
+%s предлагает %s: %s. Автор просит вознаграждение.,%s proposes %s: %s. The author asks for a reward.
+Внедрить и заплатить автору 12 000 ₽,"Implement it and pay the author 12,000 ₽"
+Улучшение навсегда,Permanent improvement
+Отклонить,Reject
+Автор обидится,The author will be offended
+Рацпредложение внедрено: ,Improvement implemented: 
+Новаторы,Innovators
+Рацпредложение: ,Improvement: 
+"Автор — %s. Внедрено в производство, автору выплачено вознаграждение.","Author: %s. Put into production, the author has been rewarded."
+Субсидия 30% на станок,30% subsidy on a machine
+Субсидия оформлена: следующий станок обойдётся на 30% дешевле (месяц).,Subsidy granted: the next machine will cost 30% less (for a month).
+Торги конкурента,Competitor's auction
+Обанкротился «Металлист-Т». На торгах его оборудование: «%s» всего за 40%% цены (%s). Предложение — на неделю.,“Metallist-T” has gone bankrupt. Its equipment is up for auction: “%s” for just 40%% of the price (%s). The offer is open for a week.
+Выкупить право (оплата при установке),Buy the right (pay on installation)
+Ставьте станок из меню «Объекты» — цена будет 40%,Place the machine from the Objects menu — the price will be 40%
+Не нужно,Not needed
+Станок с торгов за 40%%: %s,Auction machine at 40%%: %s
+Выкуплено право на «%s» с торгов. Поставьте его из «Объектов» в течение недели — цена 40%%.,Bought the right to the “%s” at auction. Place it from Objects within a week — the price is 40%%.
+Рейдеры отступили,The raiders backed off
+"Попытка захвата провалилась, документы признаны поддельными.",The takeover attempt failed; the documents were ruled forged.
+Рейдеры отсудили своё,The raiders won in court
+"Пока шли суды, счета были арестованы, часть денег списали по поддельным документам: %s. Репутация пострадала.","While the courts dragged on, the accounts were frozen and part of the money was written off on forged documents: %s. Reputation suffered."
+Бартер вместо денег,Barter instead of money
+"%s говорит, что денег нет, и предлагает вместо %s за «%s» вагон сахара на 120%% суммы. Сахар можно продать — за неделю, если повезёт.","%s says there's no money and offers a wagon of sugar worth 120%% instead of %s for “%s”. The sugar can be sold — within a week, with luck."
+Взять сахаром (≈%s через неделю),Take the sugar (≈%s in a week)
+Есть риск продать дешевле,You may have to sell it cheaper
+Требовать деньги,Demand the money
+Оплата задержится на 5–10 дней,Payment will be delayed by 5–10 days
+Задержка оплаты,Late payment
+"%s забрал заказ, но заплатит только через %d %s: «Денег нет, но вы держитесь».","%s collected the order but will only pay in %d %s: “There's no money, but hang in there.”"
+Продажа сахара,Sugar sale
+Сахар ушёл дёшево,The sugar went cheap
+"Рынок завален сахаром, продали только за %s.",The market is flooded with sugar; it only sold for %s.
+"%s снова переносит оплату (%s). «В понедельник, точно!»","%s is postponing payment again (%s). “Monday, for sure!”"
+Половина долга через суд,Half the debt through the courts
+"%s обанкротился, по суду удалось взыскать только %s.",%s went bankrupt; the court only recovered %s.
+%s наконец заплатил: %s.,%s finally paid: %s.
+Профсоюзная жизнь,Union life
+Коллектив объявил забастовку,The workers have gone on strike
+Требование: %s. Администрация обещает разобраться.,Demand: %s. The management promises to look into it.
+Построить нормальную столовую,Build a proper canteen
+Сделать бытовку для переодевания,Build a locker room for changing
+Отменить аврал и сверхурочные,Cancel the rush and the overtime
+Поднять зарплату на 10%,Raise wages by 10%
+Выплатить всем премию по 5 000 ₽,"Pay everyone a 5,000 ₽ bonus"
+Выплатить долги по зарплате,Pay the wage arrears
+профорг,the union rep
+Рабочие бросили станки и вышли к проходной с плакатами. Требование: %s. Во главе — %s.,The workers have left their machines and gathered at the gate with placards. Demand: %s. Led by %s.
+Обещание не выполнено — рабочие снова бастуют. Требование прежнее: %s.,The promise wasn't kept — the workers are striking again. Same demand: %s.
+Забастовка идёт %d-й день. Требование: %s. Каждый день простоя бьёт по репутации.,Day %d of the strike. Demand: %s. Every idle day hurts the reputation.
+Выполнить требование,Meet the demand
+Предложить компромисс,Offer a compromise
+Могут не согласиться,They may refuse
+Жёстко. Остальные испугаются — или разозлятся,Harsh. The others will be scared — or angry
+Ждать,Wait
+"Через несколько дней сдадутся сами, но обиду запомнят","They'll give in by themselves in a few days, but they'll hold a grudge"
+Забастовка!,Strike!
+"Стройте в течение 5 дней, иначе снова забастуют","Build it within 5 days, or they'll strike again"
+Аврал и сверхурочные отключатся,The rush and the overtime will be turned off
++10% к ставке всем рабочим,+10% to the rate for all workers
+%s сразу,%s at once
+"Требования выполнены, рабочие вернулись к станкам.","The demands have been met, the workers are back at their machines."
+Договорились на компромиссе. Рабочие вернулись к станкам.,A compromise was reached. The workers are back at their machines.
+Компромисс отвергли: «Подачки нам не нужны!» Забастовка продолжается.,The compromise was rejected: “We don't need handouts!” The strike goes on.
+Зачинщика уволили. Остальные молча вернулись к станкам.,The instigator was fired. The others silently went back to their machines.
+Увольнение зачинщика только разозлило людей. Забастовка продолжается.,Firing the instigator only made people angrier. The strike goes on.
+уволил{ся|ась} после проигранной забастовки,quit after the lost strike
+"Забастовка выдохлась: люди вернулись к станкам, но обиду затаили.","The strike ran out of steam: people are back at their machines, but they hold a grudge."
+Долги по зарплате погасить не вышло: %s. Забастовка вернётся.,Couldn't pay off the wage arrears: %s. The strike will be back.
+Пообещали погасить долги по зарплате за 5 дней. Не забудьте!,Promised to pay off the wage arrears within 5 days. Don't forget!
+Пообещали: %s в течение %d дней. Не забудьте!,Promised: %s within %d days. Don't forget!
+Забастовка окончена,The strike is over
+Новый год на носу,New Year is coming
+Последний рабочий день года. Коллектив ждёт корпоратив и премию. Ёлку в бытовке уже нарядили сами.,The last working day of the year. The team is expecting a party and a bonus. They've already decorated a tree in the locker room themselves.
+Корпоратив и премия (%s),A party and a bonus (%s)
+Настроение — на все праздники,Good mood for all the holidays
+Только корпоратив (%s),Just the party (%s)
+Обойдёмся,We'll do without
+Обидятся,They'll be offended
+Новогодние каникулы,New Year holidays
+"Три дня отдыха: завод стоит, люди с семьями. С Новым годом!","Three days off: the plant is idle, people are with their families. Happy New Year!"
+С Новым годом!,Happy New Year!
+"С Новым годом, товарищи!","Happy New Year, comrades!"
+"Пусть станки не ломаются, заказы не горят, а компот в столовой не кончается!","May the machines never break, the orders never burn and the compote in the canteen never run out!"
+23 февраля,February 23
+"Женская часть коллектива спрашивает, будет ли завод поздравлять мужчин.",The women of the team are asking whether the plant will congratulate the men.
+Подарки мужчинам (%s),Gifts for the men (%s)
+Только открытка,Just a card
+8 марта,March 8
+Мужчины уже скинулись на тюльпаны. А что от завода?,The men have already chipped in for tulips. And what about the plant?
+Цветы и премия женщинам (%s),Flowers and a bonus for the women (%s)
+Женщинам будет обидно,The women will be hurt
+Праздник весны и труда,Spring and Labour Day
+"Выходной день. Мир, труд, май!","A day off. Peace, labour, May!"
+Субботник,Subbotnik
+"Весна, снег сошёл — территория в мусоре. Профком предлагает завтра выйти на субботник.","Spring, the snow has melted — the grounds are full of rubbish. The union committee suggests a volunteer clean-up tomorrow."
+Провести субботник,Hold the subbotnik
+"Территорию уберут, коллектив сплотится","The grounds will be cleaned, the team will bond"
+Не надо,No need
+День машиностроителя,Machine Builders' Day
+Профессиональный праздник! Можно провести торжественное собрание и вручить грамоты лучшим.,Our professional holiday! We could hold a ceremonial meeting and hand certificates of honour to the best.
+"Собрание, грамоты и премии (%s)","Meeting, certificates and bonuses (%s)"
+"+репутация, +настроение","+reputation, +mood"
+Просто поздравить,Just congratulate
+Праздник,Holiday
+Корпоратив удался,The party was a success
+"Песни под баян, оливье и конкурс «Кто быстрее наточит». Победила дружба.","Songs with the accordion, Olivier salad and a “Who sharpens fastest” contest. Friendship won."
+Всем коллективом — на уборку,The whole team — to the clean-up
+"Вымели территорию, покрасили бордюры, посадили берёзку у проходной.","We swept the grounds, painted the kerbs and planted a birch tree by the gate."
+С Днём машиностроителя!,Happy Machine Builders' Day!
+На торжественном собрании вручили грамоты лучшим. Директор пообещал новые станки.,At the ceremonial meeting the best were given certificates of honour. The director promised new machines.
+План выполнен,Plan fulfilled
+"Итоги месяца (%s): отгружено %d из %d по плану. Репутация растёт, люди довольны.","Monthly results (%s): shipped %d of the planned %d. Reputation is growing, people are pleased."
+Итоги месяца,Monthly results
+План за %s выполнен!,%s plan fulfilled!
+Отгружено %d изделий при плане %d. Так держать!,Shipped %d items against a plan of %d. Keep it up!
+План за %s не выполнен,%s plan not fulfilled
+Отгружено %d из %d. Есть над чем поработать.,Shipped %d of %d. Room for improvement.
+План горит!,The plan is burning!
+"Конец месяца, а отгружено %d из %d. Можно объявить аврал до конца месяца: работа быстрее на четверть, но брака и усталости больше.","It's the end of the month and only %d of %d have shipped. You can declare a rush until the month ends: work a quarter faster, but with more scrap and fatigue."
+Объявить аврал до конца месяца,Declare a rush until the end of the month
+"Штурмовщина, как положено","Storming the plan, as is tradition"
+Работать спокойно,Work calmly
+Сезон отпусков,Holiday season
+"Лето! Люди просятся в отпуск. Можно отпустить по очереди — часть людей не будет неделю, зато вернутся отдохнувшими.","Summer! People are asking for leave. You can let them go in turns — some people will be away for a week, but they'll come back rested."
+Отпустить по очереди (четверть людей на неделю),Let them go in turns (a quarter of the staff for a week)
+Отпускные — средняя ставка за 5 смен,Holiday pay: the average rate for 5 shifts
+Отказать — план важнее,Refuse — the plan comes first
+Настроение упадёт,Mood will drop
+Уходит в отпуск,Going on holiday
+{Ушёл|Ушла} в отпуск на неделю,Went on holiday for a week
+В отпуск ушли %d %s.,%d %s went on holiday.
+день|дня|дней,day|days
+батарею|батареи|батарей,radiator|radiators
+рабочий день|рабочих дня|рабочих дней,working day|working days
+деталь|детали|деталей,part|parts
+человек|человека|человек,person|people
+"%s: %s, в %s","%s: %s, at %s"
+Объявлена проверка. %s. Подготовьтесь — список требований в окне «События».,Inspection announced. %s. Get ready — the list of requirements is in the Events window.
+губернатор области,the regional governor
+корреспондент областной газеты,a correspondent of the regional newspaper
+"Через два дня завод посетит %s. Наведите порядок: уберите грузы с пола, почините станки, оборудуйте помещения, позаботьтесь о настроении людей.","In two days the plant will be visited by %s. Tidy up: clear loads off the floor, repair the machines, equip the rooms, take care of people's mood."
+ Если понравится — будет областная поддержка.," If they like it, there will be regional support."
+ От статьи зависит репутация завода., The plant's reputation depends on the article.
+плановая,scheduled
+внеплановая,unscheduled
+проверка исполнения предписания,follow-up on the order
+%s приехал{|а} на завод.,%s has arrived at the plant.
+На завод пришёл %s. %s,An inspector has come to the plant: %s. %s
+Проверка внезапная!,A surprise inspection!
+Плановая проверка.,A scheduled inspection.
+Отмечается на проходной,Signing in at the gatehouse
+Осматривает: ,Inspecting: 
+Оформляет акт,Drawing up the report
+Беседует с руководством,Talking to the management
+Уходит,Leaving
+Идёт по заводу,Walking around the plant
+Инспектор записал нарушение: %s.,The inspector recorded a violation: %s.
+камеральная,desk audit
+• %s — предупреждение,• %s — warning
+Проверка без замечаний,Inspection passed with no remarks
+%s: нарушений не выявлено. Репутация завода растёт.,%s: no violations found. The plant's reputation is growing.
+Проверки,Inspections
+%s: без замечаний,%s: no remarks
+Инспектор пожал руку и сказал: «Побольше бы таких предприятий». Молодцы!,The inspector shook hands and said: “We need more businesses like this one.” Well done!
+"Выявлено %d %s:
+%s
+
+Итого штраф: %s. Предписание: устранить до %s, потом придут проверить снова. Повторное нарушение — двойной штраф и остановка участка.","Found %d %s:
+%s
+
+Total fine: %s. Order: fix by %s, then they'll come back to check. A repeat violation means a double fine and a shutdown of the section."
+"Выявлено %d %s:
+%s
+
+Штрафа нет: малому предприятию за впервые выявленное нарушение — предупреждение (ст. 4.1.1 КоАП). Предписание: устранить до %s, потом придут проверить снова. Не исправите — штраф вдвойне и остановка участка.","Found %d %s:
+%s
+
+No fine: a small business gets a warning for a first-time violation (Art. 4.1.1 of the Administrative Code). Order: fix by %s, then they'll come back to check. Not fixed — a double fine and a shutdown of the section."
+"
+
+За впервые выявленные нарушения — предупреждение вместо штрафа (ст. 4.1.1 КоАП): малое предприятие.","
+
+First-time violations get a warning instead of a fine (Art. 4.1.1 of the Administrative Code): small business."
+"
+
+Как исправить:
+","
+
+How to fix:
+"
+"
+
+Инспектора сопровождал{|а} %s (%s)%s.","
+
+The inspector was accompanied by %s (%s)%s."
+ — штраф меньше на 15%, — the fine is 15% lower
+"
+
+Нарушения повторились — участок остановлен на сутки.","
+
+The violations were repeated — the section is shut down for a day."
+Акт проверки: ,Inspection report: 
+"Понятно, устраним","Understood, we'll fix it"
+%s: предупреждение,%s: a warning
+"Инспектор нашёл %d %s, но на первый раз ограничился предупреждением. Срок исправить — до %s.","The inspector found %d %s, but let us off with a warning this time. Deadline to fix: %s."
+Оплатить штраф (%s),Pay the fine (%s)
+"Обжаловать в суде (%s, шанс %d%%)","Appeal in court (%s, %d%% chance)"
+Проиграете — штраф больше на 20%,"If you lose, the fine grows by 20%"
+"
+
+Обжаловать штраф может только юрист (Управление → Развитие → Юротдел).","
+
+Only a lawyer can appeal the fine (Management → Development → Legal department)."
+Штраф %s. Руководство обещает всё исправить до %s.,Fined %s. The management promises to fix everything by %s.
+Суд отменил штраф,The court cancelled the fine
+"Юристы нашли ошибки в акте: %s, штраф %s отменён.","The lawyers found errors in the report: %s, the %s fine is cancelled."
+Суд проигран,Court case lost
+Суд оставил штраф в силе и добавил издержки: %s.,The court upheld the fine and added costs: %s.
+грузы валяются на полу,loads are lying on the floor
+стоят сломанные станки,broken machines are standing idle
+люди хмурые,people look gloomy
+не устранены нарушения,violations haven't been fixed
+бастуют,they're on strike
+территория в сугробах,the grounds are buried in snow
+Губернатор доволен,The governor is pleased
+"«Вот на таких предприятиях держится область!» Выделена субсидия %s, репутация выросла.","“Businesses like this are what keep the region going!” A subsidy of %s was granted, reputation has grown."
+Главное,Top story
+Губернатор посетил наш завод,The governor visited our plant
+"Глава области осмотрел цеха, пообщался с рабочими и пообещал поддержку. Субсидия уже на счёте!","The head of the region toured the shops, talked to the workers and promised support. The subsidy is already in the account!"
+Губернатор уехал,The governor has left
+"«Работайте, развивайтесь». Без восторгов, но и без претензий%s.","“Keep working, keep growing.” No raptures, but no complaints either%s."
+" — заметил, что %s", — he noticed that %s
+Губернатор недоволен,The governor is displeased
+"«Бардак!» Губернатор заметил, что %s. Репутация упала.",“What a mess!” The governor noticed that %s. Reputation fell.
+всё не так,everything is wrong
+Хорошая статья,A good article
+"В областной газете вышел очерк «Гаражный цех растёт»: о людях, станках и заказах. Репутация выросла, работники охотнее идут к вам.","The regional newspaper ran a feature, “The Garage Shop Is Growing”: about the people, the machines and the orders. Reputation is up, workers are keener to join you."
+Пресса о нас,The press about us
+О нас написали в области,They wrote about us in the region
+Перепечатываем с гордостью: «Здесь работают с огоньком и без брака».,We reprint it with pride: “They work here with passion and without defects.”
+Разгромная статья,A scathing article
+Журналист написал фельетон «Промзона без прикрас»: %s. Репутация упала.,"The journalist wrote a satirical piece, “The Industrial Zone Unvarnished”: %s. Reputation fell."
+порядка нет,there's no order
+Огнетушитель в каждом помещении от 6 клеток,An extinguisher in every room of 6+ cells
+"В горячих цехах (печь, покраска, сварка) — два огнетушителя","Two extinguishers in hot shops (furnace, painting, welding)"
+В помещениях от 60 клеток — минимум два выхода,At least two exits in rooms of 60+ cells
+Сеть без выбитых автоматов,No tripped breakers in the grid
+Не больше 12 грузов на полу,No more than 12 loads on the floor
+Ставка не ниже %s за смену,Rate at least %s per shift
+Шкафчики для спецовки (хотя бы один на двоих),Lockers for overalls (at least one per two people)
+Аптечка на заводе,A first-aid kit at the plant
+Без авралов и сверхурочных,No rushes or overtime
+Не больше одной травмы за месяц,No more than one injury a month
+Туалет с раковиной,A toilet with a sink
+Инструктаж по охране труда не реже раза в %d дней (если рабочих 6 и больше),Safety briefing at least every %d days (with 6+ workers)
+СОУТ на всех рабочих местах (если рабочих 4 и больше),Working conditions assessment for all workplaces (with 4+ workers)
+"Молоко тем, у кого место вредное по СОУТ",Milk for those whose workplace is rated hazardous
+У всех рабочих целые СИЗ (шкаф СИЗ и комплекты),All workers have intact PPE (PPE cabinet and kits)
+Туалет и раковина,A toilet and a sink
+"Столовая, если людей 8 и больше","A canteen, if there are 8+ people"
+Один туалет на 12 человек,One toilet per 12 people
+Территория без мусора и брака,Grounds free of rubbish and scrap
+В помещениях убрана стружка (уборщица или разнорабочие),Swarf swept up in the rooms (cleaner or labourers)
+"Вентиляция там, где сварка, покраска или печь: воздух не хуже 40%","Ventilation where there's welding, painting or a furnace: air at least 40%"
+Нет сломанных станков,No broken machines
+Нет станков в работе с износом ниже 25%,No working machines below 25% condition
+Для кран-балки — стропальщик (погрузка 4+),A slinger for the overhead crane (hauling 4+)
+Для погрузчика — водитель (погрузка 3+),A driver for the forklift (hauling 3+)
+При своей подстанции или повышенной мощности — электрик в штате,An electrician on staff with your own substation or high power
+"Брак не копится: тара не переполнена, на полу не больше 5 бракованных деталей","Scrap doesn't pile up: bins not overflowing, no more than 5 defective parts on the floor"
+Покрасочная камера — в отдельном помещении,The paint booth is in a separate room
+У печи — окна или вентиляция,Windows or ventilation at the furnace
+Бухгалтерия (отдел) снижает риск штрафа в 4 раза,An accounting department cuts the risk of a fine 4 times
+Режим: проходная с вахтой,Security: a gatehouse with a guard
+Стол ОТК,QC table
+Испытательный стенд,Test stand
+Брак не больше 8% за две недели,Scrap no more than 8% over two weeks
+нарушение|нарушения|нарушений,violation|violations
+Зарплату выдали в долг,Wages paid on credit
+"Денег на зарплату не хватило — выдали из резерва, касса ушла в минус. Так выручить можно только раз в три месяца: в следующий раз зарплату задержат, и люди начнут уходить. Срочно сдавайте заказы или берите кредит (Финансы → Кредиты).",There wasn't enough money for wages — they were paid from reserves and the cash went negative. This can only be done once every three months: next time wages will be delayed and people will start leaving. Deliver orders urgently or take a loan (Finance → Loans).
+Нечем платить зарплату,No money for wages
+"Денег нет, а в долг зарплату уже выдавали меньше трёх месяцев назад (снова можно через %d дн.). Люди остались без денег — жалуются и грозят уволиться. Если трое уйдут за две недели, придёт трудовая инспекция и закроет завод. Долг по зарплате: %s.","There's no money, and wages were already paid on credit less than three months ago (possible again in %d d.). People are left without pay — they complain and threaten to quit. If three leave within two weeks, the labour inspectorate will come and close the plant. Wage arrears: %s."
+Взять кредит и выплатить,Take a loan and pay
+Попросить потерпеть до следующей недели,Ask them to hold on until next week
+"Настроение упадёт ещё, кто-то может уйти","Mood will drop further, someone may quit"
+Банки кредитуют с этапа «Мастерская» — сейчас не дадут,Banks lend from the Workshop stage — they won't now
+"Кредит 800 000 ₽ на полгода, если банк одобрит","An 800,000 ₽ loan for six months, if the bank approves"
+Люди жалуются: зарплату задерживают уже %d дн. (долг %s). Грозят уволиться — выплатите: Финансы → «Выплатить долги по зарплате».,People are complaining: wages have been late for %d d. (arrears %s). They threaten to quit — pay up: Finance → “Pay wage arrears”.
+%s уволил{ся|ась}: «Не платят — работать не буду». Уже %d за две недели — после %d-го придёт трудовая инспекция.,%s quit: “No pay — no work.” That's %d in two weeks — at %d the labour inspectorate will come.
+Трудовая инспекция закрыла завод,The labour inspectorate closed the plant
+"За две недели %d человек уволились, потому что им не платили зарплату. Они написали жалобу — трудовая инспекция проверила ведомости, наложила арест на счёт и приостановила деятельность предприятия. Завод закрыт.","In two weeks %d people quit because they weren't paid. They filed a complaint — the labour inspectorate checked the payroll, froze the account and suspended the business. The plant is closed."
+Нечем работать: кончился %s,Nothing to work with: out of %s
+"%s закончился, а денег на новый (%s) нет. Станки стоят, люди простаивают, жалуются и грозят уволиться.","%s ran out, and there's no money for more (%s). The machines are idle, people are standing around, complaining and threatening to quit."
+Взять у поставщика в долг,Take it from the supplier on credit
+%s через две недели (+10%%),%s in two weeks (+10%%)
+Пусть ждут денег,Let them wait for money
+Настроение падает каждый день,Mood drops every day
+"Завод в долгах %d дн.: поставщики и заказчики это знают — репутация падает каждый день, сбыт новых заказов не берёт.","The plant has been in debt for %d d.: suppliers and customers know it — reputation falls every day, and sales won't take new orders."
+Заказчик не дождался обещанного срока и расторг договор со скандалом,The customer didn't get the promised deadline and cancelled the contract with a scandal
+Заказчик приехал разбираться,A customer came to sort things out
+Представитель «%s» приехал на завод: заказ «%s» просрочен на %d дн. Требует объяснений и денег за срыв графика.,A representative of “%s” came to the plant: the “%s” order is %d d. late. They want an explanation and money for the missed schedule.
+Извиниться и заплатить неустойку,Apologise and pay a penalty
+"%s, срок +4 дня","%s, deadline +4 days"
+Пообещать сдать за 2 дня,Promise to deliver in 2 days
+Не успеете — заказ отменят со скандалом,"If you don't make it, the order will be cancelled with a scandal"
+Отказаться от заказа,Refuse the order
+"Неустойка %s, репутация −6","Penalty %s, reputation −6"
+Кредит не дали: %s.,The loan was refused: %s.
+Поставщик отгрузил %s в долг — привезут через пару часов.,The supplier shipped %s on credit — it'll arrive in a couple of hours.
+Заказчик принял извинения: срок продлён на 4 дня.,The customer accepted the apology: the deadline is extended by 4 days.
+Пообещали сдать «%s» за 2 дня. Не успеете — заказ отменят.,"Promised to deliver “%s” in 2 days. If you don't make it, the order will be cancelled."
+Отказались от заказа,Refused the order
+По соглашению сторон,By mutual agreement
+Договорились по-хорошему: компенсация %s. Остальные спокойны.,Agreed amicably: compensation %s. The others are calm.
+Сокращение штата,Redundancy
+"Законно, но положено выходное пособие — %s (две недели ставки). Люди слегка тревожатся.","Legal, but severance pay is due — %s (two weeks' rate). People are a little anxious."
+За прогулы,For absenteeism
+"Прогулов: %d — основание есть, без выплат.","Absences: %d — there are grounds, no payments."
+Прогулов не было — уволенный пойдёт в суд и к инспектору.,There were no absences — the dismissed worker will go to court and to the inspector.
+За кражу (по статье),For theft (under the article)
+"Пойман{|а} на краже — основание есть, честные одобрят.","Caught stealing — there are grounds, the honest ones will approve."
+"На краже не ловили — это клевета, будет суд.","Never caught stealing — that's slander, there will be a court case."
+Не справляется с работой,Can't cope with the job
+Низкий разряд и брак после испытательного срока — по аттестации можно.,Low grade and scrap after the probation period — allowed by assessment.
+Работает нормально или ещё на испытательном сроке (20 дней) — оснований нет.,Works normally or still on probation (20 days) — no grounds.
+Без причины,Without cause
+"Незаконно: уволенный подаст в суд (≈ %s) и пожалуется в трудовую инспекцию, остальные обидятся.","Illegal: the dismissed worker will sue (≈ %s) and complain to the labour inspectorate, the others will be offended."
+Неизвестная причина,Unknown reason
+Не хватает денег на выплату: %s,Not enough money for the payment: %s
+%s уволен{|а}: %s.,%s was dismissed: %s.
+жалоба уволенного,complaint from a dismissed worker
+"%s уволен{|а} без законной причины и подал{|а} в суд: через неделю суд, придётся заплатить ≈ %s. И жалоба в трудовую инспекцию.","%s was dismissed without lawful cause and has sued: the court is in a week, you'll have to pay ≈ %s. And a complaint to the labour inspectorate."
+%s уволен{|а} незаконно — будет суд.,%s was dismissed illegally — there will be a court case.
+Суд восстановил справедливость: %s уволили незаконно. Завод выплатил %s за вынужденный прогул и моральный вред.,Justice restored by the court: %s was dismissed illegally. The plant paid %s for lost earnings and moral damages.
+Болтает: %s,Chatting: %s
+Ругается: %s,Arguing: %s
+Дерётся: %s,Fighting: %s
+Разнимает драку,Breaking up a fight
+Смотрит на драку,Watching the fight
+Подрал{ся|ась} с %s,Got into a fight with %s
+"%s и %s сначала ругались, а потом сцепились прямо в цеху. Остальные бросили работу и смотрели.",%s and %s argued first and then came to blows right in the shop. The others dropped their work and watched.
+Разнял{|а} %s.,%s broke it up.
+ %s пострадал{|а}., %s got hurt.
+Драка в цеху,A fight in the shop
+Развести по разным сменам,Put them on different shifts
+Не будут видеться — не будут драться,"If they don't see each other, they won't fight"
+Кулаки вместо слов,Fists instead of words
+"В цеху подрались двое. Товарищи, споры решают на собрании, а не кулаками!","Two people got into a fight in the shop. Comrades, disputes are settled at meetings, not with fists!"
+Голубь залетел в цех через открытые ворота — ходит между станками. Улетит сам.,A pigeon flew into the shop through the open gate — it's walking among the machines. It'll fly out by itself.
+В помещении «%s» завелись мыши — там очень грязно. Нужна уборка: уборщица или разнорабочие (Люди → График смены → «Уборка»). Кот поможет.,Mice have appeared in the “%s” — it's very dirty there. It needs cleaning: a cleaner or labourers (People → Shift Schedule → “Cleaning”). A cat will help.
+Поймал мышь!,Caught a mouse!
+Поймала мышь!,Caught a mouse!
+%s поймал{|а} мышь. Уже %d за всё время!,%s caught a mouse. That's %d so far!
+Мышь удрала,The mouse got away
+Поймал голубя,Caught a pigeon
+Поймала голубя,Caught a pigeon
+%s поймал{|а} голубя — гордо несёт показать рабочим.,%s caught a pigeon and proudly carries it to show the workers.
+Голубь улетел,The pigeon flew off
+Огонь не удержать — вызвали пожарных (01). Расчёт будет минут через десять.,The fire can't be contained — the fire brigade has been called (01). The crew will be here in about ten minutes.
+Огонь потушили до приезда пожарных — вызов отменили.,The fire was put out before the brigade arrived — the call was cancelled.
+Пожарная охрана,Fire brigade
+"Пожарные приехали, но огонь уже потушили — расчёт уехал обратно.","The fire brigade arrived, but the fire was already out — the crew went back."
+Приехали пожарные: расчёт тянет рукава к огню.,The fire brigade has arrived: the crew is running hoses to the fire.
+Бежит к огню с рукавом,Running to the fire with a hose
+Тушит пожар из рукава,Fighting the fire with a hose
+Сматывает рукав,Reeling in the hose
+Пожарные смотали рукава и уехали.,The firefighters reeled in their hoses and left.
+Пожарный,Firefighter
+Осматривается,Looking around
+Кошка %s,Cat %s
+Кот %s,Cat %s
+Охотится на мышь,Hunting a mouse
+Подкрадывается к голубю,Stalking a pigeon
+Прыжок!,Pounce!
+Спит у тёплого места,Sleeping by a warm spot
+Спит,Sleeping
+Ест из миски,Eating from the bowl
+Клянчит у обедающих,Begging from the diners
+Умывается,Washing
+Смотрит на станок,Watching a machine
+Сидит и наблюдает,Sitting and watching
+Ловит солнечного зайчика,Chasing a sunbeam
+Идёт к миске,Going to the bowl
+Бежит в столовую,Running to the canteen
+"Ищет, где поспать",Looking for a place to sleep
+Гуляет по заводу,Strolling around the plant
+Передовик,Top worker
+%s %s выполнил{|а} норму на %d%%!,%s %s beat the quota by %d%%!
+"%s, %d лет. «Главное — не торопиться и не опаздывать», — делится секретом передовик.","%s, aged %d. “The main thing is not to rush and not to be late,” the top worker shares the secret."
+Итоги недели,Week in review
+Выручка недели — %s,Weekly revenue: %s
+"За неделю выпущено %d %s, в брак ушло %d. Заказов в работе: %d.","This week %d %s were made, %d went to scrap. Orders in progress: %d."
+Вышел свежий номер многотиражки «%s» № %d — газета коллектива %s.,A fresh issue of the factory newsletter “%s” No. %d is out — the staff paper of %s.
+Письма читателей,Letters to the editor
+Когда будет столовая?,When will we get a canteen?
+"«Обедаем на скамейке, бутерброды в промасленной газете. Нельзя ли по-человечески?» — пишет группа рабочих.","“We eat lunch on a bench, sandwiches wrapped in oily newspaper. Can't we have it like normal people?” writes a group of workers."
+В столовой снова закончился компот. Буфетчица обещает разобраться.,The canteen has run out of compote again. The counter lady promises to look into it.
+Новое блюдо в столовой — котлета по-заводски. Отзывы сдержанно положительные.,A new dish in the canteen: the factory-style cutlet. Reviews are cautiously positive.
+Столовая просит не уносить ложки. Ложек осталось одиннадцать.,The canteen asks you not to take the spoons away. There are eleven spoons left.
+Столовая,Canteen
+%s. Днём около %+d °C.,%s. Around %+d °C during the day.
+" В помещении «%s» холодно — администрация, где батареи?"," It's cold in the “%s” — management, where are the radiators?"
+ В цехах тепло — спасибо отоплению., It's warm in the shops — thanks to the heating.
+ Пейте воду и не стойте на солнцепёке., Drink water and stay out of the sun.
+изделие|изделия|изделий,item|items
+Ещё на прошлой работе прозвали «%s». %s,Already nicknamed “%s” at the previous job. %s
+{Получил|Получила} прозвище «%s». %s,Got the nickname “%s”. %s
+Новое прозвище: «%s»,New nickname: “%s”
+%s %s теперь на заводе — «%s». %s,At the plant %s %s is now “%s”. %s
+Люди завода,People of the plant
+Почему %s %s теперь «%s»,Why %s %s is now “%s”
+приспособление для смазки направляющих,a jig for lubricating the guideways
+станки изнашиваются на 10% медленнее,machines wear 10% slower
+быстросменные кулачки патрона,quick-change chuck jaws
+переналадка на 15% быстрее,changeovers 15% faster
+шаблон для контроля фасок,a template for checking chamfers
+брака на 8% меньше,8% less scrap
+разметка проходов и тележка «по уму»,marked aisles and a “smart” trolley
+носят на 10% быстрее,hauling 10% faster
+Батя,Pops
+Дед,Gramps
+Мама,Mum
+Тётя Шура,Auntie Shura
+"%s старше всех в цеху: молодых учит, всех угощает бутербродами — вот и {прозвали|прозвали}.",%s is the oldest in the shop: teaches the youngsters and treats everyone to sandwiches — hence the nickname.
+"Как-то %s полдня {объяснял|объясняла} молодым, как правильно заточить резец, — с тех пор иначе и не зовут.",Once %s spent half a day showing the youngsters how to sharpen a cutting tool properly — and has been called that ever since.
+Малой,Kiddo
+Студент,Student
+Малая,Little One
+Студентка,College Girl
+"%s — {самый молодой|самая молодая} на участке, ещё и в общаге живёт. Прозвище прилипло с первого дня.",%s is the youngest on the section and still lives in a hostel. The nickname stuck from day one.
+"%s {пришёл|пришла} с учебником под мышкой, а на перекуре {спросил|спросила}, что такое «НЗП».",%s turned up with a textbook under {his|her} arm and asked at the smoke break what “WIP” means.
+Шпала,Beanpole
+Кощей,Skeleton
+Тростинка,Reed
+Стрекоза,Dragonfly
+"%s {высокий и худой|высокая и худая} — в проход между стеллажами проходит боком, не задевая.",%s is so tall and thin that {he|she} slips sideways between the racks without touching them.
+Спецовку для %s пришлось ушивать дважды — отсюда и прозвище.,%s's overalls had to be taken in twice — hence the nickname.
+Колобок,Dumpling
+Пончик,Donut
+Медведь,Bear
+Пышка,Muffin
+Ватрушка,Cheesecake
+%s {первым|первой} приходит в столовую и {последним|последней} уходит. Никто не обижается — и сам{|а} %s тоже.,%s is the first into the canteen and the last out. Nobody minds — not even %s.
+На спор %s {съел|съела} три порции котлет и после этого {перевыполнил|перевыполнила} норму.,On a bet %s ate three portions of cutlets and then beat the quota.
+Бульдозер,Bulldozer
+Шкаф,Wardrobe
+Богатырша,Amazon
+"%s однажды в одиночку {передвинул|передвинула} верстак, который двое не могли сдвинуть.",%s once moved a workbench single-handed that two people couldn't shift.
+"Когда сломалась тележка, %s {донёс|донесла} поддон с металлом на руках.","When the trolley broke, %s carried a pallet of metal by hand."
+Профессор,Professor
+Очкарик,Specs
+Профессорша,Lady Professor
+Отличница,Teacher's Pet
+"%s замечает брак, который не видят даже штангенциркулем. Профессор, не иначе.","%s spots defects that even a caliper can't see. A professor, no less."
+"%s читает техпроцессы, как романы, и цитирует ГОСТы наизусть.",%s reads process sheets like novels and quotes the standards by heart.
+Диджей,DJ
+Диджейка,Lady DJ
+"%s даже у станка в наушниках. Мастер спросил, что играет, — получил плейлист на час.",%s wears headphones even at the machine. The foreman asked what's playing and got an hour-long playlist.
+Паровоз,Steam Engine
+Дымка,Smokey
+"За неделю %s {сбегал|сбегала} на перекур больше, чем остальные за месяц. Мастер считал.",In one week %s took more smoke breaks than the rest did in a month. The foreman counted.
+"Из курилки %s выходит в облаке дыма, как паровоз из депо.","%s comes out of the smoking room in a cloud of smoke, like a steam engine leaving the depot."
+Филин,Night Owl
+Сова,Owl
+"%s ночью работает бодрее, чем днём, и уходит со смены {довольный|довольная}, когда все зевают.",%s works livelier at night than by day and leaves the shift cheerful while everyone else is yawning.
+Чистюля,Neat Freak
+Аккуратист,Mr. Tidy
+Хозяюшка,Homemaker
+"%s протирает станок после каждой детали и раскладывает ключи по размеру. Все смеются, но завидуют.","%s wipes the machine after every part and sorts the spanners by size. Everyone laughs, but they're jealous."
+Брандмейстер,Fire Chief
+Пожарная,Firewoman
+"Когда загорелось, %s {первым|первой} {схватил|схватила} огнетушитель и {потушил|потушила} огонь, пока остальные звонили 01.","When the fire broke out, %s was the first to grab an extinguisher and put it out while the others were dialling 01."
+"%s {тушил|тушила} пожар так уверенно, будто всю жизнь {служил|служила} в пожарной части. С тех пор только так и зовут.","%s fought the fire so confidently, as if {he|she} had served in a fire station all {his|her} life. That's {his|her} name ever since."
+Везунчик,Lucky
+Заговорённый,Charmed
+Везучая,Lucky Lady
+После травмы %s {вернулся|вернулась} раньше срока и {пошутил|пошутила}: «Меня станком не возьмёшь». Прозвище не заставило себя ждать.,After an injury %s came back early and joked: “No machine can get me.” The nickname wasn't long in coming.
+Искра,Sparky
+Ампер,Amp
+Искорка,Sparkle
+"%s {сбрасывал|сбрасывала} автомат на щите уже столько раз, что открывает щит с закрытыми глазами.",%s has reset the breaker on the panel so many times that {he|she} can open the panel with {his|her} eyes closed.
+Золотые руки,Golden Hands
+Ювелир,Jeweller
+Ювелирша,Lady Jeweller
+"Деталь от %s ОТК даже не меряет — бесполезно, всё в допуске.","QC doesn't even measure %s's parts — no point, everything is within tolerance."
+"%s {выточил|выточила} резьбу, на которую главный технолог полчаса смотрел в лупу.",%s cut a thread that the chief technologist studied through a magnifier for half an hour.
+Стахановец,Stakhanovite
+Метеор,Meteor
+Стахановка,Stakhanovka
+Ракета,Rocket
+"За неделю %s {сделал|сделала} больше всех на заводе — мастер в шутку назвал так, и прилипло.","In one week %s made more than anyone at the plant — the foreman called {him|her} that as a joke, and it stuck."
+%s {закончил|закончила} недельный план к четвергу и {пошёл|пошла} помогать соседу.,%s finished the weekly plan by Thursday and went to help the neighbour.
+Прораб,Foreman
+Кирпич,Brick
+Прорабша,Forewoman
+"%s {выложил|выложила} стену ровнее, чем по отвесу. Начальник проверил уровнем и только присвистнул.",%s laid a wall straighter than a plumb line. The boss checked it with a level and just whistled.
+Полцеха {построил|построила} %s — и всё по линеечке.,Half the shop was built by %s — and all of it dead straight.
+Сварог,Svarog
+Электрод,Electrode
+"Шов у %s такой ровный, что заказчик сфотографировал его на память.",%s's weld seam is so even that a customer took a photo of it as a souvenir.
+Кочегар,Stoker
+Кочегарка,Furnace Queen
+%s по цвету металла определяет температуру точнее пирометра.,%s can tell the metal's temperature by its colour more precisely than a pyrometer.
+Премиальный,Bonus Man
+Премиальная,Bonus Queen
+%s {получил|получила} уже третью премию. Бухгалтерия завела отдельную папку.,%s has received a third bonus already. Accounting has opened a separate folder.
+Старожил,Old-Timer
+Старожилка,Old-Timer Lady
+"%s работает на заводе дольше всех нынешних и помнит, где раньше стоял туалет.",%s has worked at the plant longer than anyone else here and remembers where the toilet used to be.
+рыжий,ginger
+серый,grey
+чёрный,black
+белый,white
+полосатый,tabby
+дымчатый,smoky
+Визит губернатора,Governor's visit
+Губернатор области,The regional governor
+Визит журналиста,Journalist's visit
+Корреспондент областной газеты,A correspondent of the regional newspaper
+«Проходная»,“The Gate”
+«Первая смена»,“First Shift”
+«Норма»,“The Quota”
+«Встречный план»,“The Counter-Plan”
+«Пересменка»,“Shift Change”
+«Ночная смена»,“Night Shift”
+«Тихий цех»,“The Quiet Shop”
+«Заводской вальс»,“Factory Waltz”
+«Огни проспекта»,“Avenue Lights”
+«Над заводской рекой»,“Over the Factory River”
+«Тропинка к проходной»,“The Path to the Gate”
+«Литейный цех»,“The Foundry”
+«Буфет на втором этаже»,“The Second-Floor Buffet”
+«Ударная вахта»,“Shock-Work Watch”
+«Дождь над крышей цеха»,“Rain on the Shop Roof”
+«Ночной эфир»,“Night Broadcast”
+«Первый снег»,“First Snow”
+«Утренний автобус»,“The Morning Bus”
+paper.title,Labour Shift
+paper.subtitle,The staff newsletter · Out every Monday
+insp.fire.name,Fire Safety Inspectorate
+insp.fire.who,Fire safety inspector
+insp.labor.name,Labour Inspectorate
+insp.labor.who,State labour inspector
+insp.sanitary.name,Sanitary Inspectorate
+insp.sanitary.who,Sanitary doctor
+insp.tech.name,Technical Inspectorate
+insp.tech.who,Technical inspector
+insp.ecology.name,Environmental Inspectorate
+insp.ecology.who,Environmental inspector
+insp.tax.name,Tax audit
+insp.military.name,Military acceptance
+insp.military.who,Military acceptance officer
+insp.governor.name,Governor's visit
+insp.governor.who,The regional governor
+insp.press.name,Journalist's visit
+insp.press.who,A regional newspaper correspondent
+paper.filler.0.rubric,Classifieds
+paper.filler.0.text,Garage for sale. Cheap. Ask Petrovich in the smoking room.
+paper.filler.1.rubric,Classifieds
+paper.filler.1.text,Found: keys on a dried-fish key ring. Ask at the gatehouse.
+paper.filler.2.rubric,Classifieds
+paper.filler.2.text,"Whoever took my immersion heater from the locker room — give it back, it's my mum's."
+paper.filler.3.rubric,Crossword
+paper.filler.3.text,Across: 1. Found at QC and in life (5 letters). Down: 1. Where the plant's big questions get settled (7 letters).
+paper.filler.4.rubric,Foreman's tips
+paper.filler.4.text,Don't keep the caliper in your pocket with your keys. It takes offence.
+paper.filler.5.rubric,Shop floor life
+paper.filler.5.text,The kettle in the locker room is clogged with scale again. The union promises vinegar.
+paper.filler.6.rubric,Sport
+paper.filler.6.text,A dominoes tournament was held during the lunch break. Friendship and the second shift won.
+paper.filler.7.rubric,Health
+paper.filler.7.text,"The doctor reminds you: lunch standing up isn't lunch, it's a warm-up for the stomach."
+paper.filler.8.rubric,Weather
+paper.filler.8.text,Forecasters promise weather. Meteorologists have their doubts.
+paper.filler.9.rubric,Humour
+paper.filler.9.text,"“Why is the machine standing still?” “It isn't standing, it's thinking. About the eternal.”"
+paper.filler.10.rubric,Humour
+paper.filler.10.text,The foreman asks: “Who broke the vice?” Silence. The vice says nothing either.
+paper.filler.11.rubric,Recipe
+paper.filler.11.text,"Dried fruit compote: per bucket of water, one pack of dried fruit and the kind hands of the canteen lady."
+paper.filler.12.rubric,Congratulations
+paper.filler.12.text,"Happy birthday to everyone born this month! Happiness, health and a full bin of good parts."
+paper.filler.13.rubric,Safety
+paper.filler.13.text,A hard hat isn't for looks. Although it's for looks too.
+paper.filler.14.rubric,Classifieds
+paper.filler.14.text,"Will swap two Saturday shifts for one on Sunday. Ask at the planning office, if there is one."
+paper.filler.15.rubric,Shop floor life
+paper.filler.15.text,The canteen has run out of compote again. The counter lady promises to look into it.
+ach.first_order.name,First Order
+ach.first_order.desc,Ship your first order
+ach.orders_25.name,Regular Customers
+ach.orders_25.desc,Complete 25 orders
+ach.orders_100.name,A Hundred Orders
+ach.orders_100.desc,Complete 100 orders
+ach.shipped_1000.name,A Thousand Parts
+ach.shipped_1000.desc,"Ship 1,000 parts to customers"
+ach.shipped_10000.name,Conveyor
+ach.shipped_10000.desc,"Ship 10,000 parts"
+ach.money_1m.name,Millionaire
+ach.money_1m.desc,Save up a million rubles in the account
+ach.money_10m.name,Capital
+ach.money_10m.desc,10 million rubles in the account
+ach.stage_2.name,A Workshop of Your Own
+ach.stage_2.desc,Grow to the Workshop stage
+ach.stage_3.name,Small Business
+ach.stage_3.desc,Grow into a small business
+ach.stage_4.name,Medium Business
+ach.stage_4.desc,Grow into a medium-sized business
+ach.stage_5.name,Large Plant
+ach.stage_5.desc,Grow into a large plant
+ach.stage_6.name,Town-Forming
+ach.stage_6.desc,Become a town-forming enterprise
+ach.staff_10.name,A Team
+ach.staff_10.desc,Ten people on staff
+ach.staff_30.name,Workforce
+ach.staff_30.desc,Thirty people on staff
+ach.stars_5.name,Five Stars
+ach.stars_5.desc,A five-star plant rating
+ach.clean_1.name,No Remarks
+ach.clean_1.desc,Pass an inspection without a single violation
+ach.clean_5.name,Model Enterprise
+ach.clean_5.desc,Five inspections without violations
+ach.grant.name,State Support
+ach.grant.desc,Meet the terms of a grant and get reimbursed
+ach.nicks.name,Our Own People
+ach.nicks.desc,Three workers have earned nicknames
+ach.contract.name,Reliable Supplier
+ach.contract.desc,Complete a long-term contract without termination
+ach.export.name,For Export
+ach.export.desc,Ship an export order
+ach.state.name,State Order
+ach.state.desc,Complete a state order
+ach.night.name,Around the Clock
+ach.night.desc,Start a second shift
+ach.safe_month.name,A Month Without Injuries
+ach.safe_month.desc,Thirty days in a row without a single injury
+ach.half_year.name,Half a Year on the Market
+ach.half_year.desc,Hold out for half a year
+ach.plan.name,Plan Exceeded
+ach.plan.desc,Fulfil the monthly plan
+ach.scenario.name,Scenario Complete
+ach.scenario.desc,Complete all the scenario goals
+ach.first_course.name,Learning Is Light
+ach.first_course.desc,Train someone on a course
+ach.courses_10.name,Our Own Training Centre
+ach.courses_10.desc,Complete 10 courses
+ach.mentor.name,Passing It On
+ach.mentor.desc,A mentor has raised an apprentice
+ach.ptu.name,The Next Generation
+ach.ptu.desc,Hire a trainee from the vocational school
+ach.scrap_1t.name,A Ton of Swarf
+ach.scrap_1t.desc,Hand a ton of swarf to the scrap truck
+ach.blanks_100.name,Blanking Section
+ach.blanks_100.desc,Cut 100 blanks on the band saw
+ach.room5.name,Like a Spa
+ach.room5.desc,Fit out a five-star room
+ach.sout.name,Assessment Passed
+ach.sout.desc,Carry out a working conditions assessment
+ach.clean_air.name,Clean Air
+ach.clean_air.desc,A welding post under an extraction hood with the ventilation running
+ach.boiler_10.name,Our Own Boiler Room
+ach.boiler_10.desc,Ten days of the heating season warmed by your own boiler
+ach.pennant_4.name,Shock Brigade
+ach.pennant_4.desc,Award the socialist competition pennant four times
+ach.union_deal.name,Collective Agreement
+ach.union_deal.desc,Sign a collective agreement with the union committee
+ach.safe_60.name,Injury-Free
+ach.safe_60.desc,Sixty days in a row without accidents
+ach.thief_3.name,The Gate Never Sleeps
+ach.thief_3.desc,Catch three pilferers at the gate
+ach.iso9001.name,Quality Mark
+ach.iso9001.desc,Get ISO 9001 certified
+ach.market_25.name,Market Leader
+ach.market_25.desc,Take a quarter of the district market
+ach.lease_done.name,Paid Off!
+ach.lease_done.desc,Pay off a machine lease in full
+ach.comp_bankrupt.name,Survival of the Fittest
+ach.comp_bankrupt.desc,Outlast a competitor's bankruptcy
+ach.cat.name,A Purring Employee
+ach.cat.desc,Let a cat stay at the plant
+ach.hot_meals.name,"Soup, Main and Compote"
+ach.hot_meals.desc,Serve 500 hot lunches
+ach.town_75.name,Town-Forming
+ach.town_75.desc,Relations with the town at 75
+insp.text.no_ext,No fire extinguisher in the “%s”
+insp.text.hot_ext,Hot section without a second extinguisher: “%s”
+insp.text.one_exit,Large room with a single exit: “%s”
+insp.text.wiring,Faulty wiring: a tripped breaker
+insp.text.clutter,Cluttered aisles: loads on the floor
+insp.text.fire_recent,Aftermath of the fire: violations not fixed
+insp.text.min_wage,Wages below the minimum: %s
+insp.text.no_ppe,No place to change and store PPE
+insp.text.no_aid,No first-aid kit
+insp.text.overwork,Systematic overtime and rushes
+insp.text.injuries,High injury rate: %d injuries this month
+insp.text.no_wc,No toilet with a sink
+insp.text.no_sink,Toilet without a sink
+insp.text.no_canteen,Eating at workplaces — there's no canteen
+insp.text.few_wc,Too few toilets for this many people
+insp.text.garbage,Rubbish and scrap lying around the grounds
+insp.text.worn,Operating a worn-out machine: “%s”
+insp.text.crane,Overhead crane without a certified slinger
+insp.text.forklift,Forklift without an authorised driver
+insp.text.no_electrician,No one responsible for the electrical system (an electrician)
+insp.text.broken_long,Broken equipment not taken out of service: “%s”
+insp.text.scrap_heap,"Scrap and defects not removed, bins overflowing"
+insp.text.paint_room,Paint booth not in a separate room
+insp.text.furnace_smoke,Furnace running without extraction or window ventilation
+insp.text.books,Errors in the accounts
+insp.text.no_regime,No security regime: no gatehouse with a guard
+insp.text.no_qc,No QC table for acceptance
+insp.text.no_test,No test stand for products
+insp.text.scrap_rate,High scrap rate: %d%% over two weeks
+insp.text.no_tb,"No safety briefing held, log not filled in"
+insp.text.dirty_room,Dirt and swarf on the floor in the “%s”
+insp.text.no_sout,No working conditions assessment at %d workplaces
+insp.text.no_milk,Workers in hazardous jobs don't get milk
+insp.text.ppe_worn,Workers without personal protective equipment: %s
+insp.text.no_vent,No ventilation in the “%s”: smoke and fumes from welding or painting
+insp.text.no_lunch,The shift schedule has no lunch break (at least 30 minutes needed)
+insp.text.n1_unfiled,Accident not filed with an N-1 report
+insp.text.mice,Rodents in the “%s”
+insp.fix.no_ext,At the bottom: Objects → Safety → Fire extinguisher. Place it by a wall inside this room (needed in every room of 6+ cells).
+insp.fix.hot_ext,"A shop with a furnace, painting or welding needs two extinguishers. Place a second one: Objects → Safety → Fire extinguisher."
+insp.fix.one_exit,A room of 60+ cells needs two exits. Put a second door or gate in another wall: Build → Doors / Gates.
+insp.fix.wiring,"A breaker has tripped — part of the plant has no power. Open Utilities (E), click the red panel and switch the breaker on. To keep it from tripping again, spread the machines over different lines or raise the power."
+insp.fix.clutter,There are more than 12 loads on the floor. Put up racks (Objects → Storage) or paint a storage zone (Zones → Storage) — labourers and loaders will carry things there. Short of people? Hire a labourer (People → Hiring).
+insp.fix.fire_recent,"After the fire: clear the burnt objects (demolish and rebuild), check the extinguishers and breakers. The violations will go once everything is restored."
+insp.fix.min_wage,Raise the rate: click the person → “+10%” until it's no lower than the minimum.
+insp.fix.no_ppe,Put up clothes lockers (at least one per two people): Objects → Amenities → Clothes locker. Best in a locker room.
+insp.fix.no_aid,Hang a first-aid kit: Objects → Safety → First aid kit.
+insp.fix.overwork,Cancel the rush and the overtime (People → Shift Schedule). Can't keep up? Hire more people.
+insp.fix.injuries,"Lots of injuries. Hold a briefing (People → Training), issue PPE (People → Workplace Safety), repair worn machines, don't push rushes."
+insp.fix.no_wc,"Build a toilet: Build → Rooms → Toilet (walls, door, stall and sink at once), then run water to it (Utilities → Water & heating)."
+insp.fix.no_sink,Put a sink in the toilet (Objects → Amenities → Sink) and run a pipe to it (Utilities → Water & heating).
+insp.fix.no_canteen,With 8+ people you need a canteen: Build → Rooms → Canteen.
+insp.fix.few_wc,You need one stall per 12 people. Add another stall (Objects → Amenities → Toilet stall) to the toilet.
+insp.fix.garbage,Rubbish and scrap are lying around the grounds. Put reject bins by the machines (Objects → Storage → Reject bin); labourers will clean up. No one to do it? Hire a labourer.
+insp.fix.worn,"The machine's condition is below 25%. Click the machine and send it for repair, or turn on planned maintenance (Production → Machines → “PM”)."
+insp.fix.crane,The overhead crane needs a slinger: People → Hiring. Or demolish the crane.
+insp.fix.forklift,The forklift needs a driver: People → Hiring.
+insp.fix.no_electrician,With your own substation or high power you need an electrician: People → Hiring.
+insp.fix.broken_long,A broken machine is standing in the shop. Click it and send it for repair (or demolish it).
+insp.fix.scrap_heap,The scrap bin is overflowing. The scrap truck comes on Fridays; until then add more bins (Objects → Storage → Reject bin).
+insp.fix.paint_room,The paint booth must stand in a separate room: wall it in with a door (Build → Walls).
+insp.fix.furnace_smoke,The furnace needs extraction: windows in the shop walls (Build → Windows & doors) or ventilation (Objects → Engineering → Exhaust fan + a duct in Utilities).
+insp.fix.books,Errors in the accounts. Open an accounting department (Management → Development) — fines will become 4 times rarer.
+insp.fix.no_regime,You need a gatehouse with a guard: a room at the gate with a turnstile and a gatekeeper (People → Hiring).
+insp.fix.no_qc,Put up a QC table (Objects → QC → QC table) and hire an inspector.
+insp.fix.no_test,Put up a test stand: Objects → QC → Test stand.
+insp.fix.scrap_rate,"Lots of scrap. Put up a QC table, train people (People → Training), repair worn machines, don't push rushes."
+insp.fix.no_tb,Hold a briefing: People → Training → “Safety briefing”.
+insp.fix.dirty_room,Dirt and swarf on the floor. Hire a cleaner (People → Hiring) or add cleaning to the schedule (People → Shift Schedule). Put up a swarf container.
+insp.fix.no_sout,Order the measurements: People → Workplace Safety → “Working conditions assessment”.
+insp.fix.no_milk,People → Workplace Safety → turn on “Issue milk”.
+insp.fix.ppe_worn,Buy PPE kits and put up a PPE cabinet: People → Workplace Safety → “PPE”.
+insp.fix.no_vent,"There's welding, painting or a furnace here — it needs extraction: Objects → Engineering → Exhaust fan or Extraction hood, with a duct in Utilities."
+insp.fix.no_lunch,Add a lunch break of at least 30 minutes: People → Shift Schedule.
+insp.fix.n1_unfiled,File an N-1 report: People → Workplace Safety → “N-1 reports”.
+insp.fix.mice,Mice appear where it's very dirty. Clean the room: hire a cleaner or add cleaning to the schedule (People → Shift Schedule). Get a cat — it catches them.

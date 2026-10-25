@@ -49,7 +49,7 @@ func _draw() -> void:
 		var p := Vector2(wp.x * T, wp.y * T + 6.0 + 9.0)
 		if not view.has_point(p):
 			continue
-		var nm := w.last if w.last != "" else w.first
+		var nm := L.name(w.last if w.last != "" else w.first)
 		var sel := w.id == sel_id
 		var tw := f.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX).x
 		var has_b := not w.visitor and w.brigade >= 0
@@ -68,7 +68,7 @@ func _draw() -> void:
 	if ct:
 		var cp := Vector2(ct.pos.x * T, ct.pos.y * T + 6.0 + 6.0)
 		if view.has_point(cp):
-			var cn := ct.name
+			var cn := ct.shown_name()
 			var cw := f.get_string_size(cn, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX - 1).x
 			draw_set_transform(cp, 0.0, Vector2(k, k))
 			draw_style_box(_sb, Rect2(Vector2(-cw * 0.5 - 5.0, 0.0), Vector2(cw + 10.0, FONT_PX + 3.0)))

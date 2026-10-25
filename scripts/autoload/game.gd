@@ -28,7 +28,10 @@ var settings: Dictionary = {
 	"hour_len": 1.0,         ## длительность игрового часа: множитель (0.5 — вдвое быстрее)
 	"ui_scale": 1.0,         ## масштаб интерфейса
 	"tutorial_done": false,
+	"lang": "",              ## 1.39: язык интерфейса: "ru", "en" или "" — по языку системы (L.default_lang)
+	"intro": true,           ## 1.39: показывать интро-ролик при запуске
 }
+var intro_seen := false      ## 1.39: интро уже показали в этом запуске (в меню из игры — без ролика)
 var pending := "new"         ## что делать при входе в игровую сцену: new | load
 var pending_slot := ""
 var pending_seed := 0
@@ -42,10 +45,37 @@ func _ready() -> void:
 	Defs.load_all()
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
 	_load_settings()
+	L.apply(start_lang())
 	get_tree().root.theme = UITheme.build()
 	apply_window()
 	apply_ui_scale()
 	_handle_cmdline()
+
+
+## 1.39: запуск из тестов (сцена или скрипт из res://tests/) и служебные прогоны (--bench/--soak/--shot):
+## в них нет интро, а язык — русский (тесты сверяют русские строки), если не задан ключом `-- --lang=en`.
+static func is_test_run() -> bool:
+	for a: String in OS.get_cmdline_args():
+		if a.contains("tests/"):
+			return true
+	for a2: String in OS.get_cmdline_user_args():
+		if a2.begins_with("--bench") or a2.begins_with("--soak") or a2.begins_with("--shot") or a2 == "--newgame":
+			return true
+	return false
+
+
+func start_lang() -> String:
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("--lang="):
+			return a.get_slice("=", 1)
+	return "ru" if is_test_run() else str(settings.get("lang", ""))
+
+
+## Сменить язык (из настроек): сохранить и применить сразу.
+func set_lang(code: String) -> void:
+	settings["lang"] = code
+	save_settings()
+	L.apply(code)
 
 
 ## Служебные ключи для проверки сборки: -- --newgame --shot=путь.png
@@ -161,7 +191,7 @@ static func pc_time(saved_at: String) -> String:
 	var s := saved_at.replace("T", " ")
 	if s.length() < 16:
 		return s
-	return "%s.%s.%s в %s" % [s.substr(8, 2), s.substr(5, 2), s.substr(0, 4), s.substr(11, 5)]
+	return L.t("%s.%s.%s в %s") % [s.substr(8, 2), s.substr(5, 2), s.substr(0, 4), s.substr(11, 5)]
 
 
 func save_sim(sim: Sim, slot: String, title: String = "") -> String:

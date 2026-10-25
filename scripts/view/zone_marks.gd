@@ -49,7 +49,7 @@ func _draw() -> void:
 				bare[r2.id] = []
 			(bare[r2.id] as Array).append(t)
 			continue
-		_q.append([Vector2(t.cell) * T + Vector2(2, 2) / z, ["зона " + Rooms.zone_names(t.def_id)], "Не работает, нужна:"])
+		_q.append([Vector2(t.cell) * T + Vector2(2, 2) / z, [L.t("зона %s") % Rooms.zone_names(t.def_id)], "Не работает, нужна:"])
 	# неразмеченное помещение с оборудованием — одна метка на всё
 	for rid in bare.keys():
 		var rr2: Rooms.Room = sim.rooms.list[int(rid)]
@@ -134,8 +134,9 @@ func _mark(pos: Vector2, items: Array, full: bool, z: float, f: Font, header: St
 	draw_set_transform(pos, 0.0, Vector2(s, s))
 	var lines: Array[String] = []
 	for it in items:
-		var t := str(it)
+		var t := L.tx(str(it))   # 1.40: недостающее приходит из rooms.gd по-русски — статичное переводим здесь
 		lines.append(t if t.length() <= 40 else t.substr(0, 38) + "…")
+	header = L.t(header)
 	var lh := 15.0
 	var tw := 0.0
 	if full:
@@ -197,11 +198,11 @@ func _power_marks(z: float, f: Font, mp: Vector2) -> void:
 			draw_rect(Rect2(-w * 0.5, -7, w, 6), Color(0.85, 0.3, 0.25, 0.35 * blink))
 		var txt := ""
 		if net.tripped:
-			txt = "ВЫБИТ АВТОМАТ"
+			txt = L.t("ВЫБИТ АВТОМАТ")
 		elif over:
-			txt = "ПЕРЕГРУЗ %.0f/%d кВт" % [net.load, int(net.capacity)]
+			txt = L.t("ПЕРЕГРУЗ %.0f/%d кВт") % [net.load, int(net.capacity)]
 		elif (hovered or z >= 1.25) and not ov_power:
-			txt = ("%.1f / %d кВт" if net.load < 10.0 else "%.0f / %d кВт") % [net.load, int(net.capacity)]
+			txt = L.t("%.1f / %d кВт" if net.load < 10.0 else "%.0f / %d кВт") % [net.load, int(net.capacity)]
 		if txt != "":
 			var tw := f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x
 			var red := over or net.tripped

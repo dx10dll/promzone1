@@ -197,7 +197,7 @@ func _palette(cap: String, key: String, cols: Array) -> HBoxContainer:
 
 func _refresh_title() -> void:
 	var n := Company.clean_name(str(data.get("name", "")))
-	title_lbl.text = (("ООО «%s»" if ooo else "Мастерская «%s»") % n) if n != "" else "Без названия"
+	title_lbl.text = (L.t("ООО «%s»" if ooo else "Мастерская «%s»") % n) if n != "" else L.t("Без названия")
 	text_edit.placeholder_text = Company.initials(n)
 	if sign_prev:
 		sign_prev.queue_redraw()
@@ -217,7 +217,7 @@ func _refresh() -> void:
 		var s2 := em.duplicate()
 		s2["symbol"] = k2
 		if k2 == "letters" and str(s2.get("text", "")) == "":
-			s2["text"] = "А"
+			s2["text"] = "A" if L.is_en() else "А"
 		(b2.get_meta("view") as Emblem.View).set_spec(s2)
 		b2.set_pressed_no_signal(str(em.get("symbol", "")) == str(k2))
 	for key in _sw.keys():
@@ -242,4 +242,4 @@ class SignPreview:
 		var inner := r.grow(-5.0)
 		draw_rect(inner, Color("#1d2a38"))
 		var n := Company.clean_name(str(ed.data.get("name", "")))
-		Emblem.draw_sign_plate(self, inner, ed.data["emblem"], n if n != "" else "Без названия", "ООО" if ed.ooo else "МАСТЕРСКАЯ")
+		Emblem.draw_sign_plate(self, inner, ed.data["emblem"], n if n != "" else L.t("Без названия"), L.t("ООО" if ed.ooo else "МАСТЕРСКАЯ"))

@@ -28,7 +28,7 @@ static func default_data() -> Dictionary:
 
 
 static func random_name(rng: RandomNumberGenerator) -> String:
-	return str(NAMES[rng.randi_range(0, NAMES.size() - 1)])
+	return L.t(str(NAMES[rng.randi_range(0, NAMES.size() - 1)]))   # 1.39: в английском — латиницей (Voskhod, Zarya…)
 
 
 static func random_emblem(rng: RandomNumberGenerator, profile: String = "") -> Dictionary:
@@ -71,7 +71,10 @@ static func clean_name(s: String) -> String:
 
 static func name_of(sim: Sim) -> String:
 	var n := str(sim.company.get("name", ""))
-	return n if n != "" else "Прогресс"
+	if n == "":
+		n = "Прогресс"
+	# 1.39: в английском — перевод из списка названий (Voskhod…) или латиницей (своё название игрока)
+	return L.translit(L.t(n)) if L.is_en() else n
 
 
 static func emblem_of(sim: Sim) -> Dictionary:
@@ -81,7 +84,41 @@ static func emblem_of(sim: Sim) -> Dictionary:
 
 ## Полное название: до регистрации ООО — «Мастерская «…»», потом ООО «…».
 static func title(sim: Sim) -> String:
-	return ("ООО «%s»" if sim.progress.ooo else "Мастерская «%s»") % name_of(sim)
+	return L.t("ООО «%s»" if sim.progress.ooo else "Мастерская «%s»") % name_of(sim)
+
+
+## 1.39: название из старых данных (метка сохранения) — на текущем языке: «ООО «Прогресс»» → «Progress LLC».
+static func retitle(t: String) -> String:
+	if not L.is_en():
+		return t
+	for f: String in ["ООО «%s»", "Мастерская «%s»"]:
+		var pre := f.get_slice("%s", 0)
+		if t.begins_with(pre) and t.ends_with("»"):
+			var nm := t.substr(pre.length(), t.length() - pre.length() - 1)
+			return L.t(f) % L.translit(L.t(nm))
+	return t
+
+
+## 1.39: название чужой фирмы (конкурент, заказчик, поставщик) для показа: в русском — как есть,
+## в английском — «ООО «Техмаш-Регион»» → «Tekhmash-Region LLC», «ИП Гарипов» → «IE Garipov». Хранится по-русски.
+static func firm(t: String) -> String:
+	if not L.is_en() or t == "":
+		return t
+	var tail := ""
+	var core := t
+	var m := RegEx.create_from_string("^(.*) \\(([^()]+)\\)$").search(t)
+	if m != null:
+		core = m.get_string(1)
+		tail = " (%s)" % L.translit(L.t(m.get_string(2)))
+	var m2 := RegEx.create_from_string("^(\\S+) «(.+)»$").search(core)
+	if m2 != null:
+		var nm := L.t(m2.get_string(2))
+		nm = L.translit(nm)
+		var f := L.t(m2.get_string(1) + " «%s»")
+		return (f if not L.has_cyr(f) else L.translit(m2.get_string(1)) + " %s") % nm + tail
+	if core.begins_with("ИП "):
+		return L.t("ИП %s") % L.translit(core.substr(3)) + tail
+	return L.translit(L.t(core)) + tail
 
 
 ## Короткое: «Прогресс» в кавычках.
