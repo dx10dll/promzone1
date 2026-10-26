@@ -25,6 +25,14 @@ var enabled := true               ## для тестов: без заявок и
 var paused := false               ## 1.20: директор приостановил приём заказов
 var queue: Array = []             ## заявки в рассмотрении: ждут, пока освободится мощность (до полутора суток)
 var _qt := 0.0
+## 1.48b: доска заявок и режим сбыта. "manual" — решает игрок, "small" — мелкие выгодные берёт сам, "auto" — всё сам.
+const SMALL_SUM := 100000.0       ## «мелочь»: сумма заявки до этого порога
+const SMALL_MARGIN := 0.15        ## и маржа не ниже
+const HAGGLE_PRICE_MAX := 0.25    ## торг: надбавка к цене до +25%
+const HAGGLE_LEAD_MAX := 3        ## и до +3 дней к сроку
+var mode := "small"
+var board: Array = []             ## «Новые заявки»: ждут решения игрока (поле expires — когда уйдут к конкуренту)
+var _board_new := 0               ## сколько карточек легло на доску с последнего уведомления
 
 
 func _init(s: Sim) -> void:
@@ -127,6 +135,15 @@ func inquiry(o: Dictionary) -> bool:
 	o["arrived"] = sim.day()
 	var v := verdict(o)
 	var why := str(v[0])
+	if mode != "auto":
+		if why == "" and mode == "small" and is_small(o):
+			_take(o)
+			return true
+		if not _hard(why):
+			_post(o)
+			return false
+		_log(o, false, why, v[1])
+		return false
 	if why == "":
 		_take(o)
 		return true
@@ -140,16 +157,163 @@ func inquiry(o: Dictionary) -> bool:
 	return false
 
 
-func _take(o: Dictionary) -> void:
-	_log(o, true, "", [])
+func _take(o: Dictionary, by: String = "sales") -> void:
+	_log(o, true, "", [], by)
 	o["status"] = "offer"
 	sim.orders.list.append(o)
 	sim.orders.accept(int(o["id"]), true, true)
 
 
-func _log(o: Dictionary, ok: bool, why: String, procs: Array) -> void:
-	log.append({"day": int(o.get("arrived", sim.day())), "p": str(o["product"]), "qty": int(o["qty"]), "sum": float(o["price"]) * int(o["qty"]),
-		"ok": ok, "why": why, "procs": procs, "client": str(o["client"])})
+func _log(o: Dictionary, ok: bool, why: String, procs: Array, by: String = "") -> void:
+	var e := {"day": int(o.get("arrived", sim.day())), "p": str(o["product"]), "qty": int(o["qty"]), "sum": float(o["price"]) * int(o["qty"]),
+		"ok": ok, "why": why, "procs": procs, "client": str(o["client"])}
+	if by != "":
+		e["by"] = by   # кто взял: "sales" — сбыт сам, "director" — игрок
+	log.append(e)
+
+
+# ================================================================ доска заявок (1.48b)
+
+static func is_small(o: Dictionary) -> bool:
+	return float(o["price"]) * int(o["qty"]) <= SMALL_SUM
+
+
+## «Жёсткий» отказ: заявка не ляжет на доску (нечем делать, снято, долги, пауза) — сразу в журнал.
+static func _hard(why: String) -> bool:
+	return why.begins_with("нет оборудования") or why.begins_with("снято с ассортимента") or why.begins_with("завод в долгах") or why.begins_with("приём заказов")
+
+
+func _post(o: Dictionary) -> void:
+	o["status"] = "board"
+	o["expires"] = sim.minute + sim.rng.randf_range(1.0, 2.0) * 1440.0
+	o["haggled"] = ""
+	board.append(o)
+	_board_new += 1
+
+
+func board_get(id: int) -> Dictionary:
+	for o: Dictionary in board:
+		if int(o["id"]) == id:
+			return o
+	return {}
+
+
+## Сколько суток карточка ещё провисит (дробное).
+func board_left(o: Dictionary) -> float:
+	return maxf(0.0, (float(o["expires"]) - sim.minute) / 1440.0)
+
+
+## Риск не успеть: {level: 0 — с запасом, 1 — впритык, 2 — не успеем, days: загрузка, proc: узкий передел}.
+func board_risk(o: Dictionary) -> Dictionary:
+	var li := sim.office.load_info(str(o["product"]), int(o["qty"]))
+	var d := float(li[0])
+	var lead := float(int(o.get("lead", 3)))
+	var lv := 0
+	if d > lead:
+		lv = 2
+	elif d > lead * 0.6:
+		lv = 1
+	return {"level": lv, "days": d, "proc": str(li[1])}
+
+
+## Сменить режим сбыта. При «Всё сам»/«Мелочь сам» заявки на доске, которые сбыт теперь вправе решить сам, разбираются сразу.
+func set_mode(m: String) -> void:
+	if not ["manual", "small", "auto"].has(m) or m == mode:
+		return
+	mode = m
+	if m == "manual":
+		return
+	for o: Dictionary in board.duplicate():
+		var v := verdict(o)
+		if m == "auto":
+			board.erase(o)
+			if str(v[0]) == "":
+				_take(o)
+			elif _can_wait(str(v[0])):
+				o["why"] = str(v[0])
+				o["procs"] = v[1]
+				o["wait_until"] = sim.minute + 1.5 * 1440.0
+				queue.append(o)
+			else:
+				_log(o, false, str(v[0]), v[1])
+		elif str(v[0]) == "" and is_small(o):
+			board.erase(o)
+			_take(o)
+
+
+## Взять заявку с доски (решение игрока: порог маржи и риск не важны). Пустая строка — взято, иначе причина.
+func take(id: int) -> String:
+	var o := board_get(id)
+	if o.is_empty():
+		return L.t("Заявки уже нет — заказчик ушёл.")
+	var p := str(o["product"])
+	if not in_assortment(p):
+		return L.t("Это изделие снято с ассортимента.")
+	if not missing(p).is_empty():
+		return L.t("Нет оборудования для этого изделия.")
+	if sim.orders.active_count() >= sim.orders.max_active():
+		return L.t("Слишком много заказов в работе (максимум %d — растёт со штатом)") % sim.orders.max_active()
+	board.erase(o)
+	_take(o, "director")
+	return ""
+
+
+func refuse(id: int) -> void:
+	var o := board_get(id)
+	if o.is_empty():
+		return
+	board.erase(o)
+	_log(o, false, "отказ директора", [])
+
+
+## Шанс, что заказчик согласится на торг: цена +price_k (0..0.25) и срок +lead_add (0..3) суток.
+func haggle_chance(o: Dictionary, price_k: float, lead_add: int) -> float:
+	var mk := price_index(str(o["product"]))
+	var c := 0.97 - 3.4 * price_k * (1.0 + (mk - 1.0) * 2.0) - 0.09 * float(lead_add)   # чем больше просим, тем меньше шанс; дорогой рынок — заказчик жёстче
+	if bool(o.get("trial", false)):
+		c += 0.05
+	return clampf(c, 0.03, 0.95)
+
+
+## Торг: одна попытка на заявку. Возвращает "ok" (условия новые, заявка на доске), "no" (заказчик ушёл) или "" (нельзя).
+func haggle(id: int, price_k: float, lead_add: int) -> String:
+	var o := board_get(id)
+	if o.is_empty() or str(o.get("haggled", "")) != "":
+		return ""
+	var pk := clampf(price_k, 0.0, HAGGLE_PRICE_MAX)
+	var la := clampi(lead_add, 0, HAGGLE_LEAD_MAX)
+	if pk <= 0.0 and la <= 0:
+		return ""
+	if sim.rng.randf() < haggle_chance(o, pk, la):
+		o["price"] = int(round(float(o["price"]) * (1.0 + pk) / 10.0) * 10)
+		o["lead"] = int(o.get("lead", 3)) + la
+		o["deadline"] = sim.orders.deadline_after(int(o["lead"]))
+		o["haggled"] = "ok"
+		return "ok"
+	board.erase(o)
+	_log(o, false, "торг не удался — заказчик ушёл", [])
+	return "no"
+
+
+## Утро: заявки, провисевшие свой срок, уходят к конкуренту — одно уведомление на всех.
+func _expire_board() -> void:
+	var gone := 0
+	var gone_sum := 0.0
+	for o: Dictionary in board.duplicate():
+		if sim.minute >= float(o["expires"]) - 1.0:
+			board.erase(o)
+			_log(o, false, "ушёл к конкуренту", [])
+			gone += 1
+			gone_sum += float(o["price"]) * int(o["qty"])
+	if gone > 0:
+		sim.notify(L.t("Заказчики ушли к конкуренту: %d %s на %s. Заявки на доске висят 1–2 дня.") % [gone, L.pl(gone, "заявка|заявки|заявок"), Defs.money_str(gone_sum)], Sim.LVL_WARN)
+
+
+## Конец утра: одно уведомление о новых карточках на доске (звук — обычный n_info).
+func board_notify() -> void:
+	if _board_new > 0:
+		sim.notify(L.t("На доске новых заявок: %d. «Заказы» → «Новые заявки».") % board.size(), Sim.LVL_INFO)
+	_board_new = 0
 
 
 ## Заявки в рассмотрении: как только освободилась мощность — берём самые выгодные.
@@ -200,7 +364,7 @@ func summary(days: int = 7) -> Dictionary:
 			taken_sum += float(e["sum"])
 			continue
 		var why := str(e["why"])
-		if why == "снято с ассортимента":
+		if why == "снято с ассортимента" or why == "отказ директора":
 			continue
 		lost += 1
 		lost_sum += float(e["sum"])
@@ -305,6 +469,7 @@ func _update_market() -> void:
 # ================================================================ утро
 
 func morning() -> void:
+	_expire_board()
 	if sim.weekday() == 0:
 		_update_market()
 		_weekly_report()
@@ -591,7 +756,7 @@ func on_order_closed(o: Dictionary, ok: bool) -> void:
 
 func to_dict() -> Dictionary:
 	return {"off": off, "risk": risk, "margin": margin_i, "log": log, "contracts": contracts, "market": market,
-		"market_prev": market_prev, "next": next_contract, "queue": queue, "paused": paused}
+		"market_prev": market_prev, "next": next_contract, "queue": queue, "paused": paused, "mode": mode, "board": board}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -605,3 +770,6 @@ func from_dict(d: Dictionary) -> void:
 	next_contract = float(d.get("next", float(sim.day()) + 5.0))
 	queue = d.get("queue", [])
 	paused = bool(d.get("paused", false))
+	mode = str(d.get("mode", "small"))
+	board = d.get("board", [])
+	_board_new = 0

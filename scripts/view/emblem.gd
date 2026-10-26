@@ -149,8 +149,9 @@ static func texture(spec: Dictionary, px: int) -> Texture2D:
 
 
 ## Нарисовать эмблему в прямоугольник (с буквами, если знак — «Буквы»).
-static func draw(ci: CanvasItem, r: Rect2, spec: Dictionary, alpha: float = 1.0) -> void:
-	var px := int(clampf(ceilf(maxf(r.size.x, r.size.y) * 2.0), 16.0, 512.0))
+static func draw(ci: CanvasItem, r: Rect2, spec: Dictionary, alpha: float = 1.0, world: bool = false) -> void:
+	# 1.48: в мире (вывеска у проходной) разрешение берём по зуму камеры, а не «×2» — иначе вблизи пиксели
+	var px := int(clampf(ceilf(maxf(r.size.x, r.size.y) * (Tex.wscale() if world else 2.0)), 16.0, 1024.0))
 	var tex := texture(spec, px)
 	if tex:
 		ci.draw_texture_rect(tex, r, false, Color(1, 1, 1, alpha))
@@ -162,15 +163,19 @@ static func draw(ci: CanvasItem, r: Rect2, spec: Dictionary, alpha: float = 1.0)
 		var fs := int(r.size.y * (0.42 if t.length() <= 1 else (0.34 if t.length() == 2 else 0.27)))
 		var base := r.position + Vector2(0, r.size.y * 0.5 + fs * 0.36)
 		var col := Color(str(spec.get("fg", "#f2efe6")), alpha)
+		if world:
+			Tex.world_string(ci, f, base + Vector2(1, 1.5), t, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, Color(0, 0, 0, 0.35 * alpha))
+			Tex.world_string(ci, f, base, t, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, col)
+			return
 		ci.draw_string(f, base + Vector2(1, 1.5), t, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, Color(0, 0, 0, 0.35 * alpha))
 		ci.draw_string(f, base, t, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, fs, col)
 
 
 ## Табличка: эмблема слева, название справа (шрифт ужимается под ширину), сверху мелко — форма (ООО).
-static func draw_sign_plate(ci: CanvasItem, r: Rect2, spec: Dictionary, name: String, sub: String, text_col: Color = Color("#f2efe6")) -> void:
+static func draw_sign_plate(ci: CanvasItem, r: Rect2, spec: Dictionary, name: String, sub: String, text_col: Color = Color("#f2efe6"), world: bool = false) -> void:
 	var pad := r.size.y * 0.1
 	var es := r.size.y - pad * 2.0
-	draw(ci, Rect2(r.position + Vector2(pad, pad), Vector2(es, es)), spec)
+	draw(ci, Rect2(r.position + Vector2(pad, pad), Vector2(es, es)), spec, 1.0, world)
 	var f: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
 	var tx := r.position.x + pad * 2.0 + es
 	var tw := r.end.x - tx - pad
@@ -179,6 +184,11 @@ static func draw_sign_plate(ci: CanvasItem, r: Rect2, spec: Dictionary, name: St
 		fs -= 1
 	var sfs := maxi(4, int(r.size.y * 0.17))
 	var top := r.position.y + r.size.y * 0.5
+	if world:
+		if sub != "":
+			Tex.world_string(ci, f, Vector2(tx, top - fs * 0.55), sub, HORIZONTAL_ALIGNMENT_LEFT, tw, sfs, Color(text_col, 0.6))
+		Tex.world_string(ci, f, Vector2(tx, top + fs * 0.62), name, HORIZONTAL_ALIGNMENT_LEFT, tw, fs, text_col)
+		return
 	if sub != "":
 		ci.draw_string(f, Vector2(tx, top - fs * 0.55), sub, HORIZONTAL_ALIGNMENT_LEFT, tw, sfs, Color(text_col, 0.6))
 	ci.draw_string(f, Vector2(tx, top + fs * 0.62), name, HORIZONTAL_ALIGNMENT_LEFT, tw, fs, text_col)

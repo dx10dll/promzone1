@@ -129,7 +129,7 @@ func _items() -> Array:
 	if nd != "":
 		var rs := sim.office.room_status(nd)
 		var has_staff := not sim.office.staff(nd).is_empty()
-		var chk := "нанять человека" if not has_staff else ("нужен кабинет" if int(rs[0]) < 1 else "")
+		var chk := tr("нанять человека") if not has_staff else (tr("нужен кабинет") if int(rs[0]) < 1 else "")
 		out.append(["office", tr("Нужен отдел: %s") % L.dt("department.%s.name" % nd, str(Defs.departments[nd]["name"])), chk, UITheme.INFO, func() -> void: hud.open_window("office")])
 	# развитие: что исследует директор или что можно открыть
 	var dv := sim.dev

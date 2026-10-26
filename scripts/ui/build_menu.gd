@@ -6,12 +6,12 @@ extends RefCounted
 ## высоты (плитка в прокрутке), цена и «есть N» всегда внутри плитки; в плане — стройка и объекты разом.
 
 const COLS := 10
-const TILE := Vector2(64, 68)       ## 1.40: фиксированная раскладка — значок, подпись в две строки, цена внизу
+const TILE := Vector2(80, 88)       ## 1.40: фиксированная раскладка — значок, подпись в две строки, цена внизу
 const CAT_W := 124.0
-const ICON_Y := 3.0
-const TITLE_Y := 29.0
-const TITLE_H := 23.0
-const PRICE_H := 13.0
+const ICON_Y := 4.0
+const TITLE_Y := 40.0
+const TITLE_H := 28.0
+const PRICE_H := 15.0
 const HEAD_H := 24.0
 const FOCUS_ZOOM := 1.25            ## 1.40: «камера приближена» — с этого масштаба подсвечиваем нужное помещению
 const NEED_COL := Color("#5fd3c0")  ## подсветка «нужно помещению»
@@ -420,8 +420,8 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 		b.add_child(sw)
 	var r := TextureRect.new()
 	r.texture = tex
-	var ih := 26.0 if Tex.is_color(tex) else 22.0   # 1.38: PNG владельца с полями — крупнее
-	r.set_meta("rect", Rect2(Vector2(3, ICON_Y + (26.0 - ih) * 0.5 + 1.0), Vector2(iw, ih)))
+	var ih := 34.0 if Tex.is_color(tex) else 28.0   # 1.38: PNG владельца с полями — крупнее
+	r.set_meta("rect", Rect2(Vector2(3, ICON_Y + (34.0 - ih) * 0.5 + 1.0), Vector2(iw, ih)))
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -431,7 +431,7 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 	var l := UITheme.label(str(fit[1]), int(fit[0]), UITheme.TEXT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.add_theme_constant_override("line_spacing", -3)
+	l.add_theme_constant_override("line_spacing", -2)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.clip_text = true
 	l.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # уже переведено и разложено по строкам
@@ -440,9 +440,9 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 	if cost != "":
 		var pf: Font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
 		var ct := cost
-		if pf.get_string_size(ct, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x > iw:
+		if pf.get_string_size(ct, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x > iw:
 			ct = short_money(ct)
-		var pfit := fit_line(ct, iw, 9, 7, pf)
+		var pfit := fit_line(ct, iw, 11, 8, pf)
 		var c := UITheme.label(str(pfit[1]), int(pfit[0]), cost_col, UITheme.f_semi)
 		c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		c.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -455,13 +455,13 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 		b.add_child(c)
 	if count > 0:
 		# 1.40: «есть N» — значок в углу плитки, а не строкой под названием
-		var cb := UITheme.label("×%d" % count, 9, Color.WHITE, UITheme.f_semi)
+		var cb := UITheme.label("×%d" % count, 10, Color.WHITE, UITheme.f_semi)
 		cb.add_theme_stylebox_override("normal", UITheme.sb(Color(UITheme.GOOD, 0.85), Color(0, 0, 0, 0), 0, 6, 3, 0))
 		cb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cb.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		cb.set_meta("count", count)
-		var cw := ceilf((UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font).get_string_size(cb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x) + 6.0
+		var cw := ceilf((UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font).get_string_size(cb.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x) + 6.0
 		cb.set_meta("rect", Rect2(Vector2(TILE.x - cw - 3.0, 3.0), Vector2(cw, 13)))
 		b.add_child(cb)
 	if need:
@@ -506,19 +506,19 @@ static func _tile(h: Hud, grid: Control, tex: Texture2D, title: String, cost: St
 ## («Инструментальная», «Ленточнопильный») переносим по слогам с дефисом, составное — по дефису.
 static func fit_title(title: String, width: float) -> Array:
 	var f: Font = UITheme.f_reg if UITheme.f_reg else ThemeDB.fallback_font
-	for opt in [[10, false], [9, false], [10, true], [9, true], [8, false], [8, true]]:
+	for opt in [[12, false], [11, false], [12, true], [11, true], [10, false], [10, true], [9, true]]:
 		var px := int(opt[0])
 		var atoms := _atoms(title, f, px, width, bool(opt[1]))
 		if atoms.is_empty():
 			continue
-		var best := _lay(atoms, f, px, width, 3 if px == 8 else 2)
+		var best := _lay(atoms, f, px, width, 3 if px <= 9 else 2)
 		if best != "":
 			return [px, best]
 	# не влезает даже так — сокращаем с многоточием
 	var t := title
-	while t.length() > 3 and f.get_string_size(t + "…", HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x > width:
+	while t.length() > 3 and f.get_string_size(t + "…", HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x > width:
 		t = t.substr(0, t.length() - 1)
-	return [8, t + "…"]
+	return [9, t + "…"]
 
 
 const VOW := "аеёиоуыэюяАЕЁИОУЫЭЮЯ"

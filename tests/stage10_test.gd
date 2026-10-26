@@ -25,6 +25,7 @@ func _init() -> void:
 	Defs.load_all()
 	print("— цены и найм")
 	var g := Scenario.new_game("garage", "mech", "calm", 3)
+	g.sales.mode = "auto"   # 1.48b: тест про то, как сбыт сам берёт заказы
 	g.story.enabled = false
 	g.progress.tutorial = -1
 	check(g.ad_price() <= 3000.0 and g.ad_price("turner") <= 4000.0, "объявление: %s, по профессии %s" % [Defs.money_str(g.ad_price()), Defs.money_str(g.ad_price("turner"))])
@@ -62,6 +63,7 @@ func _init() -> void:
 	print("— сбыт: ассортимент, портфель заявок, товарный кредит")
 	var a := Scenario.new_game("garage", "mech", "calm", 8)
 	a.story.enabled = false
+	a.sales.mode = "auto"
 	a.sales.off["pin"] = true
 	var o1 := a.orders.make_offer("pin")
 	check(not a.sales.inquiry(o1) and str(a.sales.log.back()["why"]) == "снято с ассортимента", "снятое с ассортимента не берут")

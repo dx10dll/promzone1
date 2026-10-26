@@ -11,7 +11,7 @@ var _sig := ""
 func _process(_d: float) -> void:
 	if sim == null:
 		return
-	var sig := "%d|%s|%s" % [sim.company_rev, _is_lit(), sim.progress.ooo]
+	var sig := "%d|%s|%s|%.3f" % [sim.company_rev, _is_lit(), sim.progress.ooo, Tex.wscale()]
 	if sig != _sig:
 		_sig = sig
 		queue_redraw()
@@ -50,7 +50,7 @@ func _draw() -> void:
 	var spec := Company.emblem_of(sim)
 	var lit := _is_lit()
 	var col := Color("#fff4d6") if lit else Color("#f2efe6")
-	Emblem.draw_sign_plate(self, inner, spec, Company.name_of(sim), L.t("ООО") if sim.progress.ooo else L.t("МАСТЕРСКАЯ"), col)
+	Emblem.draw_sign_plate(self, inner, spec, Company.name_of(sim), L.t("ООО") if sim.progress.ooo else L.t("МАСТЕРСКАЯ"), col, true)
 	if lit:
 		draw_rect(r.grow(6.0), Color(1.0, 0.85, 0.5, 0.06))
 		draw_rect(r.grow(2.0), Color(1.0, 0.85, 0.5, 0.08))

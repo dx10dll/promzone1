@@ -662,7 +662,7 @@ func _refresh_top() -> void:
 		power_bar.add_theme_stylebox_override("fill", UITheme.sb(pc, pc, 0, 3, 0, 0))
 		power_l.add_theme_color_override("font_color", UITheme.TEXT)
 	(_chips["power"] as Control).tooltip_text = tr("Электросеть: нагрузка %.1f из %d кВт.\nНажмите — меню «Сети» (E).") % [pw.total_load, int(cap)]
-	var offers := sim.orders.by_status(["offer"]).size() + sim.sales.by_state(["offer"]).size()
+	var offers := sim.orders.by_status(["offer"]).size() + sim.sales.by_state(["offer"]).size() + sim.sales.board.size()   # 1.48: заявки на доске
 	order_badge.text = str(offers)
 	order_badge.visible = offers > 0
 	var se := sim.season
@@ -685,7 +685,7 @@ func _refresh_top() -> void:
 	(_chips["weather"] as Control).tooltip_text = wtip
 	(_chips["date"] as Control).tooltip_text = tr("%s, %s. %s\nНажмите — календарь и проверки (C).") % [se.long_date(), sim.time_str(), sim.crew.sched_text(sim.crew.sched_str(0), 0).capitalize() if sim.is_workday() else tr("Выходной")]
 	_refresh_crisis()
-	var alerts := sim.story.letters.size() + (1 if sim.story.strike.get("active", false) else 0) + (1 if not sim.story.fires.is_empty() else 0) + sim.inspect.queue.size() + (1 if sim.paper.unread else 0)
+	var alerts := unread_log + sim.story.letters.size() + (1 if sim.story.strike.get("active", false) else 0) + (1 if not sim.story.fires.is_empty() else 0) + sim.inspect.queue.size() + (1 if sim.paper.unread else 0)
 	events_badge.text = str(alerts)
 	events_badge.visible = alerts > 0
 	paper_badge.visible = false
@@ -987,7 +987,7 @@ func _cap_sub() -> void:
 	if not is_inside_tree():
 		return
 	var need := sub_root.get_combined_minimum_size()
-	var cap := get_viewport_rect().size.y * 0.34   # 1.47.1: «План», «Стройка», «Объекты» — ещё ниже, дальше прокрутка
+	var cap := get_viewport_rect().size.y * 0.40   # 1.48 (было 0.34): плитка 80×88; 1.47.1: «План», «Стройка», «Объекты» — ещё ниже, дальше прокрутка
 	sub_scroll.custom_minimum_size = Vector2(need.x, minf(need.y, cap))
 
 
@@ -1252,8 +1252,17 @@ func on_room_clicked(room_id: int) -> void:
 
 # ---------------------------------------------------------------- уведомления
 
+var unread_log := 0   ## 1.48: сообщения, ушедшие только в журнал (счётчик на кнопке «События»)
+
+
 func on_notified(text: String, level: int, cell: Vector2i) -> void:
-	toast(text, level, 9.0, cell, true)
+	# 1.48: режим уведомлений — 0 все, 1 важные (по умолчанию: предупреждения и тревоги), 2 только тревоги
+	var mode := int(Game.settings.get("notify_mode", 1.0))
+	var need := Sim.LVL_INFO if mode == 0 else (Sim.LVL_WARN if mode == 1 else Sim.LVL_BAD)
+	if level < need:
+		unread_log += 1
+		return
+	toast(text, level, [4.0, 4.0, 7.0, 12.0][clampi(level, 0, 3)], cell, true)
 	Snd.play(["n_info", "n_good", "n_warn", "n_bad"][clampi(level, 0, 3)], -4.0 if level == 0 else -1.0, 0.0, 0.7)
 
 
@@ -1301,16 +1310,34 @@ func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2
 	badge_p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	badge_p.add_child(_ticon(kind_icon, 24))
 	th.add_child(badge_p)
+	# 1.48: компактно — до 2 строк, полный текст в подсказке; одинаковые подряд склеиваются в «×N»
+	var last: Node = toasts.get_child(toasts.get_child_count() - 1) if toasts.get_child_count() > 0 else null
+	if last != null and last.has_meta("toast_text") and str(last.get_meta("toast_text")) == text:
+		var n := int(last.get_meta("toast_n", 1)) + 1
+		last.set_meta("toast_n", n)
+		(last.get_meta("toast_label") as Label).text = "%s ×%d" % [text, n]
+		(last as Control).modulate.a = 1.0
+		if last.has_meta("toast_tw"):
+			(last.get_meta("toast_tw") as Tween).kill()
+		_toast_life(last as Control, life)
+		p.free()
+		return
+	p.set_meta("toast_text", text)
 	var l := UITheme.label(text, 13)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(326, 0)
+	l.max_lines_visible = 2
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.custom_minimum_size = Vector2(310, 0)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	p.set_meta("toast_label", l)
 	th.add_child(l)
+	p.tooltip_text = text
 	if cell.x >= 0:
-		p.tooltip_text = "Нажмите, чтобы показать место"
+		p.tooltip_text = text + "\n" + tr("Нажмите, чтобы показать место")
 		p.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	if target != "":
-		p.tooltip_text = "Нажмите, чтобы открыть окно"
+		p.tooltip_text = text + "\n" + tr("Нажмите, чтобы открыть окно")
 		p.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	p.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and (e as InputEventMouseButton).pressed:
@@ -1320,11 +1347,16 @@ func toast(text: String, level: int, life: float = 7.0, cell: Vector2i = Vector2
 				open_window(target)
 			p.queue_free())
 	toasts.add_child(p)
-	while toasts.get_child_count() > 6:
+	while toasts.get_child_count() > 3:
 		var old := toasts.get_child(0)
 		toasts.remove_child(old)
 		old.queue_free()
+	_toast_life(p, life)
+
+
+func _toast_life(p: Control, life: float) -> void:
 	var tw := p.create_tween()
+	p.set_meta("toast_tw", tw)
 	tw.tween_interval(life)
 	tw.tween_property(p, "modulate:a", 0.0, 0.6)
 	tw.tween_callback(p.queue_free)
@@ -1370,6 +1402,7 @@ func open_window(kind: String) -> void:
 	win.position = Vector2((get_viewport_rect().size.x - win.size.x) * 0.5, 50.0 + 10.0 + (avail - win.size.y) * 0.5)
 	fit_window(win, false)
 	if grp == "events":
+		unread_log = 0
 		sim.paper.unread = false if win.sec == "paper" else sim.paper.unread
 	win.closed.connect(close_window)
 	if todo:

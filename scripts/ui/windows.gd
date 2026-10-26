@@ -23,7 +23,7 @@ static var train_where := "class"  ## где учить: свой класс и�
 ## 1.30: значок группы — из набора владельца (assets/ui/icons), значки разделов — прежние.
 const GROUPS := {
 	"orders": {"title": "Заказы", "icon": "orders", "secs": [
-		["active", "В работе", "orders", "orders", "active"], ["market", "Рынок", "chart_up", "orders", "market"],
+		["board", "Новые заявки", "blueprint", "orders", "board"], ["active", "В работе", "orders", "orders", "active"], ["market", "Рынок", "chart_up", "orders", "market"],
 		["contracts", "Контракты", "handshake", "orders", "contracts"], ["compet", "Конкуренты", "factory", "orders", "compet"],
 		["plan", "План ПДО", "calendar", "orders", "plan"], ["done", "Архив", "log", "orders", "done"]]},
 	"prod": {"title": "Производство", "icon": "production", "secs": [
@@ -367,6 +367,7 @@ func _popup_open() -> bool:
 
 
 func rebuild(force: bool) -> void:
+	set_badge("board", sim.sales.board.size())   # 1.48b: счётчик новых заявок у пункта меню
 	var sig := _signature() + _gate_sig()
 	if not force and sig == _sig:
 		return
@@ -540,7 +541,7 @@ func _lock_card(d: String, what: String, compact: bool = false) -> PanelContaine
 func _signature() -> String:
 	match kind:
 		"orders":
-			var parts: Array[String] = [tab]
+			var parts: Array[String] = [tab, OrderBoard.sig(sim)]
 			for o: Dictionary in sim.orders.list:
 				parts.append("%d%s%d%d" % [int(o["id"]), str(o["status"]), int(o["shipped"]), int(o.get("prio", 0))])
 			for p in Defs.products.keys():
@@ -793,6 +794,10 @@ func _icon(tex: Texture2D, sz: float = 40.0) -> TextureRect:
 
 func _orders() -> void:
 	match tab:
+		"board":
+			_info(tr("на доске %d · висят 1–2 дня") % sim.sales.board.size())
+			_intro(tr("Заявки заказчиков ложатся сюда карточками. Решайте: «Взять», «Торговаться» или «Отказать». Через 1–2 игровых дня заказчик уходит к конкуренту. Режим сбыта переключается сверху: сбыт может брать мелочь или всё сам."))
+			OrderBoard.build(content, sim, rebuild, func(t: String, lvl: int) -> void: hud.toast(t, lvl, 4.0))
 		"active":
 			_sales_head()
 			var act := sim.orders.by_status(["active", "ready", "shipping"])

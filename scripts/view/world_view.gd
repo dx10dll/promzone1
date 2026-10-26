@@ -90,9 +90,10 @@ func _draw_cells(n: Node2D) -> void:
 	var dirt: Array[Texture2D] = []
 	var grass: Array[Texture2D] = []
 	var conc: Array[Texture2D] = []
-	for i in 4:
+	for i in 8:
 		dirt.append(Tex.tile("dirt_%d" % i))
 		grass.append(Tex.tile("grass_%d" % i))
+	for i in 4:
 		conc.append(Tex.tile("concrete_%d" % i))
 	var asph: Array[Texture2D] = []
 	for i5 in 5:
@@ -119,7 +120,7 @@ func _draw_cells(n: Node2D) -> void:
 				var gk := w.ground[i]
 				match gk:
 					World.Ground.GRASS:
-						_ground_cell(n, grass[hv % 4], x, y, hv, gk)
+						_ground_cell(n, grass[hv % 8], x, y, hv, gk)
 					World.Ground.ASPHALT:
 						var av := hv % 23
 						_ground_cell(n, asph[4 if av == 0 else (2 if av == 1 else (3 if av == 2 else (hv >> 5) % 2))], x, y, hv, gk)
@@ -128,7 +129,7 @@ func _draw_cells(n: Node2D) -> void:
 					World.Ground.SIDEWALK:
 						n.draw_texture_rect(side, r, false)
 					_:
-						_ground_cell(n, dirt[hv % 4], x, y, hv, gk)
+						_ground_cell(n, dirt[hv % 8], x, y, hv, gk)
 			if fl > 0:
 				var ft: Texture2D = conc[hv % 4]
 				# плиты бетона чуть разного тона — пол не выглядит «обоями»
@@ -193,7 +194,7 @@ func _draw() -> void:
 	# продолжение улицы за краями карты (1.30: сначала асфальт, потом разметка — раньше асфальт её закрывал,
 	# и за краем карты дорога выглядела оборванной; плюс газон и южный тротуар вдоль жилого квартала)
 	var grass: Array[Texture2D] = []
-	for i in 4:
+	for i in 8:
 		grass.append(Tex.tile("grass_%d" % i))
 	for x in range(-CityBackdrop.M, 0):
 		_draw_outside_column(x, side, road, grass)
@@ -354,7 +355,7 @@ func _draw_outside_column(x: int, side: Texture2D, road: Array, grass: Array[Tex
 		if StreetFolk.zebra_at(w, x) != 0 or StreetFolk.platform_at(w, x) or CityBackdrop.bridge_at(w, x):
 			draw_texture_rect(side, Rect2(x * T, gy * T, T, T), false)   # 1.30: и на мосту через Цну
 		else:
-			draw_texture_rect(grass[vhash(x, gy) % 4], Rect2(x * T, gy * T, T, T), false)
+			draw_texture_rect(grass[vhash(x, gy) % 8], Rect2(x * T, gy * T, T, T), false)
 
 
 ## 1.30: зебры через главную дорогу и через въезды боковых улиц.

@@ -512,9 +512,8 @@ func open_lot(k: int) -> void:
 	Snd.play("n_info", -4.0)
 
 
-func _on_track(name: String) -> void:
-	if hud and MusicDirector.TITLES.has(name):
-		hud.toast(tr("Музыка: %s") % L.t(str(MusicDirector.TITLES[name])), Sim.LVL_INFO, 4.0)
+func _on_track(_name: String) -> void:
+	pass   # 1.48: владелец просил не показывать название трека при смене музыки
 
 
 func _fps_tick(delta: float) -> void:

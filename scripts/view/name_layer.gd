@@ -92,11 +92,18 @@ func _draw() -> void:
 	# кот — тоже с именем, тёплым цветом
 	var ct: Cat = sim.town.cat if sim.town else null
 	if ct:
-		var cp := Vector2(ct.pos.x * T, ct.pos.y * T + 6.0 + 6.0)
+		var cv := ct.vpos()   # 1.48: по сглаженной позиции (как у людей), а не по шагу клетки — ник не дёргается
+		var cp := Vector2(cv.x * T, cv.y * T + 10.5)
 		if view.has_point(cp):
 			var cn := ct.shown_name()
-			var cw := f.get_string_size(cn, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX - 1).x
+			var ckey := "cat:" + cn
+			var ctl: TextLine = _tw.get(ckey)
+			if ctl == null:
+				ctl = TextLine.new()
+				ctl.add_string(cn, f, FONT_PX)
+				_tw[ckey] = ctl
+			var cw := ctl.get_size().x
 			draw_set_transform(cp, 0.0, Vector2(k, k))
-			draw_style_box(_sb_fast, Rect2(Vector2(-cw * 0.5 - 5.0, 0.0), Vector2(cw + 10.0, FONT_PX + 3.0)))
-			draw_string(f, Vector2(-cw * 0.5, FONT_PX - 0.5), cn, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_PX - 1, Color("#f0c070"))
+			draw_style_box(_sb_fast, Rect2(Vector2(-cw * 0.5 - 5.0, 0.0), Vector2(cw + 10.0, FONT_PX + 4.0)))
+			ctl.draw(get_canvas_item(), Vector2(-cw * 0.5, FONT_PX + 0.5 - ctl.get_line_ascent()), Color("#f0c070"))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

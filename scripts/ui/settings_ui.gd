@@ -59,6 +59,8 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 		v.add_child(cb)
 	v.add_child(_choice("Игровой час", [[1.5, "медленно (45 с)"], [1.0, "обычно (30 с)"], [0.66, "быстро (20 с)"], [0.4, "очень быстро (12 с)"]], "hour_len",
 		"Сколько реальных секунд длится игровой час на обычной скорости"))
+	v.add_child(_choice("Уведомления", [[0.0, "все"], [1.0, "важные"], [2.0, "только тревоги"]], "notify_mode",
+		"Всплывашки справа. Остальное — только в журнале («События»), счётчик на кнопке"))
 	v.add_child(UITheme.section("music", "Звук"))
 	for vo in VOLUMES:
 		var key2 := str(vo[0])
@@ -97,7 +99,7 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 	v.add_child(_choice("Масштаб интерфейса", [[0.85, "85%"], [1.0, "100%"], [1.15, "115%"], [1.3, "130%"]], "ui_scale", "Размер кнопок и текста", func() -> void: Game.apply_ui_scale()))
 
 
-const ROW_ICONS := {"hour_len": "clock", "music_mode": "music", "quality": "star", "fps_cap": "speed_3", "vsync": "statistics", "ui_scale": "layers"}
+const ROW_ICONS := {"hour_len": "clock", "music_mode": "music", "quality": "star", "fps_cap": "speed_3", "vsync": "statistics", "ui_scale": "layers", "notify_mode": "letter"}
 
 
 static func _choice(title: String, items: Array, key: String, tip: String, after: Callable = Callable()) -> HBoxContainer:

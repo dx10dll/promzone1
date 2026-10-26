@@ -199,7 +199,7 @@ func _init() -> void:
 	print("— РП-10: экзамен на разряд")
 	var tu := S.hire(h, "turner", "turning", 9)
 	tu.grade_n = 3
-	tu.wage = 2000
+	tu.wage = 1000   # 1.48: ставки после баланса 1.39 ниже — 2000 уже выше ставки 4-го разряда
 	check(h.career.exam_block(tu) == "", "токарь с навыком 9 и 3-м разрядом может сдавать")
 	check(h.career.request_exam(tu) == "" and h.career.exam_pending(tu), "подал на экзамен")
 	h.minute = 1440.0 + 8.0 * 60.0 + 30.0
@@ -214,7 +214,7 @@ func _init() -> void:
 		check(h.story.letters.any(func(l: Dictionary) -> bool: return str(l["ev"]) == "raise_ask"), "сдал — просит прибавку по разряду")
 		var la: Dictionary = h.story.letters.filter(func(l: Dictionary) -> bool: return str(l["ev"]) == "raise_ask")[0]
 		h.story.resolve(int(la["id"]), 0)
-		check(tu.wage > 2000, "прибавили до ставки по разряду: %d" % tu.wage)
+		check(tu.wage > 1000, "прибавили до ставки по разряду: %d" % tu.wage)
 	var lab := S.hire(h, "laborer", "haul", 6)
 	check(h.career.exam_block(lab) != "", "у разнорабочего разрядов нет")
 

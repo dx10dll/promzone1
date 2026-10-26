@@ -71,6 +71,7 @@ func demand(p: String) -> int:
 func open_early() -> void:
 	for i in 3:
 		sim.sales.inquiry(_maybe_trial(make_offer()))
+	sim.sales.board_notify()
 
 
 ## Утро: недельные партии по контрактам, затем заявки заказчиков — их разбирает отдел сбыта.
@@ -105,6 +106,7 @@ func morning() -> void:
 		sim.notify(L.t("Пришёл тендер — решение за вами: «Заказы» → «Контракты»."), Sim.LVL_INFO)
 	for i in n:
 		sim.sales.inquiry(_maybe_trial(make_offer()))
+	sim.sales.board_notify()
 
 
 # ---------------------------------------------------------------- пробная партия и перенос срока (1.9.1)

@@ -56,6 +56,14 @@ static func _logical(src: Texture2D, path: String) -> Texture2D:
 
 
 static func tile(name: String) -> Texture2D:
+	# 1.48: трава и грунт — растровые тайлы 256 px с мип-уровнями (гладко при любом масштабе)
+	var png := "res://assets/tiles/%s.png" % name
+	if _cache.has(png):
+		return _cache[png]
+	if ResourceLoader.exists(png):
+		var t: Texture2D = load(png)
+		_cache[png] = t
+		return t
 	return get_tex("res://assets/tiles/%s.svg" % name)
 
 
@@ -121,6 +129,21 @@ static func set_people_scale(e: float) -> void:
 			if key.ends_with(drop):
 				_people_hi.erase(key)
 				_people_t.erase(key)
+
+
+## 1.48: во сколько раз экран «плотнее» мировых единиц (зум камеры × масштаб окна), ступенями ×√2 вверх.
+## Надписи и эмблемы в мире рисуем с таким множителем кегля/разрешения и обратным масштабом — без «пикселей».
+static func wscale() -> float:
+	var e := maxf(people_e * 2.0, 1.0)
+	return pow(2.0, ceilf(log(e) / log(2.0) * 2.0 - 0.001) / 2.0)
+
+
+## Строка в мировых координатах чётко при любом зуме: кегль × wscale, холст ÷ wscale.
+static func world_string(ci: CanvasItem, f: Font, base: Vector2, text: String, align: HorizontalAlignment, width: float, fs: float, col: Color) -> void:
+	var k := wscale()
+	ci.draw_set_transform(base, 0.0, Vector2(1.0 / k, 1.0 / k))
+	ci.draw_string(f, Vector2.ZERO, text, align, width * k if width > 0.0 else -1.0, maxi(4, roundi(fs * k)), col)
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## Мелкий масштаб: лица попроще (глаза — тёмные овалы), чтобы не превращались в кашу.
