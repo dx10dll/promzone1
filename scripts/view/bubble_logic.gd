@@ -138,13 +138,14 @@ static func step(st: Dictionary, cand: Dictionary, now: float) -> Dictionary:
 	return st
 
 
-## Видно ли облачко с таким ярусом: проблемы всегда, действия — у выбранного, под мышью и когда людей мало.
-static func shown(tier: int, selected: bool, hovered: bool, crowd: int, mode: String) -> bool:
-	if tier >= T_WANT:
-		return true
+## Видно ли облачко с таким ярусом. 1.51: владелец — «облачка захламляют экран»: сами всплывают только
+## серьёзные (красные: травма, драка, пожар, сильный голод/усталость); желания и действия — у выбранного и под мышью.
+static func shown(tier: int, selected: bool, hovered: bool, _crowd: int, mode: String) -> bool:
 	if tier <= T_NONE or mode == "off":
 		return false
-	return mode == "all" or selected or hovered or crowd <= 8
+	if tier >= T_BAD or mode == "all":
+		return true
+	return selected or hovered
 
 
 const TITLES := {

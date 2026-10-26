@@ -179,13 +179,13 @@ func _init() -> void:
 	check(str(s4["k"]) == "wc", "жёлтое → красное: сразу показываем более серьёзное")
 
 	print("— видимость: проблемы всегда, действия — выбранному, под мышью и когда людей мало")
-	check(BubbleLogic.shown(2, false, false, 99, "auto"), "проблема видна в толпе")
-	check(not BubbleLogic.shown(1, false, false, 40, "auto"), "действие скрыто, когда людей много")
-	check(BubbleLogic.shown(1, false, false, 5, "auto"), "действие видно, когда людей мало")
+	check(BubbleLogic.shown(3, false, false, 99, "auto"), "красная проблема видна сама")
+	check(not BubbleLogic.shown(2, false, false, 99, "auto"), "1.51: жёлтое желание само не всплывает")
+	check(not BubbleLogic.shown(1, false, false, 3, "auto"), "1.51: действие само не всплывает, даже когда людей мало")
+	check(BubbleLogic.shown(2, true, false, 40, "auto"), "желание видно у выбранного")
 	check(BubbleLogic.shown(1, true, false, 40, "auto"), "действие видно у выбранного")
 	check(BubbleLogic.shown(1, false, true, 40, "auto"), "действие видно под мышью")
-	check(not BubbleLogic.shown(1, true, true, 3, "off"), "режим «off» прячет действия")
-	check(BubbleLogic.shown(3, false, false, 40, "off"), "режим «off» проблем не прячет")
+	check(not BubbleLogic.shown(3, true, true, 3, "off"), "режим «off» прячет всё")
 	check(BubbleLogic.shown(1, false, false, 40, "all"), "режим «all» показывает все действия")
 
 	print("— картинки: каждый вид рисуется чётким SVG")

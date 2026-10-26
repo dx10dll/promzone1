@@ -311,6 +311,147 @@ func _res_rational(d: Dictionary, choice: int) -> void:
 		Mood.add(sim, w, "rational_ignored")
 
 
+# ================================================================ 1.51: путь роста
+
+## Ступени лестницы: разнорабочий → ученик → 2…6 разряд → мастер участка → начальник цеха.
+const STEPS := ["Разнорабочий", "Ученик профессии", "2-й разряд", "3-й разряд", "4-й разряд", "5-й разряд", "6-й разряд", "Мастер участка", "Начальник цеха"]
+const APPR_DAYS := 5            ## смен стажа, чтобы взять в ученики
+const FOREMAN_DAYS := 60        ## смен стажа для мастера участка
+const CHIEF_DAYS := 120         ## смен стажа для начальника цеха
+
+
+## Номер ступени 0–8, -1 — у должности нет лестницы (ИТР-специалисты, охрана, уборка).
+func step_of(w: Worker) -> int:
+	if w.prof == "laborer":
+		return 0
+	if w.has_grade():
+		return clampi(w.grade(), 1, 6)
+	if w.prof == "foreman":
+		return 7
+	if w.prof == "chief":
+		return 8
+	return -1
+
+
+func step_name(i: int) -> String:
+	return L.t(str(STEPS[clampi(i, 0, STEPS.size() - 1)]))
+
+
+## Навык профессии, с которого разнорабочего берут в ученики: [навык, уровень] ({} — нет).
+func trade_skill(w: Worker) -> Array:
+	var best := ""
+	var bv := 1
+	for sk in Training.SKILLS:
+		if sk == "build":
+			continue
+		if w.skill(sk) > bv:
+			bv = w.skill(sk)
+			best = sk
+	return [best, bv] if best != "" else []
+
+
+func _led_or_taught(w: Worker) -> bool:
+	return sim.crew.is_lead(w) or int(w.tally.get("mentor", 0)) > 0 or sim.training.apprentices(w).size() > 0
+
+
+func _chief_exists() -> bool:
+	for o in sim.workers:
+		if o.prof == "chief":
+			return true
+	return false
+
+
+## Что нужно для следующей ступени: [[текст, выполнено], ...]. Пусто — выше некуда.
+func next_needs(w: Worker) -> Array:
+	var out: Array = []
+	match step_of(w):
+		0:
+			var ts := trade_skill(w)
+			out.append([L.t("Стаж: %d смен (сейчас %d)") % [APPR_DAYS, w.days_worked], w.days_worked >= APPR_DAYS])
+			out.append([L.t("Навык профессии от 2: курс в учебном классе или центре"), not ts.is_empty() and int(ts[1]) >= 2])
+		1, 2, 3, 4, 5:
+			var g := step_of(w)
+			out.append([L.t("Навык «%s» от %d (сейчас %d)") % [L.t(str(Worker.SKILL_NAMES.get(w.main_skill(), ""))).to_lower(), 2 * g, w.skill(w.main_skill())], w.pot_grade() > g])
+			out.append([L.t("Стаж: %d смен (сейчас %d)") % [8 * g, w.days_worked], w.days_worked >= 8 * g])
+			out.append([L.t("Экзамен: пробная деталь мастеру"), exam_block(w) == "" or exams.has(w.id)])
+		6:
+			out.append([L.t("Разряд: 6-й подтверждён"), true])
+			out.append([L.t("Навык основной профессии от 8 (сейчас %d)") % w.skill(w.main_skill()), w.skill(w.main_skill()) >= 8])
+			out.append([L.t("Стаж: %d смен (сейчас %d)") % [FOREMAN_DAYS, w.days_worked], w.days_worked >= FOREMAN_DAYS])
+			out.append([L.t("Был бригадиром или наставником"), _led_or_taught(w)])
+		7:
+			out.append([L.t("Навык руководства от 6 (сейчас %d)") % w.skill("manage"), w.skill("manage") >= 6])
+			out.append([L.t("Стаж: %d смен (сейчас %d)") % [CHIEF_DAYS, w.days_worked], w.days_worked >= CHIEF_DAYS])
+			out.append([L.t("Должность свободна (начальник цеха один)"), not _chief_exists()])
+	return out
+
+
+## Какое «Повысить» применимо: "apprentice", "foreman", "chief" или "".
+func promote_kind(w: Worker) -> String:
+	match step_of(w):
+		0:
+			return "apprentice"
+		6:
+			return "foreman"
+		7:
+			return "chief"
+	return ""
+
+
+## Почему нельзя повысить сейчас ("" — можно).
+func promote_block(w: Worker) -> String:
+	var kind := promote_kind(w)
+	if kind == "":
+		return L.t("До следующей ступени — через экзамен на разряд") if step_of(w) in [1, 2, 3, 4, 5] else L.t("Выше некуда")
+	if w.visitor or w.is_director():
+		return L.t("Не подходит")
+	for n: Array in next_needs(w):
+		if not bool(n[1]):
+			return str(n[0])
+	return ""
+
+
+## Повысить: разнорабочий → ученик профессии, 6-й разряд → мастер участка, мастер → начальник цеха.
+func promote(w: Worker) -> String:
+	var why := promote_block(w)
+	if why != "":
+		return why
+	var old := w.prof_name()
+	match promote_kind(w):
+		"apprentice":
+			var ts := trade_skill(w)
+			var pf := Training.prof_for_skill(str(ts[0]))
+			if pf == "":
+				return L.t("Не подобрана профессия")
+			w.prof = pf
+			w.grade_n = 1
+			w.mentor = -1
+			sim.training.cancel_course(w)
+			sim.notify(Nicks.gendered(L.t("%s принят{|а} в ученики профессии: %s."), w.female) % [w.full_name(), w.prof_name().to_lower()], Sim.LVL_GOOD, w.cell())
+		"foreman":
+			w.prof = "foreman"
+			w.grade_n = 0
+			w.skills["manage"] = maxi(w.skill("manage"), 4)
+			sim.crew.set_member(w, -1)
+			w.mentor = -1
+			for a in sim.training.apprentices(w):
+				a.mentor = -1
+			sim.notify(Nicks.gendered(L.t("%s назначен{|а} мастером участка — теперь в ИТР."), w.female) % w.full_name(), Sim.LVL_GOOD, w.cell())
+		"chief":
+			w.prof = "chief"
+			w.skills["manage"] = maxi(w.skill("manage"), 6)
+			sim.notify(Nicks.gendered(L.t("%s назначен{|а} начальником цеха."), w.female) % w.full_name(), Sim.LVL_GOOD, w.cell())
+		_:
+			return ""
+	Worker.sync_helmet(w.look, w.prof)
+	w.add_history(sim.day(), Nicks.gendered(L.t("Повышен{|а}: %s → %s"), w.female) % [old, w.prof_name()])
+	sim.stats["promotions"] = int(sim.stats.get("promotions", 0)) + 1
+	Mood.add(sim, w, "grade_up")
+	_ask_raise(w)
+	Mood.refresh(sim, w)
+	return ""
+
+
 func to_dict() -> Dictionary:
 	return {"exams": exams, "wi": wage_index, "lq": last_quarter, "ly": last_year, "vet": veterans}
 

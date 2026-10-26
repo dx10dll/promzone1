@@ -43,23 +43,31 @@ func _ready() -> void:
 	visible = false
 
 
+var _fit_gen := 0   ## 1.51: номер перестройки карточки — устаревшие _fit не трогают размер
+
+
 func _begin(k: String, new_id: int, w: float) -> void:
 	kind = k
 	id = new_id
 	card_w = w
-	UITheme.clear(head)
-	UITheme.clear(actions)
-	UITheme.clear(box)
+	# 1.51: старое содержимое вынимаем сразу, а не в конце кадра — иначе при частых щелчках
+	# его высота успевала попасть в расчёт и карточка понемногу вытягивалась вниз
+	for n: Node in [head, actions, box]:
+		for c in n.get_children():
+			n.remove_child(c)
+			c.queue_free()
 	dyn.clear()
+	_fit_gen += 1
 	actions.visible = true
 	root.move_child(actions, 1)
 
 
 func _fit() -> void:
 	# высота по содержимому, но не выше экрана (между верхней и нижней панелью)
+	var gen := _fit_gen
 	await get_tree().process_frame
-	if not is_inside_tree():
-		return
+	if not is_inside_tree() or gen != _fit_gen:
+		return   # 1.51: пока ждали кадр, карточку уже перестроили — считать будет свежий вызов
 	var hh := head.get_combined_minimum_size().y + (actions.get_combined_minimum_size().y + 6.0 if actions.visible else 0.0) + 6.0
 	var h := box.get_combined_minimum_size().y
 	var max_h := get_viewport_rect().size.y - 64.0 - 90.0 - 24.0 - hh
@@ -290,7 +298,7 @@ func show_worker(s: Sim, w: Worker) -> void:
 	top.add_child(col)
 	head.add_child(top)
 	# вкладки
-	var tabs := UITheme.segmented([["main", L.t("Обзор")], ["skills", L.t("Навыки")], ["rel", L.t("Отношения")], ["hist", L.t("История")]], w_tab, func(k: String) -> void:
+	var tabs := UITheme.segmented([["main", L.t("Обзор")], ["skills", L.t("Навыки")], ["rel", L.t("Отношения")], ["career", L.t("Карьера")], ["hist", L.t("История")]], w_tab, func(k: String) -> void:
 		w_tab = k
 		_worker_tab()
 		refresh()
@@ -407,6 +415,8 @@ func _worker_tab() -> void:
 			_wt_skills(w)
 		"rel":
 			_wt_rel(w)
+		"career":
+			_wt_career(w)
 		"hist":
 			_wt_hist(w)
 		_:
@@ -644,6 +654,85 @@ func _wt_rel(w: Worker) -> void:
 		h2.add_child(vv)
 		g.add_child(h2)
 	box.add_child(g)
+
+
+## 1.51: вкладка «Карьера» — ступень, что нужно для следующей, экзамен, наставник, повышение.
+func _wt_career(w: Worker) -> void:
+	var cr := sim.career
+	var step := cr.step_of(w)
+	if step < 0:
+		box.add_child(_wrap(L.t("У этой должности нет карьерной лестницы: ИТР растут по категориям (навык 4, 6, 8)."), 12, UITheme.MUTED))
+		return
+	box.add_child(UITheme.caption(L.t("Путь роста")))
+	var fl := HFlowContainer.new()
+	fl.add_theme_constant_override("h_separation", 4)
+	fl.add_theme_constant_override("v_separation", 4)
+	for i in Careers.STEPS.size():
+		var col := UITheme.ACCENT if i == step else (UITheme.GOOD if i < step else UITheme.DIM)
+		fl.add_child(UITheme.chip(("▶ " if i == step else ("✓ " if i < step else "")) + cr.step_name(i), col, "", i == step))
+	box.add_child(fl)
+	var needs := cr.next_needs(w)
+	if needs.is_empty():
+		box.add_child(_wrap(L.t("Выше некуда: это высшая ступень на заводе."), 12, UITheme.MUTED))
+	else:
+		box.add_child(UITheme.caption(L.t("Для ступени «%s»") % cr.step_name(mini(step + 1, Careers.STEPS.size() - 1))))
+		for n: Array in needs:
+			box.add_child(_wrap(("✓ " if bool(n[1]) else "✗ ") + str(n[0]), 12, UITheme.GOOD if bool(n[1]) else UITheme.TEXT))
+	var tr := sim.training
+	var m := tr.mentor_of(w)
+	if m:
+		box.add_child(_wrap(L.t("Наставник: %s") % m.full_name(), 12, UITheme.INFO))
+	if cr.exam_pending(w):
+		box.add_child(_wrap(L.t("Сдаёт экзамен: на смене сделает пробную деталь."), 12, UITheme.INFO))
+	var btns := UITheme.hbox(6)
+	if w.has_grade() and step < 6:
+		var why := cr.exam_block(w)
+		var ex := _act(L.t("Отправить на экзамен"), func() -> void:
+			var err := cr.request_exam(w)
+			if err != "":
+				sim.notify(err, Sim.LVL_WARN)
+			show_worker(sim, w), why if why != "" else L.t("На смене сделает пробную деталь, мастер примет."), "medal")
+		ex.disabled = why != ""
+		btns.add_child(ex)
+	if not w.is_itr() and not w.visitor:
+		var cands := tr.mentor_candidates(w)
+		var mb := _act(L.t("Назначить наставника"), Callable(), L.t("Опытнее на 2+ по основному навыку, до двух учеников у наставника") if not cands.is_empty() else L.t("Подходящих наставников нет"), "research")
+		mb.disabled = cands.is_empty() and m == null
+		mb.pressed.connect(func() -> void: _pick_mentor(w, mb))
+		btns.add_child(mb)
+	var kind := cr.promote_kind(w)
+	if kind != "":
+		var pwhy := cr.promote_block(w)
+		var pb := _act(L.t("Повысить"), func() -> void:
+			var err := cr.promote(w)
+			if err != "":
+				sim.notify(err, Sim.LVL_WARN)
+			show_worker(sim, w), pwhy if pwhy != "" else L.t("Повысить до следующей ступени"), "medal")
+		pb.disabled = pwhy != ""
+		btns.add_child(pb)
+	if w.prof == "laborer":
+		btns.add_child(_act(L.t("Учить…"), _open_training, L.t("Курс в учебном классе или центре даст навык профессии"), "research"))
+	box.add_child(btns)
+
+
+## Выбор наставника из списка подходящих.
+func _pick_mentor(w: Worker, anchor: Control) -> void:
+	var pm := PopupMenu.new()
+	add_child(pm)
+	var list := sim.training.mentor_candidates(w)
+	pm.add_item(L.t("Без наставника"), 0)
+	var ids: Array[int] = [-1]
+	for o in list:
+		pm.add_item("%s — %s %d" % [o.full_name(), L.t(str(Worker.SKILL_NAMES.get(w.main_skill(), ""))).to_lower(), o.skill(w.main_skill())], ids.size())
+		ids.append(o.id)
+	pm.id_pressed.connect(func(ix: int) -> void:
+		var err := sim.training.set_mentor(w, sim.get_worker(ids[ix]) if ids[ix] >= 0 else null)
+		if err != "":
+			sim.notify(err, Sim.LVL_WARN)
+		show_worker(sim, w))
+	pm.popup_hide.connect(pm.queue_free)
+	pm.position = Vector2i(anchor.get_screen_position() + Vector2(0, anchor.size.y))
+	pm.popup()
 
 
 func _wt_hist(w: Worker) -> void:

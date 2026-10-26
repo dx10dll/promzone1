@@ -804,7 +804,7 @@ func _orders() -> void:
 			if act.is_empty():
 				content.add_child(UITheme.empty(tr("Заказов в работе нет. Сбыт возьмёт подходящие завтра утром — или посмотрите в «Рынке», почему отказывает.")))
 				return
-			_thead([["", 36], [tr("Заказ"), -1], [tr("Готовность"), 140], [tr("Срок"), 190], [tr("Приоритет"), 150], [tr("Сумма"), 100, HORIZONTAL_ALIGNMENT_RIGHT], ["", 74]])
+			_thead([["", 36], [tr("Заказ"), -1], [tr("Готовность"), 140], [tr("Срок"), 190], [tr("Приоритет"), 150], [tr("Сумма"), 100, HORIZONTAL_ALIGNMENT_RIGHT]])
 			for o2: Dictionary in act:
 				_active_row(o2)
 		"market":
@@ -967,13 +967,14 @@ func _market() -> void:
 		var capw := sl.capacity_week(p) if miss.is_empty() else 0.0
 		var price_txt := "%s–%s" % [Defs.money_str(float(pr[0]) * ix), Defs.money_str(float(pr[1]) * ix)]
 		var trend_txt := ("▲ +%d%%" if trn > 0.0 else "▼ %d%%") % int(round(trn * 100.0)) if absf(trn) >= 0.01 else tr("без изменений")
-		var on := sl.in_assortment(p)
-		var tb := UITheme.small(tr("в ассортименте") if on else tr("снято"), func() -> void:
+		var on := sl.in_assortment(p) and miss.is_empty()
+		var tb := UITheme.small(tr("в ассортименте") if on else (tr("нет станка") if not miss.is_empty() else tr("снято")), func() -> void:
 			if sl.off.has(p):
 				sl.off.erase(p)
 			else:
 				sl.off[p] = true
-			rebuild(true), tr("Снять с ассортимента или вернуть: сбыт берёт заказы только на изделия в ассортименте"))
+			rebuild(true), tr("Снять с ассортимента или вернуть: сбыт берёт заказы только на изделия в ассортименте") if miss.is_empty() else tr("Нет нужного станка — заявки на это изделие не приходят, пока его не поставите"))
+		tb.disabled = not miss.is_empty()
 		if on:
 			tb.add_theme_stylebox_override("normal", UITheme.sb(Color("#2b4130"), Color("#4f7a4a"), 1, 6, 8, 2))
 			tb.add_theme_color_override("font_color", UITheme.GOOD)
@@ -1180,9 +1181,8 @@ func _active_row(o: Dictionary) -> void:
 		hb.add_child(mv)
 		dl_cell = hb
 	var who := L.name(str(o["client"]))
-	var draw := UITheme.small(tr("Чертёж"), func() -> void: hud.show_drawing(o), tr("Рабочий чертёж детали по ЕСКД"))
 	_trow([[_icon(Tex.item(p), 30), 36], [_cl2("%s × %d" % [Defs.product_name(p), int(o["qty"])], who), -1], [prog, 140], [dl_cell, 190], [pr_ctl, 150],
-		[_cl(Defs.money_str(float(o["price"]) * int(o["qty"])), 14, UITheme.GOOD, UITheme.f_semi, HORIZONTAL_ALIGNMENT_RIGHT), 100], [draw, 74]], Callable(), 46.0)
+		[_cl(Defs.money_str(float(o["price"]) * int(o["qty"])), 14, UITheme.GOOD, UITheme.f_semi, HORIZONTAL_ALIGNMENT_RIGHT), 100]], Callable(), 46.0)   # 1.51: кнопку «Чертёж» владелец убрал
 
 
 # ---------------------------------------------------------------- снабжение

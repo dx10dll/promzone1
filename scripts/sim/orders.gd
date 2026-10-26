@@ -189,14 +189,10 @@ func make_offer(product: String = "") -> Dictionary:
 			var ks := str(k)
 			if not Defs.products.has(ks) or not sim.office.unlocked(Defs.products[ks]):
 				continue
-			var weight := 1   # то, что завод пока не умеет, тоже просят — это видно в упущенной выгоде
-			if sim.prod.can_make(ks, avail):
-				weight = 6
-			else:
-				for o: Dictionary in Defs.route(ks):
-					if avail.has(str(o["op"])):
-						weight = 2
-			for j in weight:
+			# 1.51: владелец — то, что нельзя сделать из-за отсутствия станка, снято с ассортимента: такие заявки не приходят
+			if not sim.prod.can_make(ks, avail):
+				continue
+			for j in 6:
 				pool.append(ks)
 		if pool.is_empty():
 			for k2 in sim.progress.products():

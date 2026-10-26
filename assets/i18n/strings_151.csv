@@ -1,0 +1,74 @@
+keys,en
+thought.crew_bonus.text,Crew got its plan bonus
+thought.crew_bonus_missed.text,The bonus slipped away: plan not met
+thought.lead_rush.text,The foreman pushes the plan — easy to burn out
+thought.lead_care.text,The foreman looks after his people
+thought.crew_tight.text,A tight crew — we are family
+thought.crew_loss.text,An experienced colleague left — the crew feels orphaned
+Гонит план,Pushes the plan
+Бережёт людей,Looks after people
+Наставник,Mentor
+Без характера,No temperament
+"Бригада быстрее (+5%), но люди выматываются: настроение ниже, травм больше.","The crew is faster (+5%), but people burn out: lower mood, more injuries."
+"Бригада чуть медленнее (−3%), зато настроение выше и травм меньше.","The crew is slightly slower (−3%), but mood is higher and injuries are fewer."
+"Подчинённые быстрее набираются опыта (×1,25).",Subordinates gain experience faster (×1.25).
+Сплочённость упадёт — бригаду жалко разбивать.,Cohesion will drop — it is a pity to break up a good crew.
+"«%s» выполнила план смены (%d из %d): премия %d%% от ставки, всего %s.","""%s"" met the shift plan (%d of %d): %d%% bonus on the rate, %s in total."
+"Ушёл опытный человек: %s, %d-й разряд. Бригада «%s» осиротела — сплочённость упала.","An experienced worker left: %s, grade %d. Crew ""%s"" is orphaned — cohesion dropped."
+Перевести: %s,Transfer: %s
+Всё равно перевести,Transfer anyway
+План смены,Shift plan
+нет взятых заказов на станках бригады,no orders taken on the crew's machines
+сделано %d из %d,done %d of %d
+Снизить план на 1 операцию (авто: %d),Lower the plan by 1 operation (auto: %d)
+Поднять план на 1 операцию (авто: %d),Raise the plan by 1 operation (auto: %d)
+авто,auto
+Премия,Bonus
+"Премия от ставки за смену, если бригада выполнила план на 100% и больше",Bonus on the shift rate if the crew meets 100% of the plan or more
+≈ %s за смену,≈ %s per shift
+вчера %d%%,yesterday %d%%
+Выполнение плана за прошлую смену,Plan completion for the last shift
+бригадира нет,no foreman
+Назначьте бригадира: от его характера зависит работа бригады,Appoint a foreman: his temperament shapes how the crew works
+Сплочённость,Cohesion
+%d из 100%s,%d of 100%s
+ · временный минус %d: ушёл опытный человек, · temporary −%d: an experienced worker left
+Отношения внутри бригады: средние симпатии людей,Relations inside the crew: average sympathy between people
+Ученик профессии,Trade apprentice
+2-й разряд,Grade 2
+3-й разряд,Grade 3
+4-й разряд,Grade 4
+5-й разряд,Grade 5
+6-й разряд,Grade 6
+Стаж: %d смен (сейчас %d),Service: %d shifts (now %d)
+Навык профессии от 2: курс в учебном классе или центре,Trade skill 2+: a course in the classroom or training center
+Навык «%s» от %d (сейчас %d),"Skill ""%s"" %d+ (now %d)"
+Экзамен: пробная деталь мастеру,Exam: a trial part for the foreman
+Разряд: 6-й подтверждён,Grade 6 confirmed
+Навык основной профессии от 8 (сейчас %d),Main trade skill 8+ (now %d)
+Был бригадиром или наставником,Has been a crew foreman or a mentor
+Навык руководства от 6 (сейчас %d),Management skill 6+ (now %d)
+Должность свободна (начальник цеха один),The post is vacant (one shop head only)
+До следующей ступени — через экзамен на разряд,The next step is through the grade exam
+Выше некуда,Nowhere higher
+Не подходит,Not eligible
+Не подобрана профессия,No trade picked
+%s принят{|а} в ученики профессии: %s.,%s accepted as a trade apprentice: %s.
+%s назначен{|а} мастером участка — теперь в ИТР.,%s appointed section foreman — now in the engineering staff.
+%s назначен{|а} начальником цеха.,%s appointed shop head.
+Повышен{|а}: %s → %s,Promoted: %s → %s
+Карьера,Career
+Путь роста,Career path
+"У этой должности нет карьерной лестницы: ИТР растут по категориям (навык 4, 6, 8).","This post has no career ladder: engineering staff grow by category (skill 4, 6, 8)."
+Выше некуда: это высшая ступень на заводе.,Nowhere higher: this is the top step at the plant.
+Для ступени «%s»,"For the step ""%s"""
+Наставник: %s,Mentor: %s
+Сдаёт экзамен: на смене сделает пробную деталь.,Taking the exam: will make a trial part on shift.
+Отправить на экзамен,Send to exam
+"На смене сделает пробную деталь, мастер примет.","Will make a trial part on shift, the foreman will accept it."
+"Опытнее на 2+ по основному навыку, до двух учеников у наставника",2+ more skilled in the main skill; a mentor takes up to two apprentices
+Подходящих наставников нет,No suitable mentors
+Повысить,Promote
+Повысить до следующей ступени,Promote to the next step
+Курс в учебном классе или центре даст навык профессии,A course in the classroom or center gives trade skill
+Без наставника,No mentor

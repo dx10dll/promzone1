@@ -397,7 +397,7 @@ func _together(a: Worker, b: Worker) -> bool:
 
 ## Множитель роста навыка: наставник, практика, черты.
 func growth_k(w: Worker, sk: String) -> float:
-	var k := Mood.trait_val(w, "learn_k", 1.0)
+	var k := Mood.trait_val(w, "learn_k", 1.0) * sim.crew.growth_k(w)   # 1.51: бригадир-наставник
 	var m := mentor_of(w)
 	if m and sk == w.main_skill() and _together(w, m):
 		k *= 3.0 * Mood.trait_val(m, "mentor_k", 1.0)

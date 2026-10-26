@@ -25,6 +25,26 @@ const HARM_EXTRA := 0.04
 const KD_DAYS := 120                  ## срок коллективного договора
 const UNION_MIN := 8                  ## рабочих, с которых возникает профсоюз
 
+## 1.51: план смены, премия, характер бригадира, сплочённость.
+const BONUS_PCT := [0, 5, 10]         ## премия за перевыполнение: % от ставки за смену
+const OPS_CAP := 14                   ## операций на один станок за день — потолок авто-плана
+const COH_START := 15.0               ## сплочённость новой бригады (0–100)
+const COH_GROW := 1.5                 ## рост за рабочий день без перестановок
+const COH_SHAKE := 14.0               ## падение при уходе/приходе человека в бригаду
+const COH_LEAD := 8.0                 ## падение при смене бригадира
+const COH_LOSS := 8.0                 ## уход опытного человека: постоянный минус
+const COH_PEN := 20.0                 ## ... и временный минус, он сходит за 10 дней
+const COH_SPEED := 0.04               ## бонус к скорости при сплочённости 100
+const CHARS := ["rush", "care", "mentor"]
+const CHAR_NAMES := {"rush": "Гонит план", "care": "Бережёт людей", "mentor": "Наставник"}
+const CHAR_DESC := {
+	"rush": "Бригада быстрее (+5%), но люди выматываются: настроение ниже, травм больше.",
+	"care": "Бригада чуть медленнее (−3%), зато настроение выше и травм меньше.",
+	"mentor": "Подчинённые быстрее набираются опыта (×1,25).",
+}
+const CHAR_BY_TRAIT := {"workaholic": "rush", "greedy": "rush", "tough": "rush", "soul": "care", "cheerful": "care", "quiet": "care",
+	"born_mentor": "mentor", "curious": "mentor", "veteran": "mentor", "student": "mentor"}
+
 const CLAUSES := {
 	"index": {"name": "Индексация зарплаты на 5%", "desc": "Сразу при подписании: ставки рабочих +5%."},
 	"lunch": {"name": "Компенсация обедов — 120 ₽ за смену", "desc": "Каждому рабочему за выход на смену, вместе с зарплатой."},
@@ -330,6 +350,7 @@ func add_brigade(name: String = "") -> Dictionary:
 		col += 1
 	var b := {"id": nid, "name": name if name != "" else L.t("Бригада №%d") % nid, "lead": -1, "cells": [], "strict": false,
 		"sched": "", "wins": 0, "col": col}
+	_defaults(b)
 	brigades.append(b)
 	return b
 
@@ -359,11 +380,15 @@ func set_member(w: Worker, bid: int) -> void:
 	var old := w.brigade
 	if old >= 0:
 		var ob := brigade(old)
-		if not ob.is_empty() and int(ob["lead"]) == w.id:
-			ob["lead"] = -1
+		if not ob.is_empty():
+			if int(ob["lead"]) == w.id:
+				ob["lead"] = -1
+				ob["char"] = ""
+			_shake(ob, COH_SHAKE)
 	w.brigade = bid
 	if bid >= 0:
 		var b := brigade(bid)
+		_shake(b, COH_SHAKE)
 		w.add_history(sim.day(), Nicks.gendered(L.t("Переведен{|а} в «%s»"), w.female) % str(b.get("name", "")))
 
 
@@ -373,8 +398,11 @@ func set_lead(bid: int, wid: int) -> void:
 		return
 	if int(b["lead"]) == wid:
 		return
+	if int(b["lead"]) >= 0:
+		_shake(b, COH_LEAD)
 	b["lead"] = wid
 	var w := sim.get_worker(wid)
+	b["char"] = char_for(w) if w else ""
 	if w:
 		if w.brigade != bid:
 			w.brigade = bid
@@ -488,6 +516,8 @@ func speed_k(w: Worker) -> float:
 			k += 0.03
 	if met(w):
 		k += 0.03 if bool(w.get_meta("met_lead", false)) else 0.01
+	if w.brigade >= 0:
+		k += brigade_speed(w.brigade)
 	return k
 
 
@@ -514,6 +544,9 @@ func on_op(w: Worker) -> void:
 		return
 	var key := str(w.brigade)
 	comp[key] = int(comp.get(key, 0)) + 1
+	var b := brigade(w.brigade)
+	if not b.is_empty():
+		b["done"] = int(b.get("done", 0)) + 1
 
 
 ## Автоматически: бригада на каждый цех со станками, люди — по своим станкам.
@@ -671,6 +704,260 @@ func _competition() -> void:
 	sim.paper.add(L.t("Соцсоревнование"), L.t("Вымпел — «%s»!") % str(win["name"]),
 		L.t("По итогам недели лучшая бригада — «%s»%s: %d операций. Отстающим — равняться на передовиков!") % [str(win["name"]),
 		(L.t(" бригадира %s") % ld.full_name()) if ld else "", int(cands[0][2])])
+
+
+# ================================================================ 1.51: план, премия, характер, сплочённость
+
+## Поля бригады, которых нет в старых сохранениях.
+func _defaults(b: Dictionary) -> void:
+	b["plan_adj"] = int(b.get("plan_adj", 0))
+	b["bonus"] = clampi(int(b.get("bonus", 0)), 0, BONUS_PCT.size() - 1)   ## индекс в BONUS_PCT
+	b["char"] = str(b.get("char", ""))
+	b["coh"] = float(b.get("coh", COH_START))
+	b["coh_pen"] = float(b.get("coh_pen", 0.0))
+	b["done"] = int(b.get("done", 0))
+	b["plan_now"] = int(b.get("plan_now", -1))
+	b["last_pct"] = int(b.get("last_pct", -1))
+	b["bonus_total"] = float(b.get("bonus_total", 0.0))
+
+
+func _shake(b: Dictionary, v: float) -> void:
+	b["coh"] = maxf(0.0, float(b.get("coh", COH_START)) - v)
+
+
+## Характер бригадира: из его черт, иначе случайный.
+func char_for(w: Worker) -> String:
+	if w == null:
+		return ""
+	for t in w.traits:
+		if CHAR_BY_TRAIT.has(str(t)):
+			return str(CHAR_BY_TRAIT[str(t)])
+	return str(CHARS[sim.rng.randi() % CHARS.size()])
+
+
+## Характер бригады ("" — бригадира нет). Старым сохранениям назначается по чертам без случайности.
+func char_of(bid: int) -> String:
+	var b := brigade(bid)
+	if b.is_empty() or lead_of(bid) == null:
+		return ""
+	var c := str(b.get("char", ""))
+	if c == "":
+		var ld := lead_of(bid)
+		c = ""
+		for t in ld.traits:
+			if CHAR_BY_TRAIT.has(str(t)):
+				c = str(CHAR_BY_TRAIT[str(t)])
+				break
+		if c == "":
+			c = str(CHARS[ld.id % CHARS.size()])
+		b["char"] = c
+	return c
+
+
+func char_name(c: String) -> String:
+	return L.t(str(CHAR_NAMES.get(c, "Без характера")))
+
+
+## Сплочённость 0–100 (с учётом временного минуса); у одиночки — 0.
+func cohesion(bid: int) -> float:
+	var b := brigade(bid)
+	if b.is_empty() or members(bid).size() < 2:
+		return 0.0
+	return clampf(float(b.get("coh", COH_START)) - float(b.get("coh_pen", 0.0)), 0.0, 100.0)
+
+
+## Сколько сплочённости потеряет бригада, если убрать из неё человека (для подтверждения).
+func move_cost(w: Worker) -> float:
+	if w.brigade < 0:
+		return 0.0
+	return minf(COH_SHAKE, cohesion(w.brigade))
+
+
+## Предупреждение при переводе человека: "" — спокойно, иначе текст для подтверждения.
+func move_warning(w: Worker, to_bid: int) -> String:
+	var parts: Array[String] = []
+	for bid in [w.brigade, to_bid]:
+		if int(bid) >= 0 and cohesion(int(bid)) >= 40.0 and not (int(bid) == to_bid and bid == w.brigade):
+			var b := brigade(int(bid))
+			parts.append("«%s»: %d → %d" % [str(b.get("name", "")), int(cohesion(int(bid))), int(maxf(0.0, cohesion(int(bid)) - COH_SHAKE))])
+	if parts.is_empty():
+		return ""
+	return L.t("Сплочённость упадёт — бригаду жалко разбивать.") + " " + ", ".join(parts)
+
+
+## Добавка к скорости от характера бригадира и сплочённости.
+func brigade_speed(bid: int) -> float:
+	var k := cohesion(bid) / 100.0 * COH_SPEED
+	match char_of(bid):
+		"rush":
+			k += 0.05
+		"care":
+			k -= 0.03
+	return k
+
+
+## Множитель роста навыка у подчинённых бригадира-наставника.
+func growth_k(w: Worker) -> float:
+	if w.brigade >= 0 and char_of(w.brigade) == "mentor" and lead_of(w.brigade) != w:
+		return 1.25
+	return 1.0
+
+
+## Автоплан на смену: сколько операций нужно сделать на станках бригады, чтобы взятые заказы успели к сроку.
+func plan_auto(bid: int) -> int:
+	var b := brigade(bid)
+	if b.is_empty():
+		return 0
+	var ids := {}
+	for w in members(bid):
+		ids[w.id] = true
+	var zone := rooms_of(bid)
+	var mine := {}      ## изделие -> станков бригады
+	var total := {}     ## изделие -> станков на заводе
+	for t: Thing in sim.things.values():
+		if not t.built or t.demolish or t.kind() != "machine" or t.product == "":
+			continue
+		total[t.product] = int(total.get(t.product, 0)) + 1
+		var in_zone := not zone.is_empty() and zone.has(sim.rooms.room_of_thing(t))
+		if in_zone or (zone.is_empty() and ids.has(t.owner)):
+			mine[t.product] = int(mine.get(t.product, 0)) + 1
+	var plan := 0
+	for p in mine.keys():
+		var need := 0
+		var days := 9999
+		for o: Dictionary in sim.orders.list:
+			if str(o["status"]) == "active" and str(o["product"]) == p:
+				need += sim.orders.remaining(o)
+				days = mini(days, maxi(1, int(ceil((float(o["deadline"]) - sim.minute) / 1440.0 * 5.0 / 7.0))))
+		if need <= 0:
+			continue
+		var share := float(mine[p]) / float(maxi(1, int(total[p])))
+		var per_day := int(ceil(float(need) * share / float(days)))
+		plan += mini(per_day, int(mine[p]) * OPS_CAP)
+	return plan
+
+
+## План на смену: автоплан плюс ручная правка ±.
+func plan_for(bid: int) -> int:
+	var b := brigade(bid)
+	if b.is_empty():
+		return 0
+	return maxi(0, plan_auto(bid) + int(b.get("plan_adj", 0)))
+
+
+## Сегодняшний план: зафиксирован утром, пока смена идёт — не прыгает.
+func plan_today(bid: int) -> int:
+	var b := brigade(bid)
+	if b.is_empty():
+		return 0
+	var pn := int(b.get("plan_now", -1))
+	return pn if pn >= 0 else plan_for(bid)
+
+
+func done_today(bid: int) -> int:
+	return int(brigade(bid).get("done", 0))
+
+
+## Выполнение плана, 0.0–…; без плана — -1.
+func plan_pct(bid: int) -> float:
+	var p := plan_today(bid)
+	return float(done_today(bid)) / float(p) if p > 0 else -1.0
+
+
+func set_plan_adj(bid: int, adj: int) -> void:
+	var b := brigade(bid)
+	if b.is_empty():
+		return
+	b["plan_adj"] = clampi(adj, -40, 40)
+	if int(b.get("plan_now", -1)) >= 0:
+		b["plan_now"] = plan_for(bid)
+
+
+func set_bonus(bid: int, idx: int) -> void:
+	var b := brigade(bid)
+	if not b.is_empty():
+		b["bonus"] = clampi(idx, 0, BONUS_PCT.size() - 1)
+
+
+func bonus_pct(bid: int) -> int:
+	return int(BONUS_PCT[clampi(int(brigade(bid).get("bonus", 0)), 0, BONUS_PCT.size() - 1)])
+
+
+## Сумма премии бригаде за выполненный план.
+func bonus_sum(bid: int) -> float:
+	var sum := 0.0
+	for w in members(bid):
+		sum += float(w.wage) * float(bonus_pct(bid)) / 100.0
+	return sum
+
+
+## Утро: итоги вчерашнего плана, премия.
+func settle_plans() -> void:
+	for b: Dictionary in brigades:
+		var bid := int(b["id"])
+		var plan := int(b.get("plan_now", -1))
+		if plan > 0:
+			var done := int(b.get("done", 0))
+			b["last_pct"] = int(round(float(done) / float(plan) * 100.0))
+			var ms := members(bid)
+			if done >= plan:
+				var pct := bonus_pct(bid)
+				if pct > 0 and not ms.is_empty():
+					var sum := bonus_sum(bid)
+					sim.spend(sum, "Премия бригаде за перевыполнение плана")
+					sim.stats["crew_bonus"] = float(sim.stats.get("crew_bonus", 0.0)) + sum
+					b["bonus_total"] = float(b.get("bonus_total", 0.0)) + sum
+					for w in ms:
+						Mood.add(sim, w, "crew_bonus")
+					sim.notify(L.t("«%s» выполнила план смены (%d из %d): премия %d%% от ставки, всего %s.") % [str(b["name"]), done, plan, pct, Defs.money_str(sum)], Sim.LVL_GOOD)
+			elif int(b.get("bonus", 0)) > 0:
+				for w2 in ms:
+					Mood.add(sim, w2, "crew_bonus_missed")
+		else:
+			b["last_pct"] = -1
+		b["plan_now"] = -1
+		b["done"] = 0
+
+
+## Утро рабочего дня: фиксируем план, растёт сплочённость, характер бригадира давит или бережёт.
+func start_plans() -> void:
+	for b: Dictionary in brigades:
+		var bid := int(b["id"])
+		b["plan_now"] = plan_for(bid)
+		b["done"] = 0
+		var ms := members(bid)
+		b["coh_pen"] = maxf(0.0, float(b.get("coh_pen", 0.0)) - COH_PEN / 10.0)
+		if ms.size() >= 2:
+			b["coh"] = minf(100.0, float(b.get("coh", COH_START)) + COH_GROW)
+		var ch := char_of(bid)
+		var tight := cohesion(bid) >= 50.0
+		for w in ms:
+			if tight:
+				Mood.add(sim, w, "crew_tight")
+			if w == lead_of(bid):
+				continue
+			if ch == "rush":
+				Mood.add(sim, w, "lead_rush")
+			elif ch == "care":
+				Mood.add(sim, w, "lead_care")
+
+
+## Ушёл человек: сплочённость падает; опытного (≥4 разряд) жалко — важное уведомление.
+func _on_loss(w: Worker) -> void:
+	if w.visitor or w.brigade < 0:
+		return
+	var b := brigade(w.brigade)
+	if b.is_empty():
+		return
+	_shake(b, COH_SHAKE * 0.5)
+	if w.has_grade() and w.grade() >= 4:
+		_shake(b, COH_LOSS)
+		b["coh_pen"] = float(b.get("coh_pen", 0.0)) + COH_PEN
+		sim.stats["veteran_loss"] = int(sim.stats.get("veteran_loss", 0)) + 1
+		sim.notify(L.t("Ушёл опытный человек: %s, %d-й разряд. Бригада «%s» осиротела — сплочённость упала.") % [w.full_name(), w.grade(), str(b["name"])], Sim.LVL_WARN, w.cell())
+		for o in members(w.brigade):
+			if o != w:
+				Mood.add(sim, o, "crew_loss")
 
 
 # ================================================================ охрана и несуны
@@ -1273,10 +1560,12 @@ func on_fire(w: Worker, quit: bool) -> void:
 
 ## Работник ушёл: бригада, профком.
 func on_leave(w: Worker) -> void:
+	_on_loss(w)
 	if w.brigade >= 0:
 		var b := brigade(w.brigade)
 		if not b.is_empty() and int(b["lead"]) == w.id:
 			b["lead"] = -1
+			b["char"] = ""
 			sim.notify(L.t("«%s» осталась без бригадира — назначьте нового.") % str(b["name"]), Sim.LVL_WARN)
 	if union_on() and int(union.get("lead", -1)) == w.id:
 		union["lead"] = -1
@@ -1475,6 +1764,12 @@ func injury_k(w: Worker) -> float:
 				break
 	if clause_on("ppe"):
 		k *= 0.9
+	if w.brigade >= 0:
+		match char_of(w.brigade):
+			"rush":
+				k *= 1.15
+			"care":
+				k *= 0.85
 	return k
 
 
@@ -1493,6 +1788,9 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 
 
 func morning() -> void:
+	settle_plans()
+	if sim.is_workday():
+		start_plans()
 	sim.stats["safe_days"] = maxi(int(sim.stats.get("safe_days", 0)), safe_days())
 	_cases_tick()
 	if sim.office.overtime_on() and sim.is_workday():
@@ -1539,6 +1837,7 @@ func from_dict(d: Dictionary) -> void:
 		b["wins"] = int(b.get("wins", 0))
 		if not b.has("cells"):
 			b["cells"] = []
+		_defaults(b)
 	_next_brig = int(d.get("nb", brigades.size() + 1))
 	comp_on = bool(d.get("comp_on", true))
 	comp_prize = bool(d.get("comp_prize", false))

@@ -56,7 +56,7 @@ func _init() -> void:
 	var took := g.sales.log.filter(func(e: Dictionary) -> bool: return bool(e["ok"])).size()
 	var lost := g.sales.log.filter(func(e: Dictionary) -> bool: return not bool(e["ok"]))
 	check(took >= 3 and int(g.stats["orders_done"]) >= 5, "сбыт сам взял %d заказов, выполнено %d" % [took, int(g.stats["orders_done"])])
-	check(lost.any(func(e: Dictionary) -> bool: return str(e["why"]).begins_with("нет оборудования")), "отказы «нет оборудования» видны в упущенной выгоде")
+	check(not lost.any(func(e: Dictionary) -> bool: return str(e["why"]).begins_with("нет оборудования")), "1.51: заявок на то, что не на чем делать, не приходит — изделия без станка сняты с ассортимента")
 	var sm := g.sales.summary(14)
 	check(float(sm["lost_sum"]) > 0.0 and str(sm["top"]) != "" and g.sales.advice(str(sm["top"])) != "", "главная причина потерь: %s — %s" % [Defs.process_name(str(sm["top"])), g.sales.advice(str(sm["top"]))])
 

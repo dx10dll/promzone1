@@ -267,6 +267,59 @@ func _ready() -> void:
 			lb.position = r.position + Vector2(-6, BubbleArt.H + 2)
 			layer.add_child(lb)
 			gx += 1
+	elif mode == "brigade151" or mode == "career151":
+		# 1.51: карточка бригады (план, премия, характер, сплочённость) и вкладка «Карьера»
+		var S3 := preload("res://tests/setups.gd")
+		var sm3 := gm.sim
+		sm3.story.enabled = false
+		S3.big_shop(sm3)
+		S3.offices(sm3)
+		var fm3 := S3.hire(sm3, "foreman", "manage", 6)
+		fm3.present = true
+		for dk: Thing in sm3.things.values():
+			if dk.def_id == "office_desk" and dk.cell == Vector2i(8, 7):
+				fm3.desk_id = dk.id
+		var ta := S3.hire(sm3, "turner", "turning", 7)
+		var tb := S3.hire(sm3, "turner", "turning", 4)
+		var mc3 := S3.hire(sm3, "miller", "milling", 6)
+		var fc3 := S3.hire(sm3, "fitter", "fitting", 3)
+		var lb3 := S3.hire(sm3, "laborer", "haul", 4)
+		ta.traits = ["born_mentor"]
+		mc3.traits = ["workaholic"]
+		S3.complex_orders(sm3, 3)
+		var b1 := sm3.crew.add_brigade("Токарный участок")
+		var b2 := sm3.crew.add_brigade("Фрезерный участок")
+		sm3.crew.set_member(ta, int(b1["id"]))
+		sm3.crew.set_member(tb, int(b1["id"]))
+		sm3.crew.set_member(mc3, int(b2["id"]))
+		sm3.crew.set_member(fc3, int(b2["id"]))
+		sm3.crew.set_lead(int(b1["id"]), ta.id)
+		sm3.crew.set_lead(int(b2["id"]), mc3.id)
+		b1["coh"] = 72.0
+		b2["coh"] = 35.0
+		b2["coh_pen"] = 12.0
+		b1["bonus"] = 2
+		b2["bonus"] = 1
+		b1["plan_adj"] = 2
+		sm3.crew.start_plans()
+		b1["done"] = int(sm3.crew.plan_today(int(b1["id"])) * 0.7)
+		b2["done"] = sm3.crew.plan_today(int(b2["id"]))
+		b2["last_pct"] = 104
+		for tk in sm3.things_of("machine"):
+			tk.owner = ta.id if tk.process() == "turning" else (mc3.id if tk.process() == "milling" else tk.owner)
+		gm.menu_paused = true
+		if mode == "brigade151":
+			gm.hud.open_window("crew")
+		else:
+			lb3.skills["turning"] = 3
+			lb3.days_worked = 6
+			tb.days_worked = 30
+			sm3.career.exams[tb.id] = sm3.day()
+			sm3.training.set_mentor(tb, ta)
+			gm.hud.info.show_worker(sm3, tb)
+			InfoPanel.w_tab = "career"
+			gm.hud.info.show_worker(sm3, tb)
+			await get_tree().create_timer(0.5).timeout
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":

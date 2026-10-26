@@ -911,5 +911,43 @@
     "mood": -4,
     "dur": 720,
     "grp": "byt"
+  },
+  "crew_bonus": {
+    "text": "Бригаде выплатили премию за план",
+    "mood": 6,
+    "dur": 4320,
+    "grp": "money",
+    "wage": true
+  },
+  "crew_bonus_missed": {
+    "text": "Премия пролетела: план не сделали",
+    "mood": -3,
+    "dur": 2880,
+    "grp": "money",
+    "wage": true
+  },
+  "lead_rush": {
+    "text": "Бригадир гонит план — вымотаться можно",
+    "mood": -3,
+    "dur": 1440,
+    "grp": "team"
+  },
+  "lead_care": {
+    "text": "Бригадир бережёт людей",
+    "mood": 3,
+    "dur": 1440,
+    "grp": "team"
+  },
+  "crew_tight": {
+    "text": "Сплочённая бригада — свои люди",
+    "mood": 4,
+    "dur": 1440,
+    "grp": "team"
+  },
+  "crew_loss": {
+    "text": "Ушёл опытный человек — бригада осиротела",
+    "mood": -4,
+    "dur": 4320,
+    "grp": "team"
   }
 }

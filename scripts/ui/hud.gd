@@ -2082,6 +2082,20 @@ func show_fire_dialog(w: Worker, done: Callable = Callable()) -> void:
 	v.add_child(bh)
 
 
+## 1.51: обычное окно подтверждения.
+func confirm_dialog(title: String, text: String, ok_text: String, cb: Callable) -> void:
+	var v := _open_modal(480)
+	v.add_child(UITheme.title(title, 20))
+	v.add_child(UITheme.para(text, 13, UITheme.MUTED))
+	var bh := UITheme.hbox(8)
+	bh.add_child(UITheme.spacer())
+	bh.add_child(UITheme.button(tr("Отмена"), close_modal))
+	bh.add_child(UITheme.primary(ok_text, func() -> void:
+		close_modal()
+		cb.call()))
+	v.add_child(bh)
+
+
 func show_bankrupt() -> void:
 	var v := _open_modal(520)
 	v.add_child(UITheme.title("Долги растут", 24))

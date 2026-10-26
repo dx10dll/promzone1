@@ -171,6 +171,7 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 		b["strict"] = on
 		win.rebuild(true), "Люди бригады не берут работу на чужих станках, даже если там простой"))
 	v.add_child(h2)
+	v.add_child(_plan_block(win, b))
 	# участок
 	var h3 := HFlowContainer.new()
 	h3.add_theme_constant_override("h_separation", 5)
@@ -215,8 +216,7 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 	for w2 in ms:
 		var ww := w2
 		var mb := UITheme.small(("★ " if int(b["lead"]) == w2.id else "") + w2.call_name() + "  ×", func() -> void:
-			cr.set_member(ww, -1)
-			win.rebuild(true), L.t("%s, %s. Нажмите, чтобы убрать из бригады") % [w2.full_name(), w2.prof_lc()])
+			_move(win, ww, -1), L.t("%s, %s. Нажмите, чтобы убрать из бригады") % [w2.full_name(), w2.prof_lc()])
 		# 1.33: маленький портрет рядом с именем
 		var mh := UITheme.hbox(3)
 		var mp := Portrait.new()
@@ -242,8 +242,7 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 		var wid := add.get_item_id(idx)
 		var wx := sim.get_worker(wid)
 		if wx:
-			cr.set_member(wx, bid)
-		win.rebuild(true))
+			_move(win, wx, bid))
 	h4.add_child(add)
 	v.add_child(h4)
 	# график и сплочённость
@@ -265,8 +264,83 @@ static func _brigade_card(win: GameWindow, b: Dictionary, parent: Control) -> vo
 					s += sim.training.rel(a, o)
 					n += 1
 		var avg := s / maxf(1.0, float(n))
-		foot.add_child(UITheme.chip("дружная" if avg >= 25.0 else ("ссорятся" if avg <= -25.0 else "обычная"), UITheme.GOOD if avg >= 25.0 else (UITheme.BAD if avg <= -25.0 else UITheme.MUTED), "Сплочённость: средние отношения внутри бригады"))
+		foot.add_child(UITheme.chip("дружная" if avg >= 25.0 else ("ссорятся" if avg <= -25.0 else "обычная"), UITheme.GOOD if avg >= 25.0 else (UITheme.BAD if avg <= -25.0 else UITheme.MUTED), "Отношения внутри бригады: средние симпатии людей"))
 	v.add_child(foot)
+
+
+## 1.51: перевод человека с подтверждением, если жалко разбивать сплочённую бригаду.
+static func _move(win: GameWindow, w: Worker, to_bid: int) -> void:
+	var cr := win.sim.crew
+	var warn := cr.move_warning(w, to_bid)
+	var go := func() -> void:
+		cr.set_member(w, to_bid)
+		win.rebuild(true)
+	if warn == "" or win.hud == null:
+		go.call()
+		return
+	win.hud.confirm_dialog(L.t("Перевести: %s") % w.full_name(), warn, L.t("Всё равно перевести"), go)
+
+
+## 1.51: план смены, премия, бригадир и его характер, сплочённость.
+static func _plan_block(win: GameWindow, b: Dictionary) -> Control:
+	var sim := win.sim
+	var cr := sim.crew
+	var bid := int(b["id"])
+	var box := UITheme.card(8, UITheme.BG, UITheme.LINE2)
+	var v := UITheme.vbox(5)
+	box.add_child(v)
+	# план и выполнение
+	var plan := cr.plan_today(bid)
+	var done := cr.done_today(bid)
+	var r1 := UITheme.hbox(8)
+	r1.add_child(UITheme.label("План смены", 12, UITheme.MUTED))
+	if plan > 0:
+		var pct := float(done) / float(plan) * 100.0
+		r1.add_child(UITheme.meter(minf(100.0, pct), UITheme.GOOD if pct >= 100.0 else UITheme.INFO, 110, L.t("сделано %d из %d") % [done, plan]))
+	else:
+		r1.add_child(UITheme.label("нет взятых заказов на станках бригады", 12, UITheme.DIM))
+	r1.add_child(UITheme.spacer())
+	var adj := int(b.get("plan_adj", 0))
+	r1.add_child(UITheme.small("−", func() -> void:
+		cr.set_plan_adj(bid, adj - 1)
+		win.rebuild(true), L.t("Снизить план на 1 операцию (авто: %d)") % cr.plan_auto(bid)))
+	r1.add_child(UITheme.label("%+d" % adj if adj != 0 else "авто", 12, UITheme.INFO if adj != 0 else UITheme.MUTED))
+	r1.add_child(UITheme.small("+", func() -> void:
+		cr.set_plan_adj(bid, adj + 1)
+		win.rebuild(true), L.t("Поднять план на 1 операцию (авто: %d)") % cr.plan_auto(bid)))
+	v.add_child(r1)
+	# премия
+	var r2 := UITheme.hbox(8)
+	r2.add_child(UITheme.label("Премия", 12, UITheme.MUTED))
+	var keys: Array = []
+	for i in Crew.BONUS_PCT.size():
+		keys.append([str(i), L.t("нет") if i == 0 else "%d%%" % int(Crew.BONUS_PCT[i]), L.t("Премия от ставки за смену, если бригада выполнила план на 100% и больше")])
+	r2.add_child(UITheme.segmented(keys, str(int(b.get("bonus", 0))), func(k: String) -> void:
+		cr.set_bonus(bid, int(k))
+		win.rebuild(true)))
+	if cr.bonus_pct(bid) > 0:
+		r2.add_child(UITheme.label(L.t("≈ %s за смену") % Defs.money_str(cr.bonus_sum(bid)), 12, UITheme.MUTED))
+	r2.add_child(UITheme.spacer())
+	var lp := int(b.get("last_pct", -1))
+	if lp >= 0:
+		r2.add_child(UITheme.chip(L.t("вчера %d%%") % lp, UITheme.GOOD if lp >= 100 else UITheme.WARN, L.t("Выполнение плана за прошлую смену")))
+	v.add_child(r2)
+	# бригадир, характер, сплочённость
+	var r3 := UITheme.hbox(8)
+	var ld := cr.lead_of(bid)
+	var ch := cr.char_of(bid)
+	if ld:
+		r3.add_child(UITheme.chip("%s — %s" % [ld.call_name(), cr.char_name(ch)], UITheme.ACCENT, L.t(str(Crew.CHAR_DESC.get(ch, "")))))
+	else:
+		r3.add_child(UITheme.chip(L.t("бригадира нет"), UITheme.MUTED, L.t("Назначьте бригадира: от его характера зависит работа бригады")))
+	r3.add_child(UITheme.spacer())
+	var coh := cr.cohesion(bid)
+	var pen := float(b.get("coh_pen", 0.0))
+	r3.add_child(UITheme.label("Сплочённость", 12, UITheme.MUTED))
+	r3.add_child(UITheme.meter(coh, UITheme.GOOD if coh >= 50.0 else (UITheme.INFO if coh >= 20.0 else UITheme.MUTED), 90,
+		L.t("%d из 100%s") % [int(coh), L.t(" · временный минус %d: ушёл опытный человек") % int(pen) if pen > 0.5 else ""]))
+	v.add_child(r3)
+	return box
 
 
 ## Узкая полоска графика смены (для обзора).
