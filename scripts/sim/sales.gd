@@ -108,7 +108,8 @@ func verdict(o: Dictionary) -> Array:
 	if mg < min_margin():
 		return ["маржа %d%% ниже порога %d%%" % [int(round(mg * 100.0)), int(round(min_margin() * 100.0))], []]
 	var li := sim.office.load_info(p, int(o["qty"]))
-	if float(li[0]) > float(int(o.get("lead", 3))) * risk_k():
+	# 1.50b: сам берём только когда на карточке было бы «успеем» (загрузка до 60% срока), а не «впритык»
+	if float(li[0]) > float(int(o.get("lead", 3))) * RISK_K[0]:
 		if sim.office.ops_for(str(li[1])) <= 0.0:
 			# 1.47: на переделе никто не работает — так и сказать, а не «не успеваем»
 			return ["не успеваем: некому работать — %s" % Defs.process_name(str(li[1])).to_lower(), [str(li[1])]]

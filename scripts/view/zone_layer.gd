@@ -88,7 +88,7 @@ func _title(rect: Rect2i, type: String, title: String, col: Color, f: Font, vali
 		return
 	var spacing := 0.18     # разрядка, в долях кегля
 	var est := f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 32).x / 32.0 + spacing * text.length()
-	var icon_k := 1.15
+	var icon_k := 0.0   # 1.50b: значков на полу нет — только надпись
 	var size := (box.size.x * 0.84) / (est + icon_k + 0.3)
 	size = minf(size, box.size.y * 0.36)
 	size = clampf(size, 9.0, 64.0)
@@ -98,12 +98,6 @@ func _title(rect: Rect2i, type: String, title: String, col: Color, f: Font, vali
 	var a := 0.34 if valid else 0.24
 	var dc := col.darkened(0.18)
 	var tc := Color(dc.r, dc.g, dc.b, a)
-	var tex := Tex.ui_world("zone_" + type)
-	if tex:
-		var isz := size * icon_k
-		# 1.38: цветной значок владельца — без перекраски, только приглушён прозрачностью
-		var ic := Color(1, 1, 1, 0.5 if valid else 0.32) if Tex.is_color(tex) else tc
-		draw_texture_rect(tex, Rect2(Vector2(x, y - size * 0.36 - isz * 0.5), Vector2(isz, isz)), false, ic)
 	x += size * (icon_k + 0.3)
 	# буквы рисуем в экранном кегле и уменьшаем обратно — при приближении надпись остаётся чёткой
 	var z := maxf(0.25, _zoom)

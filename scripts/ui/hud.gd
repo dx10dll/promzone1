@@ -50,7 +50,7 @@ const OVERLAYS := [["rooms", "Зоны", "Зоны и помещения: что
 	["nets", "Коммуникации", "Все сети сразу: кабель, водопровод, сжатый воздух, вентиляция — и кому чего не хватает"],
 	["light", "Освещение", "Где светло от ламп и окон, где темно"],
 	["temp", "Температура", "Тепло и холод по помещениям, батареи"],
-	["traffic", "Потоки людей", "Где чаще ходят — тропы и пробки"], ["load", "Загрузка станков", "Работает, простаивает, брак (нужен ПДО)"],
+	["traffic", "Потоки людей", "Где чаще ходят — тропы и пробки"], ["load", "Занятость станков", "Работает, простаивает, брак (нужен ПДО)"],
 	["dirt", "Чистота", "Стружка и грязь, уровень обустройства"],
 	["crew", "Бригады и охрана", "Участки бригад, камеры и посты"],
 	["logistics", "Логистика", "Кто в какую бытовку, душ, туалет, столовую ходит: протяните линию от цеха к помещению"]]
@@ -633,7 +633,7 @@ func _refresh_top() -> void:
 	time_l.add_theme_color_override("font_color", scol)
 	if skip_btn:
 		var skipping := g.is_skipping()
-		skip_btn.visible = skipping or (sim.can_skip_idle() and not g.menu_paused)
+		skip_btn.visible = skipping or (sim.can_skip_idle() and not g.menu_paused and not menus_open())
 		if skipping:
 			skip_btn.text = tr("Остановить пропуск")
 		else:
@@ -685,7 +685,8 @@ func _refresh_top() -> void:
 	(_chips["weather"] as Control).tooltip_text = wtip
 	(_chips["date"] as Control).tooltip_text = tr("%s, %s. %s\nНажмите — календарь и проверки (C).") % [se.long_date(), sim.time_str(), sim.crew.sched_text(sim.crew.sched_str(0), 0).capitalize() if sim.is_workday() else tr("Выходной")]
 	_refresh_crisis()
-	var alerts := unread_log + sim.story.letters.size() + (1 if sim.story.strike.get("active", false) else 0) + (1 if not sim.story.fires.is_empty() else 0) + sim.inspect.queue.size() + (1 if sim.paper.unread else 0)
+	# 1.50b: значок — только то, что требует решения: письма с выбором и неустранённые тревоги (забастовка, пожар); рутина и журнал его не растят
+	var alerts := decision_count()
 	events_badge.text = str(alerts)
 	events_badge.visible = alerts > 0
 	paper_badge.visible = false
@@ -944,10 +945,15 @@ func toggle_sub(kind: String) -> void:
 	_sync_bottom()
 
 
+## 1.50b: открыто ли какое-то окно или нижнее меню (кнопка «Пропустить» тогда прячется, чтобы не налезать).
+func menus_open() -> bool:
+	return win != null or (sub_panel != null and sub_panel.visible) or sub_kind != ""
+
+
 func close_sub() -> void:
 	sub_kind = ""
 	sub_panel.visible = false
-	BuildMenu.query = {"build": "", "objects": ""}
+	BuildMenu.query = {"build": "", "objects": "", "rooms": ""}
 	if g.tool.plan_mode:
 		_end_plan()   # 1.40: план живёт, только пока открыто его меню
 	_sync_bottom()
@@ -1251,6 +1257,10 @@ func on_room_clicked(room_id: int) -> void:
 
 
 # ---------------------------------------------------------------- уведомления
+
+func decision_count() -> int:
+	return sim.story.letters.size() + (1 if sim.story.strike.get("active", false) else 0) + (1 if not sim.story.fires.is_empty() else 0)
+
 
 var unread_log := 0   ## 1.48: сообщения, ушедшие только в журнал (счётчик на кнопке «События»)
 

@@ -19,7 +19,9 @@ var tool := BuildTool.new()
 var cam := GameCamera.new()
 var daynight := DayNight.new()
 var overlay := OverlayLayer.new()
+var bubbles: WorkerBubbles = null   ## 1.50d: облачка над людьми
 var badges: MachineBadges = null   ## 1.49: значки проблем над станками
+var obj_badges: ObjectBadgesLayer = null   ## 1.50c: значки проблем над остальными объектами
 var weather := WeatherLayer.new()
 var fx := FxLayer.new()
 var sound := SoundLayer.new()
@@ -84,6 +86,9 @@ func _ready() -> void:
 	plan_l.sim = sim
 	plan_l.tool = tool
 	world_root.add_child(plan_l)
+	var net_ghost := NetGhostLayer.new()   # 1.50b: заказанные, но не проложенные сети — призраки
+	net_ghost.sim = sim
+	world_root.add_child(net_ghost)
 	world_root.add_child(fx)
 	fx.setup(sim, world_root)
 	var vfx_top := VehicleFx.new()   # 1.30: струя воды, мигалки, дорожный указатель
@@ -115,11 +120,22 @@ func _ready() -> void:
 	mbadges.game = self
 	badges = mbadges
 	ov_layer.add_child(mbadges)
+	var obadges := ObjectBadgesLayer.new()
+	obadges.sim = sim
+	obadges.game = self
+	obj_badges = obadges
+	ov_layer.add_child(obadges)
 	# фамилии под людьми — поверх построек, не темнеют ночью
 	var names := NameLayer.new()
 	names.sim = sim
 	names.game = self
 	ov_layer.add_child(names)
+	# 1.50d: облачка-мысли над людьми — поверх имён
+	var wbub := WorkerBubbles.new()
+	wbub.sim = sim
+	wbub.game = self
+	bubbles = wbub
+	ov_layer.add_child(wbub)
 	tool.sim = sim
 	tool.game = self
 	tool.overlay = overlay

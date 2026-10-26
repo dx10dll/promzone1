@@ -18,7 +18,6 @@ var shadow := Sprite2D.new()
 var hand_a := Sprite2D.new()
 var hand_b := Sprite2D.new()
 var held := Node2D.new()
-var bubble := Node2D.new()
 var ring := Node2D.new()
 var smoke: Array[Sprite2D] = []
 var puff := Sprite2D.new()   ## 1.25: выдох дыма на перекуре
@@ -81,8 +80,6 @@ func setup(s: Sim, w: Worker) -> void:
 		h.modulate = skin
 	prop_sp.scale = Vector2(0.5, 0.5)
 	prop_sp.visible = false
-	add_child(bubble)
-	bubble.draw.connect(_draw_bubble)
 	gest.draw.connect(_draw_gest)
 	puff.texture = Tex.fx("smoke")
 	puff.visible = false
@@ -101,7 +98,7 @@ func setup(s: Sim, w: Worker) -> void:
 ## удалении куклы не удаляются сами — висели «сиротами». Удаляем их вместе с куклой.
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
-		for n: Node in [doll, body, trunk, headn, shadow, hand_a, hand_b, held, bubble, ring, puff, gest, veh, veh_load, prop_sp]:
+		for n: Node in [doll, body, trunk, headn, shadow, hand_a, hand_b, held, ring, puff, gest, veh, veh_load, prop_sp]:
 			if is_instance_valid(n) and n.get_parent() == null:
 				n.free()
 
@@ -326,9 +323,6 @@ func _update_pos() -> void:
 	position = Vector2(vp.x * T, vp.y * T + 6.0)
 
 
-var _bub_t := 0.0
-
-
 func _process(delta: float) -> void:
 	_t += delta
 	# 1.30: на улице за краем карты (ушёл домой, идёт на смену, горожанин) — поза от StreetFolk
@@ -369,10 +363,6 @@ func _process(delta: float) -> void:
 	_animate()
 	if _veh != "":
 		_place_vehicle()
-	_bub_t -= delta   # 1.40: значки потребностей меняются медленно — 15 раз в секунду хватает
-	if _bub_t <= 0.0:
-		_bub_t = 0.066
-		bubble.queue_redraw()
 	if selected or ring.get_meta("was", false):
 		ring.set_meta("was", selected)
 		ring.queue_redraw()
@@ -862,176 +852,3 @@ func _place_prop(ha: Vector2, hb: Vector2, side: bool, back: bool) -> void:
 			prop_sp.scale = Vector2(0.36, 0.36)
 		_:
 			prop_sp.position = hb + (Vector2(0, -1) if side else Vector2(-3, -2))   # 1.47: сбоку — прямо в кисти
-
-
-## Значки над головой: что человеку сейчас нужно (туалет, еда, отдых, холод, настроение)
-## и особые состояния (проверка, забастовка, травма, пожар). Маленькие круглые бейджи.
-func _draw_bubble() -> void:
-	if worker.bubble != "":
-		_chip(Vector2(0, -44), [worker.bubble], [1.0])
-		return
-	var icons: Array = []   ## [вид, срочность 0..1]
-	var n := worker.needs
-	var bl := float(n["bladder"])
-	var fd := float(n["food"])
-	var rs := float(n["rest"])
-	if bl < 25.0:
-		icons.append(["wc", 1.0 - bl / 25.0])
-	if fd < 22.0:
-		icons.append(["food", 1.0 - fd / 22.0])
-	if rs < 18.0:
-		icons.append(["rest", 1.0 - rs / 18.0])
-	if worker.present and not worker.visitor and _dressed:
-		var tc := sim.season.temp_at(worker.cell())
-		if tc < Defs.sea("freezing_below"):
-			icons.append(["cold", 0.7])
-		elif tc > Defs.sea("hot_above"):
-			icons.append(["hot", 0.5])
-	if worker.mood < 25.0:
-		icons.append(["mood", 1.0 - worker.mood / 25.0])
-	if icons.is_empty():
-		return
-	icons.sort_custom(func(a: Array, b: Array) -> bool: return float(a[1]) > float(b[1]))
-	icons = icons.slice(0, 3)
-	var kinds: Array = []
-	var urgs: Array = []
-	for ic: Array in icons:
-		kinds.append(str(ic[0]))
-		urgs.append(float(ic[1]))
-	_chip(Vector2(0, -43), kinds, urgs)
-
-
-const BADGE_COLS := {"hot": "#d8644e", "wc": "#3f8de0", "food": "#e0883a", "rest": "#7a64c8", "cold": "#5fa8d8", "mood": "#6d747c",
-	"inspect": "#7a5236", "strike": "#c9372c", "injury": "#c9372c", "fire": "#e0602c",
-	"idea": "#3f8a5a", "talk": "#4a7aa8", "chat": "#5a9a6a", "argue": "#d08a35", "fight": "#c9372c", "laugh": "#d9a13a"}
-
-
-## 1.15: значки над головой — компактная тёмная «пилюля» с цветными пиктограммами и хвостиком
-## к голове. Срочное — пиктограмма пульсирует, под ней светится цветная чёрточка.
-const CHIP_STEP := 8.4
-const CHIP_H := 8.6
-const CHIP_BG := Color(0.11, 0.125, 0.14, 0.9)
-
-
-func _capsule(r: Rect2, col: Color) -> void:
-	var rad := r.size.y * 0.5
-	bubble.draw_circle(Vector2(r.position.x + rad, r.position.y + rad), rad, col)
-	bubble.draw_circle(Vector2(r.end.x - rad, r.position.y + rad), rad, col)
-	if r.size.x > r.size.y:
-		bubble.draw_rect(Rect2(r.position.x + rad, r.position.y, r.size.x - 2.0 * rad, r.size.y), col)
-
-
-func _chip(c: Vector2, kinds: Array, urgs: Array) -> void:
-	var n := kinds.size()
-	var w := CHIP_STEP * n + 1.4
-	var r := Rect2(c - Vector2(w * 0.5, CHIP_H * 0.5), Vector2(w, CHIP_H))
-	# 1.19: пилюля и пиктограммы — из вектора под зум камеры (раньше рисовались примитивами и рябили)
-	var pill := Tex.emo("chip%d" % clampi(n, 1, 3))
-	if pill:
-		# в SVG: 1 ед. мира = 4 ед.; поля 3 слева/справа, 2 сверху
-		bubble.draw_texture_rect(pill, Rect2(r.position - Vector2(0.75, 0.5), Vector2(pill.get_width(), pill.get_height()) * 0.25), false)
-	else:
-		_capsule(r, CHIP_BG)
-	for i in n:
-		var kind := str(kinds[i])
-		var urg := float(urgs[i])
-		var gc := Vector2(r.position.x + 0.7 + CHIP_STEP * (i + 0.5), c.y)
-		var col := Color(str(BADGE_COLS.get(kind, "#9aa3ab"))).lightened(0.22)
-		var k := 0.66
-		if urg > 0.6:
-			k *= 1.0 + 0.07 * sin(_t * 6.0)
-			bubble.draw_line(gc + Vector2(-2.2, CHIP_H * 0.5 - 1.3), gc + Vector2(2.2, CHIP_H * 0.5 - 1.3), Color(col, 0.55 + 0.35 * sin(_t * 6.0)), 0.9, true)
-		var gt := Tex.emo(kind)
-		if gt:
-			var gs := 11.0 * k * (1.25 if Tex.is_color(gt) else 1.0)   # 1.38: у PNG владельца поля ~12%
-			bubble.draw_texture_rect(gt, Rect2(gc - Vector2(gs, gs) * 0.5, Vector2(gs, gs)), false)
-		else:
-			_glyph(gc, kind, k, col, CHIP_BG)
-
-
-## Старый круглый значок (используют снимки и подсказки): теперь — та же пилюля на одну пиктограмму.
-func _badge(c: Vector2, kind: String, urg: float, _r: float) -> void:
-	_chip(c, [kind], [urg])
-
-
-## Пиктограмма значка: fg — цвет рисунка, bg — фон (для вырезов вроде месяца).
-func _glyph(c: Vector2, kind: String, k: float, fg: Color, bg: Color) -> void:
-	var wht := fg
-	var col := bg
-	match kind:
-		"wc":
-			# капля
-			var pr := PackedVector2Array()
-			pr.append(c + Vector2(0, -4.3) * k)
-			for i2 in 17:
-				var a2 := -PI * 0.15 + (PI * 1.3) * i2 / 16.0
-				pr.append(c + Vector2(cos(a2) * 2.9, 0.8 + sin(a2) * 2.9) * k)
-			bubble.draw_colored_polygon(pr, wht)
-		"food":
-			# вилка и нож
-			bubble.draw_line(c + Vector2(-1.8, -3.6) * k, c + Vector2(-1.8, 3.8) * k, wht, 1.2 * k)
-			for dx in [-2.8, -1.8, -0.8]:
-				bubble.draw_line(c + Vector2(dx, -3.8) * k, c + Vector2(dx, -1.2) * k, wht, 0.7 * k)
-			bubble.draw_colored_polygon(PackedVector2Array([c + Vector2(1.4, -3.8) * k, c + Vector2(2.9, -2.6) * k, c + Vector2(2.6, 0.6) * k, c + Vector2(1.6, 0.6) * k]), wht)
-			bubble.draw_line(c + Vector2(2.1, 0.4) * k, c + Vector2(2.1, 3.8) * k, wht, 1.2 * k)
-		"rest":
-			# месяц
-			bubble.draw_circle(c + Vector2(-0.3, 0.2) * k, 3.4 * k, wht)
-			bubble.draw_circle(c + Vector2(1.3, -1.1) * k, 2.9 * k, col)
-		"cold":
-			# снежинка
-			for i3 in 3:
-				var a3 := PI / 3.0 * i3 + PI / 6.0
-				var d := Vector2(cos(a3), sin(a3)) * 3.7 * k
-				bubble.draw_line(c - d, c + d, wht, 0.9 * k)
-		"hot":
-			# термометр
-			bubble.draw_line(c + Vector2(0, -3.6) * k, c + Vector2(0, 1.2) * k, wht, 1.8 * k)
-			bubble.draw_circle(c + Vector2(0, 2.2) * k, 1.9 * k, wht)
-			bubble.draw_circle(c + Vector2(0, 2.2) * k, 1.0 * k, Color("#d8644e"))
-		"mood":
-			# тучка с каплей
-			bubble.draw_circle(c + Vector2(-1.6, 0.2) * k, 1.9 * k, wht)
-			bubble.draw_circle(c + Vector2(0.6, -0.9) * k, 2.3 * k, wht)
-			bubble.draw_circle(c + Vector2(2.3, 0.4) * k, 1.6 * k, wht)
-			bubble.draw_rect(Rect2(c + Vector2(-1.6, 0.2) * k, Vector2(3.9, 1.9) * k), wht)
-			bubble.draw_line(c + Vector2(-0.5, 2.8) * k, c + Vector2(-1.0, 4.0) * k, Color("#9cc8e8"), 0.9 * k)
-		"inspect":
-			bubble.draw_rect(Rect2(c + Vector2(-2.8, -3.6) * k, Vector2(5.6, 7.2) * k), wht)
-			bubble.draw_line(c + Vector2(-1.6, 0.2) * k, c + Vector2(-0.3, 1.6) * k, Color("#3f9a4a"), 1.0 * k)
-			bubble.draw_line(c + Vector2(-0.3, 1.6) * k, c + Vector2(1.9, -1.4) * k, Color("#3f9a4a"), 1.0 * k)
-		"strike":
-			bubble.draw_rect(Rect2(c + Vector2(-0.8, -3.8) * k, Vector2(1.6, 5.0) * k), wht)
-			bubble.draw_circle(c + Vector2(0, 2.9) * k, 0.95 * k, wht)
-		"injury":
-			bubble.draw_rect(Rect2(c + Vector2(-1.0, -3.4) * k, Vector2(2.0, 6.8) * k), wht)
-			bubble.draw_rect(Rect2(c + Vector2(-3.4, -1.0) * k, Vector2(6.8, 2.0) * k), wht)
-		"fire":
-			bubble.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -4.2) * k, c + Vector2(2.8, 0.6) * k, c + Vector2(1.6, 3.4) * k, c + Vector2(-1.6, 3.4) * k, c + Vector2(-2.8, 0.6) * k]), wht)
-			bubble.draw_circle(c + Vector2(0, 1.6) * k, 1.4 * k, Color("#ffd54a"))
-		"idea":
-			# лампочка
-			bubble.draw_circle(c + Vector2(0, -0.9) * k, 2.6 * k, wht)
-			bubble.draw_rect(Rect2(c + Vector2(-1.2, 1.4) * k, Vector2(2.4, 2.0) * k), wht)
-			bubble.draw_line(c + Vector2(-1.2, 3.8) * k, c + Vector2(1.2, 3.8) * k, wht, 0.8 * k)
-		"talk", "chat":
-			# облачко речи с тремя точками
-			bubble.draw_circle(c + Vector2(0, -0.4) * k, 3.4 * k, wht)
-			bubble.draw_colored_polygon(PackedVector2Array([c + Vector2(-2.0, 2.0) * k, c + Vector2(-3.4, 4.2) * k, c + Vector2(0.2, 2.6) * k]), wht)
-			for dx2 in [-1.6, 0.0, 1.6]:
-				bubble.draw_circle(c + Vector2(dx2, -0.4) * k, 0.6 * k, col)
-		"argue":
-			# молния
-			bubble.draw_colored_polygon(PackedVector2Array([c + Vector2(0.8, -4.2) * k, c + Vector2(-2.4, 0.6) * k, c + Vector2(-0.2, 0.6) * k, c + Vector2(-1.0, 4.2) * k, c + Vector2(2.4, -0.8) * k, c + Vector2(0.2, -0.8) * k]), wht)
-		"fight":
-			# звёздочка удара
-			var pts := PackedVector2Array()
-			for i4 in 10:
-				var a4 := -PI / 2.0 + TAU * i4 / 10.0
-				var rr := (4.0 if i4 % 2 == 0 else 1.8) * k
-				pts.append(c + Vector2(cos(a4), sin(a4)) * rr)
-			bubble.draw_colored_polygon(pts, wht)
-		"laugh":
-			bubble.draw_arc(c + Vector2(0, 0.2) * k, 2.6 * k, 0.15, PI - 0.15, 8, wht, 1.1 * k)
-			bubble.draw_circle(c + Vector2(-1.4, -1.4) * k, 0.7 * k, wht)
-			bubble.draw_circle(c + Vector2(1.4, -1.4) * k, 0.7 * k, wht)

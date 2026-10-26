@@ -739,7 +739,7 @@ func _cards(cols: int = 2) -> GridContainer:
 ## Карточка в сетке: заголовок (+ значок «?»), внутри — вертикальный список.
 ## 1.46: значки заголовков карточек: русский заголовок -> значок (ищется по переведённому тексту).
 const CARD_ICONS := {"Стратегия сбыта": "orders", "За 7 дней": "date", "Проблемное место": "wrench", "Ценовая политика": "money",
-	"Учебный класс": "research", "Статистика": "statistics", "Спецоценка (СОУТ)": "inspect", "СИЗ": "shield", "Рассказчик": "paper",
+	"Учебный класс": "research", "Статистика": "statistics", "Спецоценка (СОУТ)": "inspect", "СИЗ": "shield", "Сложность": "paper",
 	"Рабочие места": "objects", "Путь завода": "goals", "Практиканты ПТУ": "hire", "Поставщик металла": "supply",
 	"Погода и отопление": "temperature", "План месяца": "date", "Наша доля рынка": "chart_up", "Молоко за вредность": "med",
 	"Люди и репутация": "people", "Конкурентоспособность": "medal", "История": "log", "Инструктаж по ОТ": "shield",
@@ -797,7 +797,7 @@ func _orders() -> void:
 		"board":
 			_info(tr("на доске %d · висят 1–2 дня") % sim.sales.board.size())
 			_intro(tr("Заявки заказчиков ложатся сюда карточками. Решайте: «Взять», «Торговаться» или «Отказать». Через 1–2 игровых дня заказчик уходит к конкуренту. Режим сбыта переключается сверху: сбыт может брать мелочь или всё сам."))
-			OrderBoard.build(content, sim, rebuild, func(t: String, lvl: int) -> void: hud.toast(t, lvl, 4.0))
+			OrderBoard.build(content, sim, rebuild, func(t: String, lvl: int) -> void: hud.toast(t, lvl, 8.0 if lvl >= Sim.LVL_WARN else 4.0))
 		"active":
 			_sales_head()
 			var act := sim.orders.by_status(["active", "ready", "shipping"])
@@ -2645,7 +2645,7 @@ func _events_now() -> void:
 	sand.toggled.connect(func(v: bool) -> void: sim.season.sanding = v)
 	w.add_child(sand)
 	# рассказчик
-	var n := _card_in(right, tr("Рассказчик"), tr("Как часто и насколько тяжёлые события случаются на заводе"))
+	var n := _card_in(right, tr("Сложность"), tr("Как часто и насколько тяжёлые события случаются на заводе"))
 	var ob := OptionButton.new()
 	ob.focus_mode = Control.FOCUS_NONE
 	for i in Story.MODES.size():

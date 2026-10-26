@@ -1,0 +1,17 @@
+keys,en
+Станки заняты на,Machines busy for
+"Через сколько дней освободятся станки под этот заказ: с учётом того, что уже в работе (самый занятый передел — %s). Сравнивается со сроком.","In how many days the machines will be free for this order, counting what is already in work (busiest stage: %s). Compared with the deadline."
+%d дн.,%d d.
+"Риск не успеть к сроку: зелёный — занятость до 60% срока, жёлтый — впритык, красный — срыв и неустойка почти наверняка.","Risk of missing the deadline: green - machines busy up to 60% of the term, yellow - tight, red - a miss and a penalty are almost certain."
+"Заказчик согласился: %s, срок %d дн.","The customer agreed: %s, term %d d."
+Заказчик отказался и ушёл к конкуренту,The customer refused and went to a competitor
+Заявку можно брать.,The order can be taken.
+Торг не удался: %s. %s,Haggling failed: %s. %s
+Риск при таком сроке: %s,Risk with this term: %s
+Занятость станков,Machine occupancy
+"Занятость станков в рабочее время: зелёным — от 60%, жёлтым — 25–60%, красным — простаивает","Machine occupancy in working hours: green 60%+, yellow 25–60%, red idle"
+Сложность,Difficulty
+Поиск по всем зонам. Протяните прямоугольник — разметить клетки.,Search across all zones. Drag a rectangle to mark cells.
+Нет доступа: к клетке не подойти,No access: the cell cannot be reached
+Некому тянуть: нужен строитель,Nobody to lay it: a builder is needed
+Некому тянуть: нужен электрик или строитель,Nobody to lay it: an electrician or builder is needed

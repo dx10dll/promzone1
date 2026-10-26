@@ -1,5 +1,5 @@
 extends Node
-## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|orders --out=/файл.png [--lang=ru]
+## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders --out=/файл.png [--lang=ru]
 
 var out := "/tmp/p147.png"
 var mode := "full"
@@ -54,6 +54,22 @@ func _ready() -> void:
 			if not w.is_director():
 				gm.hud.info.show_worker(gm.sim, w)
 				break
+	elif mode == "card150":
+		# 1.50: карточка человека — «Сейчас делает / Чем недоволен / Что сделать» и пять шкал; недоплата, драка, усталость
+		for w in gm.sim.workers:
+			if not w.is_director():
+				w.wage = int(Mood.market_wage(w) * 0.7)
+				Mood.add(gm.sim, w, "fight")
+				Mood.add(gm.sim, w, "no_vacation")
+				Mood.add(gm.sim, w, "grade_up")
+				Mood.add(gm.sim, w, "ate_hot")
+				w.needs["rest"] = 8.0
+				Mood.refresh(gm.sim, w)
+				gm.hud.info.show_worker(gm.sim, w)
+				break
+		await get_tree().create_timer(0.8).timeout
+		gm.hud.info.refresh()
+		print("card size ", gm.hud.info.size)
 	elif mode == "plan":
 		gm.hud.toggle_plan()
 	elif mode.begins_with("win:"):
@@ -124,6 +140,133 @@ func _ready() -> void:
 			gm.hud.forced_overlay = "load"
 		if cam_arg == "":
 			cam_arg = "37,11,2.2"
+	elif mode.begins_with("bubbles150"):
+		# 1.50d: облачка над людьми — 12 человек подряд, у каждого своё состояние (bubbles150_tip — ещё подсказка)
+		var S2 := preload("res://tests/setups.gd")
+		var sm2 := gm.sim
+		sm2.story.enabled = false
+		S2.big_shop(sm2)
+		S2.hire(sm2, "turner", "turning", 5)
+		S2.hire(sm2, "laborer", "haul", 6)
+		S2.hire(sm2, "miller", "milling", 5)
+		S2.hire(sm2, "fitter", "fitting", 5)
+		S2.hire(sm2, "welder", "welding", 5)
+		gm.menu_paused = true
+		var t1 := sm2.minute
+		while sm2.minute < t1 + 300.0:
+			sm2.tick(0.5)
+		var ws: Array = sm2.workers.filter(func(x: Worker) -> bool: return not x.is_director() and not x.visitor)
+		var mach: Array = sm2.things_of("machine")
+		var turn: Thing = null
+		for m2: Thing in mach:
+			if m2.process() == "turning":
+				turn = m2
+		var plan := ["hungry", "wc", "tired", "wait_pay", "injury", "fight", "angry", "op_turning", "haul", "repair", "eat", "smoke", "idle", "study"]
+		var cx := 37.0
+		var cy := 12.0
+		var i2 := 0
+		for wk2: Worker in ws:
+			if i2 >= plan.size():
+				break
+			wk2.present = true
+			wk2.hidden = false
+			wk2.needs["bladder"] = 90.0
+			wk2.needs["food"] = 90.0
+			wk2.needs["rest"] = 90.0
+			wk2.mood = 70.0
+			wk2.bubble = ""
+			wk2.task = null
+			wk2.thoughts.clear()
+			var col2 := i2 % 7
+			var row2 := i2 / 7
+			wk2.pos = Vector2(cx - 3.3 + col2 * 1.1, cy + row2 * 2.6)
+			wk2.vprev = wk2.pos
+			wk2.path.clear()
+			var k2: String = plan[i2]
+			match k2:
+				"hungry": wk2.needs["food"] = 5.0
+				"wc": wk2.needs["bladder"] = 12.0
+				"tired": wk2.needs["rest"] = 12.0
+				"wait_pay": Mood.add(sm2, wk2, "arrears")
+				"injury": wk2.bubble = "injury"
+				"fight": wk2.bubble = "fight"
+				"angry": wk2.mood = 10.0
+				_:
+					var tk2 := Task.new()
+					tk2.kind = {"op_turning": "operate", "haul": "haul", "repair": "repair", "eat": "eat", "smoke": "smoke", "idle": "wander", "study": "study"}[k2]
+					if k2 == "op_turning" and turn != null:
+						tk2.res_users.append(turn.id)
+					wk2.task = tk2
+			i2 += 1
+		gm.bubbles.force_mode = "all"
+		gm.bubbles.refresh(0.5)
+		gm.bubbles.refresh(2.6)
+		if mode == "bubbles150_tip" and ws.size() > 3:
+			await get_tree().create_timer(0.3).timeout
+			gm.bubbles.mouse_override = (ws[0] as Worker).vpos() * World.T + Vector2(0, -20)
+		if cam_arg == "":
+			cam_arg = "%s,%s,3.2" % [cx + 0.2, cy + 1.2]
+	elif mode.begins_with("objbadges"):
+		# 1.50c: значки проблем над объектами — objbadges (карта) и objbadges_tip (подсказка над батареей)
+		var S2 := preload("res://tests/setups.gd")
+		var sm2 := gm.sim
+		sm2.story.enabled = false
+		S2.big_shop(sm2)
+		gm.menu_paused = true
+		for i in 6:
+			sm2.tick(0.5)
+		for ht: Thing in sm2.things_of("heater"):
+			sm2.things.erase(ht.id)
+		sm2.season.temp_day = -5.0
+		sm2.place_thing("radiator", Vector2i(44, 7), true, false)
+		sm2.place_thing("toilet", Vector2i(44, 18), true, false)
+		sm2.place_thing("fridge", Vector2i(44, 9), true, false)
+		sm2.place_thing("battery", Vector2i(45, 11), true, false)
+		sm2.place_thing("vent_hood", Vector2i(34, 17), true, false)
+		sm2.place_thing("lamp_bulb", Vector2i(45, 5), true, false)
+		sm2.place_thing("sink", Vector2i(43, 18), true, false)
+		sm2.place_thing("toilet", Vector2i(31, 17), true, false)
+		sm2.thing_rev += 1
+		sm2.tick(0.1)
+		gm.obj_badges.tracker.refresh(sm2)
+		sm2.minute += 10.0
+		gm.obj_badges.tracker.refresh(sm2)
+		for r: Dictionary in gm.obj_badges.tracker.shown.values():
+			print("objbadge ", r["k"], " ", (r["m"] as Thing).def_id, " ", (r["m"] as Thing).cell)
+		if cam_arg == "":
+			cam_arg = "39,12,1.9"
+	elif mode == "sheet150b":
+		# все облачка по видам: спокойные, жёлтые, красные
+		var layer := CanvasLayer.new()
+		layer.layer = 50
+		add_child(layer)
+		var bgr := ColorRect.new()
+		bgr.color = Color("#8e8b80")
+		bgr.size = Vector2(1920, 1080)
+		layer.add_child(bgr)
+		var kinds: Array = BubbleLogic.TITLES.keys()
+		var gx := 0
+		for kd: String in kinds:
+			var tr_t := 1
+			if ["hungry", "tired", "wc", "cold", "hot", "angry", "no_ppe", "wait_pay", "argue"].has(kd):
+				tr_t = 2
+			if ["injury", "fight", "strike", "fire"].has(kd):
+				tr_t = 3
+			var tx: Texture2D = BubbleArt.tex(kd, tr_t)
+			var r := TextureRect.new()
+			r.texture = tx
+			r.custom_minimum_size = Vector2(BubbleArt.W, BubbleArt.H)
+			r.size = Vector2(BubbleArt.W, BubbleArt.H)
+			r.stretch_mode = TextureRect.STRETCH_SCALE
+			r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			r.position = Vector2(30 + (gx % 14) * 130, 30 + (gx / 14) * 150)
+			layer.add_child(r)
+			var lb := Label.new()
+			lb.text = kd
+			lb.add_theme_font_size_override("font_size", 12)
+			lb.position = r.position + Vector2(-6, BubbleArt.H + 2)
+			layer.add_child(lb)
+			gx += 1
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":
@@ -150,6 +293,11 @@ func _ready() -> void:
 			gm.sim.fauna.pigeons.append({"pos": pf, "from": pf - Vector2(2, 0), "to": pf + Vector2(2, 0), "st": "fly", "until": 1e9, "dir": 1, "fly_t": 0.0, "inside": false})
 			var pw := Vector2(float(cv[0]) + 2.4, float(cv[1]) + 0.5)
 			gm.sim.fauna.pigeons.append({"pos": pw, "to": pw, "st": "walk", "until": 1e9, "dir": -1, "fly_t": 0.0, "inside": false})
+	if mode == "objbadges_tip":
+		for r: Dictionary in gm.obj_badges.tracker.visible_list():
+			if str(r["k"]) == "heat":
+				await get_tree().create_timer(0.3).timeout
+				gm.obj_badges.mouse_override = gm.obj_badges._rect(r["m"], gm.obj_badges._zoom()).get_center()
 	if mode == "badges_tip":
 		# наведение мыши на значок: подсказка с причиной
 		var mt: Thing = null

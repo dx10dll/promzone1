@@ -413,7 +413,35 @@ func _worker_tab() -> void:
 			_wt_main(w)
 
 
+## 1.50: три крупных пункта сверху «Обзора»: что делает, чем недоволен, что сделать.
+func _wt_strip(w: Worker) -> void:
+	if w.visitor:
+		return
+	var row := UITheme.hbox(6)
+	for it in [["doing", "production", L.t("Сейчас делает"), UITheme.INFO], ["bad", "mood", L.t("Чем недоволен"), UITheme.WARN], ["todo", "idea", L.t("Что сделать"), UITheme.GOOD]]:
+		var tile := UITheme.card(6)
+		tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tile.custom_minimum_size = Vector2((card_w - 64.0) / 3.0, 0)
+		var tv := UITheme.vbox(1)
+		var cap := UITheme.hbox(4)
+		cap.add_child(UITheme.icon_plate(str(it[1]), 18, it[3], false))
+		cap.add_child(UITheme.label(str(it[2]), 11, UITheme.MUTED, UITheme.f_caps))
+		tv.add_child(cap)
+		var val := UITheme.label("", 12, UITheme.TEXT, UITheme.f_semi)
+		val.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		val.max_lines_visible = 2
+		val.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		val.custom_minimum_size = Vector2(0, 34)   # фиксированные две строки: карточка не прыгает
+		val.mouse_filter = Control.MOUSE_FILTER_STOP
+		tv.add_child(val)
+		tile.add_child(tv)
+		row.add_child(tile)
+		dyn["t_top_" + str(it[0])] = val
+	box.add_child(row)
+
+
 func _wt_main(w: Worker) -> void:
+	_wt_strip(w)
 	var cols := UITheme.hbox(18)
 	var left := UITheme.vbox(4)
 	left.custom_minimum_size = Vector2(236, 0)
@@ -453,28 +481,26 @@ func _wt_main(w: Worker) -> void:
 	var right := UITheme.vbox(2)
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if not w.visitor:
-		# 1.15 (РП-8): пять жизненных потребностей
-		right.add_child(UITheme.section("star", "Что важно"))
-		var lg := UITheme.grid(4, 6, 2)
+		# 1.50: пять шкал настроения (были «потребности жизни» 1.15)
+		right.add_child(UITheme.section("star", "Настроение по шкалам"))
+		var lg := UITheme.grid(4, 6, 3)
 		for lfg in Mood.LIFE:
-			lg.add_child(UITheme.icon_plate({"byt": "zone_shower", "money": "money", "work": "wrench", "team": "team", "home": "bed"}[str(lfg[0])], 16, UITheme.INFO, false))
-			var gl := UITheme.label(L.t(str(lfg[1])), 12)
-			gl.custom_minimum_size = Vector2(70, 0)
+			lg.add_child(UITheme.icon_plate(str(Mood.LIFE_ICON[str(lfg[0])]), 18, UITheme.INFO, false))
+			var gl := UITheme.label(L.t(str(lfg[1])), 13, UITheme.TEXT, UITheme.f_semi)
+			gl.custom_minimum_size = Vector2(82, 0)
 			gl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lg.add_child(gl)
-			var gb := UITheme.bar(50, UITheme.GOOD, 110, 7)
+			var gb := UITheme.bar(50, UITheme.GOOD, 100, 10)
 			gb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			gb.mouse_filter = Control.MOUSE_FILTER_STOP
 			lg.add_child(gb)
 			var gv := UITheme.label("", 11, UITheme.MUTED)
+			gv.custom_minimum_size = Vector2(44, 0)
 			lg.add_child(gv)
 			dyn["t_life_l_" + str(lfg[0])] = gl
 			dyn["t_life_b_" + str(lfg[0])] = gb
 			dyn["t_life_v_" + str(lfg[0])] = gv
 		right.add_child(lg)
-		var hint := _wrap("", 12, UITheme.WARN, 300.0)
-		right.add_child(hint)
-		dyn["t_life_hint"] = hint
 	right.add_child(UITheme.section("idea", "О чём думает"))
 	var thoughts := UITheme.vbox(1)
 	right.add_child(thoughts)
@@ -1298,11 +1324,7 @@ func _refresh_worker() -> void:
 	if w == null:
 		visible = false
 		return
-	var act := w.activity if w.present else (L.t("Не вышел на работу") if w.skip_shift else L.t("Дома · %s") % L.t(Worker.SHIFT_NAMES[w.shift]))
-	if w.sick_until > sim.minute and w.away_why != "":
-		act = L.t("%s до %s") % [L.t(w.away_why).capitalize(), sim.season.date_str(int(w.sick_until / 1440.0) + 1)]
-	if not w.order.is_empty() and w.present:
-		act += L.t(" · ⚑ приказ до %02d:%02d") % [int(fmod(float(w.order.get("until", 0.0)), 1440.0) / 60.0), int(fmod(float(w.order.get("until", 0.0)), 60.0))]
+	var act := Mood.doing(sim, w)
 	(dyn["act"] as Label).text = ("● " + act) if w.present else "○ " + act
 	(dyn["act"] as Label).add_theme_color_override("font_color", (Color("#f0c060") if not w.order.is_empty() else UITheme.INFO) if w.present else UITheme.MUTED)
 	var mb: ProgressBar = dyn["mood_bar"]
@@ -1345,28 +1367,30 @@ func _refresh_worker() -> void:
 			if shown.size() > cap:
 				tv.add_child(UITheme.label((L.t("…и ещё %d") % (shown.size() - cap)) if hr_on else L.t("…остальное и цифры — у кадровика (отдел кадров)"), 12, UITheme.MUTED))
 			_fit()
-	if dyn.has("t_life_hint"):
+	if dyn.has("t_life_b_money"):
 		var lf := Mood.life(sim, w)
 		for g in Mood.LIFE:
 			var gk := str(g[0])
 			var lv := float(lf[gk]["v"])
 			var gb: ProgressBar = dyn["t_life_b_" + gk]
 			gb.value = lv
-			var gc := UITheme.GOOD if lv >= 70.0 else (Color("#8fa6bb") if lv >= 45.0 else (UITheme.WARN if lv >= 30.0 else UITheme.BAD))
+			var gc := UITheme.GOOD if lv >= 60.0 else (UITheme.WARN if lv >= Mood.NEED_BAR else UITheme.BAD)   # зелёный / жёлтый / красный
 			gb.add_theme_stylebox_override("fill", UITheme.sb(gc, gc, 0, 3, 0, 0))
-			(dyn["t_life_v_" + gk] as Label).text = L.t("хорошо") if lv >= 70.0 else (L.t("норма") if lv >= 45.0 else (L.t("терпимо") if lv >= 30.0 else L.t("плохо")))
-			(dyn["t_life_v_" + gk] as Label).add_theme_color_override("font_color", gc if lv < 45.0 or lv >= 70.0 else UITheme.MUTED)
-			var tip: Array[String] = []
-			for pp: Array in lf[gk]["parts"]:
-				if absf(float(pp[1])) >= 0.5:
-					tip.append(("%+d  " % int(round(float(pp[1])))) + str(pp[0]))
-			var ttxt := L.t(str(g[1])) + ": " + (("\n" + "\n".join(tip)) if not tip.is_empty() else L.t("ничего особенного")) + L.t("\n\nЧто помогает: ") + L.t(str(Mood.LIFE_HINT[gk]))
+			(dyn["t_life_v_" + gk] as Label).text = L.t("хорошо") if lv >= 60.0 else (L.t("так себе") if lv >= Mood.NEED_BAR else L.t("плохо"))
+			(dyn["t_life_v_" + gk] as Label).add_theme_color_override("font_color", gc)
+			var ttxt := scale_tip(g, lf[gk]["parts"])
 			gb.tooltip_text = ttxt
 			(dyn["t_life_l_" + gk] as Label).tooltip_text = ttxt
-		var worst := Mood.life_worst(sim, w)
-		var hl: Label = dyn["t_life_hint"]
-		hl.text = (L.t("Проседает «%s»: %s") % [L.t(str(worst[1])).to_lower(), L.t(str(worst[2])).to_lower()]) if not worst.is_empty() else ""
-		hl.visible = not worst.is_empty()
+		if dyn.has("t_top_doing"):
+			var cp := Mood.complaint(sim, w, lf)
+			(dyn["t_top_doing"] as Label).text = act
+			(dyn["t_top_doing"] as Label).tooltip_text = act
+			(dyn["t_top_bad"] as Label).text = str(cp["text"]) if not cp.is_empty() else L.t("Всем доволен")
+			(dyn["t_top_bad"] as Label).tooltip_text = (str(cp["text"]) + L.t("\n\nЧто помогает: ") + L.t(str(Mood.LIFE_HINT[str(cp["scale"])]))) if not cp.is_empty() else ""
+			(dyn["t_top_bad"] as Label).add_theme_color_override("font_color", UITheme.WARN if not cp.is_empty() else UITheme.GOOD)
+			var adv := Mood.advice(sim, w, lf)
+			(dyn["t_top_todo"] as Label).text = adv
+			(dyn["t_top_todo"] as Label).tooltip_text = adv
 	if dyn.has("t_need_food"):
 		for k in ["food", "bladder", "rest"]:
 			var b: ProgressBar = dyn["t_need_" + k]
@@ -1428,6 +1452,17 @@ func _refresh_worker() -> void:
 
 
 ## Курсы, наставник, ученики, друзья и недруги — одной-двумя строками.
+## Подсказка к шкале: факторы с +/- и «рычаги» — что её поднимает.
+static func scale_tip(g: Array, parts: Array) -> String:
+	var tip: Array[String] = []
+	var sorted := parts.duplicate()
+	sorted.sort_custom(func(a: Array, b: Array) -> bool: return float(a[1]) < float(b[1]))
+	for pp: Array in sorted:
+		if absf(float(pp[1])) >= 0.5:
+			tip.append(("%+d  " % int(round(float(pp[1])))) + str(pp[0]))
+	return L.t(str(g[1])) + ": " + (("\n" + "\n".join(tip)) if not tip.is_empty() else L.t("ничего особенного")) + L.t("\n\nЧто помогает: ") + L.t(str(Mood.LIFE_HINT[str(g[0])]))
+
+
 func _people_line(w: Worker) -> String:
 	var tr := sim.training
 	var parts: Array[String] = []

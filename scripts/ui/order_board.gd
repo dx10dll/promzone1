@@ -6,7 +6,11 @@ extends RefCounted
 
 static var sort_key := "sum"
 static var _seen: Dictionary = {}      ## id -> true: карточка уже показывалась (анимируем только новые)
+static var _timer_set := false
 static var _hg: Dictionary = {}        ## id -> {"open": bool, "pk": 0..25 (%), "la": 0..3}
+
+static var _res: Dictionary = {}       ## 1.50b: id -> {"ok": bool, "text": String, "title": String, "until": msec}: итог торга на карточке
+const RES_MS := 9000
 
 const MODES := ["manual", "small", "auto"]
 const SORTS := ["sum", "lead", "risk", "left"]
@@ -81,7 +85,20 @@ static func build(parent: Control, sim: Sim, refresh: Callable, toast: Callable)
 			sort_key = k
 			refresh.call(true)))
 		parent.add_child(sh)
-	if cards.is_empty():
+	var shown_gone := false
+	for rid in _res.keys():
+		var rr := _res_alive(int(rid))
+		if not rr.is_empty() and not bool(rr["ok"]) and sl.board_get(int(rid)).is_empty():
+			parent.add_child(_res_banner(rr, true))
+			shown_gone = true
+	if not _res.is_empty() and not _timer_set and parent.is_inside_tree():
+		_timer_set = true
+		var tmr := parent.get_tree().create_timer(float(RES_MS) / 1000.0 + 0.2)
+		tmr.timeout.connect(func() -> void:
+			_timer_set = false
+			if refresh.is_valid():
+				refresh.call(true))
+	if cards.is_empty() and not shown_gone:
 		parent.add_child(UITheme.empty(L.t("Новых заявок нет — следующие придут утром.")))
 	else:
 		_sort(sim, cards)
@@ -140,6 +157,69 @@ static func _sort(sim: Sim, cards: Array) -> void:
 		if is_equal_approx(ka, kb):
 			return int(a["id"]) < int(b["id"])
 		return ka < kb)
+
+
+## 1.50b: риск при сроке lead+la (тот же расчёт, что и на карточке).
+static func risk_for(sim: Sim, o: Dictionary, la: int) -> Dictionary:
+	var c := o.duplicate()
+	c["lead"] = int(o.get("lead", 3)) + la
+	return sim.sales.board_risk(c)
+
+
+static func risk_word(level: int) -> String:
+	return [L.t("успеем"), L.t("впритык"), L.t("не успеем")][clampi(level, 0, 2)]
+
+
+static func risk_col(level: int) -> Color:
+	return [UITheme.GOOD, UITheme.WARN, UITheme.BAD][clampi(level, 0, 2)]
+
+
+## Торг по заявке: итог сохраняется для плашки на доске и уходит заметным уведомлением. Возвращает "ok" / "no" / "".
+static func do_haggle(sim: Sim, id: int, pk: float, la: int, toast: Callable) -> String:
+	var o := sim.sales.board_get(id)
+	var title := ""
+	if not o.is_empty():
+		title = "%s × %d" % [Defs.product_name(str(o["product"])), int(o["qty"])]
+	var res := sim.sales.haggle(id, pk, la)
+	if res == "ok":
+		var o2 := sim.sales.board_get(id)
+		var txt := L.t("Заказчик согласился: %s, срок %d дн.") % [Defs.money_str(float(o2["price"])), int(o2["lead"])]
+		_res[id] = {"ok": true, "text": txt, "title": title, "until": Time.get_ticks_msec() + RES_MS}
+		toast.call(txt + " " + L.t("Заявку можно брать."), Sim.LVL_WARN)
+	elif res == "no":
+		var txt2 := L.t("Заказчик отказался и ушёл к конкуренту")
+		_res[id] = {"ok": false, "text": txt2, "title": title, "until": Time.get_ticks_msec() + RES_MS}
+		toast.call(L.t("Торг не удался: %s. %s") % [title, txt2], Sim.LVL_BAD)
+	else:
+		toast.call(L.t("Предложите хоть что-то: поднимите цену или добавьте срок."), Sim.LVL_INFO)
+	return res
+
+
+static func _res_alive(id: int) -> Dictionary:
+	var r: Dictionary = _res.get(id, {})
+	if r.is_empty():
+		return r
+	if Time.get_ticks_msec() > int(r["until"]):
+		_res.erase(id)
+		return {}
+	return r
+
+
+static func _res_banner(r: Dictionary, with_title: bool) -> Control:
+	var ok := bool(r["ok"])
+	var col := UITheme.GOOD if ok else UITheme.BAD
+	var pc := UITheme.card(8, Color(col.r, col.g, col.b, 0.22), col)
+	pc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var h := UITheme.hbox(8)
+	pc.add_child(h)
+	h.add_child(UITheme.icon_plate("handshake" if ok else "warn", 18, col, false))
+	var t := ("%s — %s" % [str(r["title"]), str(r["text"])]) if with_title else str(r["text"])
+	var lb := UITheme.label(t, 14, col, UITheme.f_semi)
+	lb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lb.custom_minimum_size = Vector2(300, 0)
+	lb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	h.add_child(lb)
+	return pc
 
 
 static func _stat(cap: String, value: String, col: Color, tip: String, w: float = 96.0) -> VBoxContainer:
@@ -225,20 +305,29 @@ static func _card(parent: Control, sim: Sim, o: Dictionary, refresh: Callable, t
 	fl.add_theme_constant_override("h_separation", 18)
 	fl.add_theme_constant_override("v_separation", 4)
 	mid.add_child(fl)
-	fl.add_child(_stat(L.t("СРОК"), "%d %s" % [lead, L.pl(lead, "день|дня|дней")], UITheme.TEXT,
-		L.t("Срок на изготовление и отгрузку — в рабочих днях с момента, как возьмёте заявку. За просрочку — неустойка."), 70.0))
+	var lead_stat := _stat(L.t("СРОК"), "%d %s" % [lead, L.pl(lead, "день|дня|дней")], UITheme.TEXT,
+		L.t("Срок на изготовление и отгрузку — в рабочих днях с момента, как возьмёте заявку. За просрочку — неустойка."), 70.0)
+	fl.add_child(lead_stat)
 	fl.add_child(_stat(L.t("ЦЕНА"), Defs.money_str(price), UITheme.TEXT, L.t("Цена за штуку."), 86.0))
 	fl.add_child(_stat(L.t("СУММА"), Defs.money_str(total), UITheme.TEXT, L.t("Сумма заявки целиком: цена × количество."), 110.0))
 	var mcol := UITheme.BAD if mg < 0.05 else (UITheme.WARN if mg < 0.15 else UITheme.GOOD)
 	fl.add_child(_stat(L.t("МАРЖА"), "%d%%" % int(round(mg * 100.0)), mcol,
 		L.t("Какая доля цены останется после себестоимости (~%s за штуку). Красная — почти в ноль или в убыток, жёлтая — ниже 15%%, зелёная — выгодно.") % Defs.money_str(sim.office.unit_cost(p)), 70.0))
 	var days := float(rk["days"])
-	var dtxt := L.t("некому") if days >= 98.0 else L.t("%.1f дн.") % days
-	fl.add_child(_stat(L.t("ЗАГРУЗКА"), dtxt, rcol,
-		L.t("Сколько рабочих дней уйдёт на самом загруженном переделе (%s), если взять эту заявку вместе с тем, что уже в работе. Сравнивается со сроком.") % (bottleneck if bottleneck != "" else "—"), 90.0))
-	var rtxt: String = [L.t("успеем"), L.t("впритык"), L.t("не успеем")][int(rk["level"])]
-	fl.add_child(_stat(L.t("РИСК"), rtxt, rcol,
-		L.t("Риск не успеть к сроку: зелёный — загрузка до 60% срока, жёлтый — впритык, красный — срыв и неустойка почти наверняка."), 90.0))
+	var dtxt := L.t("некому") if days >= 98.0 else L.t("%d дн.") % int(ceil(days))
+	var hs0: Dictionary = _hg.get(id, {"open": false, "pk": 10, "la": 0})
+	_hg[id] = hs0
+	fl.add_child(_stat(L.t("Станки заняты на"), dtxt, rcol,
+		L.t("Через сколько дней освободятся станки под этот заказ: с учётом того, что уже в работе (самый занятый передел — %s). Сравнивается со сроком.") % (bottleneck if bottleneck != "" else "—"), 110.0))
+	var rtxt: String = risk_word(int(rk["level"]))
+	var rst := _stat(L.t("РИСК"), rtxt, rcol,
+		L.t("Риск не успеть к сроку: зелёный — занятость до 60% срока, жёлтый — впритык, красный — срыв и неустойка почти наверняка."), 90.0)
+	fl.add_child(rst)
+	hs0["risk_l"] = rst.get_child(1)
+	hs0["lead_l"] = lead_stat.get_child(1)
+	var res_now := _res_alive(id)
+	if not res_now.is_empty() and bool(res_now["ok"]):
+		mid.add_child(_res_banner(res_now, false))
 
 	# сколько ещё висит
 	var left := sl.board_left(o)
@@ -263,8 +352,7 @@ static func _card(parent: Control, sim: Sim, o: Dictionary, refresh: Callable, t
 	bv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(bv)
 	var tried := str(o.get("haggled", "")) != ""
-	var hs: Dictionary = _hg.get(id, {"open": false, "pk": 10, "la": 0})
-	_hg[id] = hs
+	var hs: Dictionary = hs0
 
 	var b_take := UITheme.primary(L.t("Взять"), Callable(), L.t("Принять заявку на этих условиях. Порог маржи и риск вы решаете сами — сбыт не возражает, но без оборудования заявку не взять."))
 	var b_hag := UITheme.button(L.t("Торговаться"), Callable(), L.t("Попросить заказчика поднять цену и/или дать больше времени. Одна попытка: не согласится — уйдёт к конкуренту.") if not tried else L.t("Торг уже был — одна попытка на заявку."))
@@ -335,6 +423,7 @@ static func _haggle_panel(parent: Control, sim: Sim, o: Dictionary, hs: Dictiona
 	var pl := UITheme.label("", 13, UITheme.TEXT)
 	var ll := UITheme.label("", 13, UITheme.TEXT)
 	var cw := UITheme.label("", 13, UITheme.TEXT, UITheme.f_semi)
+	var rl := UITheme.label("", 13, UITheme.TEXT, UITheme.f_semi)
 	var cb := UITheme.bar(0.0, UITheme.WARN, 160.0, 8.0)
 	cb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var upd := func() -> void:
@@ -342,6 +431,18 @@ static func _haggle_panel(parent: Control, sim: Sim, o: Dictionary, hs: Dictiona
 		var la := int(hs["la"])
 		pl.text = L.t("Цена: +%d%% → %s за штуку") % [int(hs["pk"]), Defs.money_str(round(price * (1.0 + pk) / 10.0) * 10.0)]
 		ll.text = L.t("Срок: +%d дн. → %d дн.") % [la, lead + la]
+		# 1.50b: срок сдвинули — «Риск» пересчитывается сразу (и в панели, и на самой карточке)
+		var rk2 := risk_for(sim, o, la)
+		var rc2 := risk_col(int(rk2["level"]))
+		rl.text = L.t("Риск при таком сроке: %s") % risk_word(int(rk2["level"]))
+		rl.add_theme_color_override("font_color", rc2)
+		var rlab: Variant = hs.get("risk_l")
+		if rlab is Label and is_instance_valid(rlab):
+			(rlab as Label).text = risk_word(int(rk2["level"]))
+			(rlab as Label).add_theme_color_override("font_color", rc2)
+		var llab: Variant = hs.get("lead_l")
+		if llab is Label and is_instance_valid(llab):
+			(llab as Label).text = "%d %s" % [lead + la, L.pl(lead + la, "день|дня|дней")]
 		var c := sl.haggle_chance(o, pk, la)
 		var w := _word_chance(c)
 		cw.text = str(w[0])
@@ -369,6 +470,9 @@ static func _haggle_panel(parent: Control, sim: Sim, o: Dictionary, hs: Dictiona
 		return h
 	v.add_child(mk.call(int(Sales.HAGGLE_PRICE_MAX * 100.0), 5, "pk", pl, L.t("Насколько поднять цену: от 0 до +25%. Чем больше просите, тем меньше шанс; на дорогом рынке заказчики упрямее.")))
 	v.add_child(mk.call(Sales.HAGGLE_LEAD_MAX, 1, "la", ll, L.t("Сколько дней добавить к сроку: от 0 до +3. Время даёт запас, но заказчик не любит ждать.")))
+	var rh := UITheme.hbox(10)
+	rh.add_child(rl)
+	v.add_child(rh)
 	var ch := UITheme.hbox(10)
 	var cl := UITheme.label(L.t("Шанс согласия:"), 13, UITheme.MUTED)
 	cl.tooltip_text = L.t("Оценка: как заказчик ответит на такое предложение. Исход всё равно случайный.")
@@ -377,16 +481,12 @@ static func _haggle_panel(parent: Control, sim: Sim, o: Dictionary, hs: Dictiona
 	ch.add_child(cw)
 	ch.add_child(cb)
 	var go := UITheme.primary(L.t("Предложить"), func() -> void:
-		var res := sl.haggle(id, float(hs["pk"]) / 100.0, int(hs["la"]))
+		var res := do_haggle(sim, id, float(hs["pk"]) / 100.0, int(hs["la"]), toast)
 		if res == "ok":
 			hs["open"] = false
-			toast.call(L.t("Заказчик согласился на новые условия — заявку можно брать."), Sim.LVL_GOOD)
 			refresh.call(true)
 		elif res == "no":
-			toast.call(L.t("Заказчик отказался торговаться и ушёл к конкуренту."), Sim.LVL_WARN)
 			_fade_out(card, refresh)
-		else:
-			toast.call(L.t("Предложите хоть что-то: поднимите цену или добавьте срок."), Sim.LVL_INFO)
 		, L.t("Назвать условия. Одна попытка на заявку."))
 	var cn := UITheme.button(L.t("Отмена"), func() -> void:
 		hs["open"] = false

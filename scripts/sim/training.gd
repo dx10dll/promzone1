@@ -551,22 +551,22 @@ func mood_parts(w: Worker) -> Array:
 	var fn := 0
 	for o in friends(w):
 		if fn < 2 and o.present and o.shift == w.shift:
-			out.append([L.t("Работает вместе с другом: %s") % o.call_name(), 2.0])
+			out.append([L.t("Работает вместе с другом: %s") % o.call_name(), 2.0, "friend"])
 			fn += 1
 	var en := 0
 	for o2 in foes(w):
 		if en < 2 and o2.present and o2.shift == w.shift:
-			out.append([L.t("Опять рядом этот %s") % o2.call_name(), -4.0])
+			out.append([L.t("Опять рядом этот %s") % o2.call_name(), -4.0, "foe"])
 			en += 1
 	var m := mentor_of(w)
 	if m and _together(w, m):
-		out.append([L.t("Есть у кого поучиться: %s") % m.call_name(), 3.0])
+		out.append([L.t("Есть у кого поучиться: %s") % m.call_name(), 3.0, "mentor"])
 	for a in apprentices(w):
 		if _together(a, w):
-			out.append([L.t("Учит молодых"), 5.0 if Mood.has_trait(w, "born_mentor") else 3.0])
+			out.append([L.t("Учит молодых"), 5.0 if Mood.has_trait(w, "born_mentor") else 3.0, "teach"])
 			break
 	if w.practice_until >= 0:
-		out.append([L.t("Практика на настоящем заводе"), 4.0])
+		out.append([L.t("Практика на настоящем заводе"), 4.0, "practice"])
 	return out
 
 

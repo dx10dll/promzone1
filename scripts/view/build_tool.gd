@@ -595,11 +595,10 @@ func _select_at() -> void:
 	if sim.faults.at("cable", mc) or sim.faults.at("pipe", mc) or not sim.logi.ground_on(mc).is_empty():
 		cell_clicked.emit(mc)
 		return
-	var r := sim.rooms.room_at(mc)
-	if r:
-		room_clicked.emit(r.id)
+	# 1.50b: обычный щелчок по полу или зоне ничего не открывает (карточка зоны — только из меню «Зоны»)
+	if sim.rooms.room_at(mc):
 		return
-	if sim.world.flr[i] > 0 or sim.world.bp_floor[i] != World.BP_NONE or sim.world.flora[i] != 0:
+	if sim.world.bp_floor[i] != World.BP_NONE or sim.world.flora[i] != 0:
 		cell_clicked.emit(mc)
 
 

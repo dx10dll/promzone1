@@ -100,7 +100,10 @@ func _initialize() -> void:
 
 	print("== «Всё сам» — как раньше")
 	var ga := _setup(1483, "auto")
-	ga.sales.inquiry(_offer(ga, 500000.0, 0.4))
+	var big_o := _offer(ga, 500000.0, 0.4)
+	big_o["lead"] = 120   # 1.50b: сбыт сам берёт только при «успеем» — срок с запасом
+	big_o["deadline"] = ga.orders.deadline_after(120)
+	ga.sales.inquiry(big_o)
 	check(ga.sales.board.is_empty() and ga.sales.log.size() == 1 and bool(ga.sales.log[0]["ok"]), "auto: крупную берёт сразу, доска пуста")
 
 	print("== торг")

@@ -318,7 +318,7 @@ func _draw_load() -> void:
 	var tail := ""
 	if float(li[0]) > 0.3 and str(li[1]) != "":
 		tail = L.t("Заказы: ~%.1f раб. дн., проблемный участок — %s") % [float(li[0]), Defs.process_name(str(li[1])).to_lower()]
-	_legend([[L.t("Загрузка станков в рабочее время: зелёным — от 60%, жёлтым — 25–60%, красным — простаивает"), UITheme.TEXT],
+	_legend([[L.t("Занятость станков в рабочее время: зелёным — от 60%, жёлтым — 25–60%, красным — простаивает"), UITheme.TEXT],
 		[tail if tail != "" else L.t("Принятых заказов нет — станки ждут работы"), UITheme.WARN if tail != "" else UITheme.MUTED]])
 
 

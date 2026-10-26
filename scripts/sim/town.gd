@@ -620,18 +620,18 @@ func mood_parts(w: Worker) -> Array:
 		var r := sim.rooms.room_of_thing(bed)
 		var lv := sim.upkeep.level(r) if r else 1
 		if lv >= 3:
-			out.append([L.t("Уютное общежитие"), 5.0])
+			out.append([L.t("Уютное общежитие"), 5.0, "dorm_cozy"])
 		elif lv >= 2:
-			out.append([L.t("Живу в заводском общежитии"), 3.0])
+			out.append([L.t("Живу в заводском общежитии"), 3.0, "dorm"])
 		else:
-			out.append([L.t("Общежитие — голые стены"), -2.0])
+			out.append([L.t("Общежитие — голые стены"), -2.0, "dorm_bare"])
 	elif w.from_away:
-		out.append([L.t("Негде жить — снимаю угол"), -6.0])
+		out.append([L.t("Негде жить — снимаю угол"), -6.0, "nohome"])
 	if w.kids > 0:
 		if has_kg_place(w):
-			out.append([L.t("Ребёнок в заводском садике"), 5.0])
+			out.append([L.t("Ребёнок в заводском садике"), 5.0, "kg"])
 		elif sim.progress.stage >= 3:
-			out.append([L.t("Не с кем оставить ребёнка"), -2.0])
+			out.append([L.t("Не с кем оставить ребёнка"), -2.0, "nokg"])
 	return out
 
 

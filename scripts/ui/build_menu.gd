@@ -21,7 +21,7 @@ static var build_cat := "wall"
 static var zone_cat := "prod"
 static var _info: Label
 static var _info_def := ""
-static var query := {"build": "", "objects": ""}   ## 1.40: строка поиска каждого меню
+static var query := {"build": "", "objects": "", "rooms": ""}   ## 1.40: строка поиска каждого меню
 static var _q := ""                   ## поиск раздела, который сейчас собираем
 static var _search_edit: LineEdit = null
 static var focus_type := ""           ## тип помещения в центре экрана (или "")
@@ -876,14 +876,18 @@ static func _zones(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 				first = t
 				break
 		var gkk: String = gk
-		_cat(cats, Tex.ui("zone_" + first), str(gd["name"]), zone_cat == gk, func() -> void:
+		_cat(cats, Tex.ui("zone_" + first), str(gd["name"]), zone_cat == gk and _q == "", func() -> void:
 			zone_cat = gkk
+			query["rooms"] = ""
 			h._fill_sub(), Color(str(gd["color"])))
-	_head_text(head, "Протяните прямоугольник — разметить клетки; щёлкните по помещению — залить его целиком. Соседние клетки одной зоны сливаются.")
+	_search(h, head, "rooms")   # 1.50b: поиск по названию зоны, как в «Объектах»
+	_head_text(head, "Поиск по всем зонам. Протяните прямоугольник — разметить клетки." if _q != "" else "Протяните прямоугольник — разметить клетки; щёлкните по помещению — залить его целиком. Соседние клетки одной зоны сливаются.")
 	var gc := Color(str(groups.get(zone_cat, {}).get("color", "#888888")))
 	for t2 in Rooms.ui_order():
 		var d: Dictionary = Defs.rooms.get(t2, {})
-		if str(d.get("group", "")) != zone_cat:
+		if _q == "" and str(d.get("group", "")) != zone_cat:
+			continue
+		if _q != "" and not groups.has(str(d.get("group", ""))):
 			continue
 		var lock := ""
 		for dk in Defs.departments.keys():
@@ -891,7 +895,7 @@ static func _zones(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 				lock = h.sim.progress.dept_lock_text(str(dk))
 		var n := h.sim.rooms.of_type(t2, false).size()
 		_tile(h, grid, Tex.ui("zone_" + t2), str(d.get("name", t2)), "", UITheme.GOOD, L.t("нужно: %s. %s") % [Rooms.req_text(t2), L.t(str(d.get("desc", "")))], "room", t2, lock, gc, gc.lightened(0.35), n)
-	if zone_cat == "store":
+	if zone_cat == "store" or _q != "":
 		_yard_tiles(h, grid)
 	_tile(h, grid, Tex.ui("zone_erase"), "Стереть разметку", "", UITheme.MUTED, "протяните или щёлкните — клетки станут неразмеченными.", "room", "_erase")
 
