@@ -103,7 +103,7 @@ func schedule(t: String, at: float, announced: bool, why: String = "", repeat: A
 		var txt := L.t("%s: %s, в %s") % [type_name(t), sim.season.date_str(dd), "%02d:%02d" % [int(fmod(at2, 1440.0) / 60.0), int(fmod(at2, 60.0))]]
 		if why != "":
 			txt += " (%s)" % why
-		sim.notify(L.t("Объявлена проверка. %s. Подготовьтесь — список требований в окне «События».") % txt, Sim.LVL_WARN)
+		sim.notify(L.t("Объявлена проверка. %s. Чек-лист инспектора и ожидаемый штраф — в окне «События» → «Проверки».") % txt, Sim.LVL_WARN)
 
 
 func announce_visit(kind: String) -> void:
@@ -126,23 +126,31 @@ func morning() -> void:
 	for t in Defs.inspections.get("types", {}).keys():
 		var td: Dictionary = Defs.inspections["types"][t]
 		if not next_due.has(t):
-			next_due[t] = int(float(td.get("first", 10)) * calm) + sim.rng.randi_range(0, 4)
+			# 1.52: объявляют за неделю — первую проверку подтягиваем на столько же, чтобы срок не уехал
+			var lead := announce_days() if bool(td.get("planned", true)) else 0
+			next_due[t] = maxi(3, int(float(td.get("first", 10)) * calm) - lead) + sim.rng.randi_range(0, 4)
 		if d < int(next_due[t]) or not _applicable(str(t)):
 			continue
 		var every := float(td.get("every", 30)) / freq_k()
 		next_due[t] = d + int(every * sim.rng.randf_range(0.8, 1.25))
 		if bool(td.get("planned", true)):
-			schedule(str(t), sim.minute + 3.0 * 1440.0, true, L.t("плановая"))
+			schedule(str(t), sim.minute + float(announce_days()) * 1440.0, true, L.t("плановая"))
 		else:
 			schedule(str(t), sim.minute + sim.rng.randf_range(0.0, 2.0) * 1440.0, false, "")
 	# внезапная
-	if d > 12 and sim.is_workday() and sim.rng.randf() < 0.025 * freq_k():
+	if d > 12 and sim.is_workday() and sim.rng.randf() < float(Defs.inspections.get("sudden_chance", 0.012)) * freq_k():
 		var opts: Array = []
 		for t2 in ["fire", "labor", "sanitary", "tech"]:
 			if _applicable(t2):
 				opts.append(t2)
 		if not opts.is_empty():
 			schedule(str(opts[sim.rng.randi_range(0, opts.size() - 1)]), sim.minute + 120.0, false, L.t("внеплановая"))
+	# 1.52: накануне плановой проверки — напоминание с текущим прогнозом
+	for q: Dictionary in queue:
+		if bool(q.get("announced", false)) and not bool(q.get("reminded", false)) and not VISIT_KINDS.has(str(q["type"])) and days_left(q) <= 1:
+			q["reminded"] = true
+			var fc := forecast(str(q["type"]))
+			sim.notify(L.t("Завтра проверка: %s. По чек-листу нарушений: %d, ожидаемый штраф %s.") % [type_name(str(q["type"])).to_lower(), int(fc["n"]), Defs.money_str(float(fc["fine"]))], Sim.LVL_WARN)
 	# предписания
 	for p: Dictionary in prescriptions.duplicate():
 		if d >= int(p["due"]):
@@ -151,6 +159,26 @@ func morning() -> void:
 	for m: Dictionary in marks.duplicate():
 		if float(m["until"]) <= sim.minute:
 			marks.erase(m)
+
+
+func announce_days() -> int:
+	return int(Defs.inspections.get("announce_days", 7))
+
+
+## 1.52: сколько дней до проверки из очереди (0 — сегодня).
+func days_left(q: Dictionary) -> int:
+	return maxi(0, int(float(q["at"]) / 1440.0) + 1 - sim.day())
+
+
+## 1.52: объявленные плановые проверки по порядку: [{type, day, left, fc}] — для чек-листа и «Что делать».
+func upcoming() -> Array:
+	var out: Array = []
+	for q: Dictionary in queue:
+		var t := str(q["type"])
+		if not bool(q.get("announced", false)) or VISIT_KINDS.has(t):
+			continue
+		out.append({"type": t, "day": int(float(q["at"]) / 1440.0) + 1, "left": days_left(q), "why": str(q.get("why", ""))})
+	return out
 
 
 func _applicable(t: String) -> bool:
@@ -445,17 +473,16 @@ func first_time(t: String, key: String) -> bool:
 	return not (warned.get(t, []) as Array).has(key)
 
 
-## Акт проверки: штрафы, репутация, предписание.
-func _act(t: String, found: Array, repeat: Array, why: String) -> void:
+## 1.52: расчёт штрафа по найденным нарушениям — один и тот же для акта и для прогноза в чек-листе.
+## Ничего не меняет в состоянии: {fine, warns, lines, rep_keys, worst_cell, warned}.
+func assess(t: String, found: Array, repeat: Array) -> Dictionary:
 	var fine := 0.0
 	var lines: Array[String] = []
 	var rep_keys: Array = []
 	var worst_cell := Vector2i(-1, -1)
 	var warns := 0
-	var wl: Array = warned.get(t, [])
+	var wl: Array = (warned.get(t, []) as Array).duplicate()
 	for vi: Dictionary in found:
-		if str(vi["key"]) == "n1_unfiled":
-			sim.crew.on_hidden_found()
 		var f := float(vi["fine"]) * fine_k()
 		var vkey := str(vi["key"])
 		if small_business() and vkey != "n1_unfiled" and not repeat.has(vkey) and not wl.has(vkey):
@@ -467,16 +494,117 @@ func _act(t: String, found: Array, repeat: Array, why: String) -> void:
 			continue
 		if not wl.has(vkey):
 			wl.append(vkey)
-		if repeat.has(str(vi["key"])):
+		if repeat.has(vkey):
 			f *= float(Defs.inspections.get("repeat_k", 2.0))
 			var c: Array = vi.get("cell", [-1, -1])
 			if int(c[0]) >= 0:
 				worst_cell = Vector2i(int(c[0]), int(c[1]))
 		fine += f
 		lines.append("• %s — %s" % [str(vi["text"]), Defs.money_str(f)])
-		if not rep_keys.has(str(vi["key"])):
-			rep_keys.append(str(vi["key"]))
-	warned[t] = wl
+		if not rep_keys.has(vkey):
+			rep_keys.append(vkey)
+	return {"fine": fine, "warns": warns, "lines": lines, "rep_keys": rep_keys, "worst_cell": worst_cell, "warned": wl}
+
+
+## 1.52: что инспектор запишет, если прийти прямо сейчас: те же правила (violations), та же дедупликация
+## по ключу и тексту, что при обходе, и тот же расчёт штрафа (assess).
+func predicted_found(t: String) -> Array:
+	var found: Array = []
+	var seen := {}
+	for vi: Dictionary in violations(t):
+		var key := str(vi["key"]) + str(vi.get("text", ""))
+		if seen.has(key):
+			continue
+		seen[key] = true
+		found.append(vi)
+	return found
+
+
+## Подсказки «что проверят» по правилам: ключ -> требование (для строк ✓ чек-листа).
+const REQ := {
+	"no_ext": "Огнетушитель в каждом помещении от 6 клеток", "hot_ext": "Два огнетушителя там, где печь, покраска или сварка",
+	"one_exit": "Два выхода из помещений от 60 клеток", "wiring": "Сеть без выбитых автоматов", "clutter": "На полу меньше 12 грузов",
+	"fire_recent": "Последствия пожара устранены",
+	"min_wage": "Ставка не ниже минимальной", "no_ppe": "Шкафчики для спецовки (хотя бы один на двоих)", "no_aid": "Аптечка на заводе",
+	"overwork": "Без авралов и сверхурочных", "injuries": "Не больше одной травмы за месяц", "no_wc": "Туалет с раковиной",
+	"no_tb": "Инструктаж по охране труда в срок", "no_sout": "СОУТ на всех рабочих местах", "no_milk": "Молоко за вредность",
+	"ppe_worn": "У всех рабочих целые СИЗ", "no_lunch": "Обед в положенное время", "n1_unfiled": "Все несчастные случаи оформлены (акт Н-1)",
+	"no_sink": "Раковина в туалете", "no_canteen": "Столовая (если людей 8 и больше)", "few_wc": "Один туалет на 12 человек",
+	"garbage": "Территория без мусора и брака", "dirty_room": "В помещениях убрана стружка", "no_vent": "Вентиляция там, где сварка, покраска или печь",
+	"mice": "Нет грызунов",
+	"worn": "Нет станков в работе с износом ниже 25%", "crane": "Для кран-балки — стропальщик", "forklift": "Для погрузчика — водитель",
+	"no_electrician": "Электрик в штате", "broken_long": "Нет сломанных станков",
+	"scrap_heap": "Брак не копится: тара не переполнена", "paint_room": "Покрасочная камера — в отдельном помещении", "furnace_smoke": "У печи есть окна или вентиляция",
+	"books": "Бухгалтерия ведёт учёт", "no_regime": "Режим: проходная с вахтой", "no_qc": "Стол ОТК", "no_test": "Испытательный стенд", "scrap_rate": "Брак не больше 8%",
+}
+
+
+static func req_text(key: String) -> String:
+	return L.dt("insp.req." + key, str(REQ.get(key, key)))
+
+
+## 1.52: чек-лист инспектора на сегодняшний день. items: по каждому правилу вида проверки — либо одна строка ✓,
+## либо по строке ✗ на каждое найденное нарушение (текст, штраф, «что сделать», клетка для «Показать»).
+## fine — ожидаемый штраф, n — число нарушений, warns — сколько из них закончится предупреждением.
+func forecast(t: String, repeat: Array = []) -> Dictionary:
+	var found := predicted_found(t)
+	var items: Array = []
+	var rules: Dictionary = tdef(t).get("rules", {})
+	var by_key := {}
+	for vi: Dictionary in found:
+		var k := str(vi["key"])
+		if not by_key.has(k):
+			by_key[k] = []
+		(by_key[k] as Array).append(vi)
+	var rep := repeat
+	for q: Dictionary in queue:
+		if str(q["type"]) == t and not (q.get("repeat", []) as Array).is_empty():
+			rep = q["repeat"]
+	var fine := 0.0
+	var warns := 0
+	if bool(tdef(t).get("desk", false)):
+		# камеральная проверка — по жребию: с бухгалтерией шанс мал
+		var acc := sim.office.active("accounting")
+		var sales := 0.0
+		for wk: Dictionary in sim.office.weeks.slice(0, 4):
+			sales += float(wk["cats"].get("sales", 0.0))
+		var f0 := maxf(20000.0, sales * 0.03) * (0.4 if acc else 1.0)
+		var chance := 0.15 if acc else 0.65
+		items.append({"key": "books", "ok": acc, "text": req_text("books") if acc else L.dt("insp.text.books", str(Defs.inspections["texts"]["books"])),
+			"fix": L.t("Откройте отдел «Бухгалтерия» (Управление → Отделы): шанс найти ошибки упадёт с 65% до 15%."), "cell": [-1, -1], "fine": f0 * chance})
+		return {"type": t, "items": items, "found": [], "n": 0, "fine": f0 * chance, "warns": 0, "desk": true}
+	for k2: String in rules.keys():
+		if by_key.has(k2):
+			for vi2: Dictionary in by_key[k2]:
+				items.append({"key": k2, "ok": false, "text": str(vi2["text"]), "fix": str(vi2.get("fix", "")), "cell": vi2.get("cell", [-1, -1]), "fine": float(vi2["fine"]) * fine_k()})
+		else:
+			items.append({"key": k2, "ok": true, "text": req_text(k2), "fix": "", "cell": [-1, -1], "fine": 0.0})
+	var asm := assess(t, found, rep)
+	fine = float(asm["fine"])
+	warns = int(asm["warns"])
+	# сопровождать инспектора будет инженер по охране труда, если он есть, — штраф меньше на 15%
+	if not escort_safety():
+		for w in sim.workers:
+			if w.prof == "safety_engineer" and not w.hidden:
+				fine *= 0.85
+				for it: Dictionary in items:
+					it["fine"] = float(it["fine"]) * 0.85
+				break
+	return {"type": t, "items": items, "found": found, "n": found.size(), "fine": fine, "warns": warns, "desk": false}
+
+
+## Акт проверки: штрафы, репутация, предписание.
+func _act(t: String, found: Array, repeat: Array, why: String) -> void:
+	for vi0: Dictionary in found:
+		if str(vi0["key"]) == "n1_unfiled":
+			sim.crew.on_hidden_found()
+	var asm := assess(t, found, repeat)
+	var fine := float(asm["fine"])
+	var lines: Array[String] = asm["lines"]
+	var rep_keys: Array = asm["rep_keys"]
+	var worst_cell: Vector2i = asm["worst_cell"]
+	var warns := int(asm["warns"])
+	warned[t] = asm["warned"]
 	var name := type_name(t)
 	var due0 := sim.day() + int(Defs.inspections.get("prescription_days", 5))
 	history.push_front({"day": sim.day(), "type": t, "n": found.size(), "fine": fine, "why": why, "warns": warns})

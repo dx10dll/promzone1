@@ -899,6 +899,7 @@ func settle_plans() -> void:
 		if plan > 0:
 			var done := int(b.get("done", 0))
 			b["last_pct"] = int(round(float(done) / float(plan) * 100.0))
+			sim.paper.on_crew_plan(str(b["name"]), int(b["last_pct"]))
 			var ms := members(bid)
 			if done >= plan:
 				var pct := bonus_pct(bid)

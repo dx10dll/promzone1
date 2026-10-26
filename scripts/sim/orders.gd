@@ -315,6 +315,7 @@ func accept(id: int, auto_buy: bool, by_sales: bool = false) -> String:
 			if err != "":
 				msg += L.t(" Металл не заказан: ") + err
 	sim.notify(msg, Sim.LVL_INFO if by_sales else Sim.LVL_GOOD)
+	sim.paper.on_order_taken(o)
 	return ""
 
 
@@ -404,6 +405,7 @@ func fail(o: Dictionary, why: String) -> void:
 	sim.stats["orders_failed"] = int(sim.stats["orders_failed"]) + 1
 	sim.market.on_shipped(99)   # срыв — тоже «не вовремя»
 	sim.notify(L.t("Заказ сорван: %s. %s.") % [short(o), why], Sim.LVL_BAD)
+	sim.paper.on_order_failed(o)
 	if str(o.get("kind", "")) == "contract":
 		sim.sales.on_order_closed(o, false)
 

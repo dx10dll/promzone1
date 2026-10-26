@@ -182,6 +182,8 @@
 		"wild": 1.5
 	},
 	"prescription_days": 5,
+	"announce_days": 7,
+	"sudden_chance": 0.012,
 	"repeat_k": 2.0,
 	"appeal_cost": 15000,
 	"appeal_chance": 0.4,

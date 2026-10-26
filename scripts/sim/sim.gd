@@ -387,7 +387,10 @@ func add_worker(w: Worker) -> void:
 
 
 func refresh_candidates(only_prof: String = "") -> void:
+	# 1.52: мастер из газетного объявления ждёт на собеседование, пока объявление не устарело
+	var keep: Array = candidates.filter(func(c: Dictionary) -> bool: return int(c.get("ad_until", 0)) >= day())
 	candidates.clear()
+	candidates.append_array(keep)
 	var profs: Array = ["turner", "laborer", "qc", "turner", "builder", "electrician", "laborer"]
 	# под имеющееся оборудование чаще приходят нужные специальности
 	for pr in prod.processes_available().keys():
@@ -469,6 +472,7 @@ func hire(index: int) -> String:
 	candidates.remove_at(index)
 	w.add_history(day(), (L.t("Принята на работу: %s%s") if w.female else L.t("Принят на работу: %s%s")) % [w.prof_name(), (L.t(" (иногородняя, живёт в общежитии)") if w.female else L.t(" (иногородний, живёт в общежитии)")) if w.from_away else ""])
 	town.on_hired(w)
+	paper.on_hire(w)
 	var when := L.t("к началу следующей смены")
 	var win := shift_window(w)
 	if shift_is_workday(win) and minute >= win.x - 60.0 and minute < win.y - 120.0:
@@ -493,6 +497,7 @@ func fire(w: Worker, quit: bool = false, calm: bool = false) -> void:
 		spend(owed, "Расчёт при увольнении: " + w.full_name())
 	workers.erase(w)
 	worker_rev += 1
+	paper.on_fire(w, quit)
 	if not quit:
 		stats["fired_week"] = int(stats.get("fired_week", 0)) + 1
 	town.assign_beds()
@@ -1398,6 +1403,7 @@ func finish_thing(t: Thing) -> void:
 	t.built = true
 	t.build_work = 0.0
 	if t.kind() == "machine":
+		paper.on_machine(t)
 		for w in workers:
 			Mood.add(self, w, "new_machine")
 	_open_fence(t)
@@ -1949,7 +1955,7 @@ func trade_credit_left() -> float:
 
 ## Цена металла за штуку у текущего поставщика.
 func material_price(mat: String) -> float:
-	return round(float(Defs.materials.get(mat, {}).get("price", 0)) * office.material_k() * story.mod("metal_price") * (market.metal if market else 1.0))
+	return round(float(Defs.materials.get(mat, {}).get("price", 0)) * office.material_k() * story.mod("metal_price") * story.mod("metal_sale") * (market.metal if market else 1.0))
 
 
 func _eta_str(eta: float) -> String:
@@ -2176,6 +2182,7 @@ func _timed(prev: float, now: float) -> void:
 		if weekday() == 0:
 			_honor_board()
 			office.on_monday()
+		paper.morning()
 		office.morning()
 		story.morning()
 		inspect.morning()

@@ -510,6 +510,7 @@ func _audit() -> void:
 		iso = {"status": "ok", "since": sim.day(), "until": sim.day() + ISO_DAYS, "reclam": 0}
 		if not was:
 			sim.reputation = minf(100.0, sim.reputation + 5.0)
+			sim.paper.on_iso()
 		sim.stats["iso"] = 1
 		sim.story.info(L.t("Сертификат ISO 9001 получен") if not was else L.t("Сертификат ISO 9001 продлён"),
 			L.t("Аудитор доволен: система менеджмента качества работает. Сертификат действует до дня %d. Премиальные заказчики и экспорт — охотнее, заявок больше.%s") % [int(iso["until"]), "" if miss.is_empty() else L.t(" Замечание: ") + miss[0] + "."],

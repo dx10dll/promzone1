@@ -2662,7 +2662,7 @@ func _events_now() -> void:
 func _events_insp() -> void:
 	var ins := sim.inspect
 	_info(tr("проверок без замечаний: %d из %d") % [ins.clean, ins.total])
-	_intro(tr("Плановые проверки объявляют за три дня, внезапные — не объявляют. Инспектор обходит завод: пока он идёт, нарушения можно успеть исправить. Повторное нарушение по предписанию — двойной штраф и остановка участка."))
+	_intro(tr("Плановые проверки объявляют за неделю: в чек-листе ниже видно, что осмотрит инспектор и какой штраф ждёт, если он придёт сегодня. Внезапные случаются редко и не объявляются. Пока инспектор идёт по заводу, нарушения можно успеть исправить. Повторное нарушение по предписанию — двойной штраф и остановка участка."))
 	if ins.busy():
 		var v := ins.visitor()
 		var c := UITheme.card(10, Color("#2a2418"), UITheme.ACCENT_D)
@@ -2676,6 +2676,8 @@ func _events_insp() -> void:
 			h0.add_child(UITheme.small(tr("Показать"), func() -> void:
 				hud.g.tool.select_worker(vid)
 				hud.g.cam.focus_cell(v.cell())))
+	for u: Dictionary in ins.upcoming():
+		_insp_forecast_card(u)
 	var top := _cards(2)
 	var a := _card_in(top, tr("Ближайшие проверки"))
 	if ins.queue.is_empty():
@@ -2708,6 +2710,53 @@ func _events_insp() -> void:
 			continue
 		var v3 := _card_in(g, ins.type_name(tt), tr("Требования:\n• %s") % "\n• ".join(PackedStringArray(ins.checklist(tt))))
 		_insp_check(v3, tt)
+
+
+## 1.52: чек-лист инспектора: орган, дата, пункты ✓/✗ с подсказкой и «Показать», ожидаемый штраф.
+func _insp_forecast_card(u: Dictionary) -> void:
+	var ins := sim.inspect
+	var t := str(u["type"])
+	var fc := ins.forecast(t)
+	var left := int(u["left"])
+	var c := UITheme.card(12, Color("#2a2418"), UITheme.ACCENT_D)
+	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_child(c)
+	var v := UITheme.vbox(6)
+	c.add_child(v)
+	var head := UITheme.hbox(10)
+	head.add_child(_icon(Tex.ui(str(ins.tdef(t).get("icon", "inspect"))), 24))
+	var when := tr("сегодня") if left <= 0 else (tr("завтра") if left == 1 else tr("через %d дн.") % left)
+	head.add_child(_cl2(tr("Чек-лист инспектора: %s") % ins.type_name(t), "%s · %s" % [sim.season.date_str(int(u["day"])), when], UITheme.TEXT, UITheme.WARN, 15))
+	v.add_child(head)
+	var n_bad := int(fc["n"])
+	for it: Dictionary in fc["items"]:
+		if bool(it["ok"]):
+			var okl := UITheme.para("✓ " + str(it["text"]), 12, UITheme.GOOD)
+			okl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			v.add_child(okl)
+			continue
+		var row := UITheme.hbox(8)
+		var bad := UITheme.para("✗ %s · ~%s" % [L.t(str(it["text"])), Defs.money_str(float(it["fine"]))], 12, UITheme.BAD)
+		bad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(bad)
+		var cc: Array = it.get("cell", [-1, -1])
+		var cell := Vector2i(int(cc[0]), int(cc[1]))
+		var what := str(it["text"])
+		var fixs := str(it.get("fix", ""))
+		if cell.x >= 0:
+			row.add_child(UITheme.small(tr("Показать"), func() -> void:
+				hud.g.cam.focus_cell(cell)))
+		elif fixs != "":
+			row.add_child(UITheme.small(tr("Как исправить"), func() -> void:
+				hud.show_fix(what, fixs, Vector2i(-1, -1))))
+		v.add_child(row)
+		if fixs != "":
+			var hint := UITheme.para(tr("Что сделать: %s") % L.t(fixs), 11, UITheme.MUTED)
+			hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			v.add_child(hint)
+	var tot := UITheme.para(tr("Ожидаемый штраф: %s") % Defs.money_str(float(fc["fine"])) + ((tr(" (%d нарушений, из них предупреждений: %d)") % [n_bad, int(fc["warns"])]) if n_bad > 0 else tr(" — нарушений нет")), 14, UITheme.BAD if float(fc["fine"]) > 0.0 else UITheme.GOOD)
+	tot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.add_child(tot)
 
 
 ## Текущее состояние по проверке: ✓ — всё в порядке, × — что сейчас нарушено.
@@ -2855,6 +2904,12 @@ func _paper() -> void:
 		l2.color = Color(PAPER_INK, 0.4)
 		l2.custom_minimum_size = Vector2(0, 1)
 		v.add_child(l2)
+	# 1.52: «Объявления» — живые предложения с кнопкой (только в свежем номере)
+	var live_ids := {}
+	if idx == 0:
+		for ad: Dictionary in pp.live_ads():
+			live_ids[int(ad["id"])] = true
+			v.add_child(_paper_ad(ad))
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 22)
 	v.add_child(cols)
@@ -2870,7 +2925,7 @@ func _paper() -> void:
 	cols.add_child(c2)
 	var n := 0
 	for it2: Dictionary in items:
-		if it2 == lead:
+		if it2 == lead or (it2.has("ad") and live_ids.has(int(it2["ad"]))):
 			continue
 		var col := c1 if n % 2 == 0 else c2
 		n += 1
@@ -2880,6 +2935,30 @@ func _paper() -> void:
 			box.add_child(_paper_text(str(it2["title"]), 17, PAPER_INK, true))
 		box.add_child(_paper_text(str(it2.get("text", "")), 14, PAPER_INK))
 		col.add_child(box)
+
+
+## 1.52: рамка с объявлением и кнопкой действия.
+func _paper_ad(ad: Dictionary) -> Control:
+	var box := PanelContainer.new()
+	box.add_theme_stylebox_override("panel", UITheme.sb(Color(PAPER_BG, 1.0).darkened(0.05), PAPER_RED, 2, 2, 12, 8))
+	var h := UITheme.hbox(14)
+	box.add_child(h)
+	var tv := UITheme.vbox(2)
+	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	h.add_child(tv)
+	tv.add_child(_paper_text(tr("ОБЪЯВЛЕНИЕ · до %s") % sim.season.date_str(int(ad["until"])), 11, PAPER_RED))
+	tv.add_child(_paper_text(str(ad["title"]), 17, PAPER_INK, true))
+	tv.add_child(_paper_text(str(ad["text"]), 14, PAPER_INK))
+	var id := int(ad["id"])
+	var b := UITheme.primary(str(ad["btn"]) if not bool(ad.get("taken", false)) else tr("Принято"), func() -> void:
+		var err := sim.paper.accept_ad(id)
+		if err != "":
+			sim.notify(err, Sim.LVL_WARN)
+		rebuild(true), "")
+	b.disabled = bool(ad.get("taken", false))
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(b)
+	return box
 
 
 func _paper_text(t: String, size: int, col: Color, bold: bool = false) -> Label:

@@ -106,10 +106,17 @@ func _items() -> Array:
 			hud.open_window("events")
 			if hud.win:
 				hud.win.select_tab("insp")])
-	elif not sim.inspect.queue.is_empty():
-		var q: Dictionary = sim.inspect.queue[0]
-		if bool(q.get("announced", false)):
-			out.append(["inspect", tr("Скоро проверка: %s") % sim.inspect.type_name(str(q["type"])).to_lower(), sim.season.short_date(int(float(q["at"]) / 1440.0) + 1), UITheme.WARN, func() -> void:
+	else:
+		# 1.52: ближайшая объявленная проверка — через сколько дней и сколько нарушений уже видно по чек-листу
+		var up: Array = sim.inspect.upcoming()
+		if not up.is_empty():
+			var u: Dictionary = up[0]
+			var fc := sim.inspect.forecast(str(u["type"]))
+			var nv := int(fc["n"]) if not bool(fc.get("desk", false)) else (0 if sim.office.active("accounting") else 1)
+			var nvt := (tr("%d %s") % [nv, Defs.plural(nv, "нарушение", "нарушения", "нарушений")]) if nv > 0 else tr("всё в порядке")
+			var txt0 := (tr("Проверка через %d дн.: %s") % [int(u["left"]), nvt]) if int(u["left"]) > 0 else tr("Проверка сегодня: %s") % nvt
+			var val0 := ""   # орган — в чек-листе; в строке тесно
+			out.append(["inspect", txt0, val0, UITheme.BAD if nv > 0 else UITheme.WARN, func() -> void:
 				hud.open_window("events")
 				if hud.win:
 					hud.win.select_tab("insp")])

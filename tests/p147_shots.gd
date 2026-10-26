@@ -1,5 +1,5 @@
 extends Node
-## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders --out=/файл.png [--lang=ru]
+## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152 --out=/файл.png [--lang=ru]
 
 var out := "/tmp/p147.png"
 var mode := "full"
@@ -320,6 +320,47 @@ func _ready() -> void:
 			InfoPanel.w_tab = "career"
 			gm.hud.info.show_worker(sm3, tb)
 			await get_tree().create_timer(0.5).timeout
+	elif mode == "checklist152" or mode == "checklist152_todo" or mode == "paper152":
+		# 1.52: чек-лист инспектора (окно «События» → «Проверки», «Что делать» слева) и газета с объявлением
+		var S4 := preload("res://tests/setups.gd")
+		var sm4 := gm.sim
+		sm4.story.enabled = false
+		S4.big_shop(sm4)
+		S4.offices(sm4)
+		sm4.progress.stage = 4
+		gm.menu_paused = true
+		for w4 in sm4.workers:
+			w4.present = true
+		if mode != "paper152":
+			sm4.minute = 20.0 * 1440.0 + 9.0 * 60.0
+			sm4.inspect.queue.clear()
+			sm4.inspect.schedule("fire", sm4.minute + 5.0 * 1440.0, true, "плановая")
+			sm4.inspect.schedule("labor", sm4.minute + 7.0 * 1440.0, true, "плановая")
+			if mode == "checklist152":
+				gm.hud.open_window("events")
+				if gm.hud.win:
+					gm.hud.win.select_tab("insp")
+			await get_tree().create_timer(0.8).timeout
+		else:
+			sm4.minute = 30.0 * 1440.0 + 8.0 * 60.0
+			var pp4 := sm4.paper
+			var pr4 := str(Defs.products.keys()[0])
+			var of4 := sm4.orders.make_offer(pr4)
+			of4["qty"] = 120
+			of4["price"] = 2800.0
+			of4["status"] = "offer"
+			sm4.orders.list.append(of4)
+			sm4.orders.accept(int(of4["id"]), false)
+			pp4.on_crew_plan("Токарный участок", 118)
+			pp4.on_iso()
+			pp4.hired_w = 3
+			pp4.fired_w = 2
+			pp4.number = 5
+			pp4.publish(true)
+			pp4._make_ad("machine")
+			sm4.paper.unread = false
+			gm.hud.open_window("paper")
+			await get_tree().create_timer(0.4).timeout
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":

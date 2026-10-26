@@ -1,0 +1,159 @@
+keys,en
+"Завтра проверка: %s. По чек-листу нарушений: %d, ожидаемый штраф %s.","Inspection tomorrow: %s. The checklist shows %d violations, expected fine %s."
+Объявлена проверка. %s. Чек-лист инспектора и ожидаемый штраф — в окне «События» → «Проверки».,An inspection is announced. %s. The inspector's checklist and the expected fine are in Events → Inspections.
+Откройте отдел «Бухгалтерия» (Управление → Отделы): шанс найти ошибки упадёт с 65% до 15%.,Open the Accounting department (Office → Departments): the chance of finding errors drops from 65% to 15%.
+"Плановые проверки объявляют за неделю: в чек-листе ниже видно, что осмотрит инспектор и какой штраф ждёт, если он придёт сегодня. Внезапные случаются редко и не объявляются. Пока инспектор идёт по заводу, нарушения можно успеть исправить. Повторное нарушение по предписанию — двойной штраф и остановка участка.","Planned inspections are announced a week ahead: the checklist below shows what the inspector will look at and the fine awaiting if he came today. Sudden ones are rare and not announced. While the inspector walks the plant, violations can still be fixed. A repeat violation after an order means a double fine and a shut-down section."
+завтра,tomorrow
+Чек-лист инспектора: %s,Inspector's checklist: %s
+Что сделать: %s,What to do: %s
+Ожидаемый штраф: %s,Expected fine: %s
+" (%d нарушений, из них предупреждений: %d)"," (%d violations, %d of them warnings)"
+ — нарушений нет, — no violations
+ОБЪЯВЛЕНИЕ · до %s,NOTICE · until %s
+Принято,Accepted
+Проверка через %d дн.: %s,Inspection in %d d.: %s
+Проверка сегодня: %s,Inspection today: %s
+%d %s,%d %s
+всё в порядке,all in order
+Объявления,Notices
+Действует до: %s.,Valid until: %s.
+Продаётся б/у станок: %s,Used machine for sale: %s
+"С аукциона разорившегося завода: «%s», скидка %d%% (около %s). Выкупите право — поставите из «Объектов» в течение недели.","From a bankrupt plant's auction: ""%s"", %d%% off (about %s). Buy the right and place it from Objects within a week."
+Выкупить с аукциона,Buy at the auction
+Опытный мастер ищет работу,An experienced master is looking for a job
+"%s, %d лет, %s. Тридцать лет у станка, золотые руки. Ставка %s за смену. Звоните, пока не переманили.","%s, %d y.o., %s. Thirty years at the machine, golden hands. Rate %s per shift. Call before he is poached."
+Пригласить на собеседование,Invite for an interview
+Распродажа металла!,Metal clearance sale!
+Склад металлобазы «Крепкосталь» распродаёт остатки: скидка %d%% на закупку на %d %s с момента заявки.,The Krepkostal metal depot is selling off stock: %d%% off purchases for %d %s from the moment you apply.
+Воспользоваться скидкой,Use the discount
+В газете новое объявление: %s,New notice in the paper: %s
+Предложение уже недействительно,The offer is no longer valid
+Вы уже воспользовались этим предложением,You have already used this offer
+Станок с аукциона со скидкой %d%%: %s,Auction machine at %d%% off: %s
+Право на «%s» со скидкой %d%% выкуплено. Поставьте станок из «Объектов» в течение недели.,"The right to ""%s"" at %d%% off is bought. Place the machine from Objects within a week."
+%s пришёл на собеседование — он среди кандидатов (Люди → Найм).,%s came for an interview — now among the candidates (People → Hiring).
+Распродажа металла −%d%%,Metal sale −%d%%
+Скидка на металл %d%% действует %d %s.,The %d%% metal discount lasts %d %s.
+insp.req.no_ext,A fire extinguisher in every room of 6+ cells
+insp.req.hot_ext,"Two extinguishers where there is a furnace, paint booth or welding"
+insp.req.one_exit,Two exits from rooms of 60+ cells
+insp.req.wiring,Power grid without tripped breakers
+insp.req.clutter,Fewer than 12 loads on the floor
+insp.req.fire_recent,Fire damage repaired
+insp.req.min_wage,Pay not below the minimum
+insp.req.no_ppe,Lockers for work clothes (at least one per two)
+insp.req.no_aid,A first-aid kit at the plant
+insp.req.overwork,No rush jobs or overtime
+insp.req.injuries,No more than one injury a month
+insp.req.no_wc,A toilet with a sink
+insp.req.no_tb,Safety briefing on time
+insp.req.no_sout,Workplace assessment (SOUT) for all workplaces
+insp.req.no_milk,Milk for hazardous work
+insp.req.ppe_worn,All workers have intact PPE
+insp.req.no_lunch,Lunch at the proper time
+insp.req.n1_unfiled,All accidents filed (form N-1)
+insp.req.no_sink,A sink in the toilet
+insp.req.no_canteen,A canteen (if 8+ people)
+insp.req.few_wc,One toilet per 12 people
+insp.req.garbage,Grounds free of litter and scrap
+insp.req.dirty_room,Shavings cleaned from rooms
+insp.req.no_vent,"Ventilation where there is welding, painting or a furnace"
+insp.req.mice,No rodents
+insp.req.worn,No machines running with wear below 25%
+insp.req.crane,A rigger for the overhead crane
+insp.req.forklift,A driver for the forklift
+insp.req.no_electrician,An electrician on staff
+insp.req.broken_long,No broken machines
+insp.req.scrap_heap,Scrap does not pile up: bin not overflowing
+insp.req.paint_room,Paint booth in a separate room
+insp.req.furnace_smoke,The furnace has windows or ventilation
+insp.req.books,Accounting keeps the books
+insp.req.no_regime,Security regime: checkpoint with a guard
+insp.req.no_qc,A QC table
+insp.req.no_test,A test stand
+insp.req.scrap_rate,Scrap not above 8%
+paper.ev.big_order.0.rubric,Economy
+paper.ev.big_order.0.title,Big order: {0}
+paper.ev.big_order.0.text,"The contract for {1} is signed. In the shops they say: ""Now the main thing is not to let them down."" Accounting is already smiling."
+paper.ev.big_order.1.rubric,Headline
+paper.ev.big_order.1.title,The plant takes a big order
+paper.ev.big_order.1.text,"Taken: {0} worth {1}. The director promises deadlines will be met, and so will the breaks."
+paper.ev.big_order.2.rubric,News
+paper.ev.big_order.2.title,Work booked for months ahead
+paper.ev.big_order.2.text,"Order signed: {0}, {1}. The machines are rubbing their chucks in anticipation."
+paper.ev.state_order.0.rubric,Headline
+paper.ev.state_order.0.title,A state order is ours!
+paper.ev.state_order.0.text,The plant has won a state order: {0} for {1}. Trust has been given — now it must be justified.
+paper.ev.state_order.1.rubric,Economy
+paper.ev.state_order.1.title,The state chose us
+paper.ev.state_order.1.text,"The state order covers {0}, {1} in total. Acceptance will be strict, the advance is already in the account."
+paper.ev.state_order.2.rubric,News
+paper.ev.state_order.2.title,Special responsibility
+paper.ev.state_order.2.text,"An order for the state: {0}, {1}. The foremen ask nobody to joke with tolerances."
+paper.ev.order_failed.0.rubric,Incidents
+paper.ev.order_failed.0.title,Order failed: {0}
+paper.ev.order_failed.0.text,"The customer did not wait. A penalty, a damaged reputation and a hard talk in the office."
+paper.ev.order_failed.1.rubric,Economy
+paper.ev.order_failed.1.title,We were too late
+paper.ev.order_failed.1.text,"The deadline for ""{0}"" has passed. The team promises to plan shifts more carefully from now on."
+paper.ev.order_failed.2.rubric,Letters
+paper.ev.order_failed.2.title,A failed order is our common trouble
+paper.ev.order_failed.2.text,"""{0} — not shipped on time. Let's find out where we lose hours,"" writes a reader."
+paper.ev.mass_hire.0.rubric,People
+paper.ev.mass_hire.0.title,New faces on the team
+paper.ev.mass_hire.0.text,{0} new workers joined the plant this week. Get to know them and don't hesitate to ask where the canteen is.
+paper.ev.mass_hire.1.rubric,Staff
+paper.ev.mass_hire.1.title,Hiring continues
+paper.ev.mass_hire.1.text,{0} people were hired. HR asks the old-timers to show newcomers where things are.
+paper.ev.mass_hire.2.rubric,News
+paper.ev.mass_hire.2.title,The plant is growing
+paper.ev.mass_hire.2.text,"{0} new employees. The locker room got tighter, the shops got livelier."
+paper.ev.mass_fire.0.rubric,Staff
+paper.ev.mass_fire.0.title,Parting with colleagues
+paper.ev.mass_fire.0.text,{0} people left the plant this week. The administration thanks them for their work and wishes them luck.
+paper.ev.mass_fire.1.rubric,Letters
+paper.ev.mass_fire.1.title,What is going on?
+paper.ev.mass_fire.1.text,"""People are leaving — {0} in a week. Isn't it time to talk?"" workers write to the editors."
+paper.ev.mass_fire.2.rubric,Union life
+paper.ev.mass_fire.2.title,The union watches the staff
+paper.ev.mass_fire.2.text,{0} people were let go. The union reminds: layoffs follow the law and are done with respect.
+paper.ev.crew_overplan.0.rubric,Competition
+paper.ev.crew_overplan.0.title,"Crew ""{0}"" beat its plan!"
+paper.ev.crew_overplan.0.text,Yesterday the crew delivered {1}% of the plan. The pies in the break room are on the winners.
+paper.ev.crew_overplan.1.rubric,Heroes
+paper.ev.crew_overplan.1.title,"""{0}"" works like clockwork"
+paper.ev.crew_overplan.1.text,The shift plan was met at {1}%. Neighbouring sections look on with respect and slight envy.
+paper.ev.crew_overplan.2.rubric,Leaders
+paper.ev.crew_overplan.2.title,"Praise to crew ""{0}"""
+paper.ev.crew_overplan.2.text,Shift result: {1}% of the plan. The shop head shook the foreman's hand and promised a bonus.
+paper.ev.iso.0.rubric,Headline
+paper.ev.iso.0.title,ISO 9001 certificate is ours
+paper.ev.iso.0.text,The auditor left happy. Quality is now not just a word on a poster — it is also a paper with a stamp.
+paper.ev.iso.1.rubric,Quality
+paper.ev.iso.1.title,The standard is conquered
+paper.ev.iso.1.text,"The plant received ISO 9001. QC proudly straightened the coat, customers will appreciate it."
+paper.ev.iso.2.rubric,News
+paper.ev.iso.2.title,Now by international rules
+paper.ev.iso.2.text,"From today we work to ISO 9001. There is more paper, less scrap. That is the idea."
+paper.ev.canteen.0.rubric,Daily life
+paper.ev.canteen.0.title,The shops smell of borscht
+paper.ev.canteen.0.text,A canteen opened at the plant. Sandwiches in oily newspaper are a thing of the past.
+paper.ev.canteen.1.rubric,Canteen
+paper.ev.canteen.1.title,New canteen: first impressions
+paper.ev.canteen.1.text,"The plant canteen has opened. The workers' first verdict: ""The compote is one of us."""
+paper.ev.canteen.2.rubric,News
+paper.ev.canteen.2.title,A proper lunch at last
+paper.ev.canteen.2.text,Lunch is now at a table and hot. The union thanks the administration and asks for seconds.
+paper.ev.machine_new.0.rubric,News
+paper.ev.machine_new.0.title,A new machine: {0}
+paper.ev.machine_new.0.text,A new machine has arrived in the shop — {0}. The workers are already thinking up a name for it.
+paper.ev.machine_new.1.rubric,Equipment
+paper.ev.machine_new.1.title,Reinforcements in the machine park
+paper.ev.machine_new.1.text,New equipment installed: {0}. The foreman asks nobody to pat its sides until it cools down.
+paper.ev.machine_new.2.rubric,Development
+paper.ev.machine_new.2.title,The plant upgrades its equipment
+paper.ev.machine_new.2.text,"{0} has been installed. Modernization goes on in deeds, not on posters."
+"Проверки объявляют за неделю: чек-лист инспектора с нарушениями, «Показать» и ожидаемым штрафом","Inspections are announced a week ahead: an inspector checklist with violations, Show and the expected fine"
+"Внезапных проверок меньше; в «Что делать» — «Проверка через N дн.»","Fewer surprise inspections; To do shows Inspection in N days"
+"Газета пишет о ваших решениях: крупные заказы, найм, ISO, столовая, новый станок","The newspaper writes about your decisions: big orders, hiring, ISO, canteen, new machine"
+"Объявления в газете: станок с аукциона, опытный мастер, распродажа металла","Newspaper ads: auction machine, experienced foreman, metal sale"
