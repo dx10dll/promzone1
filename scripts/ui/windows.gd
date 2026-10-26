@@ -37,6 +37,7 @@ const GROUPS := {
 		["honor", "Доска почёта", "medal", "honor", ""]]},
 	"finance": {"title": "Финансы", "icon": "finances", "secs": [
 		["summary", "Сводка", "finance", "finance", "summary"], ["charts", "Графики", "chart_up", "finance", "charts"],
+		["stats", "Статистика", "statistics", "finance", "stats"],
 		["weeks", "По неделям", "log", "finance", "weeks"], ["loans", "Кредиты и лизинг", "money", "finance", "loans"],
 		["insurance", "Страхование", "shield", "finance", "insurance"], ["grants", "Гранты", "medal", "finance", "grants"],
 		["energy", "Электричество", "energy", "finance", "energy"]]},
@@ -748,7 +749,7 @@ const CARD_ICONS := {"Стратегия сбыта": "orders", "За 7 дней
 	"Рабочие места": "objects", "Путь завода": "goals", "Практиканты ПТУ": "hire", "Поставщик металла": "supply",
 	"Погода и отопление": "temperature", "План месяца": "date", "Наша доля рынка": "chart_up", "Молоко за вредность": "med",
 	"Люди и репутация": "people", "Конкурентоспособность": "medal", "История": "log", "Инструктаж по ОТ": "shield",
-	"Индекс цены металла": "chart_up", "Ждут решения": "letter", "Доля рынка": "chart_up", "Деньги на счёте": "finances",
+	"Индекс цены металла": "chart_up", "Ждут решения": "letter", "Доля рынка": "chart_up", "Деньги на счёте": "finances", "Прибыль за день": "money", "Выпуск деталей": "production", "Брак": "injury", "Среднее настроение": "mood", "Число людей": "people", "Электричество": "energy",
 	"Действует сейчас": "events", "Выручка и расходы по дням": "finances", "В пути": "supply", "Ближайшие проверки": "inspect",
 	"Шаблоны": "template", "Профком": "union", "Проект колдоговора": "law", "Охранники": "shield", "Колдоговор": "law",
 	"Журнал охраны": "log", "Все графики": "statistics", "Доля рынка по дням": "chart_up"}
@@ -2083,6 +2084,9 @@ func _finance() -> void:
 			return
 		"charts":
 			_finance_charts()
+			return
+		"stats":
+			_finance_stats()
 			return
 		"insurance":
 			_finance_insurance()
@@ -3505,6 +3509,35 @@ func _finance_charts() -> void:
 	cv3.custom_minimum_size.y = 230
 	d.add_child(_legend(cv3.series))
 	d.add_child(cv3)
+
+
+static var stats_range := 30
+
+
+## 1.54: Финансы → Статистика: дневная история за 7 или 30 суток (деньги, прибыль, выпуск, брак, настроение, люди, электричество).
+func _finance_stats() -> void:
+	var sl := sim.statlog
+	_info(tr("за последние %d дн.") % stats_range)
+	_intro(tr("Одна точка — одни игровые сутки. Наведите мышь на график — увидите значение за день. История хранится 60 суток."))
+	header_extra.add_child(UITheme.segmented([["7", tr("7 дней")], ["30", tr("30 дней")]], str(stats_range), func(k: String) -> void:
+		stats_range = int(k)
+		rebuild(true)))
+	var days := sl.last(stats_range)
+	var lab: Array = days.map(func(e: Dictionary) -> String: return tr("день %d") % int(e["d"]))
+	var g := _cards(2)
+	var defs := [
+		[tr("Деньги на счёте"), "", [{"name": tr("Остаток"), "color": UITheme.ACCENT, "values": sl.series("money", stats_range), "fill": true, "width": 2.5}], "money", false],
+		[tr("Прибыль за день"), tr("Поступления минус расходы за сутки. Кредиты не учитываются."), [{"name": tr("Прибыль"), "color": UITheme.GOOD, "values": sl.series("profit", stats_range), "kind": "bar"}], "money", true],
+		[tr("Выпуск деталей"), tr("Сколько годных деталей сделано за сутки."), [{"name": tr("Деталей"), "color": UITheme.INFO, "values": sl.series("made", stats_range), "kind": "bar"}], "num", true],
+		[tr("Брак"), tr("Доля брака среди сделанного за сутки."), [{"name": tr("Брак"), "color": UITheme.BAD, "values": sl.series("defect", stats_range)}], "pct", true],
+		[tr("Среднее настроение"), tr("Среднее настроение рабочих на конец суток, 0–100."), [{"name": tr("Настроение"), "color": UITheme.WARN, "values": sl.series("mood", stats_range), "width": 2.5}], "num", true],
+		[tr("Число людей"), "", [{"name": tr("Людей"), "color": UITheme.ACCENT, "values": sl.series("staff", stats_range), "width": 2.5}], "num", true],
+		[tr("Электричество"), tr("Расход за сутки, кВт·ч."), [{"name": tr("кВт·ч"), "color": UITheme.WARN, "values": sl.series("kwh", stats_range), "kind": "bar"}], "num", true]]
+	for dd: Array in defs:
+		var c := _card_in(g, str(dd[0]), str(dd[1]))
+		var cv := ChartView.new().setup(dd[2], lab, str(dd[3]), bool(dd[4]))
+		cv.custom_minimum_size.y = 200
+		c.add_child(cv)
 
 
 ## Прогноз кассы на две недели (бухгалтер): оплаты заказов к сроку минус зарплаты, аренда,

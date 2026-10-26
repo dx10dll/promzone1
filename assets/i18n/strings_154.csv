@@ -1,0 +1,21 @@
+keys,en
+за последние %d дн.,for the last %d days
+Одна точка — одни игровые сутки. Наведите мышь на график — увидите значение за день. История хранится 60 суток.,One point is one game day. Hover a chart to see that day's value. History is kept for 60 days.
+30 дней,30 days
+Остаток,Balance
+Прибыль за день,Daily profit
+Поступления минус расходы за сутки. Кредиты не учитываются.,Income minus expenses for the day. Loans are not counted.
+Прибыль,Profit
+Выпуск деталей,Parts made
+Сколько годных деталей сделано за сутки.,Good parts made during the day.
+Деталей,Parts
+Брак,Defects
+Доля брака среди сделанного за сутки.,Share of defects among everything made during the day.
+Среднее настроение,Average mood
+"Среднее настроение рабочих на конец суток, 0–100.","Average worker mood at the end of the day, 0-100."
+Число людей,Headcount
+Людей,People
+"Расход за сутки, кВт·ч.","Daily consumption, kWh."
+7 дней,7 days
+"«Финансы → Статистика»: графики за 7 и 30 дней — деньги, прибыль, выпуск, брак, настроение, люди, электричество","Finances → Statistics: 7- and 30-day charts — money, profit, output, scrap, mood, staff, electricity"
+"Встроенные иконки в едином стиле с иконками интерфейса","Built-in icons now match the interface icon style"

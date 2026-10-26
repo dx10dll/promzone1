@@ -227,6 +227,21 @@ func _draw() -> void:
 			var v3: Array = s3["values"]
 			if str(s3.get("kind", "line")) == "line" and hover < v3.size():
 				draw_circle(Vector2(hx, ys.call(float(v3[hover]))), 4.0, s3["color"])
+		# 1.54: значение прямо на графике (плашка у верхнего края, слева или справа от курсора)
+		var txt := ""
+		if hover < labels.size():
+			txt = tr(str(labels[hover]))
+		for s4: Dictionary in series:
+			var v4: Array = s4["values"]
+			if hover < v4.size():
+				txt += (" · " if txt != "" else "") + fmt_val(float(v4[hover]), fmt)
+		if txt != "":
+			var tw2 := f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 12.0
+			var bx := hx + 8.0 if hx + 8.0 + tw2 <= r.end.x else hx - 8.0 - tw2
+			bx = maxf(bx, r.position.x)
+			draw_rect(Rect2(bx, r.position.y, tw2, 18.0), Color(0.06, 0.07, 0.09, 0.92))
+			draw_rect(Rect2(bx, r.position.y, tw2, 18.0), Color(1, 1, 1, 0.18), false, 1.0)
+			draw_string(f, Vector2(bx + 6.0, r.position.y + 13.0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, UITheme.TEXT)
 
 
 func _x(i: int, n: int, r: Rect2) -> float:

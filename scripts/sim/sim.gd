@@ -45,6 +45,7 @@ var progress: Progress
 var logi: Logistics
 var water: Water
 var grants: Grants
+var statlog: StatLog   ## 1.54: дневная история для графиков
 var sales: Sales
 var training: Training
 var career: Careers         ## 1.15: экзамены на разряд, индексация, стаж и пенсия, рацпредложения
@@ -119,6 +120,7 @@ func _init() -> void:
 	logi = Logistics.new(self)
 	water = Water.new(self)
 	grants = Grants.new(self)
+	statlog = StatLog.new(self)
 	sales = Sales.new(self)
 	training = Training.new(self)
 	career = Careers.new(self)
@@ -2213,6 +2215,7 @@ func _on_new_day() -> void:
 	spend(rent, "Аренда бокса")
 	power.close_day()   # 1.53: электричество двумя строками — день и ночь
 	power.on_new_day()
+	statlog.record()
 	if money < 0.0:
 		notify_once("cash", L.t("Кассовый разрыв! Денег нет — срочно выполняйте заказы."), LVL_BAD, Vector2i(-1, -1), 1440.0)
 
@@ -2289,7 +2292,7 @@ func to_dict() -> Dictionary:
 		"grid": power.to_dict(), "reserve": supply_reserve, "cons": cons, "cons_supply": cons_supply, "ppr": ppr,
 		"office": office.to_dict(),
 		"season": season.to_dict(), "story": story.to_dict(), "inspect": inspect.to_dict(), "calls": calls.to_dict(), "paper": paper.to_dict(),
-		"progress": progress.to_dict(), "logi": logi.to_dict(), "grants": grants.to_dict(),
+		"progress": progress.to_dict(), "logi": logi.to_dict(), "grants": grants.to_dict(), "statlog": statlog.to_dict(),
 		"sales": sales.to_dict(), "training": training.to_dict(), "career": career.to_dict(), "upkeep": upkeep.to_dict(), "eng": eng.to_dict(), "crew": crew.to_dict(), "market": market.to_dict(), "town": town.to_dict(), "crisis": crisis.to_dict(), "fauna": fauna.to_dict(), "dev": dev.to_dict(), "bmats": bmats.to_dict(), "legacy": {"zone": rooms.legacy.keys(), "water": water.bonus},
 		"company": company, "plan": plan.to_dict(), "faults": faults.to_dict(),
 		"areas": areas.to_dict(),
@@ -2348,6 +2351,7 @@ static func from_dict(d: Dictionary) -> Sim:
 		s.rooms.legacy[int(lid)] = true
 	s.water.bonus = int(lg.get("water", 0))
 	s.stats = d.get("stats", s.stats)
+	s.statlog.from_dict(d.get("statlog", {}))
 	s.ledger = d.get("ledger", [])
 	s.honor_log = d.get("honor", [])
 	s.events = d.get("log", [])

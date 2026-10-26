@@ -203,7 +203,13 @@ static func emo(name: String) -> Texture2D:
 ## Такие текстуры помечены мета-флагом COLOR_META — их не перекрашивают (см. is_color).
 const COLOR_META := &"pz_color_icon"
 ## Зоны, которым нового значка не досталось, — значки меню владельца из набора 1.30.
-const PNG_ALIAS := {"zone_accounting": "accounting", "zone_union_office": "union"}
+const PNG_ALIAS := {"zone_accounting": "accounting", "zone_union_office": "union",
+	# 1.54 (4.1): встроенный контурный значок заменяется значком владельца с тем же смыслом — один стиль на весь интерфейс
+	"build": "construction", "calendar": "date", "chart_up": "statistics", "crew": "team", "demolish": "demolition", "factory": "company",
+	"finance": "finances", "office": "management", "overlay": "layers", "plan": "blueprint", "power": "energy", "rooms": "zones",
+	"stage_up": "level", "thermo": "temperature", "town": "city", "play1": "play", "play2": "speed_2", "play3": "speed_3",
+	"ov_rooms": "layers", "ov_nets": "networks", "ov_light": "lighting", "ov_temp": "heating", "ov_traffic": "routes",
+	"ov_load": "statistics", "ov_dirt": "cleaning", "ov_crew": "team", "ov_power": "energy"}
 static var _png: Dictionary = {}
 
 

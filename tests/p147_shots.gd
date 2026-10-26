@@ -86,6 +86,33 @@ func _ready() -> void:
 		gm.hud.open_window("finance")
 		await get_tree().create_timer(0.4).timeout
 		gm.hud.win.select_tab("energy")
+	elif mode == "stats154":
+		# 1.54: «Финансы → Статистика»: 30 суток синтетической истории (--range=7 — неделя)
+		var slg := gm.sim.statlog
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 154
+		var m := 90000.0
+		for i in 40:
+			var prof := rng.randf_range(-3000.0, 9000.0)
+			m += prof
+			var made := rng.randi_range(20, 60)
+			var scr := rng.randi_range(0, 7)
+			slg.days.append({"d": 3 + i, "money": m, "profit": prof, "made": made, "scrap": scr, "defect": float(scr) / float(made + scr),
+				"mood": 55.0 + 12.0 * sin(float(i) / 4.0) + rng.randf_range(-3, 3), "staff": 6 + i / 8, "kwh": rng.randf_range(60.0, 110.0)})
+		if lang != "ru" or cam_arg == "r7":
+			GameWindow.stats_range = 7
+		gm.hud.open_window("finance")
+		await get_tree().create_timer(0.4).timeout
+		gm.hud.win.select_tab("stats")
+		await get_tree().create_timer(0.4).timeout
+		# наведение мыши на один из графиков — плашка со значением
+		var cvs: Array = gm.hud.win.find_children("*", "ChartView", true, false)
+		if not cvs.is_empty():
+			var c0: ChartView = cvs[1]
+			c0.hover = 25
+			c0.queue_redraw()
+	elif mode == "icons154":
+		await _icons154(gm)
 	elif mode == "rivals153":
 		# 1.53: «Заказы → Конкуренты»: карточки директоров
 		var mk := gm.sim.market
@@ -449,3 +476,60 @@ func _ready() -> void:
 	img.save_png(out)
 	print("saved ", out, " ", img.get_size())
 	get_tree().quit(0)
+
+
+## 1.54: «до / после» встроенных значков рядом со значками владельца (assets/ui/icons).
+## Ряды сверху вниз: значок владельца (эталон того же смысла) · встроенный ДО · встроенный ПОСЛЕ (перекрашенный SVG) · что видно в игре (Tex.ui).
+func _icons154(gm: Node) -> void:
+	var names: Array = []
+	for line in FileAccess.get_file_as_string("res://tests/icons154_names.txt").split("\n", false):
+		names.append(line.strip_edges())
+	var before: Dictionary = {}
+	var bf := FileAccess.open("/home/claude/pz_work/icons_before/ui.json", FileAccess.READ)
+	if bf:
+		before = JSON.parse_string(bf.get_as_text())
+	var cl := CanvasLayer.new()
+	cl.layer = 100
+	add_child(cl)
+	var root := Control.new()
+	cl.add_child(root)
+	var bg := ColorRect.new()
+	bg.color = Color("#23262c")
+	bg.size = Vector2(1920, 1080)
+	root.add_child(bg)
+	var per := 14
+	var cs := 84
+	var row_t := ["значок владельца", "встроенный: до", "встроенный: после (SVG)", "в игре (Tex.ui)"]
+	for i in names.size():
+		var n: String = names[i]
+		var bx := 150 + (i % per) * (cs + 16)
+		var by := 20 + (i / per) * (4 * cs + 56)
+		var ow := str(Tex.PNG_ALIAS.get(n, n))
+		var rows: Array = [
+			Tex.png(ow, 96) if ResourceLoader.exists("res://assets/ui/icons/%s.png" % ow) else null,
+			Vec.raster(str(before.get(n, "")), 2.0) if before.has(n) else null,
+			Vec.raster(Vec.source("ui", n), 2.0),
+			Tex.ui(n)]
+		for r in 4:
+			var tr_ := TextureRect.new()
+			tr_.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr_.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			tr_.texture = rows[r]
+			tr_.position = Vector2(bx, by + r * cs)
+			tr_.size = Vector2(80, 80)
+			root.add_child(tr_)
+		var lb := Label.new()
+		lb.text = n
+		lb.position = Vector2(bx, by + 4 * cs - 4)
+		lb.add_theme_font_size_override("font_size", 13)
+		root.add_child(lb)
+		if i % per == 0:
+			for r in 4:
+				var rl := Label.new()
+				rl.text = str(row_t[r])
+				rl.position = Vector2(8, by + r * cs + 28)
+				rl.size = Vector2(138, 40)
+				rl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				rl.add_theme_font_size_override("font_size", 12)
+				root.add_child(rl)
+	await get_tree().create_timer(0.3).timeout
