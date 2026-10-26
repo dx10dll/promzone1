@@ -1,0 +1,141 @@
+keys,en
+Заявка уже в работе: сетевая компания подключит мощность через %d дн.,The request is already in progress: the grid company will connect the power in %d days.
+Больше мощности по договору не выдают.,No more power is available under the contract.
+Нужна подстанция в техпомещении.,A substation in the technical room is required.
+Не хватает денег: нужно %s.,Not enough money: %s needed.
+Заявка в сетевую компанию отправлена: +%d кВт к лимиту через %d дн.,Request sent to the grid company: +%d kW to the limit in %d days.
+Сетевая компания подключила дополнительную мощность: лимит подстанции теперь %d кВт.,The grid company has connected the extra power: the substation limit is now %d kW.
+ТРЕВОГА: выбило вводной автомат,ALARM: the main breaker has tripped
+"Нагрузка %.1f кВт превысила лимит подстанции %d кВт — завод обесточен, станки стоят. Включить автомат можно сразу, но если не убрать лишнюю нагрузку или не заказать больше мощности у сетевой компании, он выбьет снова.","The load of %.1f kW exceeded the substation limit of %d kW: the plant is without power and the machines are idle. You can switch the breaker back on at once, but unless you cut the extra load or order more power from the grid company it will trip again."
+"Автомат включён, станки продолжают работу","Breaker is back on, machines keep working"
+Позже,Later
+"Завод стоит, пока рабочие не сбросят автомат на подстанции",The plant stays idle until the workers reset the breaker at the substation
+Автомат включён: завод снова под током.,Breaker is on: the plant has power again.
+враждебное,hostile
+холодное,cold
+нейтральное,neutral
+доброе,friendly
+союзник,ally
+Наш демпинг бьёт по их ценам,Our dumping undercuts their prices
+Мы не сбиваем цены,We do not cut prices
+Конкурент перебивает клиентов,A rival is poaching our clients
+Перебивал наших клиентов,Poached our clients
+%s перебивает клиентов,%s is poaching our clients
+"Директор %s (%s) обзванивает наших заказчиков и сулит им скидки. Если ничего не делать, заявок будет на 15%% меньше неделю.","Director %s (%s) is phoning our customers and promising them discounts. If we do nothing, we get 15%% fewer requests for a week."
+Обзвонить клиентов самим (%s),Phone the clients ourselves (%s)
+Скидки и звонки: заявки вернутся сразу,Discounts and calls: requests come back at once
+Не реагировать,Do not react
+Заявок −15% неделю,Requests −15% for a week
+%s делится заказом,%s shares an order
+Директор %s: «Мы не успеваем — возьмёте часть нашего заказа на %s? Заплатим на 10%% выше рынка». Заказ появится на доске заявок.,"Director %s: ""We cannot keep up. Will you take part of our order for %s? We will pay 10%% above market."" The order will appear on the request board."
+Взять часть заказа,Take part of the order
+"Заявка на доске, цена +10%; отношение растёт","Request on the board, price +10%; relations improve"
+Без обид,No hard feelings
+%s продаёт станок,%s sells a machine
+"Директор %s обновляет парк и отдаёт б/у станок «%s» за 60%% цены — только вам, по-соседски.","Director %s is renewing the shop and is letting a used ""%s"" go for 60%% of the price, to you only, as a neighbour."
+Купить,Buy
+Следующий такой станок обойдётся в 60% цены (две недели),The next such machine costs 60% of the price (two weeks)
+%s предлагает слияние,%s proposes a merger
+"Директор %s (%s) всерьёз предлагает объединить заводы: общие заказы, станки и клиенты. Пока это только разговор — сделка потребует месяцев.","Director %s (%s) seriously proposes merging the plants: shared orders, machines and clients. For now it is only talk; a deal would take months."
+Начать переговоры,Start negotiations
+"Репутация +2, отношение растёт; решение о слиянии — позже","Reputation +2, relations improve; the merger decision comes later"
+Вежливо отказаться,Politely decline
+Отношение немного упадёт,Relations drop slightly
+%s просит металл,%s asks for metal
+Директор %s просит одолжить %d × %s: сорвалась поставка. Вернёт деньгами с наценкой — %s.,Director %s asks to borrow %d × %s: their delivery fell through. They will pay back in cash with a markup: %s.
+Одолжить за плату,Lend for a fee
+"+%s, отношение растёт; металл уйдёт со склада","+%s, relations improve; the metal leaves the warehouse"
+Отношение упадёт,Relations drop
+%s просит станок,%s asks for a machine
+"Директор %s: «Выручайте — у нас встал станок, а заказ горит. Одолжите на ночь ваш %s?» Заплатят %s, но станок поизносится.","Director %s: ""Help us out: our machine is down and the order is on fire. Could you lend your %s for the night?"" They will pay %s, but the machine will wear."
+"+%s, износ станка −10%%, отношение растёт","+%s, machine wear −10%%, relations improve"
+Денег на обзвон нет — переживём неделю с меньшим потоком заявок.,No money for the calls; we will live through a week with fewer requests.
+Мы отбили клиентов,We won the clients back
+Клиентам позвонили первыми — заявки вернулись.,We called the clients first: requests are back.
+Клиенты ушли к ним на неделю,Clients went to them for a week
+Взяли часть их заказа,Took part of their order
+"Часть заказа %s — на доске заявок: цена выше рынка, срок принятия три дня.","Part of the order from %s is on the request board: above-market price, three days to accept."
+Отказались от их заказа,Declined their order
+Станок у соседа,Machine from a neighbour
+Купили у них станок,Bought a machine from them
+"Договорились: «%s» у %s — за 60%% цены, ставьте в течение двух недель.","Agreed: ""%s"" from %s at 60%% of the price; install it within two weeks."
+Отказались от станка,Declined the machine
+Согласились на переговоры о слиянии,Agreed to merger talks
+"Переговоры о слиянии с %s начались — пока это только разговоры, ничего не обязывает.",Merger talks with %s have begun; it is only talk for now and binds us to nothing.
+Отказали в слиянии,Refused the merger
+Металла на складе уже не хватает — отказали.,There is no longer enough metal in stock: refused.
+Не смогли одолжить металл,Could not lend the metal
+Одолжили металл,Lent metal
+%s получил металл и расплатился с наценкой.,%s got the metal and paid back with a markup.
+Отказали в металле,Refused metal
+Одолжили станок на ночь,Lent a machine for the night
+"Станок вернулся от %s с оплатой, но немного изношенный.","The machine came back from %s with payment, but a bit worn."
+Отказали в станке,Refused the machine
+Звал к себе: %s,Tried to hire %s
+Ваш %s %s получил предложение от %s: директор %s (%s) обещает на 20%% больше. Человек думает.,Your %s %s has received an offer from %s: director %s (%s) promises 20%% more. They are thinking it over.
+Удержать надбавкой +%s,Keep with a raise of +%s
+Ответили на войну цен демпингом,Answered the price war with dumping
+Промолчали в войне цен,Stayed silent in the price war
+"Ответили качеством, а не ценой","Answered with quality, not price"
+Удержали человека надбавкой,Kept the person with a raise
+Человек остался у нас,The person stayed with us
+Отпустили человека без скандала,Let the person go without a fuss
+АВТОМАТ ВЫБИТ · включить,BREAKER TRIPPED · switch on
+%.0f/%.0f/%d кВт,%.0f/%.0f/%d kW
+"Электросеть (сейчас / пик за сутки / лимит): сейчас %.1f кВт, пик за сутки %.1f кВт (вчера %.1f), лимит подстанции %d кВт.
+Тариф сейчас: %s (%.1f ₽/кВт·ч); ночью с 23:00 до 7:00 вдвое дешевле — ночная смена экономит на энергии.
+Нажмите — меню «Сети» (E); если автомат выбит — включить.","Power grid (now / peak today / limit): now %.1f kW, peak today %.1f kW (yesterday %.1f), substation limit %d kW.
+Current tariff: %s (%.1f RUB/kWh); from 23:00 to 7:00 it is half the price, so a night shift saves on energy.
+Click: the Networks menu (E); if the breaker has tripped, switch it on."
+ночной,night
+дневной,day
+сейчас %s тариф · %.1f ₽/кВт·ч · лимит подстанции %d кВт,now the %s tariff · %.1f RUB/kWh · substation limit %d kW
+из %d кВт лимита,of the %d kW limit
+Пик за сутки,Peak today
+вчера %.1f кВт,yesterday %.1f kW
+%d кВт·ч,%d kWh
+Выбивало сегодня,Trips today
+раз вводной автомат,times the main breaker
+Расход на электричество,Electricity spending
+"Днём кВт·ч стоит %.1f ₽, ночью (с 23:00 до 7:00) — %.1f ₽.","By day a kWh costs %.1f RUB, at night (23:00 to 7:00) %.1f RUB."
+"Сегодня, день","Today, day"
+кВт·ч,kWh
+"Сегодня, ночь","Today, night"
+"7 дней, день","7 days, day"
+"7 дней, ночь","7 days, night"
+Совет: ночная смена дешевле по энергии — ночью электричество вдвое дешевле. Печи и прессы выгодно ставить на ночь.,Tip: a night shift is cheaper on energy: electricity costs half as much at night. Furnaces and presses are best run at night.
+Мощность по договору,Contract capacity
+"Лимит подстанции — 15–40 кВт плюс аккумуляторы. Если нагрузка выше лимита, вводной автомат выбивает, и завод стоит, пока его не включат. Сетевая компания за деньги подключит дополнительные кВт — не сразу.","The substation limit is 15-40 kW plus batteries. If the load exceeds the limit, the main breaker trips and the plant stands until it is switched on. For money the grid company will connect extra kW, but not at once."
+Сейчас по договору: +%d кВт к подстанции (шаг %d из %d).,Under the contract now: +%d kW on top of the substation (step %d of %d).
+заявка в работе: ещё %d дн.,request in progress: %d more days
+Заказать +%d кВт · %s · %d дн.,Order +%d kW · %s · %d days
+Включить автомат,Switch the breaker on
+День,Day
+"Пик, кВт","Peak, kW"
+"День, кВт·ч","Day, kWh"
+"Ночь, кВт·ч","Night, kWh"
+Расход,Spending
+Директора соседних заводов,Directors of neighbouring plants
+"У каждого завода свой директор. От вашего решения зависит, как он к вам относится: враг переманивает людей и перебивает клиентов, друг делится заказами, продаёт станки и просит о помощи. Отношение меняется письмами и ценовой политикой.","Every plant has its own director. How they treat you depends on your decisions: an enemy poaches your people and clients, a friend shares orders, sells machines and asks for help. Relations change through letters and your pricing policy."
+Отношение к нам: %s (%+d),Attitude to us: %s (%+d)
+От −100 (враждебное) до +100 (союзник),From −100 (hostile) to +100 (ally)
+Пока ничего не делал.,Has done nothing yet.
+день %d: %s,day %d: %s
+Нет воздуха,No air
+Станку нужен сжатый воздух: поставьте компрессор и протяните воздушную сеть до клетки подключения (меню «Сети»).,The machine needs compressed air: place a compressor and run the air network to its connection cell (Networks menu).
+"Компрессор в этой сети не качает: проверьте, что он включён, есть ток и стоит в компрессорной.","The compressor on this network is not pumping: check that it is switched on, powered and stands in the compressor room."
+Электричество,Electricity
+Акула,Shark
+Старой закалки,Old school
+Осторожный,Cautious
+Новатор,Innovator
+"Жёсткий, берёт своё. Переманивает людей, перебивает клиентов, на уступки не идёт.","Tough and takes what is his. Poaches people, steals clients and does not give way."
+"Работает по-соседски: предлагает сделки, просит одолжить металл или станок и помнит добро.","Works as a neighbour: offers deals, asks to borrow metal or a machine and remembers kindness."
+"Не рискует и редко лезет первым. Охотнее просит помощи, чем воюет.",Takes no risks and seldom starts a fight. Would rather ask for help than wage war.
+"Любит новые станки и толковых людей: зовёт к себе мастеров, предлагает сделки и слияние.","Loves new machines and capable people: lures masters away, offers deals and a merger."
+%.1f кВт,%.1f kW
+"Подстанция: при перегрузе выбивает вводной автомат — включить в письме или по плашке кВт","Substation: overload trips the main breaker — switch it back on from the letter or the kW chip"
+"Увеличение мощности у сетевой компании: +20, +25, +45 кВт","Power upgrade from the grid company: +20, +25, +45 kW"
+"Ночной тариф вдвое дешевле; вкладка «Финансы → Электричество»","Night tariff is half price; Finances → Electricity tab"
+"Плашка кВт: сейчас / пик за сутки / лимит; значок «нет воздуха» у пневмостанков","kW chip: now / daily peak / limit; No air badge on pneumatic machines"
+"Директора конкурентов с характером: переманивают людей, перебивают клиентов, предлагают сделки и просят помощи","Rival directors with character: poach staff, steal clients, offer deals and ask for help"

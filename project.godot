@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Промзона"
 config/description="Симулятор строительства и управления российским заводом"
-config/version="1.52"
+config/version="1.53"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.png"
@@ -46,7 +46,7 @@ texture={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://assets/i18n/strings.en.translation", "res://assets/i18n/strings_a.en.translation", "res://assets/i18n/strings_b.en.translation", "res://assets/i18n/strings_c.en.translation", "res://assets/i18n/strings_d1.en.translation", "res://assets/i18n/strings_d2.en.translation", "res://assets/i18n/strings_e.en.translation", "res://assets/i18n/strings_f1.en.translation", "res://assets/i18n/strings_f2.en.translation", "res://assets/i18n/strings_f3.en.translation", "res://assets/i18n/strings_f5.en.translation", "res://assets/i18n/strings_141.en.translation", "res://assets/i18n/strings_144.en.translation", "res://assets/i18n/strings_146.en.translation", "res://assets/i18n/strings_147.en.translation", "res://assets/i18n/strings_148.en.translation", "res://assets/i18n/strings_148b.en.translation", "res://assets/i18n/strings_149.en.translation", "res://assets/i18n/strings_150.en.translation", "res://assets/i18n/strings_150b.en.translation", "res://assets/i18n/strings_150c.en.translation", "res://assets/i18n/strings_150d.en.translation", "res://assets/i18n/strings_151b.en.translation", "res://assets/i18n/strings_151.en.translation", "res://assets/i18n/strings_152.en.translation")
+locale/translations=PackedStringArray("res://assets/i18n/strings.en.translation", "res://assets/i18n/strings_a.en.translation", "res://assets/i18n/strings_b.en.translation", "res://assets/i18n/strings_c.en.translation", "res://assets/i18n/strings_d1.en.translation", "res://assets/i18n/strings_d2.en.translation", "res://assets/i18n/strings_e.en.translation", "res://assets/i18n/strings_f1.en.translation", "res://assets/i18n/strings_f2.en.translation", "res://assets/i18n/strings_f3.en.translation", "res://assets/i18n/strings_f5.en.translation", "res://assets/i18n/strings_141.en.translation", "res://assets/i18n/strings_144.en.translation", "res://assets/i18n/strings_146.en.translation", "res://assets/i18n/strings_147.en.translation", "res://assets/i18n/strings_148.en.translation", "res://assets/i18n/strings_148b.en.translation", "res://assets/i18n/strings_149.en.translation", "res://assets/i18n/strings_150.en.translation", "res://assets/i18n/strings_150b.en.translation", "res://assets/i18n/strings_150c.en.translation", "res://assets/i18n/strings_150d.en.translation", "res://assets/i18n/strings_151b.en.translation", "res://assets/i18n/strings_151.en.translation", "res://assets/i18n/strings_152.en.translation", "res://assets/i18n/strings_153.en.translation")
 locale/fallback="ru"
 
 [rendering]

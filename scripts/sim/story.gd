@@ -202,8 +202,11 @@ func resolve(id: int, choice: int) -> void:
 				sim.sales.decline(cid)
 		"thief", "union_form", "union_warn", "n1":
 			sim.crew.on_letter(str(l["ev"]), d, choice)
-		"price_war", "auction", "poach", "iso_audit":
+		"price_war", "auction", "poach", "iso_audit", "rival_steal", "rival_deal", "rival_help":
 			sim.market.on_letter(str(l["ev"]), d, choice)
+		"breaker":
+			if choice == 0:
+				sim.power.reset_all()
 		"cat", "kittens":
 			sim.town.on_letter(str(l["ev"]), d, choice)
 		"theft":

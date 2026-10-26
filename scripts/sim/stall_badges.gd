@@ -7,7 +7,7 @@ extends RefCounted
 
 const REFRESH_S := 0.5
 const HOLD_MIN := 15.0
-const KINDS := ["power", "operator", "input", "full", "idle"]
+const KINDS := ["power", "operator", "input", "full", "idle", "air"]
 
 var shown: Dictionary = {}     ## id станка -> {"k": вид, "why": String, "hint": String, "lvl": int, "m": Thing}
 var _since: Dictionary = {}    ## id станка -> [вид, минута, с которой держится причина]
@@ -37,6 +37,8 @@ func refresh(sim: Sim) -> bool:
 		if not m.built or m.demolish:
 			continue
 		var r := Stall.reason(sim, m)
+		if r.is_empty() and m.working:
+			r = Stall.air_reason(sim, m)   # 1.53: работает, но без воздуха — медленно
 		var k := str(r.get("k", ""))
 		if k == "":
 			continue
@@ -87,4 +89,6 @@ static func title(k: String) -> String:
 			return L.t("Нет заготовки")
 		"full":
 			return L.t("Выход полон")
+		"air":
+			return L.t("Нет воздуха")
 	return L.t("Нет работы")

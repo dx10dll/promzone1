@@ -9,7 +9,7 @@ const T := World.T
 const PX := 22.0
 
 const COLS := {"power": Color("#e0524a"), "operator": Color("#e0a63c"), "input": Color("#e0a63c"),
-	"full": Color("#e0a63c"), "idle": Color("#9aa0a6")}
+	"full": Color("#e0a63c"), "idle": Color("#9aa0a6"), "air": Color("#6fb4e0")}
 
 var sim: Sim
 var game: Node
@@ -103,6 +103,12 @@ func _icon(r: Rect2, k: String, z: float, hot: bool) -> void:
 			draw_line(Vector2(4, 6), Vector2(4, 12), col, 1.5)
 			draw_line(Vector2(14, 6), Vector2(14, 12), col, 1.5)
 			draw_line(Vector2(7, 9), Vector2(11, 9), col, 1.5)
+		"air":   # облачко воздуха со стрелкой вниз: пусто
+			draw_circle(Vector2(7, 8), 3.2, col)
+			draw_circle(Vector2(11, 7), 3.6, col)
+			draw_circle(Vector2(9, 10.5), 3.2, col)
+			draw_line(Vector2(3.5, 15), Vector2(14.5, 3), Color(0.09, 0.1, 0.11), 3.0)
+			draw_line(Vector2(3.5, 15), Vector2(14.5, 3), Color("#e0524a"), 1.6)
 		"full":   # стопка деталей
 			draw_rect(Rect2(4, 11, 10, 3.6), col)
 			draw_rect(Rect2(4, 7, 10, 3.2), col.darkened(0.15))

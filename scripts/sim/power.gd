@@ -56,6 +56,111 @@ func grid_kw() -> float:
 	return float(lv[clampi(grid_level, 0, lv.size() - 1)])
 
 
+## ---- 1.53: увеличение мощности по договору (заявка в сетевую компанию)
+
+func max_contract() -> int:
+	return Defs.barr("contract_kw").size() - 1
+
+
+func contract_kw() -> float:
+	var a: Array = Defs.barr("contract_kw")
+	return float(a[clampi(contract_steps, 0, a.size() - 1)]) if not a.is_empty() else 0.0
+
+
+## Следующий шаг: {"step", "kw" (прибавка), "cost", "days"}; пусто — выше некуда.
+func next_upgrade() -> Dictionary:
+	if contract_steps >= max_contract():
+		return {}
+	var st := contract_steps + 1
+	var kw: Array = Defs.barr("contract_kw")
+	var cost: Array = Defs.barr("contract_cost")
+	var days: Array = Defs.barr("contract_days")
+	return {"step": st, "kw": float(kw[st]) - float(kw[st - 1]), "cost": float(cost[st]), "days": int(days[st])}
+
+
+## Почему нельзя заказать (пусто — можно).
+func upgrade_block() -> String:
+	if not upgrade.is_empty():
+		return L.t("Заявка уже в работе: сетевая компания подключит мощность через %d дн.") % maxi(0, int(upgrade["due"]) - sim.day())
+	var nu := next_upgrade()
+	if nu.is_empty():
+		return L.t("Больше мощности по договору не выдают.")
+	if grid_input_id() < 0:
+		return L.t("Нужна подстанция в техпомещении.")
+	if sim.money < float(nu["cost"]):
+		return L.t("Не хватает денег: нужно %s.") % Defs.money_str(float(nu["cost"]))
+	return ""
+
+
+func order_upgrade() -> String:
+	var why := upgrade_block()
+	if why != "":
+		return why
+	var nu := next_upgrade()
+	sim.spend(float(nu["cost"]), "Техприсоединение: +%d кВт" % int(nu["kw"]))
+	upgrade = {"step": int(nu["step"]), "due": sim.day() + int(nu["days"]), "cost": float(nu["cost"])}
+	sim.notify(L.t("Заявка в сетевую компанию отправлена: +%d кВт к лимиту через %d дн.") % [int(nu["kw"]), int(nu["days"])], Sim.LVL_INFO)
+	return ""
+
+
+## Утро: заявка могла дойти; закрываем сутки (пик, расход).
+func on_new_day() -> void:
+	if not upgrade.is_empty() and sim.day() >= int(upgrade["due"]):
+		contract_steps = maxi(contract_steps, int(upgrade["step"]))
+		upgrade = {}
+		_acc = 1.0
+		sim.notify(L.t("Сетевая компания подключила дополнительную мощность: лимит подстанции теперь %d кВт.") % int(total_kw()), Sim.LVL_GOOD)
+
+
+## Тариф: ночью (с 23:00 до 7:00) электричество дешевле.
+func night_now() -> bool:
+	return is_night_at(sim.minute)
+
+
+static func is_night_at(minute: float) -> bool:
+	var h := fposmod(minute, 1440.0) / 60.0
+	return h >= Defs.b("tariff_night_from") or h < Defs.b("tariff_night_to")
+
+
+func price_now() -> float:
+	return Defs.b("power_price_kwh") * (Defs.b("tariff_night_k") if night_now() else 1.0)
+
+
+## Стоимость накопленных за сутки кВт·ч: [день ₽, ночь ₽].
+func cost_today() -> Array:
+	var p := Defs.b("power_price_kwh")
+	return [kwh_day * p, kwh_night * p * Defs.b("tariff_night_k")]
+
+
+## Закрыть сутки: списать за электричество (две строки — день и ночь) и записать в историю.
+func close_day() -> void:
+	var c := cost_today()
+	if kwh_day > 0.0:
+		sim.spend(float(c[0]), "Электроэнергия, день: %d кВт·ч" % int(kwh_day))
+	if kwh_night > 0.0:
+		sim.spend(float(c[1]), "Электроэнергия, ночь: %d кВт·ч" % int(kwh_night))
+	hist.push_front({"d": sim.day(), "kd": kwh_day, "kn": kwh_night, "cd": float(c[0]), "cn": float(c[1]), "peak": peak_day})
+	if hist.size() > 14:
+		hist.resize(14)
+	peak_prev = peak_day
+	peak_day = total_load
+	kwh_day = 0.0
+	kwh_night = 0.0
+	trips_today = 0
+	sim.power_kwh_day = 0.0
+
+
+## За последние n суток: [кВт·ч день, кВт·ч ночь, ₽ день, ₽ ночь].
+func week_sum(n: int = 7) -> Array:
+	var r := [0.0, 0.0, 0.0, 0.0]
+	for h: Dictionary in hist.slice(0, n):
+		r[0] += float(h["kd"])
+		r[1] += float(h["kn"])
+		r[2] += float(h["cd"])
+		r[3] += float(h["cn"])
+	return r
+
+
 func max_level() -> int:
 	return Defs.barr("grid_levels").size() - 1
 
@@ -126,6 +231,8 @@ func source_capacity(t: Thing) -> float:
 		cap = maxf(cap, grid_kw())
 	if boostable(t):
 		cap += battery_boost(t)   # 1.18: аккумуляторы прибавляют мощность
+	if contract_steps > 0 and t.id == grid_input_id():
+		cap += contract_kw()   # 1.53: увеличение мощности по договору
 	return cap
 
 
@@ -258,6 +365,16 @@ func _sig_now() -> String:
 var _light_t := 0.0
 var _light_key := ""
 
+## 1.53: договор с сетевой компанией, пик нагрузки и тарифы.
+var contract_steps := 0            ## сколько раз увеличивали мощность (0..max_contract())
+var upgrade: Dictionary = {}       ## заявка в сетевую компанию: {"step", "due" (день), "cost"}; пусто — нет заявки
+var peak_day := 0.0                ## пик нагрузки за текущие сутки, кВт
+var peak_prev := 0.0               ## пик за вчера
+var kwh_day := 0.0                 ## сегодня дневным тарифом, кВт·ч
+var kwh_night := 0.0               ## сегодня ночным тарифом, кВт·ч
+var trips_today := 0
+var hist: Array = []               ## по суткам: {d, kd, kn, cd, cn, peak} — последние 14
+
 
 var _acc := 0.0
 
@@ -324,7 +441,13 @@ func tick(dt0: float) -> void:
 				_trip(net)
 		else:
 			net.over_time = maxf(0.0, net.over_time - dt)
-	sim.power_kwh_day += total_load * dt / 60.0
+	var kwh := total_load * dt / 60.0
+	sim.power_kwh_day += kwh
+	if night_now():
+		kwh_night += kwh
+	else:
+		kwh_day += kwh
+	peak_day = maxf(peak_day, total_load)
 	# 1.22: свет пересчитываем раз в игровую минуту (или сразу, если что-то построили/снесли)
 	_light_t -= dt
 	var lk := "%d|%d|%s|%s" % [sim.thing_rev, sim.rooms.rev, anyone, dark]
@@ -430,6 +553,13 @@ func _trip(net: Net) -> void:
 			cell = st.cell
 	sim.notify(L.t("Выбило автомат: перегрузка сети (%.1f из %d кВт). Его сбросят на подстанции, но перегруз повторится — выключите лишний станок в его карточке или прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый).") % [net.load, int(net.capacity)], Sim.LVL_BAD, cell)
 	sim.sfx.emit("breaker", cell)
+	trips_today += 1
+	# 1.53: тревога — окно с кнопкой «Включить» (игра встаёт на паузу), завод стоит, пока автомат не включат
+	sim.story.letter("breaker", L.t("ТРЕВОГА: выбило вводной автомат"),
+		L.t("Нагрузка %.1f кВт превысила лимит подстанции %d кВт — завод обесточен, станки стоят. Включить автомат можно сразу, но если не убрать лишнюю нагрузку или не заказать больше мощности у сетевой компании, он выбьет снова.") % [net.load, int(net.capacity)],
+		"bolt_off", Sim.LVL_BAD,
+		[{"text": L.t("Включить"), "hint": L.t("Автомат включён, станки продолжают работу")}, {"text": L.t("Позже"), "hint": L.t("Завод стоит, пока рабочие не сбросят автомат на подстанции")}],
+		1, {"cx": cell.x, "cy": cell.y})
 	sim.story.on_trip(cell)
 	for w in sim.workers:
 		if w.present:
@@ -448,6 +578,22 @@ func reset_source(source_id: int) -> void:
 	net.over_time = 0.0
 	for sid in net.sources:
 		tripped_sources.erase(sid)
+
+
+## 1.53: ручное включение вводного автомата — сбрасывает все выбитые сети. Сколько сетей включили.
+func reset_all() -> int:
+	var n := 0
+	for net in nets:
+		if net.tripped:
+			net.tripped = false
+			net.over_time = 0.0
+			n += 1
+			for sid in net.sources:
+				tripped_sources.erase(sid)
+	if n > 0:
+		_acc = 1.0
+		sim.notify(L.t("Автомат включён: завод снова под током."), Sim.LVL_INFO)
+	return n
 
 
 func powered(t: Thing) -> bool:
@@ -498,13 +644,22 @@ func any_tripped() -> bool:
 
 
 func to_dict() -> Dictionary:
-	return {"level": grid_level, "tripped": tripped_sources.keys()}
+	return {"level": grid_level, "tripped": tripped_sources.keys(), "contract": contract_steps, "upgrade": upgrade,
+		"peak": peak_day, "peak_prev": peak_prev, "kd": kwh_day, "kn": kwh_night, "trips": trips_today, "hist": hist}
 
 
 func from_dict(d: Dictionary) -> void:
 	grid_level = int(d.get("level", 0))
 	if float(d.get("eta", -1.0)) >= 0.0:   # заявка из старого сохранения — считаем выполненной
 		grid_level = mini(grid_level + 1, max_level())
+	contract_steps = clampi(int(d.get("contract", 0)), 0, maxi(0, max_contract()))
+	upgrade = d.get("upgrade", {})
+	peak_day = float(d.get("peak", 0.0))
+	peak_prev = float(d.get("peak_prev", 0.0))
+	kwh_day = float(d.get("kd", 0.0))
+	kwh_night = float(d.get("kn", 0.0))
+	trips_today = int(d.get("trips", 0))
+	hist = d.get("hist", [])
 	tripped_sources.clear()
 	for sid in d.get("tripped", []):
 		tripped_sources[int(sid)] = true

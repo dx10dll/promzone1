@@ -70,6 +70,40 @@ func _ready() -> void:
 		await get_tree().create_timer(0.8).timeout
 		gm.hud.info.refresh()
 		print("card size ", gm.hud.info.size)
+	elif mode == "power153":
+		# 1.53: «Финансы → Электричество»: пик, лимит, расход день/ночь, заявка на мощность; плашка кВт вверху
+		var pwr := gm.sim.power
+		gm.sim.minute = 12.0 * 1440.0 + 10.0 * 60.0
+		gm.sim.money = 400000.0
+		for i in 7:
+			pwr.hist.append({"d": 11 - i, "kd": 120.0 + i * 9.0, "kn": 38.0 + i * 5.0, "cd": (120.0 + i * 9.0) * 7.5, "cn": (38.0 + i * 5.0) * 3.75, "peak": 21.0 + (i % 3) * 3.5})
+		pwr.kwh_day = 64.0
+		pwr.kwh_night = 21.0
+		pwr.peak_day = 23.4
+		pwr.peak_prev = 26.1
+		pwr.trips_today = 1
+		pwr.upgrade = {"step": 1, "due": gm.sim.day() + 2, "cost": 60000.0}
+		gm.hud.open_window("finance")
+		await get_tree().create_timer(0.4).timeout
+		gm.hud.win.select_tab("energy")
+	elif mode == "rivals153":
+		# 1.53: «Заказы → Конкуренты»: карточки директоров
+		var mk := gm.sim.market
+		gm.sim.office.all_depts = true
+		gm.sim.minute = 40.0 * 1440.0 + 9.0 * 60.0
+		var rels := [-62, 38, 6, 71]
+		var logs := [["Переманивал наших людей", "Перебивал наших клиентов"], ["Взяли часть их заказа (+5)", "Купили у них станок (+4)"], ["Просил одолжить металл"], ["Согласились на переговоры о слиянии (+10)", "Звал к себе: Петров А."]]
+		for i in mk.comps.size():
+			var cm: Dictionary = mk.comps[i]
+			var dd := Rivals.dir_of(cm)
+			dd["rel"] = rels[i % 4]
+			for t in logs[i % 4]:
+				(dd["log"] as Array).append({"d": 30 + i * 3, "t": t})
+		gm.hud.open_window("orders")
+		await get_tree().create_timer(0.4).timeout
+		gm.hud.win.select_tab("compet")
+		await get_tree().create_timer(0.4).timeout
+		gm.hud.win.scroll.scroll_vertical = 520
 	elif mode == "plan":
 		gm.hud.toggle_plan()
 	elif mode.begins_with("win:"):

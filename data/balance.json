@@ -57,6 +57,27 @@
   3,
   5
  ],
+ "contract_kw": [
+  0,
+  20,
+  45,
+  90
+ ],
+ "contract_cost": [
+  0,
+  60000,
+  150000,
+  320000
+ ],
+ "contract_days": [
+  0,
+  2,
+  4,
+  6
+ ],
+ "tariff_night_k": 0.5,
+ "tariff_night_from": 23,
+ "tariff_night_to": 7,
  "light_kw_per_cell": 0.015,
  "cable_cost": 150,
  "breaker_delay": 3,

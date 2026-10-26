@@ -42,6 +42,18 @@ static func _iname(k: String) -> String:
 	return Defs.material_name(k) if Defs.materials.has(k) else Defs.product_name(k)
 
 
+## 1.53: пневмостанок (покраска) без сжатого воздуха: нет компрессора, он выключен или без тока. Пусто — воздух есть или не нужен.
+static func air_reason(sim: Sim, m: Thing) -> Dictionary:
+	if sim.eng.air_mode(m) != "need" or not m.enabled or m.broken:
+		return {}
+	if sim.eng.pressure(m) > 0.0:
+		return {}
+	var net := sim.eng.anet_of_thing(m)
+	if net == null:
+		return _r(L.t("Нет воздуха"), L.t("Станку нужен сжатый воздух: поставьте компрессор и протяните воздушную сеть до клетки подключения (меню «Сети»)."), WARN, "air")
+	return _r(L.t("Нет воздуха"), L.t("Компрессор в этой сети не качает: проверьте, что он включён, есть ток и стоит в компрессорной."), WARN, "air")
+
+
 ## Почему станок не работает. Пусто — если работает.
 static func reason(sim: Sim, m: Thing) -> Dictionary:
 	if m.working:
@@ -62,6 +74,9 @@ static func reason(sim: Sim, m: Thing) -> Dictionary:
 		return _r(L.t("Стоит вне цеха"), L.t("Разметьте зону «Цех» там, где стоит станок (Зоны → Производство)."), BAD)
 	if not sim.water.has_water(m):
 		return _r(L.t("Нет воды"), L.t("Протяните трубу от ввода воды или насоса (меню «Сети»)."), BAD)
+	var ar := air_reason(sim, m)
+	if not ar.is_empty():
+		return ar
 	if m.product == "":
 		return _r(L.t("Нет задания"), L.t("Нет заказов на этот передел. Возьмите заказ или откройте рынок."), INFO, "idle")
 	if not sim.prod.has_cons(m):

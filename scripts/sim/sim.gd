@@ -2211,9 +2211,8 @@ func _on_new_day() -> void:
 	season.on_new_day()
 	var rent := Defs.b("rent_per_day")
 	spend(rent, "Аренда бокса")
-	if power_kwh_day > 0.0:
-		spend(power_kwh_day * Defs.b("power_price_kwh"), "Электроэнергия: %d кВт·ч" % int(power_kwh_day))
-		power_kwh_day = 0.0
+	power.close_day()   # 1.53: электричество двумя строками — день и ночь
+	power.on_new_day()
 	if money < 0.0:
 		notify_once("cash", L.t("Кассовый разрыв! Денег нет — срочно выполняйте заказы."), LVL_BAD, Vector2i(-1, -1), 1440.0)
 
@@ -2310,6 +2309,8 @@ static func from_dict(d: Dictionary) -> Sim:
 	s.bp_progress_at = float(d.get("bp_at", s.minute))
 	s.build_priority = bool(d.get("build_priority", false))
 	s.power.from_dict(d.get("grid", {}))
+	if not (d.get("grid", {}) as Dictionary).has("kd"):
+		s.power.kwh_day = s.power_kwh_day   # сохранение до 1.53: недосчитанные кВт·ч — по дневному тарифу
 	s.supply_reserve = int(d.get("reserve", 1))
 	if d.has("cons"):
 		var cd: Dictionary = d["cons"]

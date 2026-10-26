@@ -38,7 +38,8 @@ const GROUPS := {
 	"finance": {"title": "Финансы", "icon": "finances", "secs": [
 		["summary", "Сводка", "finance", "finance", "summary"], ["charts", "Графики", "chart_up", "finance", "charts"],
 		["weeks", "По неделям", "log", "finance", "weeks"], ["loans", "Кредиты и лизинг", "money", "finance", "loans"],
-		["insurance", "Страхование", "shield", "finance", "insurance"], ["grants", "Гранты", "medal", "finance", "grants"]]},
+		["insurance", "Страхование", "shield", "finance", "insurance"], ["grants", "Гранты", "medal", "finance", "grants"],
+		["energy", "Электричество", "energy", "finance", "energy"]]},
 	"office": {"title": "Управление", "icon": "management", "secs": [
 		["develop", "Развитие и отделы", "develop", "develop", ""], ["research", "Разработки", "research", "research", ""],
 		["iso", "ISO 9001", "iso", "market", "iso"], ["advisor", "Главный инженер", "engineer", "market", "advisor"]]},
@@ -548,6 +549,8 @@ func _signature() -> String:
 				parts.append(str(sim.ok_in_storage(p)))
 			parts.append("%d|%d|%d|%d|%d|%d" % [sim.sales.log.size(), sim.sales.risk, sim.sales.margin_i, sim.sales.off.size(), sim.day(), sim.sales.queue.size()])
 			parts.append(sim.market.policy + str(int(sim.market.share * 1000.0)) + str(sim.market.alive_comps().size()))
+			for rc0: Dictionary in sim.market.alive_comps():
+				parts.append("%d%d" % [Rivals.rel_of(rc0), (Rivals.dir_of(rc0)["log"] as Array).size()])
 			for c: Dictionary in sim.sales.contracts:
 				parts.append("%d%s%d%d" % [int(c["id"]), str(c["status"]), int(c["done_w"]), int(c["fails"])])
 			return ",".join(parts)
@@ -593,6 +596,8 @@ func _signature() -> String:
 					for goal: Dictionary in Grants.def(str(a["id"])).get("goals", []):
 						gs += "1" if sim.grants.goal_ok(goal, a) else "0"
 				gs += "|%d|%d|%d" % [sim.grants.active.size(), sim.grants.done.size(), sim.day()]
+			if tab == "energy":
+				gs = "%d|%d|%s|%d|%d" % [int(sim.power.kwh_day + sim.power.kwh_night), int(sim.power.peak_day), str(sim.power.upgrade), sim.power.contract_steps, int(sim.power.night_now())]
 			return "%s|%d|%d|%d|%s|%s|%d|%s|%d" % [tab, sim.ledger.size(), int(sim.money), sim.office.loans.size(), gs, str(sim.market.insurance), sim.market.leases.size(), str(sim.market.leasing_on), sim.market.hist.size()]
 		"office":
 			var s6: Array[String] = [str(sim.office.policies), sim.office.supplier, str(sim.rooms.list.size()), str(sim.thing_rev)]
@@ -2088,6 +2093,9 @@ func _finance() -> void:
 		"grants":
 			_finance_grants()
 			return
+		"energy":
+			_finance_energy()
+			return
 	var st := sim.stats
 	_info(tr("налог с выручки %d%% · долг по кредитам %s") % [int(round(sim.office.tax_rate() * 100.0)), Defs.money_str(sim.office.debt())])
 	_crisis_card()
@@ -2177,6 +2185,63 @@ func _log() -> void:
 		if tg != "" and not tg.begins_with("events:log"):
 			cb = func() -> void: hud.call_deferred("open_window", tg)
 		_trow([[dot, 6], [_cl(tr("день %d, %s") % [int(e["day"]), str(e["time"])], 12, UITheme.MUTED), 110], [t, -1]], cb, 28.0, str(e["text"]) + (tr("\nНажмите — открыть, где с этим разбираться") if tg != "" else ""))
+
+
+## 1.53: «Финансы → Электричество»: расход днём и ночью, пик нагрузки, увеличение мощности у сетевой компании.
+func _finance_energy() -> void:
+	var pw := sim.power
+	var price := Defs.b("power_price_kwh")
+	var nk := Defs.b("tariff_night_k")
+	_info(tr("сейчас %s тариф · %.1f ₽/кВт·ч · лимит подстанции %d кВт") % [tr("ночной") if pw.night_now() else tr("дневной"), pw.price_now(), int(pw.total_kw())])
+	var ct := pw.cost_today()
+	var wk := pw.week_sum(7)
+	var g := _cards(4)
+	for t in [UITheme.stat(tr("Сейчас"), tr("%.1f кВт") % pw.total_load, UITheme.TEXT, tr("из %d кВт лимита") % int(pw.total_kw())),
+			UITheme.stat(tr("Пик за сутки"), tr("%.1f кВт") % maxf(pw.peak_day, pw.total_load), UITheme.BAD if pw.peak_day > pw.total_kw() * 0.9 else UITheme.TEXT, tr("вчера %.1f кВт") % pw.peak_prev),
+			UITheme.stat(tr("Сегодня"), Defs.money_str(float(ct[0]) + float(ct[1])), UITheme.WARN, tr("%d кВт·ч") % int(pw.kwh_day + pw.kwh_night)),
+			UITheme.stat(tr("Выбивало сегодня"), str(pw.trips_today), UITheme.BAD if pw.trips_today > 0 else UITheme.MUTED, tr("раз вводной автомат"))]:
+		t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		g.add_child(t)
+	var c := _card_in(content, tr("Расход на электричество"), tr("Днём кВт·ч стоит %.1f ₽, ночью (с 23:00 до 7:00) — %.1f ₽.") % [price, price * nk])
+	for row: Array in [[tr("Сегодня, день"), "%d %s" % [int(pw.kwh_day), tr("кВт·ч")], Defs.money_str(float(ct[0]))], [tr("Сегодня, ночь"), "%d %s" % [int(pw.kwh_night), tr("кВт·ч")], Defs.money_str(float(ct[1]))],
+			[tr("7 дней, день"), "%d %s" % [int(wk[0]), tr("кВт·ч")], Defs.money_str(float(wk[2]))], [tr("7 дней, ночь"), "%d %s" % [int(wk[1]), tr("кВт·ч")], Defs.money_str(float(wk[3]))]]:
+		var rh := UITheme.hbox(8)
+		var rl := UITheme.label(str(row[0]), 13, UITheme.MUTED)
+		rl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		rh.add_child(rl)
+		rh.add_child(UITheme.label(str(row[1]), 13, UITheme.TEXT))
+		var rv := UITheme.label(str(row[2]), 13, UITheme.BAD, UITheme.f_semi)
+		rv.custom_minimum_size = Vector2(110, 0)
+		rv.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		rh.add_child(rv)
+		c.add_child(rh)
+	c.add_child(UITheme.para(tr("Совет: ночная смена дешевле по энергии — ночью электричество вдвое дешевле. Печи и прессы выгодно ставить на ночь."), 12, UITheme.INFO))
+	var u := _card_in(content, tr("Мощность по договору"), tr("Лимит подстанции — 15–40 кВт плюс аккумуляторы. Если нагрузка выше лимита, вводной автомат выбивает, и завод стоит, пока его не включат. Сетевая компания за деньги подключит дополнительные кВт — не сразу."))
+	var nu := pw.next_upgrade()
+	u.add_child(UITheme.para(tr("Сейчас по договору: +%d кВт к подстанции (шаг %d из %d).") % [int(pw.contract_kw()), pw.contract_steps, pw.max_contract()], 13, UITheme.TEXT))
+	if not pw.upgrade.is_empty():
+		u.add_child(UITheme.chip(tr("заявка в работе: ещё %d дн.") % maxi(0, int(pw.upgrade["due"]) - sim.day()), UITheme.WARN, ""))
+	elif nu.is_empty():
+		u.add_child(UITheme.para(tr("Больше мощности по договору не выдают."), 12, UITheme.MUTED))
+	else:
+		var b := UITheme.primary(tr("Заказать +%d кВт · %s · %d дн.") % [int(nu["kw"]), Defs.money_str(float(nu["cost"])), int(nu["days"])], func() -> void:
+			var err := pw.order_upgrade()
+			if err != "":
+				hud.toast(err, Sim.LVL_WARN)
+			rebuild(true))
+		var why := pw.upgrade_block()
+		b.disabled = why != ""
+		if why != "":
+			b.tooltip_text = why
+		u.add_child(b)
+	if pw.any_tripped():
+		u.add_child(UITheme.primary(tr("Включить автомат"), func() -> void:
+			pw.reset_all()
+			rebuild(true)))
+	_thead([[tr("День"), 90], [tr("Пик, кВт"), 100], [tr("День, кВт·ч"), 120], [tr("Ночь, кВт·ч"), 120], [tr("Расход"), -1]])
+	for h: Dictionary in pw.hist.slice(0, 7):
+		_trow([[_cl(str(int(h["d"])), 13, UITheme.MUTED), 90], [_cl("%.1f" % float(h["peak"]), 13), 100], [_cl("%d" % int(h["kd"]), 13), 120], [_cl("%d" % int(h["kn"]), 13), 120],
+			[_cl(Defs.money_str(float(h["cd"]) + float(h["cn"])), 13, UITheme.BAD, UITheme.f_semi), -1]], Callable(), 28.0)
 
 
 func _finance_weeks() -> void:
@@ -3304,8 +3369,52 @@ func _compet() -> void:
 		_trow([[sw, 14], [_cl2(L.name(str(cp["name"])), tr("~%d станков") % int(roundf(float(cp["size"]) * 3.0)), UITheme.TEXT), -1], [_cl(L.t(mk._spec_text(cp)), 12, UITheme.MUTED), 250],
 			[_cl(ptxt, 13, UITheme.BAD if war else UITheme.TEXT), 110], [_cl("%d%%" % int(roundf(float(cp["quality"]) * 100.0)), 13), 90],
 			[UITheme.meter(float(cp["share"]) * 100.0, mk.comp_color(str(cp["id"])), 90, "%d%%" % int(roundf(float(cp["share"]) * 100.0))), 170]], Callable(), 40.0)
+	_rival_cards(rows)
 	var cc := _card_in(content, tr("Доля рынка по дням"))
 	cc.add_child(_share_chart(150.0))
+
+
+## 1.53: карточки директоров соседних заводов: портрет, имя, характер, отношение (−100…100) и последние действия.
+func _rival_cards(rows: Array) -> void:
+	if rows.is_empty():
+		return
+	content.add_child(UITheme.caption(tr("Директора соседних заводов")))
+	content.add_child(UITheme.para(tr("У каждого завода свой директор. От вашего решения зависит, как он к вам относится: враг переманивает людей и перебивает клиентов, друг делится заказами, продаёт станки и просит о помощи. Отношение меняется письмами и ценовой политикой."), 12, UITheme.MUTED))
+	var g := _cards(2)
+	for cp: Dictionary in rows:
+		var d := Rivals.dir_of(cp)
+		var rel := Rivals.rel_of(cp)
+		var cardc := _card_in(g)
+		var top := UITheme.hbox(12)
+		if PortraitKit.available():
+			var por := Portrait.new()
+			por.set_look(Rivals.look(cp), 1.0, {"age": int(Rivals.look(cp)["age"]), "mood": 50.0 + rel * 0.3, "doc": true})
+			por.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+			top.add_child(por)
+		var tv := UITheme.vbox(3)
+		tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tv.add_child(UITheme.label(Rivals.dname(cp), 15, UITheme.TEXT, UITheme.f_semi))
+		tv.add_child(UITheme.label(L.name(str(cp["name"])), 12, mk_color(str(cp["id"]))))
+		var ch := UITheme.chip(Rivals.char_name(str(d["char"])), UITheme.INFO, tr(str(Rivals.CHARS[str(d["char"])]["desc"])))
+		ch.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		tv.add_child(ch)
+		var rc: Color = UITheme.BAD if rel <= -25 else (UITheme.GOOD if rel >= 25 else UITheme.MUTED)
+		tv.add_child(UITheme.label(tr("Отношение к нам: %s (%+d)") % [Rivals.rel_word(rel), rel], 13, rc, UITheme.f_semi))
+		var rb := UITheme.bar((rel + 100) * 0.5, rc, 160, 6)
+		rb.tooltip_text = tr("От −100 (враждебное) до +100 (союзник)")
+		tv.add_child(rb)
+		top.add_child(tv)
+		cardc.add_child(top)
+		var lg: Array = d["log"]
+		if lg.is_empty():
+			cardc.add_child(UITheme.para(tr("Пока ничего не делал."), 12, UITheme.MUTED))
+		else:
+			for e: Dictionary in lg.slice(0, 4):
+				cardc.add_child(UITheme.para(tr("день %d: %s") % [int(e["d"]), str(e["t"])], 12, UITheme.MUTED))
+
+
+func mk_color(id: String) -> Color:
+	return sim.market.comp_color(id)
 
 
 ## Легенда графика: цветная метка и название серии.

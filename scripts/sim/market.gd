@@ -71,6 +71,7 @@ func _new_comp(p: Dictionary) -> Dictionary:
 	c["weak_weeks"] = 0
 	c["share"] = 0.0
 	c["base_price"] = float(p["price"])
+	c["dir"] = Rivals.make_dir(str(p["id"]))   # 1.53: директор завода
 	return c
 
 
@@ -150,6 +151,7 @@ func inquiry_k() -> float:
 	var k := competitiveness() * (1.1 if sim.office.active("sales") else 1.0)
 	if war_active() and policy != "dump":
 		k *= 0.85
+	k *= sim.story.mod("rival_steal")   # 1.53: сосед перебивает клиентов
 	return clampf(k, 0.55, 1.6)
 
 
@@ -223,6 +225,7 @@ func _on_monday() -> void:
 	_pay_insurance()
 	if sim.day() >= 8 and sim.story.enabled:
 		_comp_events()
+		Rivals.week(self)   # 1.53: ход директора по характеру (свой генератор случайных чисел)
 	if memo_on and sim.day() >= 7 and sim.office.active("engineer"):
 		var adv := advice()
 		if not adv.is_empty():
@@ -350,36 +353,46 @@ func _bankrupt(c: Dictionary) -> void:
 		sim.story.info(L.t("Банкротство конкурента"), t, "court", Sim.LVL_GOOD)
 
 
-func _poach() -> void:
+func _poach(cc: Dictionary = {}) -> bool:
 	if sim.workers.size() < 5:
-		return   # гараж на троих конкурентам неинтересен
+		return false   # гараж на троих конкурентам неинтересен
 	var best: Worker = null
 	for w in sim.workers:
-		if not w.has_grade() or w.grade() < 4 or w.practice_until >= 0:
+		if not w.has_grade() or w.grade() < 3 or w.practice_until >= 0:
 			continue
 		if best == null or w.grade() > best.grade() or (w.grade() == best.grade() and w.mood < best.mood):
 			best = w
 	if best == null:
-		return
+		return false
 	var al := alive_comps()
 	if al.is_empty():
-		return
-	var c: Dictionary = al[sim.rng.randi_range(0, al.size() - 1)]
+		return false
+	var c: Dictionary = cc
+	if c.is_empty():
+		c = al[sim.rng.randi_range(0, al.size() - 1)]
 	var raise := int(roundf(best.wage * 0.15 / 50.0) * 50)
+	var d := Rivals.dir_of(c)
+	Rivals.log_add(c, sim, L.t("Звал к себе: %s") % best.full_name())
 	sim.story.letter("poach", L.t("Переманивают %s") % best.full_name(),
-		L.t("%s зовёт к себе %s (%s): обещают на 20%% больше. Человек думает.") % [Company.firm(str(c["name"])), best.full_name(), best.title_lc()],
+		L.t("Ваш %s %s получил предложение от %s: директор %s (%s) обещает на 20%% больше. Человек думает.") % [best.title_lc(), best.full_name(), Company.firm(str(c["name"])), Rivals.short_name(c), Rivals.char_name(str(d["char"])).to_lower()],
 		"thief", Sim.LVL_WARN,
-		[{"text": L.t("Поднять ставку на %s") % Defs.money_str(raise), "hint": L.t("Останется и будет доволен")},
+		[{"text": L.t("Удержать надбавкой +%s") % Defs.money_str(raise), "hint": L.t("Останется и будет доволен")},
 		{"text": L.t("Поговорить по душам"), "hint": L.t("Останется, если %s у нас хорошо (настроение %d)") % [L.t("ей") if best.female else L.t("ему"), int(best.mood)]},
 		{"text": L.t("Отпустить"), "hint": L.t("Уйдёт к конкуренту")}],
 		1, {"w": best.id, "raise": raise, "comp": str(c["id"])})
+	return true
 
 
 ## Решение по письму (вызывается из Story.resolve).
 func on_letter(ev: String, d: Dictionary, choice: int) -> void:
+	if ev.begins_with("rival_"):
+		Rivals.on_letter(self, ev, d, choice)
+		return
 	match ev:
 		"price_war":
 			var c := comp(str(d.get("comp", "")))
+			if not c.is_empty():
+				Rivals.shift(c, sim, [-5, 0, 2][clampi(choice, 0, 2)], [L.t("Ответили на войну цен демпингом"), L.t("Промолчали в войне цен"), L.t("Ответили качеством, а не ценой")][clampi(choice, 0, 2)])
 			if choice == 0:
 				policy = "dump"
 				sim.notify(L.t("Перешли на демпинг: цены −10%. Вернуть цены можно в «Заказы → Конкуренты»."), Sim.LVL_INFO)
@@ -406,9 +419,13 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 			if choice == 0:
 				w.wage += int(d.get("raise", 300))
 				Mood.add(sim, w, "raise")
+				if not c2.is_empty():
+					Rivals.shift(c2, sim, -3, L.t("Удержали человека надбавкой"))
 				w.add_history(sim.day(), L.t("Звали к конкуренту — остался за прибавку"))
 				sim.notify(L.t("%s остаётся: ставку подняли.") % w.full_name(), Sim.LVL_GOOD)
 			elif choice == 1 and w.mood >= 50.0:
+				if not c2.is_empty():
+					Rivals.shift(c2, sim, -2, L.t("Человек остался у нас"))
 				w.add_history(sim.day(), L.t("Звали к конкуренту — остался: «Здесь свои»"))
 				sim.notify(L.t("%s подумал и остался: «Здесь свои люди, куда я пойду».") % w.full_name(), Sim.LVL_GOOD)
 			else:
@@ -416,6 +433,7 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 				sim.notify(L.t("%s ушёл в %s.") % [w.full_name(), cn], Sim.LVL_BAD)
 				sim.fire(w, true)
 				if not c2.is_empty():
+					Rivals.shift(c2, sim, 3, L.t("Отпустили человека без скандала"))
 					c2["quality"] = minf(0.95, float(c2["quality"]) + 0.02)
 		"iso_audit":
 			pass
@@ -760,6 +778,8 @@ func from_dict(d: Dictionary) -> void:
 	if d.is_empty():
 		return
 	comps = d.get("comps", comps)
+	for c0: Dictionary in comps:
+		Rivals.dir_of(c0)   # сохранения до 1.53: директоров нет — создаём
 	policy = str(d.get("policy", "market"))
 	share = float(d.get("share", 0.0))
 	share_hist = d.get("share_hist", [])
