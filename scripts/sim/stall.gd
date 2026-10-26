@@ -8,6 +8,7 @@ const WARN := 1    ## скоро само не пройдёт
 const INFO := 2    ## обычное ожидание
 
 
+## Поле "k" — вид значка над станком (1.49): power | operator | full | input | idle, пусто — значка нет.
 ## Список: [{"m": Thing, "why": String, "hint": String, "lvl": int}], сначала серьёзные.
 static func list(sim: Sim) -> Array:
 	var out: Array = []
@@ -33,8 +34,8 @@ static func bad_count(sim: Sim) -> int:
 	return n
 
 
-static func _r(why: String, hint: String, lvl: int) -> Dictionary:
-	return {"why": why, "hint": hint, "lvl": lvl}
+static func _r(why: String, hint: String, lvl: int, k: String = "") -> Dictionary:
+	return {"why": why, "hint": hint, "lvl": lvl, "k": k}
 
 
 static func _iname(k: String) -> String:
@@ -50,9 +51,9 @@ static func reason(sim: Sim, m: Thing) -> Dictionary:
 	if not m.enabled:
 		return _r(L.t("Выключен"), L.t("Включите его в карточке станка или в списке станков."), INFO)
 	if not sim.power.connected(m):
-		return _r(L.t("Нет кабеля"), L.t("Заведите кабель от подстанции в клетку его розетки (меню «Сети»)."), BAD)
+		return _r(L.t("Нет кабеля"), L.t("Заведите кабель от подстанции в клетку его розетки (меню «Сети»)."), BAD, "power")
 	if not sim.power.powered(m):
-		return _r(L.t("Нет тока"), L.t("Не хватает мощности или отключена подстанция: проверьте «Сети»."), BAD)
+		return _r(L.t("Нет тока"), L.t("Не хватает мощности или отключена подстанция: проверьте «Сети»."), BAD, "power")
 	if sim.inspect.is_suspended(m):
 		return _r(L.t("Опечатан проверкой"), L.t("Устраните нарушение — после повторной проверки снимут пломбу."), BAD)
 	if m.condition < 15.0:
@@ -62,7 +63,7 @@ static func reason(sim: Sim, m: Thing) -> Dictionary:
 	if not sim.water.has_water(m):
 		return _r(L.t("Нет воды"), L.t("Протяните трубу от ввода воды или насоса (меню «Сети»)."), BAD)
 	if m.product == "":
-		return _r(L.t("Нет задания"), L.t("Нет заказов на этот передел. Возьмите заказ или откройте рынок."), INFO)
+		return _r(L.t("Нет задания"), L.t("Нет заказов на этот передел. Возьмите заказ или откройте рынок."), INFO, "idle")
 	if not sim.prod.has_cons(m):
 		var cn := str(sim.prod.cons_need(m)[0])
 		return _r(L.t("Нет расходника"), L.t("Закончился %s — закажите в «Металл и расходники».") % L.dt("consumable.%s.short" % cn, str(Defs.consumables.get(cn, {}).get("short", cn))), WARN)
@@ -76,19 +77,19 @@ static func reason(sim: Sim, m: Thing) -> Dictionary:
 				here += 1
 	if ops == 0:
 		var pn := L.t(str(Worker.PROF_NAMES.get(str(Defs.processes.get(pr, {}).get("prof", "")), "станочник")))
-		return _r(L.t("Некому работать"), L.t("Нет ни одного человека на этот передел: наймите (%s).") % pn.to_lower(), WARN)
+		return _r(L.t("Некому работать"), L.t("Нет ни одного человека на этот передел: наймите (%s).") % pn.to_lower(), WARN, "operator")
 	if here == 0:
 		return _r(L.t("Станочник не на смене"), L.t("Все, кто умеет, сейчас дома или в другую смену."), INFO)
 	if m.is_batch():
 		if sim.count_slot(m, 0) == 0:
-			return _r(L.t("Ждёт загрузки"), L.t("Печь ждёт деталей с предыдущей операции."), INFO)
-		return _r(L.t("Ждёт рабочего"), L.t("Загрузка есть — термист скоро запустит печь."), INFO)
+			return _r(L.t("Ждёт загрузки"), L.t("Печь ждёт деталей с предыдущей операции."), INFO, "input")
+		return _r(L.t("Ждёт рабочего"), L.t("Загрузка есть — термист скоро запустит печь."), INFO, "operator")
 	if sim.count_slot(m, 1) >= m.slot_cap(1):
-		return _r(L.t("Выход забит"), L.t("Готовые детали некому унести: нужен разнорабочий или место на стеллаже."), WARN)
+		return _r(L.t("Выход забит"), L.t("Готовые детали некому унести: нужен разнорабочий или место на стеллаже."), WARN, "full")
 	var miss := sim.prod.missing_inputs(m)
 	if not miss.is_empty():
 		var k := str(miss.keys()[0])
 		if Defs.materials.has(k) and sim.free_material(k) <= 0:
-			return _r(L.t("Нет металла"), L.t("%s нет на складе — закажите в «Металл и расходники».") % _iname(k), WARN)
-		return _r(L.t("Ждёт заготовок"), L.t("Не хватает: %s ×%d — несут или ждут предыдущей операции.") % [_iname(k), int(miss[k])], INFO)
+			return _r(L.t("Нет металла"), L.t("%s нет на складе — закажите в «Металл и расходники».") % _iname(k), WARN, "input")
+		return _r(L.t("Ждёт заготовок"), L.t("Не хватает: %s ×%d — несут или ждут предыдущей операции.") % [_iname(k), int(miss[k])], INFO, "input")
 	return _r(L.t("Ждёт станочника"), L.t("Заготовки есть, станочник занят на другой работе."), INFO)

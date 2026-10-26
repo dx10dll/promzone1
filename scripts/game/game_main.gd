@@ -19,6 +19,7 @@ var tool := BuildTool.new()
 var cam := GameCamera.new()
 var daynight := DayNight.new()
 var overlay := OverlayLayer.new()
+var badges: MachineBadges = null   ## 1.49: значки проблем над станками
 var weather := WeatherLayer.new()
 var fx := FxLayer.new()
 var sound := SoundLayer.new()
@@ -108,6 +109,12 @@ func _ready() -> void:
 	marks.sim = sim
 	marks.game = self
 	ov_layer.add_child(marks)
+	# 1.49: значки проблем над станками
+	var mbadges := MachineBadges.new()
+	mbadges.sim = sim
+	mbadges.game = self
+	badges = mbadges
+	ov_layer.add_child(mbadges)
 	# фамилии под людьми — поверх построек, не темнеют ночью
 	var names := NameLayer.new()
 	names.sim = sim

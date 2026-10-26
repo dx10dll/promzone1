@@ -1,0 +1,9 @@
+keys,en
+"Нет питания","No power"
+"Нет оператора","No operator"
+"Нет заготовки","No workpiece"
+"Выход полон","Output full"
+"Нет работы","No work"
+"Значки над станками: нет заготовки, нет оператора, выход полон, нет питания — с подсказкой, что делать","Badges above machines: no stock, no operator, output full, no power — with a hint on what to do"
+"В слое «Загрузка станков» отмечены станки без работы","The Machine load layer marks machines with no work"
+"«Что делать»: выполненный совет отмечается галочкой и уходит","To do: a resolved tip gets a check mark and disappears"

@@ -12,6 +12,8 @@ var _head: Button
 var _hr: Control
 var _sig := ""
 var _t := 0.0
+var _track := TodoTrack.new()   ## 1.49: выполненные советы ещё 3 секунды висят зачёркнутыми
+var _hour := -1                 ## 1.49: игровой час последнего пересчёта — раз в час пересобираем список принудительно
 
 
 func setup(h: Hud) -> void:
@@ -56,6 +58,9 @@ func setup(h: Hud) -> void:
 
 
 func _process(delta: float) -> void:
+	if _track.tick(delta):
+		_sig = ""
+		_t = 0.0
 	_t -= delta
 	if _t > 0.0:
 		return
@@ -207,7 +212,14 @@ func next_dept() -> String:
 
 func _refresh() -> void:
 	var items := _items()
-	var sig := str(collapsed) + str(items.map(func(a: Array) -> String: return str(a[1]) + str(a[2])))
+	# 1.49: что было в списке и пропало — «выполнено»; раз в игровой час список пересобирается принудительно
+	_track.update(items)
+	items = _track.merged(items)
+	var hr := int(sim.minute / 60.0)
+	if hr != _hour:
+		_hour = hr
+		_sig = ""
+	var sig := str(collapsed) + str(items.map(func(a: Array) -> String: return str(a[1]) + str(a[2]) + (str(a[5]) if a.size() > 5 else "")))
 	if sig == _sig:
 		return
 	_sig = sig
@@ -236,6 +248,7 @@ func _refresh() -> void:
 ## Подпункты («· …») — мелко, с отступом, под своей задачей.
 func _line(it: Array) -> Button:
 	var sub := str(it[0]) == ""
+	var ghost := it.size() > 5 and str(it[5]) == "ghost"
 	var col: Color = it[3]
 	var b := Button.new()
 	b.flat = true
@@ -288,6 +301,8 @@ func _line(it: Array) -> Button:
 	var txt := str(it[1])
 	if sub and txt.begins_with("· "):
 		txt = "○  " + txt.substr(2)
+	if ghost:
+		txt = "✓  " + txt
 	var l := UITheme.label(txt, 12 if sub else 14, (UITheme.MUTED if sub else (UITheme.TEXT if col == UITheme.ACCENT or col == UITheme.INFO else col)), null if sub else UITheme.f_semi)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.clip_text = true
@@ -295,6 +310,16 @@ func _line(it: Array) -> Button:
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(l)
+	if ghost:
+		# зачёркнуто: линия по середине текста
+		l.draw.connect(func() -> void:
+			var fnt := l.get_theme_font("font")
+			var fs := l.get_theme_font_size("font_size")
+			var w := minf(fnt.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x, l.size.x)
+			var y := l.size.y * 0.5
+			l.draw_line(Vector2(0, y), Vector2(w, y), Color(UITheme.MUTED, 0.9), 1.5))
+		b.modulate = Color(1, 1, 1, 0.7)
+		b.disabled = true
 	if str(it[2]) != "":
 		if sub:
 			var vl := UITheme.label(str(it[2]), 11, UITheme.MUTED, UITheme.f_semi)
@@ -306,7 +331,7 @@ func _line(it: Array) -> Button:
 			pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			h.add_child(pill)
-	if not sub:
+	if not sub and not ghost:
 		var ar := UITheme.label("›", 18, UITheme.MUTED, UITheme.f_semi)
 		ar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		ar.size_flags_vertical = Control.SIZE_SHRINK_CENTER

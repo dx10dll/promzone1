@@ -88,6 +88,42 @@ func _ready() -> void:
 			if mode == "board_open":
 				OrderBoard._hg[int(sl.board[0]["id"])] = {"open": true, "pk": 10, "la": 1}
 		gm.hud.open_window("orders")
+	elif mode.begins_with("badges"):
+		# 1.49: значки проблем над станками — badges (карта) и badges_load (слой «Загрузка станков»)
+		var S := preload("res://tests/setups.gd")
+		var sm := gm.sim
+		sm.story.enabled = false
+		S.big_shop(sm)
+		S.hire(sm, "turner", "turning", 5)
+		S.hire(sm, "laborer", "haul", 3)
+		S.hire(sm, "miller", "milling", 5)
+		S.hire(sm, "fitter", "fitting", 5)
+		S.hire(sm, "welder", "welding", 5)
+		S.complex_orders(sm, 3)
+		gm.menu_paused = true
+		var t0 := sm.minute
+		while sm.minute < t0 + 600.0:
+			sm.tick(0.5)
+		var mc: Array = sm.things_of("machine")
+		for wk in sm.workers:
+			wk.present = true   # снимок: все на месте, чтобы причины были про заготовки и выход
+		var prods: Array = mc.filter(func(t: Thing) -> bool: return t.product != "" and t.cell.x >= 29 and not t.is_batch() and Stall.reason(sm, t).get("k", "") == "")
+		if prods.size() >= 3:
+			for id in sm.slot_ids(prods[0], 0).duplicate():
+				sm.delete_item(sm.items[id])
+			var fm := prods[1] as Thing
+			for i in fm.slot_cap(1):
+				sm.put_in_thing(sm.new_item("part", fm.product, "ok"), fm, 1)
+			sm.power.thing_net.erase((prods[2] as Thing).id)
+		gm.badges.tracker.refresh(sm)
+		sm.minute += 30.0
+		gm.badges.tracker.refresh(sm)
+		for r: Dictionary in gm.badges.tracker.shown.values():
+			print("badge ", r["k"], " ", (r["m"] as Thing).def_id, " ", (r["m"] as Thing).cell)
+		if mode == "badges_load":
+			gm.hud.forced_overlay = "load"
+		if cam_arg == "":
+			cam_arg = "37,11,2.2"
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":
@@ -114,6 +150,15 @@ func _ready() -> void:
 			gm.sim.fauna.pigeons.append({"pos": pf, "from": pf - Vector2(2, 0), "to": pf + Vector2(2, 0), "st": "fly", "until": 1e9, "dir": 1, "fly_t": 0.0, "inside": false})
 			var pw := Vector2(float(cv[0]) + 2.4, float(cv[1]) + 0.5)
 			gm.sim.fauna.pigeons.append({"pos": pw, "to": pw, "st": "walk", "until": 1e9, "dir": -1, "fly_t": 0.0, "inside": false})
+	if mode == "badges_tip":
+		# наведение мыши на значок: подсказка с причиной
+		var mt: Thing = null
+		for r: Dictionary in gm.badges.tracker.visible_list(false):
+			if str(r["k"]) == "full":
+				mt = r["m"]
+		if mt != null:
+			await get_tree().create_timer(0.3).timeout
+			gm.badges.mouse_override = gm.badges._rect(mt, gm.badges._zoom()).get_center()
 	await get_tree().create_timer(0.6).timeout
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
