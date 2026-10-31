@@ -65,7 +65,7 @@ func _ready() -> void:
 	for b: Node in hud.sub_panel.find_children("*", "Button", true, false):
 		if b.has_meta("cat"):
 			cats.append(str(b.get_meta("cat")))
-	check(cats == ["Стены", "Полы", "Окна и двери", "Зоны на улице", "Готовые помещения"], "порядок: стены, полы, двери, улица, готовые помещения %s" % str(cats))
+	check(cats == ["Стены", "Полы", "Окна и двери", "Зоны на улице", "Готовые помещения", "Калька (план)"], "порядок: стены, полы, двери, улица, готовые помещения %s" % str(cats))
 	var hs: Array[float] = []
 	for c: String in BuildMenu.BUILD_CATS:
 		BuildMenu.build_cat = c

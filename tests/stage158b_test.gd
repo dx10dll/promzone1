@@ -99,19 +99,7 @@ func _initialize() -> void:
 	var gz := Scenario.new_game("garage", "mech", "calm", 1585)
 	var dt := FloorMarks.data(gz)
 	check(not (dt["unload"] as Array).is_empty(), "разметка: зона разгрузки есть (%d кл.)" % (dt["unload"] as Array).size())
-	check(dt.has("ship") and dt.has("buffer"), "разметка: ключи отгрузки и буфера")
-	var gm: Sim = g
-	var lathe: Thing = null
-	for m: Thing in gm.things_of("machine"):
-		if m.def_id == "lathe":
-			lathe = m
-			break
-	if lathe:
-		lathe.product = "pin"
-		lathe.enabled = true
-		gm.logi.set_buffer(lathe, 6)
-		var d2 := FloorMarks.data(gm)
-		check((d2["buffer"] as Array).size() >= 1, "буферная клетка попала в разметку")
+	check(dt.has("ship") and not dt.has("buffer"), "разметка: ключ отгрузки есть, буфера нет (1.59)")
 	g.dispose()
 	g2.dispose()
 	gz.dispose()

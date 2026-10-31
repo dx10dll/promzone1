@@ -68,6 +68,42 @@ func _process(delta: float) -> void:
 	_refresh()
 
 
+## 1.59: этот текст уведомления — о том же, что сейчас висит в «Что делать»? Тогда тост не нужен (в журнале он остаётся).
+func covers(text: String) -> bool:
+	var nt := _tokens(text)
+	if nt.is_empty():
+		return false
+	for it: Array in _items():
+		var t := str(it[1])
+		if t == "" or t.begins_with("·") or not TodoTrack.KEYED.has(str(it[0])) and str(it[0]) != "":
+			continue
+		var tt := _tokens(t)
+		if tt.size() < 2:
+			continue
+		var small := tt if tt.size() <= nt.size() else nt
+		var big := nt if small == tt else tt
+		var hit := 0
+		for w: String in small:
+			if big.has(w):
+				hit += 1
+		if hit >= 2 and float(hit) / float(small.size()) >= 0.75:
+			return true
+	return false
+
+
+static func _tokens(s: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	var w := ""
+	for ch in s.to_lower() + " ":
+		if ch.to_lower() != ch.to_upper() or ch == "ё":
+			w += ch
+		else:
+			if w.length() >= 4 and not out.has(w):
+				out.append(w.substr(0, 6))   # грубая основа: «выбит»/«выбиты», «денег»/«деньги»
+			w = ""
+	return out
+
+
 func _items() -> Array:
 	var out: Array = []   # [icon, text, value, color, action:Callable, (необяз.) "cta" — крупная кнопка под строкой]
 	# 1.17: неделя стройки — заказов нет; кнопка «Начать производство»

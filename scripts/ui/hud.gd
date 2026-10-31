@@ -46,14 +46,24 @@ var ov_btns: Dictionary = {}      ## панель оверлеев справа:
 var legend_panel: PanelContainer
 var legend_box: VBoxContainer
 var _legend_sig := ""
+## 1.59: пять слоёв на панели справа; у «Сетей» и «Логистики» при включении открываются подвкладки.
 const OVERLAYS := [["rooms", "Зоны", "Зоны и помещения: что где, чего не хватает"],
-	["nets", "Коммуникации", "Все сети сразу: кабель, водопровод, сжатый воздух, вентиляция — и кому чего не хватает"],
-	["light", "Освещение", "Где светло от ламп и окон, где темно"],
-	["temp", "Температура", "Тепло и холод по помещениям, батареи"],
-	["traffic", "Потоки людей", "Где чаще ходят — тропы и пробки"], ["load", "Занятость станков", "Работает, простаивает, брак (нужен ПДО)"],
-	["dirt", "Чистота", "Стружка и грязь, уровень обустройства"],
-	["crew", "Бригады и охрана", "Участки бригад, камеры и посты"],
-	["logistics", "Логистика", "Кто в какую бытовку, душ, туалет, столовую ходит: протяните линию от цеха к помещению"]]
+	["nets", "Сети", "Все сети сразу: кабель, водопровод, сжатый воздух, вентиляция — и кому чего не хватает. Внутри: свет и температура"],
+	["load", "Загрузка", "Работает, простаивает, брак (нужен ПДО)"],
+	["logistics", "Логистика", "Кто в какую бытовку, душ, туалет, столовую ходит: протяните линию от цеха к помещению. Внутри: потоки людей и бригады"],
+	["dirt", "Чистота", "Стружка и грязь, уровень обустройства"]]
+## Подвкладки слоя: первая — сам слой.
+const OV_SUBS := {
+	"nets": [["nets", "Сети", "Все сети сразу: кабель, водопровод, сжатый воздух, вентиляция — и кому чего не хватает"],
+		["light", "Свет", "Где светло от ламп и окон, где темно"],
+		["temp", "Температура", "Тепло и холод по помещениям, батареи"]],
+	"logistics": [["logistics", "Линии", "Кто в какую бытовку, душ, туалет, столовую ходит: протяните линию от цеха к помещению"],
+		["traffic", "Потоки людей", "Где чаще ходят — тропы и пробки"],
+		["crew", "Бригады", "Участки бригад, камеры и посты"]]}
+const OV_GROUP := {"light": "nets", "temp": "nets", "traffic": "logistics", "crew": "logistics"}
+var sub_ov_panel: PanelContainer
+var sub_ov_btns: Dictionary = {}   ## подвкладка -> кнопка
+var _sub_sig := ""
 var letter_box: Control = null     ## открытое письмо-событие
 var tutorial: TutorialPanel = null
 var letter_id := -1
@@ -388,9 +398,15 @@ func _build_overlays() -> void:
 		b.add_theme_stylebox_override("pressed", on)
 		b.add_theme_stylebox_override("hover_pressed", on)
 		UITheme.micon_colors(b)
-		b.pressed.connect(func() -> void: set_overlay(key))
+		b.pressed.connect(func() -> void: on_layer_button(key))
 		v.add_child(b)
 		ov_btns[key] = b
+	sub_ov_panel = PanelContainer.new()
+	sub_ov_panel.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.106, 0.108, 0.112, 0.94), UITheme.LINE, 1, 10, 6, 5, 10, 0.4, 3))
+	_anchor(sub_ov_panel, 1, 0.5, 1, 0.5, -62, -240, -62, -240)
+	sub_ov_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	sub_ov_panel.visible = false
+	add_child(sub_ov_panel)
 	legend_panel = PanelContainer.new()
 	legend_panel.add_theme_stylebox_override("panel", UITheme.sbs(Color(0.106, 0.108, 0.112, 0.94), UITheme.LINE, 1, 10, 12, 10, 12, 0.4, 3))
 	_anchor(legend_panel, 0, 1, 0, 1, 12, -102, 312, -102)
@@ -426,6 +442,63 @@ func set_overlay(key: String) -> void:
 	_sync_overlays()
 
 
+## Слой верхнего уровня, к которому относится оверлей (свет → сети, бригады → логистика).
+static func layer_of(key: String) -> String:
+	return str(OV_GROUP.get(key, key))
+
+
+## Слой, который игрок включил руками ("" — никакого).
+func manual_layer() -> String:
+	return "logistics" if g.tool.mode == "logistics" else forced_overlay
+
+
+## Щелчок по кнопке слоя: выключен — включить (первой подвкладкой), включен — выключить.
+func on_layer_button(key: String) -> void:
+	var act := manual_layer()
+	if act != "" and layer_of(act) == key:
+		if act == "logistics":
+			toggle_logistics()
+		else:
+			forced_overlay = ""
+		_sync_overlays()
+		return
+	set_overlay(key)
+
+
+## Щелчок по подвкладке: включает именно её, повторный щелчок ничего не выключает.
+func pick_sublayer(key: String) -> void:
+	if manual_layer() == key:
+		return
+	if key == "logistics":
+		toggle_logistics()
+	else:
+		set_overlay(key)
+		if forced_overlay != key:
+			forced_overlay = key
+			_sync_overlays()
+
+
+func _sync_sub_tabs(cur: String) -> void:
+	var grp := layer_of(cur)
+	var items: Array = OV_SUBS.get(grp, [])
+	var sig := grp + "|" + cur if not items.is_empty() else ""
+	if sig == _sub_sig:
+		return
+	_sub_sig = sig
+	UITheme.clear(sub_ov_panel)
+	sub_ov_btns.clear()
+	sub_ov_panel.visible = not items.is_empty()
+	if items.is_empty():
+		return
+	var shown: Array = []
+	for it: Array in items:
+		shown.append([it[0], tr(str(it[1])), tr(str(it[2]))])
+	var seg := UITheme.segmented(shown, cur, pick_sublayer)
+	for i in items.size():
+		sub_ov_btns[str((items[i] as Array)[0])] = seg.get_child(i)
+	sub_ov_panel.add_child(seg)
+
+
 ## 1.40: оверлей «Логистика» — режим инструмента. Выходит из плана и окна, как любая кнопка нижней панели.
 func toggle_logistics() -> void:
 	if g.tool.mode == "logistics":
@@ -445,7 +518,8 @@ func toggle_logistics() -> void:
 func _sync_overlays() -> void:
 	var cur := g.overlay.mode
 	for k in ov_btns.keys():
-		(ov_btns[k] as Button).set_pressed_no_signal(k == cur)
+		(ov_btns[k] as Button).set_pressed_no_signal(cur != "" and k == layer_of(cur))
+	_sync_sub_tabs(cur)
 	# легенда: название и пояснение активного оверлея
 	var lg: Array = g.overlay.legend
 	var sig := cur + "|" + str(lg)
@@ -460,6 +534,10 @@ func _sync_overlays() -> void:
 	for o: Array in OVERLAYS:
 		if str(o[0]) == cur:
 			title = str(o[1])
+	for grp: String in OV_SUBS.keys():
+		for so: Array in OV_SUBS[grp]:
+			if str(so[0]) == cur:
+				title = str(so[1])
 	var hh := UITheme.hbox(8)
 	var ic := TextureRect.new()
 	ic.texture = _ov_tex(cur)
@@ -763,7 +841,6 @@ func _build_bottom() -> void:
 	_bbtn(h, "build", "construction", "Стройка", "Полы, стены, окна, двери, ворота (B)", func() -> void: toggle_sub("build"))
 	_bbtn(h, "objects", "objects", "Объекты", "Станки, стеллажи, бытовка (O)", func() -> void: toggle_sub("objects"))
 	_bbtn(h, "rooms", "zones", "Зоны", "Зоны: цех, склад, бытовка, столовая, кабинеты… Рисуются клетками внутри помещений (R)", func() -> void: open_rooms())
-	_bbtn(h, "plan", "blueprint", "План", "Планировка: нарисуйте будущий завод на кальке — стены, полы, зоны, станки. Бесплатно, рабочие план не трогают. Потом «Утвердить план» (V)", toggle_plan)
 	_bbtn(h, "power", "networks", "Сети", "Электричество, свет, водопровод, вентиляция, сжатый воздух (E)", func() -> void: toggle_sub("power"))
 	_bbtn(h, "demolish", "demolition", "Снос", "Снести стены, полы, объекты (X)", func() -> void: set_tool("demolish"))
 	_bbtn(h, "cancel", "undo", "Отмена", "Отменить чертежи — деньги вернутся", func() -> void: set_tool("cancel"))
@@ -860,7 +937,7 @@ func _active_bottom() -> String:
 	if win != null and bottom_btns.has(win.group):
 		return win.group
 	if g.tool.plan_mode:
-		return "plan"   # в планировке открыто меню стройки, но горит «План»
+		return "build"   # 1.59: калька — кнопка внутри «Стройки», горит «Стройка»
 	if sub_kind != "" and bottom_btns.has(sub_kind):
 		return sub_kind
 	var m := g.tool.mode
@@ -1272,6 +1349,9 @@ func on_notified(text: String, level: int, cell: Vector2i) -> void:
 	var need := Sim.LVL_INFO if mode == 0 else (Sim.LVL_WARN if mode == 1 else Sim.LVL_BAD)
 	if level < need:
 		unread_log += 1
+		return
+	if todo != null and todo.covers(text):
+		unread_log += 1   # 1.59: то же самое уже висит в «Что делать» — отдельный тост не нужен, в журнале запись осталась
 		return
 	toast(text, level, [4.0, 4.0, 7.0, 12.0][clampi(level, 0, 3)], cell, true)
 	Snd.play(["n_info", "n_good", "n_warn", "n_bad"][clampi(level, 0, 3)], -4.0 if level == 0 else -1.0, 0.0, 0.7)

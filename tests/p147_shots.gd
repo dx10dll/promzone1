@@ -160,6 +160,11 @@ func _ready() -> void:
 				cam_arg = "35,16,2.2"
 	elif mode == "plan":
 		gm.hud.toggle_plan()
+	elif mode == "layers159":
+		gm.hud.on_layer_button("logistics")   # 1.59: «Логистика» включена, видны подвкладки
+		gm.hud.pick_sublayer("traffic")
+	elif mode == "build159":
+		gm.hud.toggle_sub("build")            # 1.59: в «Стройке» кнопка «Калька (план)»
 	elif mode.begins_with("win:"):
 		gm.hud.open_window(mode.substr(4))
 	elif mode.begins_with("sub:"):
@@ -557,21 +562,6 @@ func _ready() -> void:
 		gm.menu_paused = true
 		gm.hud.open_window("supply")
 		await get_tree().create_timer(0.5).timeout
-	elif mode == "buffer158":
-		# 1.58: карточка станка с настройкой «Держать заготовок у станка»
-		var sm8 := gm.sim
-		sm8.story.enabled = false
-		const S8 := preload("res://tests/setups.gd")
-		S8.big_shop(sm8, false)
-		var lathe8: Thing = null
-		for t8: Thing in sm8.things_of("machine"):
-			if t8.def_id == "lathe" and t8.cell == Vector2i(38, 5):
-				lathe8 = t8
-		sm8.logi.set_buffer(lathe8, 8)
-		gm.menu_paused = true
-		gm.cam.position = Vector2(lathe8.cell) * World.T
-		gm.hud.info.show_thing(sm8, lathe8)
-		await get_tree().create_timer(0.5).timeout
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":
@@ -750,7 +740,6 @@ func _setup158(gm: GameMain) -> void:
 	for m: Thing in sm.things_of("machine"):
 		if m.def_id == "lathe" and m.cell == Vector2i(38, 5):
 			m.product = "pin"
-			sm.logi.set_buffer(m, 8)
 	var lg := sm.logi
 	lg.heat_reset()
 	for k in 14:

@@ -16,7 +16,6 @@ const A_UNLOAD := 1
 const A_SHIP := 2                ## зона отгрузки (1.12): готовые заказы ждут машину клиента
 const MAT_PER_CELL := 24
 const RAW_PALLET := "pallet_raw"   ## 1.29: поддон заготовок в зоне разгрузки
-const BUFFER_MAX := 24             ## 1.58: «держать у станка» — не больше пачки на клетку
 const NO_ORD := -9                 ## 1.56: «взять заказ из самой детали» (аргумент _cell_room / free_cell)
 
 var sim: Sim
@@ -27,10 +26,6 @@ var _zone_cache: Array[Vector2i] = []
 var _zone_rev := -1
 var _ship_cache: Array[Vector2i] = []
 var _ship_rev := -1
-var _buf_min := -1.0             ## 1.58: буферные клетки у станков (кэш на минуту): клетка -> станок и станок -> клетка
-var _buf_rev := -1
-var _buf_cells: Dictionary = {}
-var _buf_by: Dictionary = {}
 
 
 func _init(s: Sim) -> void:
@@ -233,7 +228,7 @@ func clutter_count() -> int:
 	var n := 0
 	for gid in sim.ground_items:
 		var it: Item = sim.items.get(gid)
-		if it and not in_zone(it.cell) and not in_ship(it.cell) and not is_buffer_cell(it.cell):
+		if it and not in_zone(it.cell) and not in_ship(it.cell):
 			n += 1
 	return n
 
@@ -241,7 +236,7 @@ func clutter_count() -> int:
 func first_clutter() -> int:
 	for gid in sim.ground_items:
 		var it: Item = sim.items.get(gid)
-		if it and not in_zone(it.cell) and not in_ship(it.cell) and not is_buffer_cell(it.cell):
+		if it and not in_zone(it.cell) and not in_ship(it.cell):
 			return int(gid)
 	return -1
 
@@ -650,112 +645,6 @@ func when_text(t: float) -> String:
 	if d == sim.day() + 1:
 		return L.t("завтра") + " " + hm
 	return L.t("день %d") % d + " " + hm
-
-
-# ================================================================ 1.58: буфер заготовок у станка
-
-## Клетки-буферы: у станка с «держать N» (N > 0) рядом одна свободная клетка (не рабочее место и не зона),
-## куда разнорабочие заранее сносят заготовки. Строится раз в минуту или после смены настроек.
-func buffer_dirty() -> void:
-	_buf_min = -1.0
-
-
-func _buf_build() -> void:
-	if _buf_min == sim.minute and _buf_rev == sim.thing_rev:
-		return
-	_buf_min = sim.minute
-	_buf_rev = sim.thing_rev
-	_buf_cells.clear()
-	_buf_by.clear()
-	var ms := sim.things_of("machine")
-	var want: Array[Thing] = []
-	for m: Thing in ms:
-		if m.buffer > 0 and not m.demolish and m.enabled and m.product != "":
-			want.append(m)
-	if want.is_empty():
-		return
-	var spots := {}
-	for m2: Thing in ms:
-		for sp: Dictionary in m2.spots():
-			spots[sp["cell"]] = true
-	var w := sim.world
-	for m3: Thing in want:
-		var r := m3.rect()
-		var sps := m3.spots()
-		var anchor: Vector2i = (sps[0]["cell"] as Vector2i) if not sps.is_empty() else m3.cell
-		var best := Vector2i(-1, -1)
-		var bd := INF
-		for ring in [1, 2]:
-			if best.x >= 0:
-				break
-			var big := r.grow(ring)
-			var inner := r.grow(ring - 1)
-			for y in range(big.position.y, big.end.y):
-				for x in range(big.position.x, big.end.x):
-					var c := Vector2i(x, y)
-					if inner.has_point(c) or not w.inb(c) or spots.has(c) or not w.passable(c) or w.occ[w.idx(c)] >= 0:
-						continue
-					if in_zone(c) or in_ship(c) or _buf_cells.has(w.idx(c)):
-						continue
-					var d := Vector2(c - anchor).length_squared()
-					if d < bd:
-						bd = d
-						best = c
-		if best.x >= 0:
-			_buf_cells[w.idx(best)] = m3.id
-			_buf_by[m3.id] = best
-
-
-func is_buffer_cell(c: Vector2i) -> bool:
-	if sim.world.inb(c):
-		_buf_build()
-		return _buf_cells.has(sim.world.idx(c))
-	return false
-
-
-func buffer_cell_of(m: Thing) -> Vector2i:
-	_buf_build()
-	return _buf_by.get(m.id, Vector2i(-1, -1))
-
-
-## Сколько заготовок уже «у станка»: во входном слоте, едут туда и лежат на буферной клетке.
-func buffer_held(m: Thing) -> int:
-	m.ensure_incoming()
-	var n := sim.count_slot(m, 0) + int(m.incoming[0])
-	var bc := buffer_cell_of(m)
-	if bc.x >= 0:
-		for it: Item in _ground_on(bc):
-			if it.reserved_by < 0 and sim.prod.input_ok(it, m):
-				n += 1
-	return n
-
-
-func set_buffer(m: Thing, n: int) -> void:
-	m.buffer = clampi(n, 0, BUFFER_MAX)
-	buffer_dirty()
-
-
-## Разнорабочие держат у станка столько заготовок, сколько задано: недостающие несут на буферную клетку.
-## Станочник при разнорабочем на смене такое не берёт (фильтр в Brain, 1.56).
-func add_buffer_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
-	_buf_build()
-	if _buf_by.is_empty():
-		return
-	var wc := w.cell()
-	for mid in _buf_by.keys():
-		var m: Thing = sim.things.get(mid)
-		if m == null or m.broken or not sim.planner.should_feed(m):
-			continue
-		var deficit := m.buffer - buffer_held(m)
-		if deficit <= 0:
-			continue
-		if m.slot_cap(0) - sim.count_slot(m, 0) - int(m.incoming[0]) > 0:
-			continue   # во входном слоте ещё есть место — подаст обычная подача
-		var bc: Vector2i = _buf_by[mid]
-		var it := b._nearest_feed(m, w, bc)
-		if it == null or _cell_room(bc, it) <= 0:
-			continue
-		cands.append({"s": 70.0 + haul_bonus - b._dist(wc, sim.item_cell(it)) * 0.3, "k": "haul_cell", "item": it, "cell": bc, "need": deficit})
 
 
 # ================================================================ 1.58: обзор «Склад и логистика»
@@ -1543,7 +1432,7 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 			t.data["zres"] = sim.world.idx(c)
 			var n := 1 + extra.size()
 			var what := crate_name(it) if it.kind == "crate" else it.display_name()
-			var to := L.t("в зону разгрузки") if in_zone(c) else (L.t("в зону отгрузки") if in_ship(c) else (L.t("к воротам") if it.kind == "bmat" else (L.t("к станку") if is_buffer_cell(c) else L.t("на склад"))))
+			var to := L.t("в зону разгрузки") if in_zone(c) else (L.t("в зону отгрузки") if in_ship(c) else (L.t("к воротам") if it.kind == "bmat" else L.t("на склад")))
 			if in_ship(c):
 				for iid2 in t.res_items:
 					(sim.items[iid2] as Item).set_meta("to_ship", true)

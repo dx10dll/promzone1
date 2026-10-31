@@ -1388,9 +1388,6 @@ func _find_work(w: Worker) -> Task:
 	# 5а. готовые заказы — в зону отгрузки
 	sim.logi.add_ship_jobs(self, w, cands, haul_bonus)
 
-	# 5б. 1.58: «держать N заготовок у станка» — заготовки сносят на буферную клетку заранее
-	sim.logi.add_buffer_jobs(self, w, cands, haul_bonus)
-
 	# 6. 1.56: погрузка заказа в машину клиента — дело грузчиков машины (Logistics.tick_crews), наши в кузов не лезут
 
 	# 7. грузы, брошенные на полу
@@ -1411,8 +1408,6 @@ func _find_work(w: Worker) -> Task:
 			continue
 		if sim.logi.in_ship(it5.cell) and it5.kind == "part" and sim.logi.ship_wanted(it5.def_id):
 			continue   # ждёт машину клиента в зоне отгрузки
-		if sim.logi.is_buffer_cell(it5.cell):
-			continue   # 1.58: буфер у станка — не хлам
 		if it5.cat() == "machined" or it5.cat() == "wip":
 			var dst5 := _route_dest(it5, it5.cell)
 			if not dst5.is_empty():

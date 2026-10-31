@@ -309,7 +309,7 @@ static func focus_text(h: Hud) -> String:
 
 # ---------------------------------------------------------------- общие кусочки
 
-static func _cat(cats: Control, tex: Texture2D, text: String, on: bool, cb: Callable, col: Color = Color(0, 0, 0, 0)) -> void:
+static func _cat(cats: Control, tex: Texture2D, text: String, on: bool, cb: Callable, col: Color = Color(0, 0, 0, 0)) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.set_meta("cat", text)
@@ -348,6 +348,7 @@ static func _cat(cats: Control, tex: Texture2D, text: String, on: bool, cb: Call
 		b.add_theme_constant_override("icon_max_width", 18)
 	b.pressed.connect(cb)
 	cats.add_child(b)
+	return b
 
 
 ## Текст в рамке шириной w: подбираем кегль (from…to), не влезает — обрезаем с многоточием.
@@ -729,6 +730,10 @@ static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 			build_cat = k
 			query["build"] = ""
 			h._fill_sub())
+	# 1.59: калька-планировка — кнопка внутри «Стройки» (раньше была отдельным меню «План»)
+	var cq := _cat(cats, UITheme.micon("blueprint"), "Калька (план)", h.g.tool.plan_mode, func() -> void: h.toggle_plan(), Color(0.36, 0.62, 1.0))
+	cq.name = "CalqueBtn"
+	cq.tooltip_text = L.t("Планировка на кальке: нарисуйте будущий завод — стены, полы, зоны, станки. Бесплатно, рабочие план не трогают. Потом «Утвердить план» (V)")
 	if not h.g.tool.plan_mode:
 		head.add_child(_priority(h))
 		var ms := mats_status(h.sim)
