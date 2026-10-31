@@ -16,11 +16,16 @@ var _sig: PackedInt64Array = PackedInt64Array()
 var _cw := 0
 var _chh := 0
 var _cur := Rect2i()   ## клетки куска, который сейчас рисуется
+var _look := "base"    ## 1.55: сезонный вид земли (SeasonLook)
 
 
 func _process(_d: float) -> void:
-	if sim and sim.world.rev != _rev:
+	if sim == null:
+		return
+	var lk := SeasonLook.look(sim.season.season_id())
+	if sim.world.rev != _rev or lk != _look:
 		_rev = sim.world.rev
+		_look = lk
 		_refresh_chunks()
 
 
@@ -65,6 +70,7 @@ func _chunk_sig(r: Rect2i) -> int:
 		for x in range(x0, x1):
 			var i := y * w.w + x
 			a.append(int(w.flr[i]) | (int(w.ground[i]) << 8) | ((int(w.bp_floor[i]) & 0xff) << 12) | (int(w.area[i]) << 20) | (int(w.wall[i]) << 24))
+	a.append(_look.hash())
 	return hash(a)
 
 
@@ -91,8 +97,8 @@ func _draw_cells(n: Node2D) -> void:
 	var grass: Array[Texture2D] = []
 	var conc: Array[Texture2D] = []
 	for i in 8:
-		dirt.append(Tex.tile("dirt_%d" % i))
-		grass.append(Tex.tile("grass_%d" % i))
+		dirt.append(SeasonLook.baked("dirt_%d" % i, _look, false))
+		grass.append(SeasonLook.baked("grass_%d" % i, _look, true))
 	for i in 4:
 		conc.append(Tex.tile("concrete_%d" % i))
 	var asph: Array[Texture2D] = []
@@ -195,7 +201,7 @@ func _draw() -> void:
 	# и за краем карты дорога выглядела оборванной; плюс газон и южный тротуар вдоль жилого квартала)
 	var grass: Array[Texture2D] = []
 	for i in 8:
-		grass.append(Tex.tile("grass_%d" % i))
+		grass.append(SeasonLook.baked("grass_%d" % i, _look, true))
 	for x in range(-CityBackdrop.M, 0):
 		_draw_outside_column(x, side, road, grass)
 	for x in range(w.w, w.w + CityBackdrop.M):
@@ -210,6 +216,7 @@ func _draw() -> void:
 			draw_rect(Rect2(x * T + 4, mid - 1.5, 22, 3), Color(0.92, 0.92, 0.86, 0.85))
 	draw_rect(Rect2(-CityBackdrop.M * T, (w.road_row + 3) * T - 2, (w.w + 2 * CityBackdrop.M) * T, 2), Color(0.9, 0.9, 0.85, 0.6))
 	_draw_crossings()
+	_draw_lamp_posts()
 
 
 # ---------------------------------------------------------------- 1.19: земля богаче
@@ -278,6 +285,8 @@ func _ground_cell(n: Node2D, tex: Texture2D, x: int, y: int, hv: int, gk: int) -
 	var cols := PackedColorArray([_tone(gk, _nz[y * _nzw + x]), _tone(gk, _nz[y * _nzw + x + 1]),
 		_tone(gk, _nz[(y + 1) * _nzw + x + 1]), _tone(gk, _nz[(y + 1) * _nzw + x])])
 	n.draw_polygon(pts, cols, PackedVector2Array(uv), tex)
+	if _look != "base" and (gk == World.Ground.GRASS or gk == World.Ground.DIRT or gk == World.Ground.ASPHALT):
+		SeasonLook.decorate(n, _look, x, y, hv, gk == World.Ground.GRASS, T)
 
 
 ## Кромки газона: пучки травы свешиваются на соседний грунт — газон не «квадратами».
@@ -356,6 +365,16 @@ func _draw_outside_column(x: int, side: Texture2D, road: Array, grass: Array[Tex
 			draw_texture_rect(side, Rect2(x * T, gy * T, T, T), false)   # 1.30: и на мосту через Цну
 		else:
 			draw_texture_rect(grass[vhash(x, gy) % 8], Rect2(x * T, gy * T, T, T), false)
+			SeasonLook.decorate(self, _look, x, gy, vhash(x, gy), true, T)
+
+
+## 1.55: столбы уличных фонарей (свет от них даёт NightGlow ночью).
+func _draw_lamp_posts() -> void:
+	for p in DayNight.street_lamp_points(sim.world):
+		draw_circle(p + Vector2(2, 3), 3.5, Color(0, 0, 0, 0.2))
+		draw_line(p + Vector2(0, 2), p + Vector2(0, -12), Color("#3a3f44"), 2.4)
+		draw_line(p + Vector2(0, -12), p + Vector2(4, -13), Color("#3a3f44"), 2.0)
+		draw_circle(p + Vector2(4, -13), 2.6, Color("#f2e6b0"))
 
 
 ## 1.30: зебры через главную дорогу и через въезды боковых улиц.

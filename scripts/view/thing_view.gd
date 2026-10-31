@@ -525,16 +525,19 @@ func _draw_machine() -> void:
 		over.draw_circle(lp, 2.6, col)
 	var pr := thing.process()
 	var lathe_fx := pr == "turning" and not _anchor("chuck").is_empty()
+	# 1.55: какие частицы показывать (по качеству, «Меньше анимации» и масштабу)
+	_far = _zoom_now() < ShopFx.ZOOM_MIN
+	var fxs := ShopFx.effects(pr, thing.working, thing.broken, FxLayer.quality, _zoom_now())
 	if lathe_fx:
-		_fx_lathe()
+		_fx_lathe(fxs.has("chips"))
 	elif thing.working:
 		match pr:
 			"milling", "drilling", "turning":
-				_fx_cutting(pr == "milling")   # станки ЧПУ: шпиндель за окном кожуха
+				_fx_cutting(pr == "milling", fxs.has("chips"))   # станки ЧПУ: шпиндель за окном кожуха
 			"welding":
 				_fx_welding()
 			"paint":
-				_fx_paint()
+				_fx_paint(fxs.has("mist"))
 			"assembly":
 				_fx_assembly()
 	if pr == "heat":
@@ -542,6 +545,7 @@ func _draw_machine() -> void:
 		_fx_steam()
 	elif pr == "casting":
 		_fx_casting()
+		_fx_steam()
 	elif pr == "stamping":
 		_fx_stamping()
 	if thing.working:
@@ -576,7 +580,7 @@ func _draw_slot_items(slot: int, base: Vector2, maxn: int) -> void:
 			over.draw_texture_rect(tex, Rect2(c - Vector2(5, 5), Vector2(10, 10)), false, m)
 
 
-func _fx_lathe() -> void:
+func _fx_lathe(chips: bool = true) -> void:
 	var ch := _anchor("chuck")
 	if thing.working and not ch.is_empty():
 		var r := Rect2(tp(ch[0], ch[1]), Vector2(ch[2], ch[3]) * 0.5)
@@ -586,7 +590,7 @@ func _fx_lathe() -> void:
 			over.draw_line(Vector2(r.position.x + 0.8, y), Vector2(r.end.x - 0.8, y), Color("#4a5156"), 1.2)
 			y += 3.5
 		var tool := _anchor("tool")
-		if not tool.is_empty():
+		if chips and not tool.is_empty():
 			var tpnt := tp(tool[0], tool[1])
 			for k in 4:
 				var ph2 := fmod(_t * 1.7 + k * 0.27, 1.0)
@@ -608,7 +612,7 @@ func _fx_lathe() -> void:
 			over.draw_rect(rr, Color("#23262a"), false, 0.6)
 
 
-func _fx_cutting(mill: bool) -> void:
+func _fx_cutting(mill: bool, chips: bool = true) -> void:
 	var a := _anchor("work")
 	if a.is_empty():
 		return
@@ -619,6 +623,8 @@ func _fx_cutting(mill: bool) -> void:
 	for k in 3:
 		var aa := ang + k * TAU / 3.0
 		over.draw_line(p + Vector2(cos(aa), sin(aa) * 0.35) * r, p - Vector2(cos(aa), sin(aa) * 0.35) * r, Color("#e8eef2", 0.7), 1.0)
+	if not chips:
+		return
 	# стружка
 	for k in 6:
 		var ph := fmod(_t * 1.9 + k * 0.17, 1.0)
@@ -645,11 +651,11 @@ func _fx_welding() -> void:
 		over.draw_circle(p, 26.0 * fl, Color(0.55, 0.75, 1.0, 0.10))
 		over.draw_circle(p, 12.0 * fl, Color(0.75, 0.88, 1.0, 0.22))
 		over.draw_circle(p, 3.5, Color(1, 1, 1, 0.95))
-		for k in 7:
+		for k in (7 if FxLayer.quality > 0 and not _far else 0):
 			var ph := fmod(_t * 2.3 + k * 0.143, 1.0)
 			var ang := k * 0.9 + 0.4
 			var q := p + Vector2(cos(ang) * ph * 14.0, -absf(sin(ang)) * ph * 10.0 + ph * ph * 16.0)
-			over.draw_line(q, q + Vector2(cos(ang), 0.6) * 1.6, Color(1.0, 0.82, 0.35, 1.0 - ph), 1.0)
+			over.draw_line(q, q + Vector2(cos(ang), 0.6) * 1.6, Color(1.0, 0.82, 0.35, 1.0 - ph), 1.7)
 		if FxLayer.quality >= 2:
 			# 1.25: брызги металла падают на пол и гаснут там красными точками
 			_sparks(p, 12, Color(1.0, 0.78, 0.38), 1.0, Vector2.ZERO, 22.0)
@@ -663,9 +669,9 @@ func _fx_welding() -> void:
 			over.draw_texture_rect(sm, Rect2(c - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false, Color(1, 1, 1, 0.35 * (1.0 - ph2)))
 
 
-func _fx_paint() -> void:
+func _fx_paint(mist: bool = true) -> void:
 	var a := _anchor("mist")
-	if a.is_empty():
+	if a.is_empty() or not mist:
 		return
 	var p := tp(a[0], a[1])
 	var col := Color("#5a8f4e")
@@ -700,6 +706,8 @@ func _fx_assembly() -> void:
 
 ## 1.25: сноп искр — разлетаются дугой и падают; dir — куда летят (ноль — во все стороны), floor — где пол.
 func _sparks(at: Vector2, n: int, col: Color, spd: float, dir: Vector2, floor_y: float) -> void:
+	if _far or FxLayer.quality <= 0:
+		return
 	for k in n:
 		var sd := float(k) * 1.618 + float(thing.id) * 0.73
 		var life := 0.5 + fmod(sd * 0.37, 0.35)
@@ -717,7 +725,7 @@ func _sparks(at: Vector2, n: int, col: Color, spd: float, dir: Vector2, floor_y:
 			continue
 		var pq := maxf(0.0, ph - 0.1)
 		var tail := at + v * pq + Vector2(0, 30.0 * pq * pq)
-		over.draw_line(tail, q, Color(col.r, col.g, col.b, 1.0 - ph * 0.7), 1.1)
+		over.draw_line(tail, q, Color(col.r, col.g, col.b, 1.0 - ph * 0.6), 1.6)
 
 
 func _fx_furnace() -> void:
@@ -750,6 +758,11 @@ func _fx_furnace() -> void:
 
 var _was_work := false
 var _steam_until := -1.0
+var _far := false   ## 1.55: слишком далеко — частицы не рисуем
+
+
+func _zoom_now() -> float:
+	return get_viewport().get_canvas_transform().get_scale().x if is_inside_tree() else 1.0
 
 
 func _fx_steam() -> void:
@@ -757,7 +770,7 @@ func _fx_steam() -> void:
 	if _was_work and not thing.working:
 		_steam_until = _t + 4.0
 	_was_work = thing.working
-	if FxLayer.quality > 0 and (thing.working or _t < _steam_until):
+	if FxLayer.quality > 0 and not _far and (thing.working or _t < _steam_until):
 		var w2 := float(meta.get("w", 64)) * 0.5
 		var top2 := -float(meta.get("oy", 64)) * 0.5
 		var burst := _t < _steam_until
@@ -767,7 +780,7 @@ func _fx_steam() -> void:
 			var ph3 := fmod(_t * (0.32 if burst else 0.2) + float(j2) / float(n), 1.0)
 			var c3 := Vector2(w2 * (0.3 + float(j2 % 3) * 0.2) + sin(_t * 0.9 + j2 * 1.7) * 5.0, top2 + 6.0 - ph3 * (46.0 if burst else 30.0))
 			var sz := (10.0 + ph3 * (26.0 if burst else 16.0))
-			var al := (1.0 - ph3) * (0.55 if burst else 0.28)
+			var al := (1.0 - ph3) * (0.6 if burst else 0.42)
 			if sm:
 				over.draw_texture_rect(sm, Rect2(c3 - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false, Color(1, 1, 1, al))
 
@@ -776,13 +789,29 @@ func _fx_broken() -> void:
 	var w := float(meta.get("w", 64)) * 0.5
 	var top := -float(meta.get("oy", 64)) * 0.5
 	var sm := Tex.fx("smoke")
-	if sm:
+	if sm and FxLayer.quality > 0 and not _far:
 		for k in 3:
 			var ph := fmod(_t * 0.3 + k * 0.33, 1.0)
 			var c := Vector2(w * 0.5 + sin(ph * 6.0 + k) * 5.0, top + 14.0 - ph * 26.0)
 			var sz := 8.0 + ph * 16.0
 			over.draw_texture_rect(sm, Rect2(c - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false, Color(0.35, 0.35, 0.37, 0.6 * (1.0 - ph)))
 	_wrench(Vector2(w * 0.5 + 9.0, top - 11.0), Color("#ff5a45"))
+	_beacon(Vector2(w * 0.5 - 8.0, top - 6.0))
+
+
+## 1.55: аварийная оранжевая лампа над сломанным станком: мигает и крутит луч («Меньше анимации» — горит ровно).
+func _beacon(c: Vector2) -> void:
+	var calm := ShopFx.calm()
+	var k := ShopFx.beacon_k(_t + float(thing.id) * 0.23, calm)
+	var g := Tex.fx("glow")
+	if g:
+		over.draw_texture_rect(g, Rect2(c - Vector2(24, 24), Vector2(48, 48)), false, Color(1.0, 0.5, 0.1, 0.8 * k))
+	over.draw_rect(Rect2(c + Vector2(-3.0, 1.0), Vector2(6.0, 2.5)), Color("#3a3d41"))
+	over.draw_circle(c, 3.6, Color(1.0, 0.42 + 0.25 * k, 0.08, 0.4 + 0.6 * k))
+	over.draw_circle(c + Vector2(-1.0, -1.0), 1.2, Color(1, 0.95, 0.8, 0.8 * k))
+	if not calm and k > 0.5:
+		var a := _t * 7.0
+		over.draw_line(c, c + Vector2(cos(a), sin(a) * 0.6) * 15.0, Color(1.0, 0.6, 0.15, 0.55), 2.0)
 
 
 ## Значок «гаечный ключ» в кружке.

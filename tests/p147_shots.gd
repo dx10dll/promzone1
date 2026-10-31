@@ -30,9 +30,16 @@ func _ready() -> void:
 	Game.pending_opts = {"tutorial": false}
 	Game.pending_seed = 147
 	Game.settings["tutorial_done"] = true
+	var big155 := mode.ends_with("155")
+	if big155:
+		Game.pending_sim = GameBench.build_plant(60)   # 1.55: большой завод, как в замере
 	var gm: GameMain = load("res://scenes/game.tscn").instantiate()
 	add_child(gm)
 	await get_tree().create_timer(1.5).timeout
+	if big155:
+		await _setup155(gm)
+		if cam_arg == "":
+			cam_arg = "28,24,1.2" if mode == "night155" else ("28,22,1.0" if mode in ["winter155", "autumn155"] else "34,9,2.6")
 	if mode == "hud":
 		gm.sim.notify("Выбит автомат — часть завода без тока", Sim.LVL_BAD)
 		gm.sim.notify("Новая программа поддержки: «Тепло в цехах» — вернут 40 000 ₽. Финансы → Гранты.", Sim.LVL_GOOD)
@@ -476,6 +483,35 @@ func _ready() -> void:
 	img.save_png(out)
 	print("saved ", out, " ", img.get_size())
 	get_tree().quit(0)
+
+
+## 1.55: снимки живости цеха, ночи и сезонов: sparks155 | night155 | winter155 | autumn155.
+func _setup155(gm: GameMain) -> void:
+	var sm := gm.sim
+	var want := "winter" if mode == "winter155" else ("autumn" if mode in ["autumn155", "night155"] else "summer")
+	var hour := 23.0 if mode == "night155" else 12.0
+	for d in 400:
+		sm.minute = float(d) * 1440.0 + hour * 60.0
+		if sm.season.season_id() == want:
+			break
+	if mode == "winter155":
+		for i in sm.season.snow.size():
+			sm.season.snow[i] = 200
+		sm.season.snow_rev += 1
+	# сломанный станок для аварийной лампы
+	var done := false
+	for m in sm.things_of("machine"):
+		if m.process() == "milling" and not done:
+			m.broken = true
+			m.working = false
+			done = true
+	gm.hud.close_modal()
+	gm.menu_paused = false
+	await get_tree().create_timer(2.0).timeout
+	for m2 in sm.things_of("machine"):
+		if not m2.broken:
+			m2.working = true
+			m2.progress = 0.6
 
 
 ## 1.54: «до / после» встроенных значков рядом со значками владельца (assets/ui/icons).

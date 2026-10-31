@@ -15,10 +15,17 @@ var flakes: Array[Vector3] = []   ## x, y (доля экрана), скорос�
 static var quality := 2
 
 
+## 1.55: качество эффектов с учётом «Меньше анимации» (она выключает искры, стружку, пар и дым).
+static func refresh_quality() -> void:
+	var st: Dictionary = Game.settings
+	quality = ShopFx.level(int(float(st.get("quality", 2))), bool(st.get("reduce_motion", false)))
+
+
 func setup(s: Sim, world_root: Node2D) -> void:
 	sim = s
 	root = world_root
 	z_index = 30
+	refresh_quality()
 	var glow := Tex.fx("glow")
 	for i in MAX_LIGHTS:
 		var l := PointLight2D.new()
@@ -44,7 +51,7 @@ func _process(delta: float) -> void:
 		return
 	_t += delta
 	if Engine.get_process_frames() % 30 == 0:
-		quality = clampi(int(float(Game.settings.get("quality", 2))), 0, 2)
+		refresh_quality()
 	_update_lights()
 	queue_redraw()
 

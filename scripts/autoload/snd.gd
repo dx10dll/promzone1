@@ -9,6 +9,9 @@ const BUS_VOL := {"Music": "vol_music", "SFX": "vol_sfx", "Ambient": "vol_env", 
 const CITY := ["train_horn", "car_horn", "van_horn", "factory_horn", "bark", "meow", "pigeon_coo", "pigeon_flap", "squeak",
 	"amb_city", "amb_train", "amb_day", "amb_night", "amb_wind", "amb_rain"]
 const PEOPLE := ["cough", "dishes", "door", "doorbell", "kettle", "phone", "injury", "amb_crowd"]
+## 1.55: шина цеха с лёгкой реверберацией (шлёт в «Звуки»): станки и удары по металлу.
+const SHOP_BUS := "Shop"
+const SHOP_SND := ["grinder", "clank1", "clank2", "anvil", "hiss", "hammer"]
 const LOOPS := ["m_", "amb_", "v_crowd"]
 
 var _cache: Dictionary = {}
@@ -44,6 +47,19 @@ func _ready() -> void:
 			var i := AudioServer.bus_count - 1
 			AudioServer.set_bus_name(i, b)
 			AudioServer.set_bus_send(i, "Master")
+	if AudioServer.get_bus_index(SHOP_BUS) < 0:
+		AudioServer.add_bus()
+		var si := AudioServer.bus_count - 1
+		AudioServer.set_bus_name(si, SHOP_BUS)
+		AudioServer.set_bus_send(si, "SFX")
+		var rv := AudioEffectReverb.new()
+		rv.room_size = 0.42
+		rv.damping = 0.65
+		rv.spread = 0.8
+		rv.hipass = 0.15
+		rv.dry = 1.0
+		rv.wet = 0.0
+		AudioServer.add_bus_effect(si, rv)
 	for i in 10:
 		var p := AudioStreamPlayer.new()
 		p.bus = "SFX"
@@ -76,6 +92,8 @@ static func bus_for(name: String) -> String:
 		return "People"
 	if name.begins_with("amb_"):
 		return "Ambient"
+	if name in SHOP_SND or name.begins_with("m_"):
+		return SHOP_BUS
 	return "SFX"
 
 

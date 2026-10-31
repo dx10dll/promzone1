@@ -32,6 +32,8 @@ var beacons: Array = []          ## 1.30: красные заградитель�
 var _signs: Array = []           ## [Vector2, [строки]] — уличные таблички, рисуются поверх всего
 var _tags: Array = []            ## [Vector2, текст, подпись, размер] — подписи достопримечательностей
 var _rec := DrawChunks.new()
+var roof_rects: Array[Rect2] = []   ## 1.55: кровли зданий — зимой на них лежит снег (RoofSnow)
+var _roof_snow: RoofSnow = null
 var _tiles: Node2D
 var _tiles_n := 0
 var _meshes: Array[ArrayMesh] = []   ## меши леса — держим, пока они нарисованы
@@ -114,10 +116,18 @@ func _build() -> void:
 	_rec.clear()
 	_compose()
 	_tiles_n = _rec.build(_tiles)
+	if _roof_snow == null:
+		_roof_snow = RoofSnow.new()
+		add_child(_roof_snow)
+		move_child(_roof_snow, 1)
+	_roof_snow.sim = sim
+	_roof_snow.roofs = roof_rects
+	_roof_snow.queue_redraw()
 
 
 func _compose() -> void:
 	_font = UITheme.f_semi if UITheme.f_semi else ThemeDB.fallback_font
+	roof_rects.clear()
 	chimneys.clear()
 	lanes.clear()
 	doors.clear()
@@ -516,6 +526,7 @@ func _private(r: Rect2, salt: int) -> void:
 			var roof_cols := [Color("#8d9196"), Color("#8a5a44"), Color("#5f7a5a"), Color("#9a9a8e")]
 			var hc: Color = roof_cols[_rng.randi_range(0, 3)]
 			var hr := Rect2(lot.position + Vector2(_rng.randf_range(4, 18), 5), Vector2(_rng.randf_range(34, 46), _rng.randf_range(26, 32)))
+			roof_rects.append(Rect2(hr.position, Vector2(hr.size.x, hr.size.y * 0.5)))
 			_rec.draw_rect(Rect2(hr.position + Vector2(4, 5), hr.size), C_SHADOW)
 			_rec.draw_rect(Rect2(hr.position, Vector2(hr.size.x, hr.size.y * 0.5)), hc.lightened(0.12))
 			_rec.draw_rect(Rect2(hr.position + Vector2(0, hr.size.y * 0.5), Vector2(hr.size.x, hr.size.y * 0.5)), hc.darkened(0.12))
@@ -553,6 +564,7 @@ func _nine_storeys(r: Rect2) -> void:
 func _panel_tall(r: Rect2, floors: int, street: String, num: int) -> void:
 	var face_h := floors * 5.0 + 6.0
 	var roof := Rect2(r.position, Vector2(r.size.x, r.size.y - face_h))
+	roof_rects.append(roof)
 	_rec.draw_rect(Rect2(r.position + Vector2(12, 14), r.size), C_SHADOW)
 	_rec.draw_rect(roof, Color("#6f7173"))
 	_rec.draw_rect(roof, Color("#505254"), false, 2.0)
@@ -615,6 +627,7 @@ func _merchant_row(r: Rect2) -> void:
 		var face_h := clampf(hr.size.y * 0.32, 14.0, 24.0)
 		_rec.draw_rect(Rect2(hr.position + Vector2(5, 7), hr.size), C_SHADOW)
 		var rf := Rect2(hr.position, Vector2(hr.size.x, hr.size.y - face_h))
+		roof_rects.append(rf)
 		_rec.draw_rect(rf, roof)
 		_rec.draw_line(rf.position + Vector2(0, rf.size.y * 0.5), rf.position + Vector2(rf.size.x, rf.size.y * 0.5), roof.darkened(0.3), 1.5)
 		var face := Rect2(Vector2(hr.position.x, rf.end.y), Vector2(hr.size.x, face_h))
@@ -1475,6 +1488,7 @@ func _school(r: Rect2) -> void:
 func _building(r: Rect2, roof_col: Color, wall_col: Color, gates: int = 0, sign_text: String = "") -> Rect2:
 	var face_h := clampf(r.size.y * 0.22, 14.0, 30.0)
 	var roof := Rect2(r.position, Vector2(r.size.x, r.size.y - face_h))
+	roof_rects.append(roof)
 	var face := Rect2(Vector2(r.position.x, roof.end.y), Vector2(r.size.x, face_h))
 	_rec.draw_rect(Rect2(r.position + Vector2(8, 10), r.size), C_SHADOW)
 	_rec.draw_rect(roof, roof_col)

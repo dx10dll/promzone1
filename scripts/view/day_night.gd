@@ -18,7 +18,11 @@ var sim: Sim
 var world_root: Node2D
 var tint := CanvasModulate.new()
 var beams := BeamLayer.new()
-var lamps: Array[PointLight2D] = []
+var lamps: Array[PointLight2D] = []   ## 1.55: больше не используется — свет ламп рисует NightGlow дешёвыми пятнами (без PointLight2D)
+var spots: Array[Dictionary] = []     ## светильники: {id, pos, r, col, dark}
+var street: PackedVector2Array = []   ## уличные фонари
+var glow := NightGlow.new()
+var glow_layer := CanvasLayer.new()
 var _rev := -1
 var night := 0.0
 
@@ -29,6 +33,13 @@ func setup(s: Sim, root: Node2D, beam_parent: Node2D) -> void:
 	root.add_child(tint)
 	beams.sim = s
 	beam_parent.add_child(beams)
+	# 1.55: пятна света — на своём слое, который следует за камерой, но не темнеет вместе с миром
+	glow_layer.layer = 1
+	glow_layer.follow_viewport_enabled = true
+	add_child(glow_layer)
+	glow.dn = self
+	glow.sim = s
+	glow_layer.add_child(glow)
 
 
 static func sky(t: float) -> Color:
@@ -77,46 +88,46 @@ func _process(_d: float) -> void:
 	if sim.thing_rev != _rev:
 		_rev = sim.thing_rev
 		_rebuild_lamps()
-	for l in lamps:
-		var on := true
-		if l.has_meta("lamp"):
-			on = bool(sim.power.lamp_on.get(int(l.get_meta("lamp")), false))
-		var e := (night * 0.95 + (0.35 if l.has_meta("dark_room") else 0.0)) if on else 0.0
-		l.energy = e
-		l.visible = e > 0.02
 	beams.set_alpha((1.0 - night) * (1.0 if t > sr + 30.0 and t < ss + 30.0 else 0.0) * (0.5 if sim.season.is_snowing() else 1.0))
 
 
-## Свет от светильников (горят, если подключены и темно) и городские фонари вдоль улицы.
+## Положения уличных фонарей: вдоль тротуара у дороги и вдоль боковых заборов участка.
+static func street_lamp_points(w: World) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for x in range(2, w.w, 9):
+		out.append(Vector2(x * T, w.sidewalk_row * T + 10.0))
+	for y in range(w.plot.position.y + 4, w.plot.end.y - 2, 9):
+		out.append(Vector2((w.plot.position.x - 0.5) * T, y * T))
+		out.append(Vector2((w.plot.end.x + 0.5) * T, y * T))
+	return out
+
+
+## Горит ли светильник сейчас (подключён и включён).
+func lamp_lit(sp: Dictionary) -> bool:
+	return bool(sim.power.lamp_on.get(int(sp["id"]), false))
+
+
+## Яркость пятна света 0–1 при текущей ночи (для теста и NightGlow).
+func spot_alpha(sp: Dictionary) -> float:
+	if not lamp_lit(sp):
+		return 0.0
+	return clampf(night * 0.62 + (0.2 if bool(sp["dark"]) else 0.0), 0.0, 0.9)
+
+
+## Список светильников (горят, если подключены и темно) и уличных фонарей — данные для NightGlow.
 func _rebuild_lamps() -> void:
-	for l in lamps:
-		l.queue_free()
-	lamps.clear()
-	var glow := Tex.fx("glow")
+	spots.clear()
 	for t: Thing in sim.things.values():
 		if not t.built or t.kind() != "light":
 			continue
-		var l := PointLight2D.new()
-		l.texture = glow
-		var rr := float(t.def().get("light_r", 3.0))
-		l.texture_scale = rr * 0.62
-		l.color = Color("#e8f2ff") if t.def_id == "lamp_tube" else (Color("#dfe8ff") if t.def_id == "lamp_drl" else Color("#ffe2a8"))
-		l.position = (Vector2(t.cell) + Vector2(0.5, 0.5)) * T
-		l.energy = 0.0
-		l.set_meta("lamp", t.id)
+		var col := Color("#ffe2a8")
+		if t.def_id == "lamp_tube":
+			col = Color("#e8f2ff")
+		elif t.def_id == "lamp_drl":
+			col = Color("#dfe8ff")
 		var r := sim.rooms.room_at(t.cell)
-		if r and r.windows == 0:
-			l.set_meta("dark_room", true)
-		world_root.add_child(l)
-		lamps.append(l)
-	# уличные фонари вдоль тротуара
-	var w := sim.world
-	for x in range(2, w.w, 9):
-		var l2 := PointLight2D.new()
-		l2.texture = glow
-		l2.texture_scale = 2.6
-		l2.color = Color("#ffd98a")
-		l2.position = Vector2(x * T, w.sidewalk_row * T + 10.0)
-		world_root.add_child(l2)
-		lamps.append(l2)
+		spots.append({"id": t.id, "pos": (Vector2(t.cell) + Vector2(0.5, 0.5)) * T, "r": float(t.def().get("light_r", 3.0)),
+			"col": col, "dark": r != null and r.windows == 0})
+	street = street_lamp_points(sim.world)
+	glow.queue_redraw()
 	beams.queue_redraw()

@@ -46,14 +46,59 @@ const ZONE_SND := {"canteen": "amb_canteen", "restroom": "amb_canteen", "locker"
 const ZONE_LOOPS := ["amb_canteen", "amb_locker", "amb_office", "amb_shop", "amb_boiler"]
 
 
+const SHOP_ROOMS := ["workshop", "storage", "toolroom", "boiler_room", "compressor_room", "tech_room"]
+var _wet := 0.0
+
+
+## 1.55: громкость станка (дБ) от расстояния до центра камеры и масштаба: дальше и выше — тише.
+## Слышимый радиус растёт с приближением; вплотную станок ~ −5 дБ, на краю радиуса ~ −30 дБ от этого.
+static func machine_db(dist: float, zoom: float) -> float:
+	var base := lerpf(-17.0, -5.0, clampf((zoom - 0.55) / 1.8, 0.0, 1.0))
+	var reach := 1100.0 / clampf(zoom, 0.5, 2.5) * 0.9 + 250.0
+	var k := clampf(dist / reach, 0.0, 1.0)
+	return base - 26.0 * pow(k, 0.8)
+
+
+## Доля «мокрого» звука реверберации: только когда камера над цехом и приближена.
+static func reverb_wet(room_type: String, zoom: float) -> float:
+	if not room_type in SHOP_ROOMS:
+		return 0.0
+	return lerpf(0.06, 0.26, clampf((zoom - 0.5) / 1.5, 0.0, 1.0))
+
+
+## Громкость уличного эмбиента: отдаление — громче; внутри помещения — глуше; на улице всегда тихо слышен.
+static func city_gain(zk: float, indoors: bool) -> float:
+	var g := lerpf(0.55, 0.12, zk)
+	return g * (0.4 if indoors else 1.0) + (0.0 if indoors else 0.04)
+
+
+func _room_type_at(center: Vector2) -> String:
+	var c := Vector2i(floori(center.x / T), floori(center.y / T))
+	if not sim.world.inb(c):
+		return ""
+	var r := sim.rooms.room_at(c)
+	return r.type if r else ""
+
+
+func _update_reverb(center: Vector2, z: float) -> void:
+	var bi := AudioServer.get_bus_index(Snd.SHOP_BUS)
+	if bi < 0 or AudioServer.get_bus_effect_count(bi) == 0:
+		return
+	var rv := AudioServer.get_bus_effect(bi, 0) as AudioEffectReverb
+	if rv == null:
+		return
+	_wet = move_toward(_wet, reverb_wet(_room_type_at(center), z), 0.04)
+	rv.wet = _wet
+
+
 func setup(g: GameMain) -> void:
 	game = g
 	sim = g.sim
 	for i in MAX_MACHINES:
 		var p := AudioStreamPlayer2D.new()
-		p.bus = "SFX"
+		p.bus = Snd.SHOP_BUS
 		p.max_distance = 1100.0
-		p.attenuation = 1.6
+		p.attenuation = 1.0
 		add_child(p)
 		players.append(p)
 	for nm: String in ZONE_LOOPS:
@@ -129,9 +174,10 @@ func _process(delta: float) -> void:
 			elif not p.playing:
 				p.play(randf() * 2.0)
 			p.global_position = cands[i][2]
-			p.volume_db = base_db - (4.0 if snd == "m_lathe" else 0.0)
+			p.volume_db = machine_db(float(cands[i][0]), z) - (4.0 if snd == "m_lathe" else 0.0)
 		elif p.playing:
 			p.stop()
+	_update_reverb(center, z)
 	_zones(running, center, z)
 	_voices(running, center, z)
 	_crowd_murmur(running, center, z)
@@ -239,7 +285,7 @@ func _zones(running: bool, center: Vector2, z: float) -> void:
 ## Город при отдалении и поезд на ветке.
 func _city(center: Vector2, z: float) -> void:
 	var zk := zoom_k(z)
-	Snd.ambient("amb_city", lerpf(0.55, 0.08, zk))
+	Snd.ambient("amb_city", city_gain(zk, _room_type_at(center) != ""))
 	var cb := game.city
 	if cb == null or cb.life == null:
 		return
