@@ -122,7 +122,7 @@ func _init() -> void:
 	for s in rack.slot_count():
 		for i in rack.slot_cap(s):
 			g.put_in_thing(g.new_item("part", "bracket", "ok"), rack, s)
-	check(before != "full" and _k(g, rack) == "full", "забитый стеллаж — значок «полно»")
+	check(before != "full" and _k(g, rack) != "full", "забитый стеллаж при свободном другом складе — без «полно» (1.58, см. stage158b)")
 	for s in rack.slot_count():
 		for id in g.slot_ids(rack, s).duplicate():
 			g.delete_item(g.items[id])

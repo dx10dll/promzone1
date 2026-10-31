@@ -30,6 +30,7 @@ var crates_in := 0           ## сколько уже принесли
 var order_eta := -1.0        ## когда приедет фургон с оборудованием (-1 — уже привезли или не заказано)
 var charge := 0.0            ## 1.13: заряд аккумуляторного шкафа, кВт·ч
 var owner := -1              ## 1.15: за кем закреплено рабочее место (id работника, -1 — ни за кем)
+var buffer := 0               ## 1.58: «держать N заготовок у станка» (0 — как раньше: только входной слот)
 var rot := 0                 ## поворот: 0 — рабочая сторона снизу (юг), 1 — слева (запад), 2 — сверху, 3 — справа
 
 
@@ -288,7 +289,7 @@ func to_dict() -> Dictionary:
 	return {
 		"id": id, "def": def_id, "cx": cell.x, "cy": cell.y, "built": built,
 		"bw": build_work, "progress": progress, "cond": condition, "product": product,
-		"demolish": demolish, "made": parts_made, "paid": cost_paid, "on": enabled, "broken": broken, "jstep": job_step, "batch": batch_t, "setup": setup_key, "util": util, "defects": defects, "rot": rot, "cr_need": crates_need, "cr_in": crates_in, "eta": order_eta, "charge": charge, "own": owner,
+		"demolish": demolish, "made": parts_made, "paid": cost_paid, "on": enabled, "broken": broken, "jstep": job_step, "batch": batch_t, "setup": setup_key, "util": util, "defects": defects, "rot": rot, "cr_need": crates_need, "cr_in": crates_in, "eta": order_eta, "charge": charge, "own": owner, "buf": buffer,
 	}
 
 
@@ -318,5 +319,6 @@ static func from_dict(d: Dictionary) -> Thing:
 	t.order_eta = float(d.get("eta", -1.0))
 	t.charge = float(d.get("charge", 0.0))
 	t.owner = int(d.get("own", -1))
+	t.buffer = clampi(int(d.get("buf", 0)), 0, Logistics.BUFFER_MAX)   # 1.58: старые сейвы — 0 («как раньше»)
 	t.ensure_incoming()
 	return t

@@ -62,6 +62,9 @@ func _ready() -> void:
 	world_root.add_child(street)
 	zones.sim = sim
 	world_root.add_child(zones)
+	var fmarks := FloorMarks.new()   # 1.58: разметка пола у зон и буферов
+	fmarks.sim = sim
+	world_root.add_child(fmarks)
 	var faults_l := FaultLayer.new()   # 1.18: лужи от прорыва водопровода
 	faults_l.sim = sim
 	world_root.add_child(faults_l)

@@ -213,15 +213,14 @@ func _init() -> void:
 		g4.story.letters.clear()
 		if Rivals._help(mk, careful_c, r5):
 			var hl := _letter(g4, "rival_help")
-			if str(hl["data"]["sub"]) == "machine":
-				var tm: Thing = g4.things[int(hl["data"]["thing"])]
-				var cond := tm.condition
-				var mn := g4.money
+			if str(hl["data"]["sub"]) == "subcontract":
+				var n_ord := g4.orders.list.size()
 				var rb3 := Rivals.rel_of(careful_c)
 				g4.story.resolve(int(hl["id"]), 0)
-				got_mach_help = g4.money > mn and tm.condition < cond and Rivals.rel_of(careful_c) > rb3
+				var no: Dictionary = g4.orders.list[g4.orders.list.size() - 1]
+				got_mach_help = g4.orders.list.size() == n_ord + 1 and int(no["qty"]) == int(hl["data"]["qty"]) and int(no["price"]) == int(hl["data"]["price"]) and Rivals.rel_of(careful_c) > rb3
 				break
-	check(got_mach_help, "одолжили станок: деньги, износ, отношение растёт")
+	check(got_mach_help, "субподряд соседа: обычный заказ с их количеством и ценой, отношение растёт")
 	for i in 12:
 		g4.put_on_ground(g4.new_item("mat", "strip2", "raw"), Vector2i(14 + i % 3, 25))
 	g4.story.letters.clear()

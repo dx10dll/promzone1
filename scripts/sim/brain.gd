@@ -1388,6 +1388,9 @@ func _find_work(w: Worker) -> Task:
 	# 5а. готовые заказы — в зону отгрузки
 	sim.logi.add_ship_jobs(self, w, cands, haul_bonus)
 
+	# 5б. 1.58: «держать N заготовок у станка» — заготовки сносят на буферную клетку заранее
+	sim.logi.add_buffer_jobs(self, w, cands, haul_bonus)
+
 	# 6. 1.56: погрузка заказа в машину клиента — дело грузчиков машины (Logistics.tick_crews), наши в кузов не лезут
 
 	# 7. грузы, брошенные на полу
@@ -1408,6 +1411,8 @@ func _find_work(w: Worker) -> Task:
 			continue
 		if sim.logi.in_ship(it5.cell) and it5.kind == "part" and sim.logi.ship_wanted(it5.def_id):
 			continue   # ждёт машину клиента в зоне отгрузки
+		if sim.logi.is_buffer_cell(it5.cell):
+			continue   # 1.58: буфер у станка — не хлам
 		if it5.cat() == "machined" or it5.cat() == "wip":
 			var dst5 := _route_dest(it5, it5.cell)
 			if not dst5.is_empty():
@@ -1990,7 +1995,7 @@ func _qc_with_parts() -> Array[Thing]:
 	return _jb_qc.filter(func(q: Thing) -> bool: return q.user < 0 and not q.demolish)
 
 
-func _nearest_feed(m: Thing, w: Worker) -> Item:
+func _nearest_feed(m: Thing, w: Worker, skip: Vector2i = Vector2i(-1, -1)) -> Item:
 	if sim.minute != _feed_min:
 		_feed_min = sim.minute
 		_feed_idx.clear()
@@ -2012,11 +2017,13 @@ func _nearest_feed(m: Thing, w: Worker) -> Item:
 		for it: Item in _feed_idx.get(key, []):
 			if it.reserved_by >= 0 or sim.items.get(it.id) != it:
 				continue
+			if it.loc == Item.Loc.GROUND and it.cell == skip:
+				continue   # 1.58: уже лежит на буферной клетке этого станка
 			var d := _dist(sim.item_cell(it), m.cell)
 			if d >= bd:
 				continue
-			if not _feed_source_ok(it, m) or not sim.prod.wants(m, it):
-				continue
+			if not _feed_source_ok(it, m) or not (sim.prod.input_ok(it, m) if skip.x >= 0 else sim.prod.wants(m, it)):
+				continue   # 1.58: для буфера входной слот может быть полон — смотрим только на годность заготовки
 			if it.q == "ok":
 				if not fo.has(it.def_id):
 					fo[it.def_id] = sim.planner.free_ok(it.def_id)

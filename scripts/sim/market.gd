@@ -684,16 +684,11 @@ func advice(limit: int = 6) -> Array:
 			"text": L.t("За неделю отказали заказчикам на %s, больше всего — из-за этого передела (%s). %s") % [Defs.money_str(float(s["lost_sum"])), Defs.money_str(float(s["top_sum"])), sim.sales.advice(pr)],
 			"open": "orders", "sec": "market"})
 	var broken := 0
-	var worn := 0
 	for t in sim.things_of("machine"):
 		if t.built and t.broken:
 			broken += 1
-		elif t.built and t.condition < 35.0:
-			worn += 1
 	if broken > 0:
 		out.append({"prio": 95, "title": L.t("Станков сломано: %d") % broken, "text": L.t("Сломанный станок стоит, а заказы горят. Ремонт делает токарь или рукастый рабочий — проверьте, что у них есть время."), "open": "prod", "sec": "machines"})
-	if worn >= 2 and not sim.ppr:
-		out.append({"prio": 70, "title": L.t("Включите ППР"), "text": L.t("%d станка сильно изношены. Планово-предупредительный ремонт обслуживает их раньше — поломки реже.") % worn, "open": "prod", "sec": "machines"})
 	var late := 0
 	for o: Dictionary in sim.orders.by_status(["active"]):
 		if sim.minute > float(o["deadline"]) - 1440.0:

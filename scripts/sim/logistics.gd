@@ -16,6 +16,7 @@ const A_UNLOAD := 1
 const A_SHIP := 2                ## зона отгрузки (1.12): готовые заказы ждут машину клиента
 const MAT_PER_CELL := 24
 const RAW_PALLET := "pallet_raw"   ## 1.29: поддон заготовок в зоне разгрузки
+const BUFFER_MAX := 24             ## 1.58: «держать у станка» — не больше пачки на клетку
 const NO_ORD := -9                 ## 1.56: «взять заказ из самой детали» (аргумент _cell_room / free_cell)
 
 var sim: Sim
@@ -26,6 +27,10 @@ var _zone_cache: Array[Vector2i] = []
 var _zone_rev := -1
 var _ship_cache: Array[Vector2i] = []
 var _ship_rev := -1
+var _buf_min := -1.0             ## 1.58: буферные клетки у станков (кэш на минуту): клетка -> станок и станок -> клетка
+var _buf_rev := -1
+var _buf_cells: Dictionary = {}
+var _buf_by: Dictionary = {}
 
 
 func _init(s: Sim) -> void:
@@ -228,7 +233,7 @@ func clutter_count() -> int:
 	var n := 0
 	for gid in sim.ground_items:
 		var it: Item = sim.items.get(gid)
-		if it and not in_zone(it.cell) and not in_ship(it.cell):
+		if it and not in_zone(it.cell) and not in_ship(it.cell) and not is_buffer_cell(it.cell):
 			n += 1
 	return n
 
@@ -236,7 +241,7 @@ func clutter_count() -> int:
 func first_clutter() -> int:
 	for gid in sim.ground_items:
 		var it: Item = sim.items.get(gid)
-		if it and not in_zone(it.cell) and not in_ship(it.cell):
+		if it and not in_zone(it.cell) and not in_ship(it.cell) and not is_buffer_cell(it.cell):
 			return int(gid)
 	return -1
 
@@ -595,6 +600,354 @@ func add_ship_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void
 		return
 
 
+# ================================================================ 1.58: расписание машин
+
+## Расписание машин на сегодня и завтра (дальше — по запросу): [{t, kind, text, here, late}] по времени.
+## t — абсолютная минута приезда; kind: metal / equip / pickup / here (машина уже у ворот).
+## Машины приезжают в это самое время: расписание — просто их собственные сроки (eta), показанные заранее.
+func schedule(days_ahead: int = 1) -> Array:
+	var out: Array = []
+	var end := float(sim.day() + days_ahead) * 1440.0
+	for v: Vehicle in sim.vehicles:
+		if (v.kind == "delivery" or v.kind == "pickup") and v.state in ["queued", "arriving", "parked"]:
+			out.append({"t": sim.minute, "kind": "here", "text": v.cargo_desc, "here": true, "late": false})
+	for s: Dictionary in sim.supply:
+		if bool(s.get("spawned", false)) or bool(s.get("done", false)) or float(s["eta"]) >= end:
+			continue
+		out.append({"t": float(s["eta"]), "kind": "metal", "here": false, "late": false,
+			"text": L.t("металл: %s × %d (%s)") % [Defs.material_name(str(s["mat"])), int(s["qty"]), sim.office.supplier_name()]})
+	var by_eta := {}
+	for e: Dictionary in equip:
+		if bool(e["spawned"]) or float(e["eta"]) >= end:
+			continue
+		var key := int(float(e["eta"]))
+		if not by_eta.has(key):
+			by_eta[key] = {"t": float(e["eta"]), "names": []}
+		var nm := Defs.obj_name(str(e["def"]))
+		if not (by_eta[key]["names"] as Array).has(nm):
+			(by_eta[key]["names"] as Array).append(nm)
+	for k in by_eta.keys():
+		var g: Dictionary = by_eta[k]
+		var names: Array = g["names"]
+		out.append({"t": float(g["t"]), "kind": "equip", "here": false, "late": false,
+			"text": L.t("оборудование: ") + ", ".join(names.slice(0, 3)) + (L.t(" и др.") if names.size() > 3 else "")})
+	for o: Dictionary in sim.orders.by_status(["ready"]):
+		if bool(o["pickup_spawned"]) or float(o["pickup_eta"]) < 0.0 or float(o["pickup_eta"]) >= end:
+			continue
+		out.append({"t": float(o["pickup_eta"]), "kind": "pickup", "here": false, "late": sim.minute >= float(o["pickup_eta"]),
+			"text": L.t("забирает заказ №%d (%s)") % [sim.orders.num(o), Company.firm(str(o["client"]))]})
+	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["t"]) < float(b["t"]))
+	return out
+
+
+## Время и день записи расписания одной строкой: «сегодня 10:30», «завтра 09:15».
+func when_text(t: float) -> String:
+	var d := int(t / 1440.0) + 1
+	var m := int(fmod(t, 1440.0))
+	var hm := "%02d:%02d" % [int(m / 60), m % 60]
+	if d == sim.day():
+		return L.t("сегодня") + " " + hm
+	if d == sim.day() + 1:
+		return L.t("завтра") + " " + hm
+	return L.t("день %d") % d + " " + hm
+
+
+# ================================================================ 1.58: буфер заготовок у станка
+
+## Клетки-буферы: у станка с «держать N» (N > 0) рядом одна свободная клетка (не рабочее место и не зона),
+## куда разнорабочие заранее сносят заготовки. Строится раз в минуту или после смены настроек.
+func buffer_dirty() -> void:
+	_buf_min = -1.0
+
+
+func _buf_build() -> void:
+	if _buf_min == sim.minute and _buf_rev == sim.thing_rev:
+		return
+	_buf_min = sim.minute
+	_buf_rev = sim.thing_rev
+	_buf_cells.clear()
+	_buf_by.clear()
+	var ms := sim.things_of("machine")
+	var want: Array[Thing] = []
+	for m: Thing in ms:
+		if m.buffer > 0 and not m.demolish and m.enabled and m.product != "":
+			want.append(m)
+	if want.is_empty():
+		return
+	var spots := {}
+	for m2: Thing in ms:
+		for sp: Dictionary in m2.spots():
+			spots[sp["cell"]] = true
+	var w := sim.world
+	for m3: Thing in want:
+		var r := m3.rect()
+		var sps := m3.spots()
+		var anchor: Vector2i = (sps[0]["cell"] as Vector2i) if not sps.is_empty() else m3.cell
+		var best := Vector2i(-1, -1)
+		var bd := INF
+		for ring in [1, 2]:
+			if best.x >= 0:
+				break
+			var big := r.grow(ring)
+			var inner := r.grow(ring - 1)
+			for y in range(big.position.y, big.end.y):
+				for x in range(big.position.x, big.end.x):
+					var c := Vector2i(x, y)
+					if inner.has_point(c) or not w.inb(c) or spots.has(c) or not w.passable(c) or w.occ[w.idx(c)] >= 0:
+						continue
+					if in_zone(c) or in_ship(c) or _buf_cells.has(w.idx(c)):
+						continue
+					var d := Vector2(c - anchor).length_squared()
+					if d < bd:
+						bd = d
+						best = c
+		if best.x >= 0:
+			_buf_cells[w.idx(best)] = m3.id
+			_buf_by[m3.id] = best
+
+
+func is_buffer_cell(c: Vector2i) -> bool:
+	if sim.world.inb(c):
+		_buf_build()
+		return _buf_cells.has(sim.world.idx(c))
+	return false
+
+
+func buffer_cell_of(m: Thing) -> Vector2i:
+	_buf_build()
+	return _buf_by.get(m.id, Vector2i(-1, -1))
+
+
+## Сколько заготовок уже «у станка»: во входном слоте, едут туда и лежат на буферной клетке.
+func buffer_held(m: Thing) -> int:
+	m.ensure_incoming()
+	var n := sim.count_slot(m, 0) + int(m.incoming[0])
+	var bc := buffer_cell_of(m)
+	if bc.x >= 0:
+		for it: Item in _ground_on(bc):
+			if it.reserved_by < 0 and sim.prod.input_ok(it, m):
+				n += 1
+	return n
+
+
+func set_buffer(m: Thing, n: int) -> void:
+	m.buffer = clampi(n, 0, BUFFER_MAX)
+	buffer_dirty()
+
+
+## Разнорабочие держат у станка столько заготовок, сколько задано: недостающие несут на буферную клетку.
+## Станочник при разнорабочем на смене такое не берёт (фильтр в Brain, 1.56).
+func add_buffer_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
+	_buf_build()
+	if _buf_by.is_empty():
+		return
+	var wc := w.cell()
+	for mid in _buf_by.keys():
+		var m: Thing = sim.things.get(mid)
+		if m == null or m.broken or not sim.planner.should_feed(m):
+			continue
+		var deficit := m.buffer - buffer_held(m)
+		if deficit <= 0:
+			continue
+		if m.slot_cap(0) - sim.count_slot(m, 0) - int(m.incoming[0]) > 0:
+			continue   # во входном слоте ещё есть место — подаст обычная подача
+		var bc: Vector2i = _buf_by[mid]
+		var it := b._nearest_feed(m, w, bc)
+		if it == null or _cell_room(bc, it) <= 0:
+			continue
+		cands.append({"s": 70.0 + haul_bonus - b._dist(wc, sim.item_cell(it)) * 0.3, "k": "haul_cell", "item": it, "cell": bc, "need": deficit})
+
+
+# ================================================================ 1.58: обзор «Склад и логистика»
+
+const STORE_CAT := {"mat": "metal", "wip": "wip", "ok": "finished", "scrap": "scrap"}
+const STORE_KEYS := ["metal", "wip", "finished", "scrap"]
+const HAUL_KINDS := ["haul", "haul_cell", "deliver"]
+
+
+## Заполнение складов по типам: {metal|wip|finished|scrap: [занято, вместимость]}. Типы жёсткие: металл, заготовки, готовое, брак.
+func storage_fill() -> Dictionary:
+	var out := {}
+	for k: String in STORE_KEYS:
+		out[k] = [0, 0]
+	for t: Thing in sim.things.values():
+		if not t.built or t.demolish or not t.is_storage():
+			continue
+		for s in t.slot_count():
+			var acc: Array = (t.def().get("storage", {}) as Dictionary).get("accept", [])
+			if acc.is_empty():
+				continue
+			var key: String = STORE_CAT.get(str(acc[0]), "")
+			if key == "":
+				continue
+			var row: Array = out[key]
+			row[0] = int(row[0]) + sim.count_slot(t, s)
+			row[1] = int(row[1]) + t.slot_cap(s)
+	return out
+
+
+## Сколько разнорабочих таскает грузы сейчас: {busy, present, total}.
+func haulers() -> Dictionary:
+	var busy := 0
+	var present := 0
+	var total := 0
+	for w: Worker in sim.workers:
+		if w.prof != "laborer":
+			continue
+		total += 1
+		if w.present:
+			present += 1
+		if w.task != null and HAUL_KINDS.has(w.task.kind):
+			busy += 1
+	return {"busy": busy, "present": present, "total": total}
+
+
+## Проблемы логистики: [{k, text}]. k: noway / full / far / blanks.
+func problems() -> Array:
+	var out: Array = []
+	for area: int in [A_UNLOAD, A_SHIP]:
+		var cells: Array[Vector2i] = zone_cells() if area == A_UNLOAD else ship_cells()
+		if cells.is_empty():
+			continue
+		var nm := L.t("разгрузки") if area == A_UNLOAD else L.t("отгрузки")
+		if road_steps(area) < 0.0:
+			out.append({"k": "noway", "text": L.t("Нет прохода от ворот до зоны %s — грузчики водителя не дойдут.") % nm})
+			continue
+		var probe := Item.new()
+		if area == A_UNLOAD:
+			probe.kind = "mat"
+			probe.def_id = str(Defs.materials.keys()[0])
+			probe.q = "raw"
+		else:
+			probe.kind = "part"
+			probe.def_id = str(Defs.products.keys()[0])
+			probe.q = "ok"
+		var room := free_cell(cells, probe, cells[0]).x >= 0
+		if not room and area == A_UNLOAD and not raw_pallet(probe, cells[0]).is_empty():
+			room = true
+		if not room:
+			out.append({"k": "full", "text": L.t("Зона %s заполнена — новому грузу некуда встать.") % nm})
+		var ft := far_text(area)
+		if ft != "":
+			out.append({"k": "far", "text": L.t("Зона %s далеко от дороги (×%s): грузчики идут пешком.") % [nm, "%.1f" % snappedf(slowdown(area), 0.1)]})
+	var waiting: Array[String] = []
+	for m: Thing in sim.things_of("machine"):
+		if m.built and Stall.reason(sim, m).get("k", "") == "input":
+			waiting.append(m.title())
+	if not waiting.is_empty():
+		out.append({"k": "blanks", "text": L.t("Станки ждут заготовок: %d (%s)") % [waiting.size(), ", ".join(waiting.slice(0, 3)) + (L.t(" и др.") if waiting.size() > 3 else "")]})
+	return out
+
+
+## Данные окна «Склад и логистика».
+func overview() -> Dictionary:
+	var counts := [0, 0, 0, 0]
+	var kit: Array = []
+	for o: Dictionary in sim.orders.list:
+		var st := sim.orders.stage(o)
+		if st < 0 or st > 3:
+			continue
+		counts[st] = int(counts[st]) + 1
+		if st == 1:
+			kit.append({"num": sim.orders.num(o), "tag": sim.orders.tag(o), "have": staged_for(o), "need": sim.orders.remaining(o)})
+	return {"storage": storage_fill(), "stages": counts, "kitting": kit, "schedule": schedule(),
+		"haul": haulers(), "problems": problems()}
+
+
+# ================================================================ 1.58: поток грузов (карта «Логистика»)
+
+const HEAT_BLOCK := 2        ## крупная сетка: блок 2×2 клетки
+const HEAT_TAU := 180.0      ## за сколько игровых минут след остывает в e раз
+const HEAT_STEP := 2.0       ## как часто (игровых минут) затухает вся сетка
+var heat := PackedFloat32Array()   ## сколько времени носильщики провели в блоке
+var jam := PackedFloat32Array()    ## сколько из него они стояли, не двигаясь на пути
+var _hw := 0
+var _hh := 0
+var _heat_acc := 0.0
+var _last_pos: Dictionary = {}
+
+
+func heat_reset() -> void:
+	heat = PackedFloat32Array()
+	jam = PackedFloat32Array()
+	_last_pos.clear()
+
+
+func _heat_ensure() -> void:
+	var w := sim.world
+	var hw := int(ceil(float(w.w) / HEAT_BLOCK))
+	var hh := int(ceil(float(w.h) / HEAT_BLOCK))
+	if heat.size() != hw * hh:
+		_hw = hw
+		_hh = hh
+		heat.resize(hw * hh)
+		jam.resize(hw * hh)
+		heat.fill(0.0)
+		jam.fill(0.0)
+
+
+func heat_idx(c: Vector2i) -> int:
+	_heat_ensure()
+	return clampi(c.y / HEAT_BLOCK, 0, _hh - 1) * _hw + clampi(c.x / HEAT_BLOCK, 0, _hw - 1)
+
+
+func heat_add(c: Vector2i, v: float, waited: bool) -> void:
+	var i := heat_idx(c)
+	heat[i] += v
+	if waited:
+		jam[i] += v
+
+
+func heat_at(c: Vector2i) -> float:
+	_heat_ensure()
+	return heat[heat_idx(c)]
+
+
+func jam_at(c: Vector2i) -> float:
+	_heat_ensure()
+	return jam[heat_idx(c)]
+
+
+func heat_block_cell(i: int) -> Vector2i:
+	return Vector2i((i % _hw) * HEAT_BLOCK, (i / _hw) * HEAT_BLOCK)
+
+
+func _sample(w: Worker, hauling: bool, dt: float) -> void:
+	if not hauling:
+		_last_pos.erase(w.id)
+		return
+	var p := w.pos
+	var still: bool = _last_pos.has(w.id) and (_last_pos[w.id] as Vector2).distance_squared_to(p) < 0.000001
+	_last_pos[w.id] = p
+	var cur := w.task.current() if w.task != null else {}
+	var goto := str(cur.get("t", "")) == "goto"
+	heat_add(w.cell(), dt, still and goto)
+
+
+## Раз в тик: где сейчас носильщики и кто из них стоит на пути. Сетка крупная, затухание — раз в пару минут.
+func tick_traffic(dt: float) -> void:
+	if dt <= 0.0:
+		return
+	_heat_ensure()
+	for w: Worker in sim.workers:
+		_sample(w, w.present and w.task != null and HAUL_KINDS.has(w.task.kind), dt)
+	for vid in crews.keys():
+		for c: Dictionary in crews[vid]:
+			var cw: Worker = c["w"]
+			_sample(cw, str(c["st"]) in ["to_a", "to_b", "to_home"], dt)
+	_heat_acc += dt
+	if _heat_acc >= HEAT_STEP:
+		var k := exp(-_heat_acc / HEAT_TAU)
+		_heat_acc = 0.0
+		for i in heat.size():
+			heat[i] *= k
+			jam[i] *= k
+			if heat[i] < 0.001:
+				heat[i] = 0.0
+			if jam[i] < 0.001:
+				jam[i] = 0.0
+
+
 # ================================================================ 1.56–1.57: грузчики машин
 
 ## Машину грузят и разгружают грузчики, приехавшие с водителем: наши в кузов не лезут.
@@ -794,7 +1147,7 @@ func _unload_start(v: Vehicle, c: Dictionary, k: int, dt: float) -> int:
 	var first: Item = null
 	for iid in cargo:
 		var c0: Item = sim.items.get(iid)
-		if c0 and (c0.kind == "mat" or c0.kind == "crate") and c0.reserved_by < 0:
+		if c0 and c0.reserved_by < 0:   # 1.58: любой груз (раньше только металл и ящики — на стройматериалах грузчики стояли без дела)
 			first = c0
 			break
 	if first == null:
@@ -810,9 +1163,10 @@ func _unload_start(v: Vehicle, c: Dictionary, k: int, dt: float) -> int:
 	var walk := _walk_cell(dest)
 	if walk.x < 0 or not sim.world.reachable(acc, walk):
 		v.crew_off = true
+		heat_add(c["w"].cell(), 3.0, true)   # 1.58: на карте «Логистика» — красное пятно там, где встали
 		sim.notify_once("unload_noway", L.t("Грузчики водителя не могут дойти до зоны разгрузки: нет прохода от ворот. Разгружают наши."), Sim.LVL_WARN, acc, 720.0)
 		return 0
-	var cap := 2 if first.kind == "crate" else tare_of(first)
+	var cap := 2 if first.kind == "crate" else (BuildMats.pallet(first.def_id) if first.kind == "bmat" else maxi(1, tare_of(first)))
 	var key := first.stack_key()
 	var ids: Array = []
 	for iid2 in cargo.duplicate():
@@ -1189,7 +1543,7 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 			t.data["zres"] = sim.world.idx(c)
 			var n := 1 + extra.size()
 			var what := crate_name(it) if it.kind == "crate" else it.display_name()
-			var to := L.t("в зону разгрузки") if in_zone(c) else (L.t("в зону отгрузки") if in_ship(c) else (L.t("к воротам") if it.kind == "bmat" else L.t("на склад")))
+			var to := L.t("в зону разгрузки") if in_zone(c) else (L.t("в зону отгрузки") if in_ship(c) else (L.t("к воротам") if it.kind == "bmat" else (L.t("к станку") if is_buffer_cell(c) else L.t("на склад"))))
 			if in_ship(c):
 				for iid2 in t.res_items:
 					(sim.items[iid2] as Item).set_meta("to_ship", true)
@@ -1278,5 +1632,6 @@ func to_dict() -> Dictionary:
 
 func from_dict(d: Dictionary) -> void:
 	equip = d.get("equip", [])
+	heat_reset()
 	crews.clear()
 	cell_res.clear()

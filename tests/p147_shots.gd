@@ -138,6 +138,26 @@ func _ready() -> void:
 		gm.hud.win.select_tab("compet")
 		await get_tree().create_timer(0.4).timeout
 		gm.hud.win.scroll.scroll_vertical = 520
+	elif mode == "logi158" or mode == "floor158" or mode == "tag_hover158":
+		_setup158(gm)
+		if mode == "tag_hover158":
+			var sm8 := gm.sim
+			var oid8 := int((sm8.orders.list[0] as Dictionary)["id"])
+			for c8 in [Vector2i(35, 16), Vector2i(36, 16)]:
+				for i in 8:
+					var it8 := sm8.new_item("part", "pin", "ok")
+					it8.ord_id = oid8
+					sm8.put_on_ground(it8, c8)
+			cam_arg = "35,16,2.6"
+			await get_tree().create_timer(0.8).timeout
+			for zm in gm.find_children("*", "ZoneMarks", true, false):
+				(zm as ZoneMarks).mouse_override = Vector2(35.5, 16.5) * 32.0
+		elif mode == "logi158":
+			gm.hud.open_window("prod:logi")
+		else:
+			gm.hud.set_overlay("logistics")
+			if cam_arg == "":
+				cam_arg = "35,16,2.2"
 	elif mode == "plan":
 		gm.hud.toggle_plan()
 	elif mode.begins_with("win:"):
@@ -510,6 +530,48 @@ func _ready() -> void:
 		print("far text: ", sm6.logi.far_text(Logistics.A_UNLOAD), " steps ", sm6.logi.road_steps(Logistics.A_UNLOAD))
 		if cam_arg == "":
 			cam_arg = "14,24.5,1.0"
+	elif mode == "schedule158":
+		# 1.58: окно «Металл и расходники»: расписание машин на сегодня и завтра
+		var sm7 := gm.sim
+		sm7.story.enabled = false
+		sm7.progress.stage = maxi(sm7.progress.stage, 2)
+		sm7.money = 900000.0
+		sm7.minute = 8.0 * 60.0 + 40.0
+		sm7.order_material("bar45", 20)
+		sm7.order_material("hex27", 12)
+		for i7 in sm7.supply.size():
+			(sm7.supply[i7] as Dictionary)["eta"] = sm7.minute + 110.0 + 330.0 * i7
+		sm7.logi.equip.append({"id": sm7.new_id(), "thing": -1, "def": "lathe", "eta": 1440.0 + 9.0 * 60.0 + 45.0, "spawned": false})
+		var o7 := sm7.orders.make_offer("pin")
+		o7["qty"] = 30
+		o7["status"] = "offer"
+		sm7.orders.list.append(o7)
+		sm7.orders.accept(int(o7["id"]), false)
+		for k7 in 30:
+			var it7 := sm7.new_item("part", "pin", "ok")
+			it7.ord_id = int(o7["id"])
+			sm7.put_on_ground(it7, sm7.logi.ship_cells()[0])
+		sm7.orders._t = 0.0
+		sm7.orders.tick(1.0)
+		o7["pickup_eta"] = sm7.minute + 330.0 + 60.0
+		gm.menu_paused = true
+		gm.hud.open_window("supply")
+		await get_tree().create_timer(0.5).timeout
+	elif mode == "buffer158":
+		# 1.58: карточка станка с настройкой «Держать заготовок у станка»
+		var sm8 := gm.sim
+		sm8.story.enabled = false
+		const S8 := preload("res://tests/setups.gd")
+		S8.big_shop(sm8, false)
+		var lathe8: Thing = null
+		for t8: Thing in sm8.things_of("machine"):
+			if t8.def_id == "lathe" and t8.cell == Vector2i(38, 5):
+				lathe8 = t8
+		sm8.logi.set_buffer(lathe8, 8)
+		gm.menu_paused = true
+		gm.cam.position = Vector2(lathe8.cell) * World.T
+		gm.hud.info.show_thing(sm8, lathe8)
+		await get_tree().create_timer(0.5).timeout
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":
@@ -650,3 +712,47 @@ func _icons154(gm: Node) -> void:
 				rl.add_theme_font_size_override("font_size", 12)
 				root.add_child(rl)
 	await get_tree().create_timer(0.3).timeout
+
+
+## 1.58: «Склад и логистика» и разметка пола: цех со станками, зона отгрузки, заказ на сборке, буфер у станка, следы носильщиков.
+func _setup158(gm: GameMain) -> void:
+	var S3 := preload("res://tests/setups.gd")
+	var sm := gm.sim
+	sm.story.enabled = false
+	S3.big_shop(sm, false)
+	var w := sm.world
+	for y in range(15, 18):
+		for x in range(33, 37):
+			w.area[w.idx(Vector2i(x, y))] = 2
+	w.area_rev += 1
+	for o0: Dictionary in sm.orders.list.duplicate():
+		sm.orders.list.erase(o0)
+	for q in [["pin", 30], ["pin", 12]]:
+		var o := sm.orders.make_offer(str(q[0]))
+		o["qty"] = int(q[1])
+		o["status"] = "offer"
+		sm.orders.list.append(o)
+		sm.orders.accept(int(o["id"]), true)
+	var o1: Dictionary = sm.orders.list[0]
+	o1["status"] = "ready"
+	for i in 12:
+		var it := sm.new_item("part", "pin", "ok")
+		it.ord_id = int(o1["id"])
+		sm.put_on_ground(it, Vector2i(34, 16))
+	var pr: Thing = sm.place_thing("pallet_raw", Vector2i(33, 19), true, false)
+	for i in 12:
+		sm.put_in_thing(sm.new_item("mat", "bar45", "raw"), pr, 0)
+	var rk: Thing = sm.place_thing("pallet", Vector2i(35, 19), true, false)
+	for i in 9:
+		sm.put_in_thing(sm.new_item("part", "pin", "ok"), rk, 0)
+	var lab := S3.hire(sm, "laborer", "haul", 5)
+	lab.present = true
+	for m: Thing in sm.things_of("machine"):
+		if m.def_id == "lathe" and m.cell == Vector2i(38, 5):
+			m.product = "pin"
+			sm.logi.set_buffer(m, 8)
+	var lg := sm.logi
+	lg.heat_reset()
+	for k in 14:
+		lg.heat_add(Vector2i(37 - k, 18 - k / 7 * 2), 25.0 + float(k % 5) * 12.0, false)
+	lg.heat_add(Vector2i(30, 18), 80.0, true)

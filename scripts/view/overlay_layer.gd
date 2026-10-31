@@ -818,6 +818,7 @@ func _draw_logistics() -> void:
 		for c in r.cells:
 			draw_rect(Rect2(Vector2(c) * T, Vector2(T, T)), Color(col.r, col.g, col.b, a))
 		draw_rect(Rect2(Vector2(r.rect.position) * T, Vector2(r.rect.size) * T), Color(col.r, col.g, col.b, 0.85), false, 2.0)
+	_draw_haul_heat()
 	var links := sim.areas.link_list()
 	for l: Dictionary in links:
 		var col2: Color = LOGI_COL[str(l["kind"])]
@@ -850,10 +851,31 @@ func _draw_logistics() -> void:
 			_text(r.center * T + Vector2(0, 12), sub, 9.5, Color("#c9c5b8"))
 	var lg: Array = [[L.t("Протяните линию от цеха (или конторы — для ИТР) к бытовке, душевой, туалету, столовой или комнате отдыха."), UITheme.TEXT],
 		[L.t("Щелчок или ПКМ по линии убирает связь. Щелчок по столовой — «только для ИТР». Нет линии — ходят в ближайшее."), UITheme.MUTED],
-		[L.t("Пунктир — связи ИТР."), UITheme.MUTED]]
+		[L.t("Пунктир — связи ИТР."), UITheme.MUTED],
+		[L.t("Жёлтым — где носят грузы, красным — где носильщики стояли и ждали (пробки)."), UITheme.MUTED]]
 	for k: String in Areas.KINDS:
 		lg.append([L.t(str(LOGI_NAME[k])), LOGI_COL[k]])
 	_legend(lg)
+
+
+## 1.58: тепло переноски грузов по крупной сетке (блоки 2×2): жёлтое — ходят, красное — стояли в ожидании.
+func _draw_haul_heat() -> void:
+	var lg := sim.logi
+	var mx := 1.0
+	for v in lg.heat:
+		mx = maxf(mx, v)
+	var mj := maxf(1.0, mx * 0.25)
+	for i in lg.heat.size():
+		var v2 := lg.heat[i]
+		if v2 < 0.12 * mx and lg.jam[i] < 0.5:
+			continue
+		var c := lg.heat_block_cell(i)
+		var rect := Rect2(Vector2(c) * T, Vector2(Logistics.HEAT_BLOCK, Logistics.HEAT_BLOCK) * T).grow(-2.0)
+		var k := clampf(sqrt(v2 / mx), 0.0, 1.0)
+		draw_rect(rect, Color(0.95, 0.78, 0.18, 0.08 + k * 0.3))
+		var jr := clampf(lg.jam[i] / mj, 0.0, 1.0)
+		if lg.jam[i] >= 0.5:
+			draw_rect(rect, Color(0.88, 0.2, 0.16, 0.2 + jr * 0.4))
 
 
 # ---------------------------------------------------------------- сжатый воздух

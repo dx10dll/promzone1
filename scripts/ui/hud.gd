@@ -772,7 +772,7 @@ func _build_bottom() -> void:
 	order_badge = UITheme.badge("0", UITheme.BAD)
 	order_badge.position = Vector2(48, 2)
 	ob.add_child(order_badge)
-	_bbtn(h, "prod", "production", "Производство", "Станки и ППР, металл и расходники, склад оборудования (P)", func() -> void: open_window("prod"))
+	_bbtn(h, "prod", "production", "Производство", "Станки, металл и расходники, склад и логистика (P)", func() -> void: open_window("prod"))
 	var pb := _bbtn(h, "people", "people", "Люди", "Сотрудники, найм, обучение, охрана труда, бригады, график, профсоюз (L)", func() -> void: open_window("people"))
 	people_badge = UITheme.badge("", UITheme.INFO)
 	people_badge.visible = false

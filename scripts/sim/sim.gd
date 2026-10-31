@@ -65,7 +65,6 @@ var traffic := PackedFloat32Array()  ## сколько раз проходили
 var cons: Dictionary = {}       ## расходники на складе: код -> единиц
 var cons_supply: Array = []     ## заказанные расходники в пути [{cons, packs, eta}]
 var area_refusal := ""        ## 1.29: почему не удалось стереть зону (последняя клетка)
-var ppr := false                ## планово-предупредительный ремонт: обслуживать станки раньше
 var minute := 0.0
 var money := 0.0
 var reputation := 50.0
@@ -958,9 +957,9 @@ func today_net() -> float:
 	return t
 
 
-## Порог обслуживания станков: обычный или по ППР.
+## Порог обслуживания станков: обычный или раньше (при главном инженере).
 func service_at() -> float:
-	return Defs.b("ppr_at") if ppr or office.active("engineer") else Brain.SERVICE_AT   # главный инженер ведёт ППР сам
+	return Defs.b("ppr_at") if office.active("engineer") else Brain.SERVICE_AT   # главный инженер обслуживает станки раньше
 
 
 ## Печи работают без присмотра: партия греется, потом детали переходят на следующую операцию.
@@ -1015,7 +1014,7 @@ func roll_breakdown(m: Thing) -> void:
 		m.working = false
 		sfx.emit("breakdown", m.cell)
 		calls.on_breakdown(m.title())
-		notify(L.t("%s сломался! Нужен ремонт (%s на запчасти). Чтобы станки не ломались, обслуживайте их вовремя — включите ППР в «Производство → Станки».") % [m.title(), Defs.money_str(Defs.b("repair_cost"))], LVL_BAD, m.cell)
+		notify(L.t("%s сломался! Нужен ремонт (%s на запчасти). Чтобы станки не ломались, держите слесаря и обслуживайте их вовремя.") % [m.title(), Defs.money_str(Defs.b("repair_cost"))], LVL_BAD, m.cell)
 
 
 ## Готовые детали на складах и на полу (их можно отгружать).
@@ -1727,6 +1726,7 @@ func embed(ox: int, oy: int, nw: int, nh: int) -> void:
 	bp_res = remap.call(bp_res)
 	net_res.clear()
 	logi.cell_res.clear()
+	logi.heat_reset()
 	light = PackedByteArray()
 	traffic = PackedFloat32Array()
 	season.setup_map()
@@ -2144,6 +2144,7 @@ func tick(dt: float) -> void:
 	_tick_supply()
 	logi.tick()
 	logi.tick_crews(dt)   # 1.56: грузчики машин
+	logi.tick_traffic(dt)   # 1.58: поток грузов для карты «Логистика»
 	bmats.tick_trucks()
 	grants.tick(dt)
 	_tick_vehicles(dt)
@@ -2290,7 +2291,7 @@ func to_dict() -> Dictionary:
 		"orders": orders.list, "supply": supply, "candidates": candidates, "customs": customs, "cust_k": custom_chance,
 		"stats": stats, "ledger": ledger.slice(0, 100), "log": events.slice(0, 60), "honor": honor_log,
 		"power": power_kwh_day, "gate_x": gate_x, "rng": rng.state, "bp_at": bp_progress_at, "build_priority": build_priority,
-		"grid": power.to_dict(), "reserve": supply_reserve, "cons": cons, "cons_supply": cons_supply, "ppr": ppr,
+		"grid": power.to_dict(), "reserve": supply_reserve, "cons": cons, "cons_supply": cons_supply,
 		"office": office.to_dict(),
 		"season": season.to_dict(), "story": story.to_dict(), "inspect": inspect.to_dict(), "calls": calls.to_dict(), "paper": paper.to_dict(),
 		"progress": progress.to_dict(), "logi": logi.to_dict(), "grants": grants.to_dict(), "statlog": statlog.to_dict(),
@@ -2321,7 +2322,6 @@ static func from_dict(d: Dictionary) -> Sim:
 		for k in cd.keys():
 			s.cons[k] = float(cd[k])
 	s.cons_supply = d.get("cons_supply", [])
-	s.ppr = bool(d.get("ppr", false))
 	s.office.from_dict(d.get("office", {}))
 	s.season.from_dict(d.get("season", {}))
 	s.story.from_dict(d.get("story", {}))

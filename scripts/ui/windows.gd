@@ -28,7 +28,7 @@ const GROUPS := {
 		["plan", "План ПДО", "calendar", "orders", "plan"], ["done", "Архив", "log", "orders", "done"]]},
 	"prod": {"title": "Производство", "icon": "production", "secs": [
 		["machines", "Станки", "shop", "shop", ""], ["stall", "Простой", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
-		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
+		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["logi", "Склад и логистика", "supply", "supply", "logi"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
 	"people": {"title": "Люди", "icon": "people", "secs": [
 		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "hire", "staff", "hire"],
 		["train", "Обучение", "idea", "staff", "train"], ["safety", "Охрана труда", "injury", "staff", "safety"],
@@ -567,9 +567,11 @@ func _signature() -> String:
 			s2.append(str(sim.supply_reserve))
 			s2.append(str(sim.logi.equip.size()))
 			s2.append(str(sim.item_rev))
+			if tab == "logi":
+				s2.append("logi%d|%d|%d" % [int(sim.minute / 5.0), sim.thing_rev, sim.orders.list.size()])
 			return ",".join(s2)
 		"shop":
-			var s5: Array[String] = [tab, str(sim.ppr), str(sim.thing_rev)]
+			var s5: Array[String] = [tab, str(sim.thing_rev)]
 			for m in sim.things_of("machine"):
 				s5.append("%d%s%d%d%s%s%d" % [m.id, m.product, m.job_step, int(m.condition), str(m.broken), str(m.enabled), int(m.working)])
 			for c in Defs.consumables.keys():
@@ -745,7 +747,7 @@ func _cards(cols: int = 2) -> GridContainer:
 ## 1.46: значки заголовков карточек: русский заголовок -> значок (ищется по переведённому тексту).
 const CARD_ICONS := {"Стратегия сбыта": "orders", "За 7 дней": "date", "Проблемное место": "wrench", "Ценовая политика": "money",
 	"Учебный класс": "research", "Статистика": "statistics", "Спецоценка (СОУТ)": "inspect", "СИЗ": "shield", "Сложность": "paper",
-	"Рабочие места": "objects", "Путь завода": "goals", "Практиканты ПТУ": "hire", "Поставщик металла": "supply",
+	"Рабочие места": "objects", "Путь завода": "goals", "Практиканты ПТУ": "hire", "Поставщик металла": "supply", "Машины сегодня и завтра": "supply", "Склады по типам": "objects", "Заказы по этапам": "orders", "Носильщики": "people", "Проблемы": "warn",
 	"Погода и отопление": "temperature", "План месяца": "date", "Наша доля рынка": "chart_up", "Молоко за вредность": "med",
 	"Люди и репутация": "people", "Конкурентоспособность": "medal", "История": "log", "Инструктаж по ОТ": "shield",
 	"Индекс цены металла": "chart_up", "Ждут решения": "letter", "Доля рынка": "chart_up", "Деньги на счёте": "finances", "Прибыль за день": "money", "Выпуск деталей": "production", "Брак": "injury", "Среднее настроение": "mood", "Число людей": "people", "Электричество": "energy",
@@ -1204,14 +1206,38 @@ func _active_row(o: Dictionary) -> void:
 
 # ---------------------------------------------------------------- снабжение
 
+## 1.58: карточка «Машины сегодня и завтра» (в «Металл и расходники» и в «Склад и логистика»).
+func _schedule_card(parent: Control) -> void:
+	var sch := sim.logi.schedule()
+	var sc := _card_in(parent, tr("Машины сегодня и завтра"), tr("Машины приезжают в указанное время: металл, оборудование и клиенты за готовыми заказами. Если перед воротами уже стоит машина, следующая ждёт у въезда."))
+	if sch.is_empty():
+		sc.add_child(UITheme.label(tr("Машин не ожидается."), 13, UITheme.MUTED))
+	for row: Dictionary in sch:
+		var rl := tr("на воротах") if bool(row["here"]) else sim.logi.when_text(float(row["t"]))
+		var rt := str(row["text"]) + (tr(" · заказ ещё собирают") if bool(row["late"]) else "")
+		var rh := UITheme.hbox(10)
+		var tl2 := UITheme.label(rl, 13, UITheme.INFO if bool(row["here"]) else UITheme.WARN, UITheme.f_semi)
+		tl2.custom_minimum_size = Vector2(130, 0)
+		rh.add_child(tl2)
+		var dl := UITheme.label(rt, 13, UITheme.TEXT)
+		dl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rh.add_child(dl)
+		sc.add_child(rh)
+
+
 func _supply() -> void:
 	if tab == "stash":
 		_stash()
+		return
+	if tab == "logi":
+		_logi()
 		return
 	_intro(tr("Снабжение работает само: металл и расходники докупаются под принятые заказы (с запасом на брак) и приезжают фургоном в рабочее время. Оборудование заказывается, когда вы ставите объект. Цены на металл гуляют: индекс меняется каждый день, иногда — скачком."))
 	var mk := sim.market
 	var trn := mk.metal_trend()
 	_info(tr("индекс цены металла %.2f%s") % [mk.metal, tr(" · %s%d%% за неделю") % ["+" if trn > 0 else "−", int(roundf(absf(trn) * 100.0))] if absf(trn) >= 0.01 else ""])
+	_schedule_card(content)   # 1.58: расписание машин — кто и когда приедет сегодня и завтра
 	var top := _cards(3)
 	var a := _card_in(top, tr("Поставщик металла"))
 	if sim.office.active("supply"):
@@ -1313,6 +1339,67 @@ func _cons_rows() -> void:
 		var stock := float(sim.cons.get(c, 0.0))
 		var line := tr("%s: на складе %.0f ед.%s — докупается автоматически") % [cons_text(str(c)), stock, tr(" · едет") if sim.cons_on_way(str(c)) else ""]
 		content.add_child(UITheme.label(line, 14, UITheme.TEXT if stock > float(cd["units"]) * 0.25 else UITheme.WARN))
+
+
+## 1.58: «Склад и логистика» — один экран: склады по типам, заказы по этапам, машины, носильщики, проблемы.
+func _logi() -> void:
+	_intro(tr("Склады, сборка заказов, машины и носильщики в одном месте. Типы складов жёсткие: металл, заготовки, готовое, брак. Что не так на карте — смотрите слой «Логистика»."))
+	var ov := sim.logi.overview()
+	var top := _cards(2)
+	var a := _card_in(top, tr("Склады по типам"))
+	var names := {"metal": tr("Металл"), "wip": tr("Заготовки"), "finished": tr("Готовое"), "scrap": tr("Брак")}
+	for k: String in Logistics.STORE_KEYS:
+		var row: Array = (ov["storage"] as Dictionary)[k]
+		var used := int(row[0])
+		var cap := int(row[1])
+		var h := UITheme.hbox(10)
+		var nl := UITheme.label(str(names[k]), 13, UITheme.TEXT)
+		nl.custom_minimum_size = Vector2(90, 0)
+		h.add_child(nl)
+		var pct := 100.0 * float(used) / float(cap) if cap > 0 else 0.0
+		var col := UITheme.BAD if pct >= 95.0 and cap > 0 else (UITheme.WARN if pct >= 80.0 else UITheme.GOOD)
+		var bar := UITheme.bar(pct, col, 120.0, 10.0)
+		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		h.add_child(bar)
+		h.add_child(UITheme.label(("%d / %d" % [used, cap]) if cap > 0 else tr("нет склада"), 13, UITheme.TEXT if cap > 0 else UITheme.MUTED))
+		a.add_child(h)
+	var b := _card_in(top, tr("Заказы по этапам"))
+	var cnt: Array = ov["stages"]
+	for i in 4:
+		var h2 := UITheme.hbox(10)
+		var l1 := UITheme.label(sim.orders.stage_name(i), 13, UITheme.TEXT)
+		l1.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		h2.add_child(l1)
+		h2.add_child(UITheme.label(str(int(cnt[i])), 14, UITheme.TEXT if int(cnt[i]) > 0 else UITheme.MUTED, UITheme.f_semi))
+		b.add_child(h2)
+	var kit: Array = ov["kitting"]
+	if not kit.is_empty():
+		b.add_child(UITheme.caption(tr("Собирают на поддонах")))
+	for kd: Dictionary in kit:
+		var h3 := UITheme.hbox(10)
+		var l2 := UITheme.label(str(kd["tag"]), 12, UITheme.TEXT)
+		l2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		h3.add_child(l2)
+		h3.add_child(UITheme.label("%d/%d" % [int(kd["have"]), int(kd["need"])], 13, UITheme.WARN, UITheme.f_semi))
+		b.add_child(h3)
+	_schedule_card(content)
+	var bot := _cards(2)
+	var hv: Dictionary = ov["haul"]
+	var c := _card_in(bot, tr("Носильщики"))
+	c.add_child(UITheme.label(tr("Таскают сейчас: %d из %d на смене") % [int(hv["busy"]), int(hv["present"])], 14, UITheme.TEXT, UITheme.f_semi))
+	if int(hv["total"]) != int(hv["present"]):
+		c.add_child(UITheme.caption(tr("Всего разнорабочих в штате: %d") % int(hv["total"])))
+	if int(hv["total"]) == 0:
+		c.add_child(UITheme.para(tr("Разнорабочих нет: станочники носят сами. Наймите разнорабочего."), 13, UITheme.WARN))
+	var d := _card_in(bot, tr("Проблемы"))
+	var pr: Array = ov["problems"]
+	if pr.is_empty():
+		d.add_child(UITheme.label(tr("Проблем с логистикой нет."), 13, UITheme.GOOD))
+	for p: Dictionary in pr:
+		var pl := UITheme.label(str(p["text"]), 13, UITheme.BAD if str(p["k"]) in ["noway", "full"] else UITheme.WARN)
+		pl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		d.add_child(pl)
 
 
 func _stash() -> void:
@@ -1973,16 +2060,6 @@ func _shop() -> void:
 			broken += 1
 	_info(tr("%d %s · работают %d%s") % [ms.size(), Defs.plural(ms.size(), "станок", "станка", "станков"), work, (tr(" · сломано %d") % broken) if broken > 0 else ""])
 	_intro(tr("Щёлкните по строке — камера покажет станок и откроется его карточка. Состояние падает от работы; ниже %d%% станок могут остановить на ремонт.") % int(Defs.b("breakdown_below")))
-	var ppr := CheckBox.new()
-	ppr.text = tr("ППР")
-	ppr.button_pressed = sim.ppr
-	ppr.focus_mode = Control.FOCUS_NONE
-	ppr.tooltip_text = tr("Планово-предупредительный ремонт: слесари обслуживают станки уже при износе ниже %d%% (обычно — ниже %d%%).\nОбслуживание чаще и дороже, зато станки почти не ломаются.\nРемонт сломанного станка — %s и полдня простоя.") % [int(Defs.b("ppr_at")), int(Brain.SERVICE_AT), Defs.money_str(Defs.b("repair_cost"))]
-	ppr.toggled.connect(func(v: bool) -> void:
-		sim.ppr = v
-		rebuild(true))
-	ppr.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	header_extra.add_child(ppr)
 	var has_tr := not sim.rooms.of_type("toolroom").is_empty()
 	header_extra.add_child(UITheme.chip(tr("кладовая инструмента: есть") if has_tr else tr("кладовая инструмента: нет"), UITheme.GOOD if has_tr else UITheme.MUTED,
 		tr("Инструментальная кладовая: режущего инструмента уходит на четверть меньше")))
@@ -3709,7 +3786,7 @@ func _advisor() -> void:
 	var comps := sim.things_of("compressor").size()
 	var pneu := sim.things.values().filter(func(t: Thing) -> bool: return t.built and str(t.machine_def().get("air", "")) != "").size()
 	nv.add_child(UITheme.stat(tr("Сжатый воздух"), tr("%d компр.") % comps if comps > 0 else tr("нет"), UITheme.TEXT if comps > 0 or pneu == 0 else UITheme.WARN, tr("потребителей: %d") % pneu))
-	nv.add_child(UITheme.stat(tr("Вода"), tr("есть насос") if sim.water.has_source() else tr("нет насоса"), UITheme.GOOD if sim.water.has_source() else UITheme.WARN, tr("ППР станков: %s") % (tr("ведёт сам") if sim.office.active("engineer") else (tr("включён") if sim.ppr else tr("выключен")))))
+	nv.add_child(UITheme.stat(tr("Вода"), tr("есть насос") if sim.water.has_source() else tr("нет насоса"), UITheme.GOOD if sim.water.has_source() else UITheme.WARN, tr("Обслуживание станков: %s") % (tr("ведёт сам") if sim.office.active("engineer") else tr("по износу"))))
 	for t0 in nv.get_children():
 		(t0 as Control).size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rv.add_child(nc)

@@ -890,6 +890,30 @@ func show_thing(s: Sim, t: Thing) -> void:
 		ob.pressed.connect(func() -> void: _pick_owner(t, ob))
 		orow.add_child(ob)
 		head.add_child(orow)
+	# 1.58: сколько заготовок держать у станка заранее
+	if t.kind() == "machine" and t.built and not t.demolish:
+		var brow := UITheme.hbox(6)
+		var bl := _wrap(L.t("Держать заготовок у станка:"), 12, UITheme.TEXT, card_w - 170.0)
+		bl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bl.tooltip_text = L.t("Разнорабочие заранее носят заготовки на клетку рядом со станком, пока там не наберётся столько. «Авто» — как раньше: только во входной слот станка. Станочник сам заготовки не носит, если на смене есть разнорабочий.")
+		bl.mouse_filter = Control.MOUSE_FILTER_STOP
+		brow.add_child(bl)
+		var bv := UITheme.label("", 13, UITheme.TEXT, UITheme.f_semi)
+		bv.custom_minimum_size = Vector2(44, 0)
+		bv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var bshow := func() -> void: bv.text = L.t("авто") if t.buffer <= 0 else str(t.buffer)
+		var bstep := func(d: int) -> void:
+			sim.logi.set_buffer(t, t.buffer + d)
+			bshow.call()
+		var bm := UITheme.small("◀", func() -> void: bstep.call(-1), L.t("Меньше"))
+		bm.custom_minimum_size = Vector2(28, 26)
+		var bp := UITheme.small("▶", func() -> void: bstep.call(1), L.t("Больше"))
+		bp.custom_minimum_size = Vector2(28, 26)
+		brow.add_child(bm)
+		brow.add_child(bv)
+		brow.add_child(bp)
+		bshow.call()
+		head.add_child(brow)
 	# действия
 	if (t.kind() == "machine" or t.kind() in ["vent_fan", "compressor", "boiler"]) and t.built:
 		var tg := _act("", func() -> void: pass)
@@ -1349,7 +1373,7 @@ func _set_chip(text: String, col: Color) -> void:
 	chip.text = text
 	# 1.20: красная плашка подсказывает, что сделать
 	var fixes := {"Нет тока": L.t("Как исправить: протяните кабель от щитка к этому объекту («Сети», E). Если кабель есть — проверьте, не выбит ли автомат, и хватает ли мощности подстанции."),
-		"Сломан": L.t("Как исправить: отправьте в ремонт кнопкой ниже — придёт слесарь или станочник. Чтобы ломалось реже, включите ППР (Производство → Станки)."),
+		"Сломан": L.t("Как исправить: отправьте в ремонт кнопкой ниже — придёт слесарь или станочник."),
 		"Не греет": L.t("Как исправить: котлу нужен ток, вода (труба от водомера) и топливо. Подробности — в строке состояния ниже."),
 		"Простаивает": L.t("Нет работы или некому работать: проверьте заказы, металл на стеллаже и есть ли станочник нужной профессии."),
 		"Не подключён": L.t("Как исправить: протяните воздуховод от вытяжного вентилятора к зонту («Сети» → «Вентиляция»).")}

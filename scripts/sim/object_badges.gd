@@ -118,13 +118,26 @@ static func reason(sim: Sim, t: Thing) -> Dictionary:
 				return _r("vent", L.t("Нет вытяжки"), L.t("В этой сети нет работающего вентилятора: поставьте его и подведите ток."))
 		"storage":
 			if t.is_storage():
-				var full := true
-				for s in t.slot_count():
-					if sim.count_slot(t, s) < t.slot_cap(s):
-						full = false
-				if full and t.slot_count() > 0:
+				if t.slot_count() > 0 and _all_full(sim, t):
 					return _r("full", L.t("Полно"), L.t("Освободите место или поставьте ещё стеллаж: сюда больше ничего не влезет."))
 	return {}
+
+
+## 1.58: «Полно» — только если забит весь склад этого типа (металл, заготовки, готовое, брак): новый стеллаж или поддон,
+## даже достраиваемый, значок снимает; снова покажем, когда и он заполнится.
+static func _all_full(sim: Sim, t: Thing) -> bool:
+	var acc0: Array = (t.def().get("storage", {}) as Dictionary).get("accept", [])
+	for o: Thing in sim.things_of("storage", false):
+		if o.demolish or o.slot_count() == 0:
+			continue
+		if o != t and (o.def().get("storage", {}) as Dictionary).get("accept", []) != acc0:
+			continue
+		if not o.built:
+			return false
+		for s in o.slot_count():
+			if sim.count_slot(o, s) < o.slot_cap(s):
+				return false
+	return true
 
 
 static func _heat_why(sim: Sim) -> Dictionary:

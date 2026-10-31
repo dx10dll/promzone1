@@ -83,7 +83,6 @@ func _init() -> void:
 	sim.office.all_depts = false
 
 	print("— главный инженер и охрана труда")
-	sim.ppr = false
 	var s0 := sim.service_at()
 	sim.office.all_depts = true
 	if Defs.CHIEF_ENGINEER:

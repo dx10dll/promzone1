@@ -319,17 +319,25 @@ static func _help(mk: Market, c: Dictionary, rng: RandomNumberGenerator) -> bool
 			[{"text": L.t("Одолжить за плату"), "hint": L.t("+%s, отношение растёт; металл уйдёт со склада") % Defs.money_str(price)}, {"text": L.t("Отказать"), "hint": L.t("Отношение упадёт")}],
 			1, {"comp": str(c["id"]), "sub": "metal", "mat": best, "qty": qty, "price": price})
 		return true
-	# станок на ночь
-	var ms: Array = sim.things_of("machine").filter(func(t: Thing) -> bool: return t.built and t.enabled and not t.broken and not t.demolish)
-	if ms.is_empty():
+	# 1.58: сосед не успевает с заказом и просит сделать его за нас: субподряд с ценой, сроком и количеством
+	var avail := sim.prod.processes_available()
+	var pool: Array = []
+	for k in sim.progress.products():
+		var ks := str(k)
+		if Defs.products.has(ks) and sim.office.unlocked(Defs.products[ks]) and sim.prod.can_make(ks, avail):
+			pool.append(ks)
+	if pool.is_empty():
 		return false
-	var m: Thing = ms[rng.randi_range(0, ms.size() - 1)]
-	var fee := 8000.0
-	sim.story.letter("rival_help", L.t("%s просит станок") % cn,
-		L.t("Директор %s: «Выручайте — у нас встал станок, а заказ горит. Одолжите на ночь ваш %s?» Заплатят %s, но станок поизносится.") % [short_name(c), m.title().to_lower(), Defs.money_str(fee)],
+	var p := str(pool[rng.randi_range(0, pool.size() - 1)])
+	var o := sim.orders.make_offer(p)
+	var price := int(round(float(o["price"]) * 1.2 / 10.0) * 10)
+	var lead := maxi(2, int(o["lead"]) - 1)
+	var qty := int(o["qty"])
+	sim.story.letter("rival_help", L.t("%s просит выручить с заказом") % cn,
+		L.t("Директор %s: «Не успеваем сдать заказ — сделайте за нас: %s × %d, срок %d дн., цена %s за штуку (на 20%% выше рынка)». Заказ встанет в работу как обычный.") % [short_name(c), Defs.product_name(p).to_lower(), qty, lead, Defs.money_str(price)],
 		"handshake", Sim.LVL_INFO,
-		[{"text": L.t("Одолжить за плату"), "hint": L.t("+%s, износ станка −10%%, отношение растёт") % Defs.money_str(fee)}, {"text": L.t("Отказать"), "hint": L.t("Отношение упадёт")}],
-		1, {"comp": str(c["id"]), "sub": "machine", "thing": m.id, "price": fee})
+		[{"text": L.t("Взять субподряд"), "hint": L.t("Обычный заказ в работе, срок %d дн.; отношение растёт") % lead}, {"text": L.t("Отказать"), "hint": L.t("Отношение упадёт")}],
+		1, {"comp": str(c["id"]), "sub": "subcontract", "product": p, "qty": qty, "price": price, "lead": lead})
 	return true
 
 
@@ -399,16 +407,22 @@ static func on_letter(mk: Market, ev: String, d: Dictionary, choice: int) -> voi
 						sim.notify(L.t("%s получил металл и расплатился с наценкой.") % cn, Sim.LVL_GOOD)
 					else:
 						shift(c, sim, -3, L.t("Отказали в металле"))
-				"machine":
+				"subcontract":
 					if choice == 0:
-						var t: Thing = sim.things.get(int(d.get("thing", -1)))
-						if t != null:
-							t.condition = maxf(0.0, t.condition - 10.0)
-						sim.earn(float(d.get("price", 8000.0)), "Оплата: аренда станка соседом")
-						shift(c, sim, 6, L.t("Одолжили станок на ночь"))
-						sim.notify(L.t("Станок вернулся от %s с оплатой, но немного изношенный.") % cn, Sim.LVL_INFO)
+						var o := sim.orders.make_offer(str(d.get("product", "")))
+						o["qty"] = int(d.get("qty", 1))
+						o["price"] = int(d.get("price", o["price"]))
+						o["lead"] = int(d.get("lead", 3))
+						o["client"] = cn
+						o["status"] = "offer"
+						o["expires"] = sim.minute + 3.0 * 1440.0
+						sim.orders.list.append(o)
+						var err := sim.orders.accept(int(o["id"]), true)
+						shift(c, sim, 6, L.t("Взяли их заказ по субподряду"))
+						if err != "":
+							sim.notify(L.t("Заказ %s — на доске заявок (в работу сейчас не взять: %s).") % [cn, err], Sim.LVL_WARN)
 					else:
-						shift(c, sim, -3, L.t("Отказали в станке"))
+						shift(c, sim, -3, L.t("Отказали в субподряде"))
 
 
 ## Убрать со склада qty единиц металла. Возвращает, сколько убрали.
