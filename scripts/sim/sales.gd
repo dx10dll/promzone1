@@ -119,7 +119,7 @@ func verdict(o: Dictionary) -> Array:
 		# платить только за то, чего нет на складе и не едет
 		var short := maxi(0, sim.planner.material_deficit(mat) + Defs.mat_qty(p) * int(o["qty"]))
 		var cost := sim.material_price(mat) * short
-		if cost > 0.0 and sim.money - cost < 0.0 and sim.trade_credit_left() < cost:
+		if cost > 0.0 and sim.money - cost < 0.0:
 			return ["не хватает денег на металл", []]
 	return ["", []]
 

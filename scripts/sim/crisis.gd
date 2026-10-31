@@ -144,8 +144,7 @@ func _tools_daily() -> void:
 			if int(tools_short[c2]) == 1 and sim.story.get_letter_by_ev("crisis_tools").is_empty():
 				sim.story.letter("crisis_tools", L.t("Нечем работать: кончился %s") % L.dt("consumable.%s.short" % c2, str(cd.get("short", c2))),
 					L.t("%s закончился, а денег на новый (%s) нет. Станки стоят, люди простаивают, жалуются и грозят уволиться.") % [L.dt("consumable.%s.name" % c2, str(cd.get("name", c2))), Defs.money_str(float(cd.get("price", 0.0)))],
-					"wrench", Sim.LVL_BAD, [{"text": L.t("Взять у поставщика в долг"), "hint": L.t("%s через две недели (+10%%)") % Defs.money_str(float(cd.get("price", 0.0)) * 1.1)},
-						{"text": L.t("Пусть ждут денег"), "hint": L.t("Настроение падает каждый день")}], 0, {"cons": c2})
+					"wrench", Sim.LVL_BAD, [{"text": L.t("Ждать денег"), "hint": L.t("Настроение падает каждый день; выручат оплата заказа или кредит")}], 0, {"cons": c2})
 		else:
 			tools_short.erase(c2)
 
@@ -202,13 +201,7 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 				for w in sim.workers:
 					Mood.add(sim, w, "wage_late")
 		"crisis_tools":
-			var c := str(d.get("cons", "tools"))
-			var cd: Dictionary = Defs.consumables.get(c, {})
-			if choice == 0 and not cd.is_empty():
-				sim.office.add_debt(float(cd["price"]) * 1.1, 2, "Отсрочка платежа за расходники")
-				sim.cons_supply.append({"cons": c, "packs": 1, "eta": sim.to_work_time(sim.minute + 120.0)})
-				sim.notify(L.t("Поставщик отгрузил %s в долг — привезут через пару часов.") % L.dt("consumable.%s.pack" % c, str(cd.get("pack", c))), Sim.LVL_WARN)
-				tools_short.erase(c)
+			pass   # 1.62: торгового кредита поставщика нет; письма из старых сохранений просто закрываются
 		"crisis_client":
 			var o := sim.orders.get_order(int(d.get("order", -1)))
 			if o.is_empty() or str(o["status"]) != "active":

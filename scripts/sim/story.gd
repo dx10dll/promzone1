@@ -237,6 +237,8 @@ func resolve(id: int, choice: int) -> void:
 			sim.career.on_letter(str(l["ev"]), d, choice)
 		"grant":
 			_res_grant(d, choice)
+		"grant_offer":
+			sim.grants.on_letter(d, choice)
 		"competitor_sale":
 			_res_sale(d, choice)
 		"raid":

@@ -1922,17 +1922,12 @@ func order_material(mat: String, qty: int, auto: bool = false) -> String:
 	var cost := price * qty
 	var sd := office.supplier_def()
 	if auto and not can_afford(cost):
-		# 1.20: снабжение само в долг не закупает — решает директор (Производство → Металл)
-		notify_once("auto_supply_debt", L.t("Снабжение: на металл нет денег — само в долг не закупает. Купить в долг можно вручную: «Производство → Металл и расходники»."), LVL_WARN, Vector2i(-1, -1), 720.0)
+		# 1.62: торгового кредита поставщика больше нет — на металл нужны деньги
+		notify_once("auto_supply_debt", L.t("Снабжение: на металл нет денег — закупка подождёт. Выручат оплата заказов или кредит (Финансы → Кредиты и лизинг)."), LVL_WARN, Vector2i(-1, -1), 720.0)
 		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
 	if not can_afford(cost):
-		# товарный кредит: под принятые заказы поставщик отгружает с отсрочкой платежа
-		if trade_credit_left() < cost:
-			return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
-		office.add_debt(cost * 1.05, 2, "Отсрочка платежа за металл")
-		notify(L.t("Денег на металл не хватило — %s отгрузил %s × %d в долг: %s вернуть за две недели (+5%%).") % [office.supplier_name(), Defs.material_name(mat), qty, Defs.money_str(cost * 1.05)], LVL_WARN)
-	else:
-		spend(cost, "Металл: %s × %d (%s)" % [Defs.material_name(mat), qty, office.supplier_name()])
+		return L.t("Не хватает денег: нужно %s") % Defs.money_str(cost)
+	spend(cost, "Металл: %s × %d (%s)" % [Defs.material_name(mat), qty, office.supplier_name()])
 	var dl: Array = sd.get("delay", [Defs.b("supply_delay_min"), Defs.b("supply_delay_max")])
 	var delay := rng.randf_range(float(dl[0]), float(dl[1]))
 	if rng.randf() < float(sd.get("risk", 0.0)):
@@ -1945,16 +1940,6 @@ func order_material(mat: String, qty: int, auto: bool = false) -> String:
 	var when := _eta_str(eta)
 	notify(L.t("Заказан металл: %s × %d. Привезут %s.") % [Defs.material_name(mat), qty, when], LVL_INFO)
 	return ""
-
-
-## Сколько ещё поставщики готовы отгрузить в долг (лимит растёт с этапом, при плохой репутации — меньше).
-func trade_credit_left() -> float:
-	var limit := (120000.0 + 60000.0 * float(progress.stage - 1)) * clampf(reputation / 50.0, 0.3, 1.5)
-	var used := 0.0
-	for l: Dictionary in office.loans:
-		if str(l.get("title", "")).begins_with("Отсрочка"):
-			used += float(l["payment"]) * int(l["left"])
-	return maxf(0.0, limit - used)
 
 
 ## Цена металла за штуку у текущего поставщика.

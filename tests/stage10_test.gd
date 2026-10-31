@@ -77,9 +77,9 @@ func _init() -> void:
 	check(not a.sales.queue.has(big) and str(a.sales.log.back()["why"]).begins_with("не успеваем"), "через полтора дня заказчик ушёл — записано в отказы")
 	a.money = 0.0
 	var debt0 := a.office.debt()
-	check(a.order_material("bar45", 20) == "" and a.office.debt() > debt0, "нет денег — металл в долг с отсрочкой")
+	check(a.order_material("bar45", 20) != "" and a.office.debt() == debt0, "нет денег — металл в долг не дают (торгового кредита с 1.62 нет)")
 	a.money = -500000.0
-	check(a.order_material("bar45", 2000) != "", "лимит товарного кредита не бесконечный")
+	check(a.order_material("bar45", 2000) != "", "в минусе металл тоже не купить")
 	a.dispose()
 
 	print("— контракты")

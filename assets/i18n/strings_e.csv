@@ -1462,7 +1462,7 @@ help.sales_auto.text,"Orders are taken by the [b]sales department[/b] by itself:
 • Each order has a [b]priority[/b] (urgent ones are made first) and a GOST [b]drawing[/b] of the part."
 help.strategy.title,Strategy and the market
 help.strategy.text,"The Orders window: how much to risk deadlines (“With margin”, “Normal”, “Tight”, the last with the “Tight scheduling” step), from what margin to take orders (5, 15 or 25%), what to keep in your range.
-The Market tab: what customers ask for, this week's prices, your capacity and [b]missed profit[/b], how much you lose without the right machine or person. It's a hint for what to build next. With an accountant you see margins; with a planning office, whether you'll make it in time."
+The Market tab is one card: demand by 3–4 product groups (rising / falling / steady) and the main rival in each; click a group for products, this week's prices, your capacity and [b]missed profit[/b], how much you lose without the right machine or person. It's a hint for what to build next. With an accountant you see margins; with a planning office, whether you'll make it in time."
 help.deadlines.title,"Deadlines, penalties and extensions"
 help.deadlines.text,"• Lateness costs a 5% penalty per day (up to 30% of the amount); after 3 days the order fails.
 • Every overdue day lowers reputation; after 2 days the customer comes to sort it out: a 10% penalty and +4 days, a promise to deliver within 2 days, or cancellation.
@@ -1478,7 +1478,7 @@ help.tenders.text,"• From the “Medium business” stage, export orders and s
 • Military acceptance inspects regularly, and items go through the test rig.
 • “Hot” orders and tenders are decided by the director, by letter."
 help.competitors.title,Competitors and pricing policy
-help.competitors.text,"Orders → Competitors (needs a sales manager). Our [b]market share[/b] depends on capacity, quality, deadlines, reputation, prices and ISO 9001.
+help.competitors.text,"Orders → Market: the “Market” card (price policy and neighbours: the button at the bottom, needs a sales manager). Our [b]market share[/b] depends on capacity, quality, deadlines, reputation, prices and ISO 9001.
 • [b]Dumping[/b]: prices 10% lower, a third more requests, thinner margins.
 • [b]Market[/b]: normal prices.
 • [b]Premium[/b]: prices 12% higher, fewer requests.
@@ -1488,7 +1488,7 @@ help.metal.text,"Production → Metal & consumables. Materials: St45 round bar (
 • The metal price shifts every day, sometimes in jumps: cheap, buy ahead; expensive, buy only for orders.
 • Stock: “Orders only”, “Small” (+20%), “Large” (+50%).
 • With a buyer: supplier choice (bulk 10–23% cheaper) and a price chart.
-• Short of money? The supplier ships on credit with two weeks' deferral (+5%), within a limit."
+• Short of money? Metal is paid up front: the supplier gives no credit — wait for order payments or take a bank loan."
 help.sec.logistics,Storage and logistics
 help.unload_zone.title,Unloading zone
 help.unload_zone.text,"[b]Required[/b]: Build → Outdoor zones → “Unloading”. Trucks bring metal, building materials and equipment crates here, and workers carry them from here to racks and install spots.
@@ -1707,18 +1707,18 @@ help.loans.title,Loans and leasing
 help.loans.text,"Finance → Loans & leasing. The bank gives loans from the “Workshop” stage: at 22%, at 17% with accounting, and up to 3 million ₽ at 14% with the “Bank & leasing” step.
 [b]Leasing[/b]: a machine from 40,000 ₽: 20% up front, the rest in payments over 12 weeks (+18%)."
 help.insurance.title,Insurance
-help.insurance.text,"Finance → Insurance (the “Bank & leasing” step). Premiums are paid on Mondays.
+help.insurance.text,"Finance → Insurance (the “Bank & leasing” step). One checkbox, [b]“Insure everything”[/b]; the premium is paid on the first day of the month and the price is shown on the card.
 • [b]Property[/b]: 80% of machine repair costs and fire damage.
 • [b]Liability[/b]: half of penalties, complaints and contract fines.
 • [b]Accident[/b]: the whole compensation under an N-1 report."
 help.grants.title,Grants
-help.grants.text,"Finance → Grants are mini-quests: apply for a support program, meet the conditions (equip a shop or canteen, create jobs), and after an inspection your expenses are reimbursed.
-Programs appear depending on your situation: have a canteen, “A bigger canteen”; cash in the red, “Crisis support”; smoky welding and painting, “Clean air in the shop”. You'll be notified about a new suitable program."
+help.grants.text,"Finance → Grants are mini-quests: file an application for a support program, wait for the decision, meet the conditions (equip a shop or canteen, create jobs), and after an inspection your expenses are reimbursed.
+The fund's memo arrives once every two or three weeks, depending on your situation: have a canteen, “A bigger canteen”; cash in the red, “Crisis support”; smoky welding and painting, “Clean air in the shop”. You can apply (money for paperwork and a few days for documents; it may be rejected — the chance is higher with good reputation and ISO 9001) or skip."
 help.crisis.title,Debts and crisis
 help.crisis.text,"• Not enough for wages? They're paid on credit (cash goes negative), but only once every 3 months. The next time wages are [b]delayed[/b]: people get angry, and a letter offers to take a loan or ask them to be patient.
 • From the 3rd day of delay the unhappiest person leaves. Three gone within two weeks and the labor inspectorate [b]shuts the plant[/b] (game over).
 • Cash negative for two days or more lowers reputation; sales won't take new orders while you're in debt.
-• No tools and no money: a letter offers to buy from the supplier on credit (+10%) or wait."
+• No tools and no money: a letter says production waits for cash; order payments or a bank loan will help (suppliers give no credit)."
 help.reports.title,Reports and charts
 help.reports.text,"• Finance → Summary: money and recent transactions.
 • By week: a report by item, product cost and margin, a two-week cash forecast (needs an accountant and “Cost accounting”).

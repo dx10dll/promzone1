@@ -496,7 +496,7 @@ func loan_payment(amount: float, weeks_n: int, rate: float) -> float:
 func take_loan(amount: float, weeks_n: int) -> String:
 	if sim.progress.stage < 2:
 		return L.t("Банки кредитуют предприятия от этапа «Мастерская». Пока — гранты и программы поддержки")
-	if loans.size() >= 2:
+	if loans.filter(func(l: Dictionary) -> bool: return not bool(l.get("legacy", false))).size() >= 2:
 		return L.t("Банк не даст больше двух кредитов одновременно")
 	if not loan_ok(amount):
 		return L.t("Кредит больше 800 тыс. ₽ — после ступени «Банк и лизинг» (Управление → Развитие)")
@@ -787,4 +787,9 @@ func from_dict(d: Dictionary) -> void:
 	research_pts = d.get("pts", {})
 	weeks = d.get("weeks", [])
 	loans = d.get("loans", [])
+	# 1.62: торгового кредита поставщика больше нет — старые «отсрочки» остаются обычным долгом без процентов, без места в лимите банка
+	for ln: Dictionary in loans:
+		if str(ln.get("title", "")).begins_with("Отсрочка"):
+			ln["title"] = "Долг поставщику (бывшая отсрочка)"
+			ln["legacy"] = true
 	vacancies = d.get("vac", [])

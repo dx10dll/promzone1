@@ -24,7 +24,7 @@ static var train_where := "class"  ## где учить: свой класс и�
 const GROUPS := {
 	"orders": {"title": "Заказы", "icon": "orders", "secs": [
 		["board", "Новые заявки", "blueprint", "orders", "board"], ["active", "В работе", "orders", "orders", "active"], ["market", "Рынок", "chart_up", "orders", "market"],
-		["contracts", "Контракты", "handshake", "orders", "contracts"], ["compet", "Конкуренты", "factory", "orders", "compet"],
+		["contracts", "Контракты", "handshake", "orders", "contracts"],
 		["plan", "План ПДО", "calendar", "orders", "plan"], ["done", "Архив", "log", "orders", "done"]]},
 	"prod": {"title": "Производство", "icon": "production", "secs": [
 		["machines", "Станки", "shop", "shop", ""], ["stall", "Простой", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
@@ -59,14 +59,13 @@ const GROUPS := {
 const ALIASES := {"develop": ["office", "develop"], "staff": ["people", "staff"], "crew": ["people", "brig"], "shop": ["prod", "machines"], "supply": ["prod", "supply"],
 	"research": ["office", "research"], "paper": ["events", "paper"], "log": ["events", "log"]}
 ## Старые ключи вкладок -> разделы.
-const SEC_ALIASES := {"main": "supply", "stage": "stage"}
+const SEC_ALIASES := {"main": "supply", "stage": "stage", "compet": "market"}
 ## Разделы, которые открывает специалист (1.10) или ступень развития (1.11, «dev:…»): раздел -> [отдел, что появится].
 const SEC_GATES := {
 	"weeks": ["accounting", "Движение денег по неделям и статьям, себестоимость и маржа заказов, прогноз кассы."],
 	"insurance": ["dev:fin3", "Страховые полисы оформляет и ведёт бухгалтерия."],
 	"contracts": ["dev:mkt3", "Долгие контракты с крупными заказчиками: поставки партиями по графику, цена выше рыночной. И экспортные заказы при репутации от 60."],
 	"iso": ["dev:tech3", "Сертификация ISO 9001: аудитор проверяет ОТК, качество, техотдел, СОУТ и инструктажи. Сертификат даёт больше заявок и премиальные цены."],
-	"compet": ["sales", "Таблица конкурентов: доли рынка, цены, войны цен. Ценовая политика — демпинг или премиум. На 10% больше заявок."],
 	"plan": ["pdo", "План производства с прогнозом сроков, приоритеты заказов, вдвое меньше переналадок, оценка «успеваем?» на рынке."],
 	"brig": ["foreman", "Бригады и бригадиры, участки, соцсоревнование между бригадами."],
 	"sched": ["foreman", "Свой график смены по 15 минут: планёрка, обед, перерывы, уборка."],
@@ -597,7 +596,7 @@ func _signature() -> String:
 				for a: Dictionary in sim.grants.active:
 					for goal: Dictionary in Grants.def(str(a["id"])).get("goals", []):
 						gs += "1" if sim.grants.goal_ok(goal, a) else "0"
-				gs += "|%d|%d|%d" % [sim.grants.active.size(), sim.grants.done.size(), sim.day()]
+				gs += "|%d|%d|%d|%d" % [sim.grants.active.size(), sim.grants.done.size(), sim.grants.pending.size(), sim.day()]
 			if tab == "energy":
 				gs = "%d|%d|%s|%d|%d" % [int(sim.power.kwh_day + sim.power.kwh_night), int(sim.power.peak_day), str(sim.power.upgrade), sim.power.contract_steps, int(sim.power.night_now())]
 			return "%s|%d|%d|%d|%s|%s|%d|%s|%d" % [tab, sim.ledger.size(), int(sim.money), sim.office.loans.size(), gs, str(sim.market.insurance), sim.market.leases.size(), str(sim.market.leasing_on), sim.market.hist.size()]
@@ -818,8 +817,6 @@ func _orders() -> void:
 			_market()
 		"contracts":
 			_contracts()
-		"compet":
-			_compet()
 		"plan":
 			_plan()
 		"done":
@@ -925,85 +922,158 @@ func _sales_head() -> void:
 		content.add_child(ph)
 
 
+static var mk_open: Dictionary = {}   ## 1.62: какие строки карточки «Рынок» раскрыты
+
+
+func _mk_toggle(key: String) -> void:
+	mk_open[key] = not bool(mk_open.get(key, false))
+	rebuild(true)
+
+
+## 1.62: Заказы → Рынок — одна карточка: спрос по 3–4 группам изделий и главный конкурент в каждой; подробности — по щелчку.
 func _market() -> void:
 	var sl := sim.sales
+	var mk := sim.market
 	var s := sl.summary(7)
-	_info(tr("заявки за 7 дней · цены меняются по понедельникам"))
-	_intro(tr("Заявки заказчиков за неделю по изделиям вашего профиля. Снимите изделие с ассортимента — сбыт перестанет его брать, и станки займутся выгодным. × — передел, для которого нет оборудования."))
+	_info(tr("наша доля рынка %d%% · заявок ×%.2f") % [int(roundf(mk.share * 100.0)), mk.inquiry_k()])
+	_intro(tr("Спрос по группам изделий (по ценам недели) и главный сосед-конкурент в каждой. Щёлкните по группе — откроются изделия, цены и ассортимент. Внизу — ценовая политика, все заводы региона и их директора."))
+	var card := _card_in(content)
+	var top := UITheme.hbox(10)
+	top.add_child(UITheme.label("%d%%" % int(roundf(mk.share * 100.0)), 26, UITheme.ACCENT, UITheme.f_semi))
+	var cap := UITheme.label(tr("наша доля рынка"), 13, UITheme.MUTED)
+	cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(cap)
+	var prev := float(mk.share_hist[mk.share_hist.size() - 1]["ours"]) if not mk.share_hist.is_empty() else mk.share
+	var dlt := mk.share - prev
+	if absf(dlt) >= 0.005:
+		var dl := UITheme.label(tr("%s%d%% за неделю") % ["+" if dlt > 0 else "−", int(roundf(absf(dlt) * 100.0))], 13, UITheme.GOOD if dlt > 0 else UITheme.BAD)
+		dl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		top.add_child(dl)
+	if mk.war_active():
+		top.add_child(UITheme.chip(tr("у соседей война цен"), UITheme.BAD, tr("Заявок −15%, пока она идёт (если мы не демпингуем)")))
+	card.add_child(top)
 	if float(s["lost_sum"]) > 0.0:
-		var parts: Array[String] = []
-		var procs: Array = (s["by_proc"] as Dictionary).keys()
-		procs.sort_custom(func(a: String, b: String) -> bool: return float(s["by_proc"][a]) > float(s["by_proc"][b]))
-		for pr in procs.slice(0, 3):
-			parts.append("%s %s" % [Defs.process_name(str(pr)).to_lower(), Defs.money_str(float(s["by_proc"][pr]))])
-		content.add_child(UITheme.para(tr("Упущено за неделю: %s.%s") % [Defs.money_str(float(s["lost_sum"])), (tr(" По переделам: ") + ", ".join(parts) + ".") if not parts.is_empty() else ""], 13, UITheme.WARN))
+		card.add_child(UITheme.para(tr("Упущено за неделю: %s — не хватает станка или людей на переделе.") % Defs.money_str(float(s["lost_sum"])), 13, UITheme.WARN))
 	var avail := sim.prod.processes_available()
-	var prods: Array = []
-	for k in sim.progress.products():
-		if Defs.products.has(str(k)):
-			prods.append(str(k))
-	prods.sort_custom(func(a: String, b: String) -> bool:
-		var ma := sl.missing(a).is_empty()
-		var mb := sl.missing(b).is_empty()
-		if ma != mb:
-			return ma
-		return float(sl.demand(a)[1]) > float(sl.demand(b)[1]))
-	_thead([["", 36], [tr("Изделие и маршрут"), -1], [tr("Цена за шт."), 170], [tr("Спрос за неделю"), 170], [tr("Мощность"), 120], ["", 120]])
-	for p: String in prods:
-		var pd: Dictionary = Defs.products[p]
-		var trn := sl.trend(p)
-		var pr: Array = pd.get("price", [0, 0])
-		var ix := sl.price_index(p) * (0.9 + sim.reputation / 500.0) * sim.progress.price_k()
-		var seen := {}
-		var todo: Array[String] = [p]
-		var steps: Array[String] = []
-		while not todo.is_empty():
-			var q: String = todo.pop_front()
-			for c in Defs.components(q).keys():
-				todo.append(str(c))
-			for o: Dictionary in Defs.route(q):
-				var op := str(o["op"])
-				if not seen.has(op):
-					seen[op] = true
-					steps.append(Defs.process_name(op) + ("" if avail.has(op) else " ×"))
-		var miss := sl.missing(p)
-		var sub := " → ".join(steps)
-		if not sim.office.unlocked(pd):
-			sub = tr("нужна разработка техотдела")
-		var dm := sl.demand(p)
-		var capw := sl.capacity_week(p) if miss.is_empty() else 0.0
-		var price_txt := "%s–%s" % [Defs.money_str(float(pr[0]) * ix), Defs.money_str(float(pr[1]) * ix)]
-		var trend_txt := ("▲ +%d%%" if trn > 0.0 else "▼ %d%%") % int(round(trn * 100.0)) if absf(trn) >= 0.01 else tr("без изменений")
-		var on := sl.in_assortment(p) and miss.is_empty()
-		var tb := UITheme.small(tr("в ассортименте") if on else (tr("нет станка") if not miss.is_empty() else tr("снято")), func() -> void:
-			if sl.off.has(p):
-				sl.off.erase(p)
+	for g: Dictionary in mk.card_groups():
+		var gid := str(g["id"])
+		var opened := bool(mk_open.get(gid, false))
+		var tid := str(g["trend"])
+		var col: Color = UITheme.GOOD if tid == "up" else (UITheme.BAD if tid == "down" else UITheme.MUTED)
+		var verdict := tr("спрос растёт") if tid == "up" else (tr("спрос падает") if tid == "down" else tr("спрос ровный"))
+		var arrow := UITheme.label(str(g["arrow"]), 20, col, UITheme.f_semi)
+		arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var cd: Dictionary = g["comp"]
+		var comp_cell: Control
+		if cd.is_empty():
+			comp_cell = _cl(tr("конкурентов в районе нет"), 12, UITheme.MUTED)
+		else:
+			var pw := tr("война цен") if bool(cd["war"]) else (tr("ниже рынка") if float(cd["price"]) < 0.97 else (tr("выше рынка") if float(cd["price"]) > 1.03 else tr("по рынку")))
+			comp_cell = _cl2(tr("%s · %d%%") % [L.name(str(cd["name"])), int(roundf(float(cd["share"]) * 100.0))], tr("%s · цены %s") % [str(cd["director"]), pw], UITheme.TEXT, UITheme.BAD if bool(cd["war"]) else UITheme.MUTED, 13)
+		var n_pr := (g["products"] as Array).size()
+		var gk := gid
+		_trow([[arrow, 30], [_cl2(tr(str(g["name"])), tr("изделий: %d") % n_pr, UITheme.TEXT, UITheme.MUTED, 14), 230], [_cl(verdict, 14, col, UITheme.f_semi), 140],
+			[comp_cell, -1], [_cl("▴" if opened else "▾", 14, UITheme.MUTED, null, HORIZONTAL_ALIGNMENT_RIGHT), 24]],
+			func() -> void: _mk_toggle(gk), 50.0, tr("Щёлкните, чтобы раскрыть изделия группы"), card)
+		if opened:
+			if (g["products"] as Array).is_empty():
+				card.add_child(UITheme.para(tr("В вашем ассортименте изделий этой группы пока нет."), 12, UITheme.MUTED))
 			else:
-				sl.off[p] = true
-			rebuild(true), tr("Снять с ассортимента или вернуть: сбыт берёт заказы только на изделия в ассортименте") if miss.is_empty() else tr("Нет нужного станка — заявки на это изделие не приходят, пока его не поставите"))
-		tb.disabled = not miss.is_empty()
-		if on:
-			tb.add_theme_stylebox_override("normal", UITheme.sb(Color("#2b4130"), Color("#4f7a4a"), 1, 6, 8, 2))
-			tb.add_theme_color_override("font_color", UITheme.GOOD)
-		# РП-14: маржа — со ступенью «Себестоимость», «успеваем?» — с диспетчером ПДО
-		var mg_txt := ""
-		if sim.dev.on("fin2"):
-			var mid := (float(pr[0]) + float(pr[1])) * 0.5 * ix
-			var mg := sim.office.margin({"product": p, "price": mid})
-			mg_txt = tr(" · маржа %d%%") % int(round(mg * 100.0))
-		var cap_sub := ""
-		var cap_col := UITheme.MUTED
-		if sim.office.active("pdo") and capw > 0.0:
-			var qr: Array = pd.get("qty", [5, 15])
-			var qty := int((int(qr[0]) + int(qr[1])) / 2)
-			var lead := float(sim.orders.make_lead(p, qty))
-			var ld := sim.office.load_days(p, qty)
-			cap_sub = tr("успеваем") if ld <= lead * 0.75 else (tr("впритык") if ld <= lead else tr("не успеваем"))
-			cap_col = UITheme.GOOD if ld <= lead * 0.75 else (UITheme.WARN if ld <= lead else UITheme.BAD)
-		_trow([[_icon(Tex.item(p), 30), 36], [_cl2(Defs.product_name(p), sub, UITheme.TEXT, UITheme.BAD if not miss.is_empty() else UITheme.INFO), -1],
-			[_cl2(price_txt, trend_txt + mg_txt, UITheme.GOOD, UITheme.GOOD if trn > 0.0 else (UITheme.BAD if trn < 0.0 else UITheme.MUTED), 13), 170],
-			[_cl2(tr("%d шт. на %s") % [int(dm[0]), Defs.money_str(float(dm[1]))], (tr("взято %d шт.") % int(dm[2])) if int(dm[0]) > 0 else "", UITheme.TEXT if int(dm[0]) > 0 else UITheme.MUTED, UITheme.MUTED, 13), 170],
-			[_cl2((tr("~%d в нед.") % int(capw)) if capw > 0.0 else (tr("нет людей") if miss.is_empty() else tr("нет станков")), cap_sub, UITheme.TEXT if capw > 0.0 else UITheme.MUTED, cap_col, 13), 120], [tb, 120]], Callable(), 46.0)
+				_thead([["", 36], [tr("Изделие и маршрут"), -1], [tr("Цена за шт."), 170], [tr("Спрос за неделю"), 170], [tr("Мощность"), 120], ["", 120]], card)
+				var prods: Array = (g["products"] as Array).duplicate()
+				prods.sort_custom(func(a: String, b: String) -> bool:
+					var ma := sl.missing(a).is_empty()
+					var mb := sl.missing(b).is_empty()
+					if ma != mb:
+						return ma
+					return float(sl.demand(a)[1]) > float(sl.demand(b)[1]))
+				for p in prods:
+					_market_row(str(p), avail, card)
+			if not cd.is_empty():
+				card.add_child(UITheme.para(tr("Главный конкурент: %s — %s. Специализация: %s.") % [L.name(str(cd["name"])), str(cd["director"]), L.t(str(cd["spec"]))], 12, UITheme.INFO))
+	var more := bool(mk_open.get("all", false))
+	var mb := UITheme.ghost(tr("Цены, соседние заводы и директора ▴") if more else tr("Цены, соседние заводы и директора ▾"), func() -> void: _mk_toggle("all"))
+	mb.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	card.add_child(mb)
+	if more:
+		_market_more()
+
+
+## Раскрытые подробности карточки: ценовая политика, заводы региона с директорами и график доли рынка.
+func _market_more() -> void:
+	var mk := sim.market
+	var b := _card_in(content, tr("Ценовая политика"), tr("Демпинг — цены −10%: заявок на треть больше, но маржа тоньше и соседи могут начать войну цен. Премиум — цены +12%: заявок меньше; с сертификатом ISO 9001 заказчики почти не уходят."))
+	if not sim.office.active("sales"):
+		b.add_child(UITheme.para(tr("Ценовую политику ведёт отдел сбыта: пока цены «по рынку». Менеджер по сбыту даёт выбор — демпинг или премиум."), 12, UITheme.MUTED))
+	else:
+		b.add_child(UITheme.segmented([["dump", tr("Демпинг"), tr(str(Market.POLICIES["dump"]["desc"]))], ["market", tr("По рынку"), ""], ["premium", tr("Премиум"), tr(str(Market.POLICIES["premium"]["desc"]))]], mk.policy, func(k: String) -> void:
+			mk.policy = k
+			rebuild(true)))
+		b.add_child(UITheme.para(tr(str(mk.pol()["desc"])), 12))
+	var rows: Array = mk.alive_comps()
+	rows.sort_custom(func(x: Dictionary, y: Dictionary) -> bool: return float(x["share"]) > float(y["share"]))
+	_rival_cards(rows)
+	var cc := _card_in(content, tr("Доля рынка по дням"))
+	cc.add_child(_share_chart(150.0))
+
+
+## Строка изделия в раскрытой группе: цена, тренд, спрос, мощность, ассортимент.
+func _market_row(p: String, avail: Dictionary, parent: Control) -> void:
+	var sl := sim.sales
+	var pd: Dictionary = Defs.products[p]
+	var trn := sl.trend(p)
+	var pr: Array = pd.get("price", [0, 0])
+	var ix := sl.price_index(p) * (0.9 + sim.reputation / 500.0) * sim.progress.price_k()
+	var seen := {}
+	var todo: Array[String] = [p]
+	var steps: Array[String] = []
+	while not todo.is_empty():
+		var q: String = todo.pop_front()
+		for c in Defs.components(q).keys():
+			todo.append(str(c))
+		for o: Dictionary in Defs.route(q):
+			var op := str(o["op"])
+			if not seen.has(op):
+				seen[op] = true
+				steps.append(Defs.process_name(op) + ("" if avail.has(op) else " ×"))
+	var miss := sl.missing(p)
+	var sub := " → ".join(steps)
+	if not sim.office.unlocked(pd):
+		sub = tr("нужна разработка техотдела")
+	var dm := sl.demand(p)
+	var capw := sl.capacity_week(p) if miss.is_empty() else 0.0
+	var price_txt := "%s–%s" % [Defs.money_str(float(pr[0]) * ix), Defs.money_str(float(pr[1]) * ix)]
+	var trend_txt := ("▲ +%d%%" if trn > 0.0 else "▼ %d%%") % int(round(trn * 100.0)) if absf(trn) >= 0.01 else tr("без изменений")
+	var on := sl.in_assortment(p) and miss.is_empty()
+	var tb := UITheme.small(tr("в ассортименте") if on else (tr("нет станка") if not miss.is_empty() else tr("снято")), func() -> void:
+		if sl.off.has(p):
+			sl.off.erase(p)
+		else:
+			sl.off[p] = true
+		rebuild(true), tr("Снять с ассортимента или вернуть: сбыт берёт заказы только на изделия в ассортименте") if miss.is_empty() else tr("Нет нужного станка — заявки на это изделие не приходят, пока его не поставите"))
+	tb.disabled = not miss.is_empty()
+	if on:
+		tb.add_theme_stylebox_override("normal", UITheme.sb(Color("#2b4130"), Color("#4f7a4a"), 1, 6, 8, 2))
+		tb.add_theme_color_override("font_color", UITheme.GOOD)
+	# РП-14: маржа — со ступенью «Себестоимость», «успеваем?» — с диспетчером ПДО
+	var mg_txt := ""
+	if sim.dev.on("fin2"):
+		var mid := (float(pr[0]) + float(pr[1])) * 0.5 * ix
+		var mg := sim.office.margin({"product": p, "price": mid})
+		mg_txt = tr(" · маржа %d%%") % int(round(mg * 100.0))
+	var cap_sub := ""
+	var cap_col := UITheme.MUTED
+	if sim.office.active("pdo") and capw > 0.0:
+		var qr: Array = pd.get("qty", [5, 15])
+		var qty := int((int(qr[0]) + int(qr[1])) / 2)
+		var lead := float(sim.orders.make_lead(p, qty))
+		var ld := sim.office.load_days(p, qty)
+		cap_sub = tr("успеваем") if ld <= lead * 0.75 else (tr("впритык") if ld <= lead else tr("не успеваем"))
+		cap_col = UITheme.GOOD if ld <= lead * 0.75 else (UITheme.WARN if ld <= lead else UITheme.BAD)
+	_trow([[_icon(Tex.item(p), 30), 36], [_cl2(Defs.product_name(p), sub, UITheme.TEXT, UITheme.BAD if not miss.is_empty() else UITheme.INFO), -1],
+		[_cl2(price_txt, trend_txt + mg_txt, UITheme.GOOD, UITheme.GOOD if trn > 0.0 else (UITheme.BAD if trn < 0.0 else UITheme.MUTED), 13), 170],
+		[_cl2(tr("%d шт. на %s") % [int(dm[0]), Defs.money_str(float(dm[1]))], (tr("взято %d шт.") % int(dm[2])) if int(dm[0]) > 0 else "", UITheme.TEXT if int(dm[0]) > 0 else UITheme.MUTED, UITheme.MUTED, 13), 170],
+		[_cl2((tr("~%d в нед.") % int(capw)) if capw > 0.0 else (tr("нет людей") if miss.is_empty() else tr("нет станков")), cap_sub, UITheme.TEXT if capw > 0.0 else UITheme.MUTED, cap_col, 13), 120], [tb, 120]], Callable(), 46.0, "", parent)
 
 
 func _contracts() -> void:
@@ -2345,7 +2415,7 @@ func _finance_weeks() -> void:
 func _finance_grants() -> void:
 	var gr := sim.grants
 	_info(tr("в работе %d из %d") % [gr.active.size(), gr.max_active()])
-	_intro(tr("Программы поддержки: оформите программу, выполните условия до срока — фонд возместит затраты. Деньги приходят только после выполнения. Одновременно — не больше %d программ.") % gr.max_active())
+	_intro(tr("Программы поддержки: подайте заявку, дождитесь решения, выполните условия до срока — фонд возместит затраты. Деньги приходят только после выполнения. Одновременно — не больше %d программ.") % gr.max_active())
 	if not gr.active.is_empty():
 		content.add_child(UITheme.caption(tr("В работе")))
 		var ga := _cards(2)
@@ -2364,30 +2434,25 @@ func _finance_grants() -> void:
 			for gi in gl0.size():
 				var ok := gr.goal_ok(gl0[gi], a)
 				v.add_child(_cl(("✓ " if ok else "○ ") + Grants.goal_text(g, gi), 13, UITheme.GOOD if ok else UITheme.TEXT))
-	var offers := gr.offers()
-	content.add_child(UITheme.caption(tr("Можно оформить")))
-	if offers.is_empty():
-		content.add_child(UITheme.para(tr("Сейчас подходящих программ нет. Они появляются по ситуации: когда растёт штат, не хватает бытовки или столовой, цех стал тесным, касса ушла в минус — и на следующих этапах роста."), 13))
-	var go := _cards(2)
-	for g2: Dictionary in offers:
-		var v2 := _card_in(go)
-		var hh2 := UITheme.hbox(8)
-		var t2 := _cl2(Grants.text(g2, "title"), Grants.text(g2, "org"))
-		t2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		hh2.add_child(t2)
-		hh2.add_child(UITheme.label(Defs.money_str(float(g2["reward"])), 15, UITheme.GOOD, UITheme.f_semi))
-		v2.add_child(hh2)
-		v2.add_child(UITheme.para(Grants.text(g2, "desc"), 12))
-		var goals: Array[String] = []
-		for gi2 in (g2.get("goals", []) as Array).size():
-			goals.append(Grants.goal_text(g2, gi2))
-		v2.add_child(UITheme.para(tr("Условия: %s · срок %d дн.") % [", ".join(goals), int(g2.get("days", 14))], 12, UITheme.INFO))
-		var gid := str(g2["id"])
-		v2.add_child(UITheme.primary(tr("Оформить"), func() -> void:
-			var err := sim.grants.take(gid)
-			if err != "":
-				hud.toast(err, Sim.LVL_WARN)
-			rebuild(true)))
+	if not gr.pending.is_empty():
+		content.add_child(UITheme.caption(tr("Заявки на рассмотрении")))
+		var gp := _cards(2)
+		for pa: Dictionary in gr.pending:
+			var gd := Grants.def(str(pa["id"]))
+			var vp := _card_in(gp)
+			var hp := UITheme.hbox(8)
+			var tp := _cl2(Grants.text(gd, "title"), Grants.text(gd, "org"))
+			tp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			hp.add_child(tp)
+			hp.add_child(UITheme.label(Defs.money_str(float(gd.get("reward", 0))), 15, UITheme.GOOD, UITheme.f_semi))
+			vp.add_child(hp)
+			var lp := maxi(0, int(pa["ready"]) - sim.day())
+			vp.add_child(_cl(tr("документы готовятся: решение через %d %s · одобрят с вероятностью ~%d%%") % [lp, Defs.plural(lp, "день", "дня", "дней"), int(round(float(pa["p"]) * 100.0))], 12, UITheme.INFO))
+			vp.add_child(_cl(tr("оформление обошлось в %s") % Defs.money_str(float(pa["fee"])), 12, UITheme.MUTED))
+	content.add_child(UITheme.caption(tr("Новые программы")))
+	content.add_child(UITheme.para(tr("Фонд присылает памятку примерно раз в две-три недели: подать заявку (деньги на оформление и несколько дней на документы, одобрить могут не всегда) или пропустить. Шанс растёт с репутацией, сертификатом ISO 9001 и этапом роста. Памятка приходит в «События → Сейчас»."), 13))
+	if gr.next_offer >= 0:
+		content.add_child(UITheme.para(tr("Следующая памятка ожидается около дня %d.") % maxi(gr.next_offer, sim.day()), 12, UITheme.MUTED))
 	if not gr.done.is_empty():
 		var names: Array[String] = []
 		for id in gr.done:
@@ -3379,67 +3444,6 @@ func _stamp(text: String, col: Color, w: float) -> Stamp:
 static var chart_range := 28
 
 
-## Заказы → Конкуренты: наша доля рынка, ценовая политика и заводы региона.
-func _compet() -> void:
-	var mk := sim.market
-	_info(tr("наша доля рынка %d%% · заявок ×%.2f") % [int(roundf(mk.share * 100.0)), mk.inquiry_k()])
-	_intro(tr("Заказчики выбирают между нами и соседними заводами. Нашу долю определяют мощность (станочники), качество, доля заказов, сданных вовремя, репутация, цены и сертификат ISO 9001. Чем выше конкурентоспособность — тем больше заявок каждое утро."))
-	var g := _cards(3)
-	var a := _card_in(g, tr("Наша доля рынка"))
-	var prev := float(mk.share_hist[mk.share_hist.size() - 1]["ours"]) if not mk.share_hist.is_empty() else mk.share
-	var dlt := mk.share - prev
-	var sh := UITheme.hbox(8)
-	sh.add_child(UITheme.label("%d%%" % int(roundf(mk.share * 100.0)), 30, UITheme.ACCENT, UITheme.f_semi))
-	if absf(dlt) >= 0.005:
-		var dl := UITheme.label(tr("%s%d%% за неделю") % ["+" if dlt > 0 else "−", int(roundf(absf(dlt) * 100.0))], 13, UITheme.GOOD if dlt > 0 else UITheme.BAD)
-		dl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		sh.add_child(dl)
-	a.add_child(sh)
-	var mb := UITheme.bar(mk.share * 100.0, UITheme.ACCENT, 100, 6)
-	mb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	a.add_child(mb)
-	a.add_child(UITheme.para(tr("заводов в районе: %d") % (mk.alive_comps().size() + 1), 12))
-	var b := _card_in(g, tr("Ценовая политика"), tr("Демпинг — цены −10%: заявок на треть больше, но маржа тоньше и соседи могут начать войну цен. Премиум — цены +12%: заявок меньше; с сертификатом ISO 9001 заказчики почти не уходят."))
-	b.add_child(UITheme.segmented([["dump", tr("Демпинг"), tr(str(Market.POLICIES["dump"]["desc"]))], ["market", tr("По рынку"), ""], ["premium", tr("Премиум"), tr(str(Market.POLICIES["premium"]["desc"]))]], mk.policy, func(k: String) -> void:
-		mk.policy = k
-		rebuild(true)))
-	b.add_child(UITheme.para(tr(str(mk.pol()["desc"])), 12))
-	if mk.war_active():
-		b.add_child(UITheme.chip(tr("у соседей война цен"), UITheme.BAD, tr("Заявок −15%, пока она идёт (если мы не демпингуем)")))
-	var c := _card_in(g, tr("Конкурентоспособность"), tr("Множитель числа заявок: качество из рейтинга, доля заказов, сданных вовремя, ценовая политика и сертификат."))
-	var q := float(sim.progress.rating.get("quality", 0.5))
-	for row: Array in [[tr("Качество"), "%d%%" % int(roundf(q * 100.0)), UITheme.ramp(q)], [tr("Сдано вовремя"), "%d%%" % int(roundf(mk.ontime() * 100.0)), UITheme.ramp(mk.ontime())],
-			["ISO 9001", tr("есть") if mk.iso_ok() else tr("нет"), UITheme.GOOD if mk.iso_ok() else UITheme.MUTED], [tr("Заявок"), "×%.2f" % mk.inquiry_k(), UITheme.ACCENT]]:
-		var rh := UITheme.hbox(8)
-		var rl := UITheme.label(str(row[0]), 13, UITheme.MUTED)
-		rl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		rh.add_child(rl)
-		rh.add_child(UITheme.label(str(row[1]), 13, row[2], UITheme.f_semi))
-		c.add_child(rh)
-	_thead([["", 14], [tr("Завод"), -1], [tr("Специализация"), 250], [tr("Цены"), 110], [tr("Качество"), 90], [tr("Доля рынка"), 170]])
-	var rows: Array = mk.alive_comps()
-	rows.sort_custom(func(x: Dictionary, y: Dictionary) -> bool: return float(x["share"]) > float(y["share"]))
-	var me := ColorRect.new()
-	me.color = UITheme.ACCENT
-	me.custom_minimum_size = Vector2(10, 10)
-	_trow([[me, 14], [_cl2(tr("Наш завод"), _stage_name(sim.progress.stage), UITheme.ACCENT), -1], [_cl(", ".join(PackedStringArray(_our_procs())), 12, UITheme.MUTED), 250],
-		[_cl(tr(str(mk.pol()["name"])).to_lower(), 13, UITheme.TEXT), 110], [_cl("%d%%" % int(roundf(q * 100.0)), 13), 90],
-		[UITheme.meter(mk.share * 100.0, UITheme.ACCENT, 90, "%d%%" % int(roundf(mk.share * 100.0))), 170]], Callable(), 40.0)
-	for cp: Dictionary in rows:
-		var sw := ColorRect.new()
-		sw.color = mk.comp_color(str(cp["id"]))
-		sw.custom_minimum_size = Vector2(10, 10)
-		var war := int(cp["war_until"]) >= sim.day()
-		var pr := float(cp["price"])
-		var ptxt := tr("война цен") if war else (tr("ниже рынка") if pr < 0.97 else (tr("выше рынка") if pr > 1.03 else tr("по рынку")))
-		_trow([[sw, 14], [_cl2(L.name(str(cp["name"])), tr("~%d станков") % int(roundf(float(cp["size"]) * 3.0)), UITheme.TEXT), -1], [_cl(L.t(mk._spec_text(cp)), 12, UITheme.MUTED), 250],
-			[_cl(ptxt, 13, UITheme.BAD if war else UITheme.TEXT), 110], [_cl("%d%%" % int(roundf(float(cp["quality"]) * 100.0)), 13), 90],
-			[UITheme.meter(float(cp["share"]) * 100.0, mk.comp_color(str(cp["id"])), 90, "%d%%" % int(roundf(float(cp["share"]) * 100.0))), 170]], Callable(), 40.0)
-	_rival_cards(rows)
-	var cc := _card_in(content, tr("Доля рынка по дням"))
-	cc.add_child(_share_chart(150.0))
-
-
 ## 1.53: карточки директоров соседних заводов: портрет, имя, характер, отношение (−100…100) и последние действия.
 func _rival_cards(rows: Array) -> void:
 	if rows.is_empty():
@@ -3618,48 +3622,45 @@ func cash_forecast() -> Dictionary:
 		fin += float(l["payment"]) * 2.0
 	for le: Dictionary in sim.market.leases:
 		fin += float(le["payment"]) * 2.0
-	for k in sim.market.insurance.keys():
-		fin += sim.market.premium(str(k)) * 2.0
+	if sim.market.insure_all:
+		fin += sim.market.monthly_premium() * 14.0 / float(sim.season.dpm())
 	var end := sim.money + inflow - wages - rent - fin
 	return {"end": end, "text": tr("заказы +%s, зарплаты −%s, аренда −%s, кредиты и полисы −%s") % [Defs.money_str(inflow), Defs.money_str(wages), Defs.money_str(rent), Defs.money_str(fin)]}
 
 
-## Финансы → Страхование: три полиса, взнос по понедельникам.
+## Финансы → Страхование (1.62): одна галочка «Застраховать всё», взнос — в первый день месяца.
 func _finance_insurance() -> void:
 	var mk := sim.market
-	var week := 0.0
-	for k in mk.insurance.keys():
-		week += mk.premium(str(k))
 	var paid := 0.0
 	for k2 in mk.paid_claims.keys():
 		paid += float(mk.paid_claims[k2])
-	_info(tr("полисов %d · взносы %s в неделю · выплачено %s") % [mk.insurance.size(), Defs.money_str(week), Defs.money_str(paid)])
-	_intro(tr("Страховая компания «Заводская защита». Взнос — по понедельникам, полис начинает действовать со следующего дня. Штрафы проверок не страхуются — по закону их платит сам завод."))
-	var g := _cards(3)
+	_info(tr("застраховано всё: %s · взнос %s в месяц · выплачено %s") % [tr("да") if mk.insure_all else tr("нет"), Defs.money_str(mk.monthly_premium()), Defs.money_str(paid)])
+	_intro(tr("Страховая компания «Заводская защита». Одна галочка вместо трёх полисов. Взнос — в первый день месяца, страховка начинает действовать со следующего дня. Штрафы проверок не страхуются — по закону их платит сам завод."))
+	var v := _card_in(content)
+	var cb := CheckBox.new()
+	cb.text = tr("Застраховать всё")
+	cb.button_pressed = mk.insure_all
+	cb.add_theme_font_size_override("font_size", 18)
+	cb.tooltip_text = tr("Включает все виды страховки сразу; снять галочку — расторгнуть")
+	cb.toggled.connect(func(on: bool) -> void:
+		mk.set_insure_all(on)
+		rebuild(true))
+	v.add_child(cb)
+	v.add_child(UITheme.label(tr("%s в месяц") % Defs.money_str(mk.monthly_premium()), 22, UITheme.ACCENT if not mk.insure_all else UITheme.TEXT, UITheme.f_semi))
+	v.add_child(UITheme.para(tr("Цена считается от оборудования, выручки за неделю и числа людей — растёт вместе с заводом."), 12, UITheme.MUTED))
+	v.add_child(UITheme.caption(tr("Что покрывает")))
 	for kind in Market.INSURANCE.keys():
 		var d: Dictionary = Market.INSURANCE[kind]
-		var on := mk.insurance.has(kind)
-		var v := _card_in(g)
 		var h := UITheme.hbox(8)
-		h.add_child(_icon(Tex.ui(str(d["icon"])), 22))
-		h.add_child(UITheme.label(tr(str(d["name"])), 15, UITheme.TEXT, UITheme.f_semi))
-		v.add_child(h)
-		v.add_child(UITheme.para(tr(str(d["desc"])), 12))
-		v.add_child(UITheme.label(tr("%s в неделю") % Defs.money_str(mk.premium(str(kind))), 18, UITheme.ACCENT if not on else UITheme.TEXT, UITheme.f_semi))
+		h.add_child(_icon(Tex.ui(str(d["icon"])), 20))
+		var t := _cl2(tr(str(d["name"])), tr(str(d["desc"])))
+		t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		h.add_child(t)
 		var pc := float(mk.paid_claims.get(kind, 0.0))
-		v.add_child(UITheme.label(tr("выплачено: %s") % Defs.money_str(pc) if pc > 0.0 else (tr("действует с дня %d") % (int((mk.insurance[kind] as Dictionary).get("since", 0)) + 1) if on else tr("не оформлен")), 12, UITheme.GOOD if pc > 0.0 or on else UITheme.MUTED))
-		var kk := str(kind)
-		var bt: Button
-		if not on:
-			bt = UITheme.primary(tr("Оформить"), func() -> void:
-				mk.toggle_insurance(kk, true)
-				rebuild(true))
-		else:
-			bt = UITheme.ghost(tr("Расторгнуть полис"), func() -> void:
-				mk.toggle_insurance(kk, false)
-				rebuild(true), "", UITheme.BAD)
-		bt.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		v.add_child(bt)
+		h.add_child(UITheme.label(tr("выплачено: %s") % Defs.money_str(pc) if pc > 0.0 else (tr("действует") if mk.insured(str(kind)) else tr("не оформлена")), 12, UITheme.GOOD if pc > 0.0 or mk.insure_all else UITheme.MUTED))
+		v.add_child(h)
+	if mk.insure_all:
+		v.add_child(UITheme.label(tr("действует с дня %d") % (int((mk.insurance.get("property", {}) as Dictionary).get("since", 0)) + 1), 12, UITheme.GOOD))
 
 
 ## Управление → ISO 9001.

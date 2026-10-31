@@ -1,5 +1,5 @@
 extends Node
-## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161 --out=/файл.png [--lang=ru]
+## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161|market162|grant162 --out=/файл.png [--lang=ru]
 
 var out := "/tmp/p147.png"
 var mode := "full"
@@ -135,7 +135,7 @@ func _ready() -> void:
 				(dd["log"] as Array).append({"d": 30 + i * 3, "t": t})
 		gm.hud.open_window("orders")
 		await get_tree().create_timer(0.4).timeout
-		gm.hud.win.select_tab("compet")
+		gm.hud.win.select_tab("market")
 		await get_tree().create_timer(0.4).timeout
 		gm.hud.win.scroll.scroll_vertical = 520
 	elif mode == "logi158" or mode == "floor158" or mode == "tag_hover158":
@@ -171,6 +171,35 @@ func _ready() -> void:
 		sm6.safety.set_level(1)
 		sm6.progress.all_open = true
 		gm.hud.open_window("people:safety")
+	elif mode == "market162":
+		# 1.62: карточка «Рынок»: группы со спросом и главным конкурентом, одна группа раскрыта
+		var sm2 := gm.sim
+		sm2.story.enabled = false
+		sm2.office.all_depts = true
+		sm2.progress.all_open = true
+		sm2.minute = 40.0 * 1440.0 + 9.0 * 60.0
+		var mk2 := sm2.market
+		var shares := [0.22, 0.31, 0.12, 0.2]
+		for i2 in mk2.comps.size():
+			(mk2.comps[i2] as Dictionary)["share"] = shares[i2 % 4]
+		mk2.share = 0.15
+		mk2.share_hist.append({"week": 5, "ours": 0.12, "comps": {}})
+		(mk2.comps[1] as Dictionary)["war_until"] = sm2.day() + 5
+		(mk2.comps[1] as Dictionary)["price"] = 0.88
+		for pid in Defs.products.keys():
+			var gid2 := Market.group_of(str(pid))
+			var up := 1.09 if gid2 == "turn" else (0.9 if gid2 == "weld" else 1.0)
+			sm2.sales.market[pid] = up
+			sm2.sales.market_prev[pid] = 1.0 if gid2 != "asm" else 1.0
+		GameWindow.mk_open["mill"] = true
+		gm.hud.open_window("orders:market")
+	elif mode == "grant162":
+		# 1.62: памятка фонда — подать заявку или пропустить
+		var sm3 := gm.sim
+		sm3.story.enabled = true
+		sm3.minute = 30.0 * 1440.0 + 9.0 * 60.0
+		sm3.grants.next_offer = 0
+		sm3.grants._maybe_offer()
 	elif mode == "layers159":
 		gm.hud.on_layer_button("logistics")   # 1.59: «Логистика» включена, видны подвкладки
 		gm.hud.pick_sublayer("traffic")

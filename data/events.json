@@ -211,7 +211,7 @@
     },
     "grant": {
       "kind": "good",
-      "w": 4,
+      "w": 0,
       "sev": 0,
       "cd": 25,
       "min_day": 12,

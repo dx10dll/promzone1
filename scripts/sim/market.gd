@@ -50,7 +50,8 @@ var hist: Array = []          ## по дням: {d, money, rev, exp, share, meta
 var outcomes: Array = []      ## последние 20 отгрузок: true — вовремя
 var last_reclam := -100       ## день последней рекламации
 var iso: Dictionary = {"status": "none"}   ## none | audit | ok | remarks | suspended; since, until, audit_at, reclam
-var insurance: Dictionary = {}             ## вид -> {since: день}
+var insurance: Dictionary = {}             ## вид -> {since: день}; с 1.62 включаются все три сразу («Застраховать всё»)
+var insure_all := false                    ## 1.62: одна галочка вместо трёх полисов
 var paid_claims: Dictionary = {}           ## вид -> сумма выплат за всё время
 var leases: Array = []        ## [{id, thing, title, payment, left, total}]
 var leasing_on := false       ## покупать станки в лизинг
@@ -91,6 +92,80 @@ func comp_color(id: String) -> Color:
 		if str(POOL[i]["id"]) == id:
 			return Color(COMP_COLORS[i % COMP_COLORS.size()])
 	return Color("#999999")
+
+
+# ================================================================ карточка «Рынок» (1.62)
+
+## Группы изделий для карточки «Рынок»: по основному (первому) переделу маршрута.
+const GROUPS := [
+	{"id": "turn", "name": "Токарные детали", "procs": ["turning", "drilling"]},
+	{"id": "weld", "name": "Сварные конструкции", "procs": ["welding", "paint"]},
+	{"id": "asm", "name": "Узлы и сборка", "procs": ["assembly", "test"]},
+	{"id": "mill", "name": "Фрезеровка, литьё и штамповка", "procs": ["milling", "casting", "stamping", "heat"]},
+]
+const TREND_EPS := 0.015
+
+
+static func group_of(product: String) -> String:
+	var route: Array = Defs.route(product)
+	var op := str((route[0] as Dictionary).get("op", "turning")) if not route.is_empty() else "turning"
+	for g: Dictionary in GROUPS:
+		if (g["procs"] as Array).has(op):
+			return str(g["id"])
+	return "turn"
+
+
+## Главный конкурент группы: сильнейший по доле среди тех, кто работает на этих переделах (иначе — просто сильнейший).
+func main_competitor(procs: Array) -> Dictionary:
+	var best: Dictionary = {}
+	var best_any: Dictionary = {}
+	for c: Dictionary in alive_comps():
+		if best_any.is_empty() or float(c["share"]) > float(best_any["share"]):
+			best_any = c
+		var hit := false
+		for pr in c.get("spec", []):
+			if procs.has(str(pr)):
+				hit = true
+		if hit and (best.is_empty() or float(c["share"]) > float(best["share"])):
+			best = c
+	return best if not best.is_empty() else best_any
+
+
+## Данные карточки «Рынок»: 3–4 группы изделий со спросом (растёт / падает / ровный) и главным конкурентом.
+## [{id, name, trend: "up"|"down"|"flat", arrow, signal, products: [id], comp: {id, name, director, share, price, war, spec}}]
+func card_groups() -> Array:
+	var mine: Array = sim.progress.products()
+	var by: Dictionary = {}
+	for p in mine:
+		if Defs.products.has(str(p)):
+			var gid := group_of(str(p))
+			if not by.has(gid):
+				by[gid] = []
+			(by[gid] as Array).append(str(p))
+	var order: Array = GROUPS.filter(func(g: Dictionary) -> bool: return by.has(str(g["id"])))
+	order.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return (by[str(a["id"])] as Array).size() > (by[str(b["id"])] as Array).size())
+	for g0: Dictionary in GROUPS:
+		if order.size() >= 3:
+			break
+		if not order.has(g0):
+			order.append(g0)
+	var out: Array = []
+	for g: Dictionary in order.slice(0, 4):
+		var prods: Array = by.get(str(g["id"]), [])
+		var sig := 0.0
+		for p2 in prods:
+			sig += sim.sales.trend(str(p2)) + 0.5 * (sim.sales.price_index(str(p2)) - 1.0)
+		if not prods.is_empty():
+			sig /= float(prods.size())
+		var tr_id := "up" if sig > TREND_EPS else ("down" if sig < -TREND_EPS else "flat")
+		var c := main_competitor(g["procs"])
+		var cd: Dictionary = {}
+		if not c.is_empty():
+			cd = {"id": str(c["id"]), "name": str(c["name"]), "director": Rivals.dname(c), "share": float(c["share"]),
+				"price": float(c["price"]), "war": int(c["war_until"]) >= sim.day(), "spec": _spec_text(c)}
+		out.append({"id": str(g["id"]), "name": str(g["name"]), "trend": tr_id, "arrow": {"up": "▲", "down": "▼", "flat": "►"}[tr_id],
+			"signal": sig, "products": prods, "procs": g["procs"], "comp": cd})
+	return out
 
 
 # ================================================================ конкурентоспособность и доля
@@ -201,6 +276,7 @@ func morning() -> void:
 	if sim.weekday() == 0:
 		_on_monday()
 	_tick_iso()
+	_pay_insurance()
 
 
 func _expire_wars() -> void:
@@ -222,7 +298,6 @@ func _on_monday() -> void:
 	_metal_shock()
 	metal_week = metal
 	_pay_leases()
-	_pay_insurance()
 	if sim.day() >= 8 and sim.story.enabled:
 		_comp_events()
 		Rivals.week(self)   # 1.53: ход директора по характеру (свой генератор случайных чисел)
@@ -395,7 +470,7 @@ func on_letter(ev: String, d: Dictionary, choice: int) -> void:
 				Rivals.shift(c, sim, [-5, 0, 2][clampi(choice, 0, 2)], [L.t("Ответили на войну цен демпингом"), L.t("Промолчали в войне цен"), L.t("Ответили качеством, а не ценой")][clampi(choice, 0, 2)])
 			if choice == 0:
 				policy = "dump"
-				sim.notify(L.t("Перешли на демпинг: цены −10%. Вернуть цены можно в «Заказы → Конкуренты»."), Sim.LVL_INFO)
+				sim.notify(L.t("Перешли на демпинг: цены −10%. Вернуть цены можно в «Заказы → Рынок»."), Sim.LVL_INFO)
 			elif choice == 2:
 				if sim.money < 60000.0:
 					sim.notify(L.t("Денег на рекламу нет — держим цены."), Sim.LVL_WARN)
@@ -621,24 +696,59 @@ func premium(kind: String) -> float:
 	return 0.0
 
 
-func toggle_insurance(kind: String, on: bool) -> void:
-	if on and not insurance.has(kind) and not sim.dev.on("fin3"):
-		sim.notify(L.t("Страховку оформляет бухгалтерия после ступени «Банк и лизинг» (Управление → Развитие)."), Sim.LVL_WARN)
-		return
-	if on and not insurance.has(kind):
-		insurance[kind] = {"since": sim.day()}
-		var p := premium(kind)
-		sim.spend(p, "Страховка: %s, первый взнос" % str(INSURANCE[kind]["name"]).to_lower())
-		sim.notify(L.t("Полис «%s» оформлен: %s в неделю, действует со следующего дня.") % [L.t(str(INSURANCE[kind]["name"])), Defs.money_str(p)], Sim.LVL_INFO)
-	elif not on and insurance.has(kind):
-		insurance.erase(kind)
+## 1.62: цена «Застраховать всё» в месяц — три взноса прежних полисов, пересчитанные на месяц (кратно 100 ₽).
+func monthly_premium() -> float:
+	var w := 0.0
+	for k in INSURANCE.keys():
+		w += premium(str(k))
+	return roundf(w * float(sim.season.dpm()) / 7.0 / 100.0) * 100.0
 
 
+## 1.62: одна галочка: имущество и поломки станков, пожар, ответственность перед заказчиками, несчастные случаи.
+func set_insure_all(on: bool) -> void:
+	if on and not insure_all:
+		if not sim.dev.on("fin3"):
+			sim.notify(L.t("Страховку оформляет бухгалтерия после ступени «Банк и лизинг» (Управление → Развитие)."), Sim.LVL_WARN)
+			return
+		insure_all = true
+		for k in INSURANCE.keys():
+			insurance[k] = {"since": sim.day()}
+		var p := monthly_premium()
+		sim.spend(p, "Страховка: всё застраховано, первый взнос")
+		sim.notify(L.t("Всё застраховано: %s в месяц, действует со следующего дня.") % Defs.money_str(p), Sim.LVL_INFO)
+	elif not on and insure_all:
+		insure_all = false
+		insurance.clear()
+		sim.notify(L.t("Страховка расторгнута: ремонты, пожары и компенсации — за свой счёт."), Sim.LVL_WARN)
+
+
+## Совместимость со старым кодом: любой вид включает «всё».
+func toggle_insurance(_kind: String, on: bool) -> void:
+	set_insure_all(on)
+
+
+## Ежемесячный взнос — в первый день месяца.
 func _pay_insurance() -> void:
-	for k in insurance.keys():
-		if int((insurance[k] as Dictionary).get("since", 0)) == sim.day():
-			continue
-		sim.spend(premium(str(k)), "Страховка: %s" % str(INSURANCE[k]["name"]).to_lower())
+	if not insure_all or sim.season.dom() != 1:
+		return
+	if int((insurance.get("property", {}) as Dictionary).get("since", 0)) == sim.day():
+		return
+	sim.spend(monthly_premium(), "Страховка: всё застраховано")
+
+
+## 1.62: старые сохранения с отдельными полисами объединяются в одну галочку.
+func _migrate_insurance(had_flag: bool) -> void:
+	if had_flag:
+		return
+	if insurance.is_empty():
+		insure_all = false
+		return
+	var since := sim.day() if sim else 0
+	for k0 in insurance.keys():
+		since = mini(since, int((insurance[k0] as Dictionary).get("since", since)))
+	insure_all = true
+	for k in INSURANCE.keys():
+		insurance[k] = {"since": since}
 
 
 ## Страховой случай: возмещение части расходов. Возвращает выплату.
@@ -736,8 +846,8 @@ func advice(limit: int = 6) -> Array:
 	var mval := 0.0
 	for t2 in sim.things_of("machine"):
 		mval += float(Defs.objects.get(t2.def_id, {}).get("cost", 0))
-	if mval >= 900000.0 and not insurance.has("property"):
-		out.append({"prio": 30, "title": L.t("Застрахуйте оборудование"), "text": L.t("Станков на %s. Полис — %s в неделю, возмещает 80%% ремонта и ущерб от пожара.") % [Defs.money_str(mval), Defs.money_str(premium("property"))], "open": "finance", "sec": "insurance"})
+	if mval >= 900000.0 and not insure_all:
+		out.append({"prio": 30, "title": L.t("Застрахуйте оборудование"), "text": L.t("Станков на %s. «Застраховать всё» — %s в месяц: возмещает 80%% ремонта и ущерб от пожара, половину неустоек, компенсации по несчастным случаям.") % [Defs.money_str(mval), Defs.money_str(monthly_premium())], "open": "finance", "sec": "insurance"})
 	var unassigned := 0
 	for r2 in sim.rooms.list:
 		if r2.type == "" and r2.area() >= 6:
@@ -765,7 +875,7 @@ static func engineer_look() -> Dictionary:
 
 func to_dict() -> Dictionary:
 	return {"comps": comps, "policy": policy, "share": share, "share_hist": share_hist, "metal": metal, "metal_week": metal_week,
-		"hist": hist, "outcomes": outcomes, "last_reclam": last_reclam, "iso": iso, "insurance": insurance, "claims": paid_claims,
+		"hist": hist, "outcomes": outcomes, "last_reclam": last_reclam, "iso": iso, "insurance": insurance, "insure_all": insure_all, "claims": paid_claims,
 		"leases": leases, "leasing_on": leasing_on, "memo": memo_on, "hd": _hd}
 
 
@@ -785,6 +895,8 @@ func from_dict(d: Dictionary) -> void:
 	last_reclam = int(d.get("last_reclam", -100))
 	iso = d.get("iso", {"status": "none"})
 	insurance = d.get("insurance", {})
+	insure_all = bool(d.get("insure_all", false))
+	_migrate_insurance(d.has("insure_all"))
 	paid_claims = d.get("claims", {})
 	leases = d.get("leases", [])
 	leasing_on = bool(d.get("leasing_on", false))
