@@ -720,9 +720,9 @@ func advice(limit: int = 6) -> Array:
 	if war_active() and policy != "dump":
 		out.append({"prio": 55, "title": L.t("Война цен у конкурентов"), "text": L.t("Заявок меньше на 15%. Можно ответить демпингом или переждать, держа качество."), "open": "orders", "sec": "compet"})
 	if sim.workers.size() >= 4 and sim.eng.unassessed() > 0 and not sim.eng.sout_busy():
-		out.append({"prio": 50, "title": L.t("Не проведена СОУТ"), "text": L.t("Без спецоценки трудовая инспекция штрафует, а для ISO 9001 она обязательна."), "open": "people", "sec": "safety"})
+		out.append({"prio": 50, "title": L.t("Не проведена СОУТ"), "text": L.t("Без спецоценки трудовая инспекция штрафует, а для ISO 9001 она обязательна. Уровень «По закону» в «Люди → Охрана труда» проведёт её сам."), "open": "people", "sec": "safety"})
 	if sim.workers.size() >= 6 and not sim.training.tb_valid() and not sim.training.tb_active():
-		out.append({"prio": 50, "title": L.t("Пора провести инструктаж"), "text": L.t("Инструктаж по охране труда — минус 30% травм. Без него штрафуют."), "open": "people", "sec": "train"})
+		out.append({"prio": 50, "title": L.t("Пора провести инструктаж"), "text": L.t("Инструктаж по охране труда — минус 30% травм. Без него штрафуют. Уровень «По закону» в «Люди → Охрана труда» ведёт журнал сам."), "open": "people", "sec": "safety"})
 	if sim.workers.size() >= 8 and sim.crew.brigades.is_empty():
 		out.append({"prio": 40, "title": L.t("Разбейте людей на бригады"), "text": L.t("Бригадир ускоряет бригаду, люди меньше бегают по заводу."), "open": "people", "sec": "brig"})
 	if sim.dev.on("tech3") and not iso_ok() and str(iso.get("status", "none")) != "audit":

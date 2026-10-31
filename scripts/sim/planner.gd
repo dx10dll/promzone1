@@ -259,7 +259,7 @@ func _check_cons() -> void:
 				continue
 		sim.notify_once("cons_" + str(c), L.t("Заканчивается %s (осталось на %d операций), а на покупку не хватает денег.") % [L.dt("consumable.%s.short" % c, str(cd["short"])), int(stock)], Sim.LVL_WARN, Vector2i(-1, -1), 480.0)
 	# СИЗ: если есть шкаф, держим запас на тех, у кого комплект скоро износится
-	if not sim.eng.cabinets().is_empty() and sim.auto_supply and not sim.cons_on_way("ppe"):
+	if not sim.eng.cabinets().is_empty() and sim.auto_supply and not sim.cons_on_way("ppe") and sim.safety.level < Safety.LAW:
 		var need := 0
 		for w in sim.workers:
 			if not w.is_itr() and w.ppe < 30.0:

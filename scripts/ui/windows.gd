@@ -31,7 +31,7 @@ const GROUPS := {
 		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["logi", "Склад и логистика", "supply", "supply", "logi"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
 	"people": {"title": "Люди", "icon": "people", "secs": [
 		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "hire", "staff", "hire"],
-		["train", "Обучение", "idea", "staff", "train"], ["safety", "Охрана труда", "injury", "staff", "safety"],
+		["train", "Карьера", "idea", "staff", "train"], ["safety", "Охрана труда", "injury", "staff", "safety"],
 		["brig", "Бригады", "crew", "crew", "brig"], ["sched", "График смены", "clock", "crew", "sched"],
 		["sec", "Охрана", "thief", "crew", "sec"], ["union", "Профсоюз", "handshake", "crew", "union"],
 		["honor", "Доска почёта", "medal", "honor", ""]]},
@@ -586,7 +586,7 @@ func _signature() -> String:
 			for c: Dictionary in trn.courses:
 				s3.append("%d:%d" % [int(c["wid"]), int(float(c["done"]) / 30.0)])
 			var eg := sim.eng
-			s3.append("%s|%d|%d|%d|%s" % [str(eg.sout_busy()), eg.sout.size(), eg.ppe_stock(), eg.cabinets().size(), str(eg.milk_on)])
+			s3.append("%s|%d|%d|%d|%s|%d|%d" % [str(eg.sout_busy()), eg.sout.size(), eg.ppe_stock(), eg.cabinets().size(), str(eg.milk_on), sim.safety.level, int(sim.safety.paid_total / 1000.0)])
 			s3.append("%d|%d|%s" % [sim.crew.cases.size(), sim.crew.safe_days(), str(sim.crew.cases.slice(0, 3))])
 			for w in sim.workers:
 				s3.append("%d%s%d%d%d%d%d%d" % [w.id, w.activity if tab != "train" and tab != "safety" else "", int(w.mood), w.shift, w.mentor, w.skill(w.main_skill()), int(w.ppe / 10.0), w.workplace])
@@ -746,7 +746,7 @@ func _cards(cols: int = 2) -> GridContainer:
 ## Карточка в сетке: заголовок (+ значок «?»), внутри — вертикальный список.
 ## 1.46: значки заголовков карточек: русский заголовок -> значок (ищется по переведённому тексту).
 const CARD_ICONS := {"Стратегия сбыта": "orders", "За 7 дней": "date", "Проблемное место": "wrench", "Ценовая политика": "money",
-	"Учебный класс": "research", "Статистика": "statistics", "Спецоценка (СОУТ)": "inspect", "СИЗ": "shield", "Сложность": "paper",
+	"Учебный класс": "research", "Охрана труда": "shield", "Что сейчас": "events", "Статистика": "statistics", "Спецоценка (СОУТ)": "inspect", "СИЗ": "shield", "Сложность": "paper",
 	"Рабочие места": "objects", "Путь завода": "goals", "Практиканты ПТУ": "hire", "Поставщик металла": "supply", "Машины сегодня и завтра": "supply", "Склады по типам": "objects", "Заказы по этапам": "orders", "Носильщики": "people", "Проблемы": "warn",
 	"Погода и отопление": "temperature", "План месяца": "date", "Наша доля рынка": "chart_up", "Молоко за вредность": "med",
 	"Люди и репутация": "people", "Конкурентоспособность": "medal", "История": "log", "Инструктаж по ОТ": "shield",
@@ -1754,12 +1754,12 @@ func _training() -> void:
 		if trn.mentor_of(w0):
 			mentors += 1
 	_info(tr("на курсах %d · с наставником %d · практикантов %d") % [learners, mentors, trn.practicants().size()])
-	_intro(tr("Курсы повышения разряда дают +2 к навыку, курсы смежной профессии — допуск к другим станкам (навык до 3). Наставник утраивает рост ученика у станка, но сам работает на 8% медленнее; он должен быть опытнее на 2 и работать в ту же смену."))
+	_intro(tr("Карьера: курсы, наставники, практиканты ПТУ и учебный класс. Курсы повышения разряда дают +2 к навыку, курсы смежной профессии — допуск к другим станкам (навык до 3). Наставник утраивает рост ученика у станка, но сам работает на 8% медленнее; он должен быть опытнее на 2 и работать в ту же смену."))
 	_hbtn(tr("Подобрать наставников"), func() -> void:
 		var n := trn.auto_mentors()
 		hud.toast(tr("Назначено наставников: %d") % n if n > 0 else tr("Подходящих пар нет: наставник должен быть опытнее ученика на 2 и работать в ту же смену."), Sim.LVL_INFO)
 		rebuild(true), tr("Каждому, кто до 3-го разряда, — опытного наставника из той же смены"))
-	var g := _cards(3)
+	var g := _cards(2)
 	# учебный класс
 	var seats := trn.class_seats()
 	var a := _card_in(g, tr("Учебный класс"), tr("Помещение с линолеумом, две парты и доска (Объекты → Офис), назначенное «Учебным классом». Курсы в нём вдвое-втрое дешевле учебного центра, и человек не пропадает на несколько дней."))
@@ -1773,25 +1773,6 @@ func _training() -> void:
 		train_where = k
 		rebuild(true))
 	a.add_child(wh)
-	# инструктаж
-	var b := _card_in(g, tr("Инструктаж по ОТ"), tr("Все, кто на смене, по очереди слушают инженера по охране труда (полчаса). Действует %d дней: травм на 30%% меньше. Без него трудовая инспекция штрафует, если рабочих 6 и больше.") % Training.TB_DAYS)
-	if trn.tb_active():
-		b.add_child(UITheme.label(tr("идёт"), 18, UITheme.INFO, UITheme.f_semi))
-		b.add_child(UITheme.para(tr("осталось %d чел.") % trn.tb_wait.size(), 12))
-	elif trn.tb_valid():
-		b.add_child(UITheme.label(tr("действует"), 18, UITheme.GOOD, UITheme.f_semi))
-		b.add_child(UITheme.para(tr("до дня %d · травм на 30%% меньше") % (trn.tb_day + Training.TB_DAYS), 12))
-	else:
-		b.add_child(UITheme.label(tr("просрочен") if trn.tb_day >= 0 else tr("не проводился"), 18, UITheme.WARN, UITheme.f_semi))
-		b.add_child(UITheme.para(tr("травм больше, возможен штраф"), 12))
-	var tbb := UITheme.small(tr("Провести · %s") % Defs.money_str(Training.TB_COST), func() -> void:
-		var err := trn.start_tb()
-		if err != "":
-			hud.toast(err, Sim.LVL_WARN)
-		rebuild(true))
-	tbb.disabled = trn.tb_active()
-	tbb.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	b.add_child(tbb)
 	# ПТУ
 	var c := _card_in(g, tr("Практиканты ПТУ"), tr("По понедельникам приходит практикант (до %d одновременно) на %d дней. Стипендия %s за смену, учится вдвое быстрее; в конце практики — решите, брать ли в штат.") % [trn.ptu_cap(), Training.PTU_DAYS, Defs.money_str(Training.PTU_WAGE)])
 	if trn.ptu:
@@ -1808,7 +1789,7 @@ func _training() -> void:
 			if err != "":
 				hud.toast(err, Sim.LVL_WARN)
 			rebuild(true)))
-	for cc in [a, b, c]:
+	for cc in [a, c]:
 		for ch in (cc as Control).get_children():
 			if ch is Button:
 				(ch as Button).size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -1912,80 +1893,70 @@ func _menu(text: String, items: Array[String], cb: Callable, tip: String = "") -
 	return mb
 
 
-## Охрана труда: СОУТ, СИЗ, молоко за вредность, акты Н-1.
+## Охрана труда (1.61): одна карточка с тремя уровнями вместо СОУТ, СИЗ, молока и инструктажа; ниже — рабочие места и акты Н-1.
 func _safety() -> void:
 	var eng := sim.eng
+	var sf := sim.safety
+	sf.ensure()
 	var places := eng.workplaces()
-	var n := [0, 0, 0, 0]
-	for m in places:
-		var c := eng.class_of(m)
-		if c >= 0:
-			n[c] += 1
-	var un := eng.unassessed()
-	var cabs := eng.cabinets().size()
-	var bare := eng.without_ppe()
-	var ent := eng.entitled_count()
 	var sd := sim.crew.safe_days()
-	_info(tr("дней без травм: %d") % sd)
-	var g := _cards(3)
-	# СОУТ
-	var a := _card_in(g, tr("Спецоценка (СОУТ)"), tr("Лаборатория замеряет шум, воздух (сварочный аэрозоль, пары краски), микроклимат и свет. На вредных местах положены доплата к ставке (3.1 — 4%, 3.2 — 8%, 3.3 — 12%) и молоко. Трудовая инспекция штрафует, если СОУТ не проведена (при 4 рабочих и больше). Улучшили условия — закажите замеры заново, класс снизится."))
-	if eng.sout_busy():
-		a.add_child(UITheme.label(tr("идут замеры"), 18, UITheme.INFO, UITheme.f_semi))
-		a.add_child(UITheme.para(tr("%d мест · итог к концу дня %d") % [eng.sout_ids.size(), int(eng.sout_until / 1440.0) + 1], 12))
-	elif places.is_empty():
-		a.add_child(UITheme.label(tr("нет мест"), 18, UITheme.MUTED, UITheme.f_semi))
-		a.add_child(UITheme.para(tr("станков пока нет"), 12))
-	else:
-		a.add_child(UITheme.label(tr("не оценено: %d") % un if un > 0 else tr("все оценены"), 18, UITheme.WARN if un > 0 else UITheme.GOOD, UITheme.f_semi))
-		a.add_child(UITheme.para(tr("мест %d · допустимых %d · вредных %d") % [places.size(), n[0], n[1] + n[2] + n[3]], 12))
-	var ab := UITheme.hbox(6)
-	var b1 := UITheme.small(tr("Новые · %s") % Defs.money_str(eng.sout_price(false)), func() -> void:
-		var err := eng.start_sout(false)
-		if err != "":
-			hud.toast(err, Sim.LVL_WARN)
-		rebuild(true), tr("Замеры только там, где СОУТ ещё не проводилась (%s за место)") % Defs.money_str(Eng.SOUT_COST))
-	b1.disabled = eng.sout_busy() or un == 0
-	ab.add_child(b1)
-	var b2 := UITheme.small(tr("Все заново · %s") % Defs.money_str(eng.sout_price(true)), func() -> void:
-		var err2 := eng.start_sout(true)
-		if err2 != "":
-			hud.toast(err2, Sim.LVL_WARN)
-		rebuild(true), tr("Повторные замеры на всех местах — после того, как улучшили вентиляцию, свет или отопление"))
-	b2.disabled = eng.sout_busy() or places.is_empty()
-	ab.add_child(b2)
-	a.add_child(ab)
-	# СИЗ
-	var b := _card_in(g, tr("СИЗ"), tr("Комплект (каска, очки, наушники, перчатки, респиратор) служит около 20 смен. Без СИЗ травм в полтора раза больше; в наушниках шум не раздражает, в респираторе дым — меньше. Шкаф СИЗ (Объекты → Безопасность): рабочие сами берут новый комплект, когда старый износится. Новички приходят без СИЗ."))
-	if cabs == 0:
-		b.add_child(UITheme.label(tr("нет шкафа"), 18, UITheme.WARN, UITheme.f_semi))
-		b.add_child(UITheme.para(tr("Объекты → Безопасность → шкаф СИЗ"), 12))
-	else:
-		b.add_child(UITheme.label(tr("без СИЗ: %d") % bare.size() if bare.size() > 0 else tr("все в СИЗ"), 18, UITheme.WARN if bare.size() > 0 else UITheme.GOOD, UITheme.f_semi))
-		b.add_child(UITheme.para(tr("шкафов %d · комплектов на складе %d") % [cabs, eng.ppe_stock()], 12))
-	var bh := UITheme.hbox(6)
-	var cd: Dictionary = Defs.consumables.get("ppe", {})
-	bh.add_child(UITheme.small(tr("Купить 5 · %s") % Defs.money_str(float(cd.get("price", 7500))), func() -> void:
-		var err3 := sim.order_cons("ppe", 1)
-		if err3 != "":
-			hud.toast(err3, Sim.LVL_WARN)
-		rebuild(true), tr("Курьер привезёт в течение пары часов. При автозакупке снабжение докупает само.")))
-	if sim.cons_on_way("ppe"):
-		bh.add_child(UITheme.chip(tr("везут"), UITheme.INFO))
-	b.add_child(bh)
-	# молоко
-	var c2 := _card_in(g, tr("Молоко за вредность"), tr("Положено тем, кто работает на местах класса 3.x по СОУТ. Людям обидно без молока, а трудовая инспекция за это штрафует."))
-	c2.add_child(UITheme.label(tr("положено %d чел.") % ent, 18, UITheme.TEXT, UITheme.f_semi))
-	c2.add_child(UITheme.para(tr("%s на человека за смену") % Defs.money_str(Eng.MILK_COST), 12, UITheme.WARN if ent > 0 and not eng.milk_on else UITheme.MUTED))
-	var cb := CheckBox.new()
-	cb.text = tr("Выдавать молоко")
-	cb.button_pressed = eng.milk_on
-	cb.focus_mode = Control.FOCUS_NONE
-	cb.toggled.connect(func(on: bool) -> void:
-		eng.milk_on = on
-		rebuild(true))
-	c2.add_child(cb)
-	# рабочие места и акты Н-1 — две колонки
+	_info(tr("уровень: %s · %s в месяц · дней без травм: %d") % [Safety.level_name(sf.level), Defs.money_str(sf.monthly_cost()), sd])
+	_intro(tr("Один выбор вместо СОУТ, СИЗ, молока за вредность, инструктажа и пункта профкома о СИЗ. Уровень сам включает всё нужное и списывает ставку по дням (игровой месяц — 14 дней). Цена зависит от числа рабочих."))
+	var wn := sf.staff_n()
+	var card := _card_in(content, tr("Охрана труда"), tr("Выберите, сколько завод вкладывает в безопасность. Пункты трудовой инспекции, настроение людей и риск травм меняются вместе с уровнем."))
+	var tiers := UITheme.hbox(10)
+	card.add_child(tiers)
+	for lv in 3:
+		var cur := sf.level == lv
+		var tc := UITheme.card(12, Color("#2a2418") if cur else UITheme.BG3, UITheme.ACCENT if cur else UITheme.LINE)
+		tc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tc.size_flags_stretch_ratio = 1.0
+		tiers.add_child(tc)
+		var tv := UITheme.vbox(6)
+		tc.add_child(tv)
+		var th := UITheme.hbox(8)
+		th.add_child(UITheme.label(Safety.level_name(lv), 17, UITheme.ACCENT if cur else UITheme.TEXT, UITheme.f_semi))
+		if cur:
+			th.add_child(UITheme.chip(tr("выбран"), UITheme.ACCENT, "", true))
+		tv.add_child(th)
+		var cost := sf.monthly_cost(lv)
+		tv.add_child(UITheme.label(tr("бесплатно") if cost <= 0.0 else tr("%s в месяц") % Defs.money_str(cost), 20, UITheme.GOOD if cost <= 0.0 else UITheme.TEXT, UITheme.f_semi))
+		tv.add_child(UITheme.para(tr("0 ₽ — расходы только по вашим решениям") if lv == 0 else tr("%s + %s на рабочего · сейчас рабочих: %d") % [Defs.money_str(float(Safety.BASE[lv])), Defs.money_str(float(Safety.PER_WORKER[lv])), wn], 12))
+		for e: Array in Safety.effects(lv):
+			var kind := str(e[0])
+			var pre := "✗ " if kind == "warn" else ("✓ " if kind == "check" else "• ")
+			var col := UITheme.BAD if kind == "warn" else (UITheme.GOOD if kind == "check" else UITheme.TEXT)
+			var ln := UITheme.para(pre + str(e[1]), 12, col)
+			ln.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			tv.add_child(ln)
+		var sp := Control.new()
+		sp.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		tv.add_child(sp)
+		var pick := UITheme.primary(tr("Выбрать"), func() -> void:
+			sf.set_level(lv)
+			rebuild(true), tr("Ставка списывается по дням, начиная с завтрашнего утра"))
+		pick.disabled = cur
+		pick.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		tv.add_child(pick)
+	# что сейчас
+	var st := _card_in(content, tr("Что сейчас"), tr("Состояние пунктов, которые проверяет трудовая инспекция. Уровень «По закону» держит их в порядке сам."))
+	var kvs := UITheme.hbox(24)
+	st.add_child(kvs)
+	var un := eng.unassessed()
+	var sout_txt := tr("идут замеры") if eng.sout_busy() else (tr("нет мест") if places.is_empty() else (tr("не оценено: %d") % un if un > 0 else tr("все оценены")))
+	var sout_col := UITheme.INFO if eng.sout_busy() else (UITheme.MUTED if places.is_empty() else (UITheme.WARN if un > 0 else UITheme.GOOD))
+	var items: Array = [
+		["inspect", tr("СОУТ"), sout_txt, sout_col],
+		["med", tr("Молоко"), tr("выдаём") if eng.milk_on else (tr("положено %d чел.") % eng.entitled_count() if eng.entitled_count() > 0 else tr("не нужно")), UITheme.GOOD if eng.milk_on else (UITheme.WARN if eng.entitled_count() > 0 else UITheme.MUTED)],
+		["shield", tr("СИЗ"), tr("без СИЗ: %d") % eng.without_ppe().size() if not eng.without_ppe().is_empty() else tr("все в СИЗ"), UITheme.WARN if not eng.without_ppe().is_empty() else UITheme.GOOD],
+		["log", tr("Инструктаж"), tr("идёт") if sim.training.tb_active() else (tr("до дня %d") % (sim.training.tb_day + Training.TB_DAYS) if sim.training.tb_valid() else tr("просрочен")), UITheme.INFO if sim.training.tb_active() else (UITheme.GOOD if sim.training.tb_valid() else UITheme.WARN)]]
+	for it: Array in items:
+		var kcol: Control = UITheme.kv(str(it[0]), str(it[1]), str(it[2]), it[3] as Color)
+		kcol.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		kvs.add_child(kcol)
+	if sf.level >= Safety.LAW:
+		var paid := UITheme.para(tr("Заплачено за охрану труда за всё время: %s") % Defs.money_str(sf.paid_total), 12)
+		st.add_child(paid)
 	var cols := _cards(2)
 	var pl := _card_in(cols, tr("Рабочие места"), tr("Класс условий труда по последним замерам и что вредит сейчас."))
 	if not sim.office.active("safety"):
@@ -2903,6 +2874,9 @@ func _insp_forecast_card(u: Dictionary) -> void:
 		if cell.x >= 0:
 			row.add_child(UITheme.small(tr("Показать"), func() -> void:
 				hud.g.cam.focus_cell(cell)))
+		elif bool(it.get("card", false)):
+			row.add_child(UITheme.small(tr("Охрана труда"), func() -> void:
+				hud.open_window("people:safety"), tr("Открыть карточку «Охрана труда»: уровень «По закону» закрывает этот пункт")))
 		elif fixs != "":
 			row.add_child(UITheme.small(tr("Как исправить"), func() -> void:
 				hud.show_fix(what, fixs, Vector2i(-1, -1))))

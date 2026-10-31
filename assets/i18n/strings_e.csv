@@ -1554,7 +1554,7 @@ help.skills.text,"• Everyone has skills by trade; a skill grows with work.
 • Pass: a grade and a request for a raise; fail: a retake in a week.
 • Engineers have a category (II, I, lead) instead of a grade."
 help.training.title,"Training, mentors, vocational school"
-help.training.text,"People → Training: grade-up courses (+2 to a skill) and second-trade courses (access to other machines).
+help.training.text,"People → Careers: grade-up courses (+2 to a skill) and second-trade courses (access to other machines).
 • In your own [b]classroom[/b] (two desks, a board) it's cheap and the person studies during their shift; at a training center it's pricier and they're away for several days.
 • A [b]mentor[/b] triples a trainee's growth at the machine but works a bit slower himself.
 • [b]Vocational school[/b] (the “Vocational school link” step): trainees are cheap and learn twice as fast; take the best onto the staff."
@@ -1759,7 +1759,7 @@ help.fire.text,"Free workers run to put it out, many times faster with an exting
 help.injuries.title,Injuries and sick leave
 help.injuries.text,"Injuries come from fatigue, rush jobs, worn machines, darkness, cold and slippery chips or ice.
 • The injured person goes on sick leave; a first aid kit nearby shortens it.
-• Fewer injuries: PPE, briefings (−30%), a safety engineer (−15%), the “Days without injury” board, light and order."
+• Fewer injuries: “Workplace Safety” (PPE, briefings −30%), a safety engineer (−15%), the “Days without injury” board, light and order."
 help.breakdowns.title,Machine breakdowns
 help.breakdowns.text,"A completely worn machine breaks down, and the repair is expensive and long. Turn on preventive maintenance, keep a fitter and a setter. A broken machine is listed in Production → Downtime with the reason."
 help.medbay.title,First aid post and flu

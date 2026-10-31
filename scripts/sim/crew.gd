@@ -1372,6 +1372,7 @@ func _union_daily() -> void:
 		var keys: Array = CLAUSES.keys()
 		var offer: Array = []
 		var pool := keys.duplicate()
+		pool.erase("ppe")   # 1.61: охрана труда — карточка «Охрана труда», в колдоговор не выносим
 		for i in 4:
 			if pool.is_empty():
 				break

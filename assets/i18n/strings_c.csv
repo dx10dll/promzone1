@@ -975,11 +975,11 @@ insp.fix.no_regime,You need a gatehouse with a guard: a room at the gate with a 
 insp.fix.no_qc,Put up a QC table (Objects → QC → QC table) and hire an inspector.
 insp.fix.no_test,Put up a test stand: Objects → QC → Test stand.
 insp.fix.scrap_rate,"Lots of scrap. Put up a QC table, train people (People → Training), repair worn machines, don't push rushes."
-insp.fix.no_tb,Hold a briefing: People → Training → “Safety briefing”.
+insp.fix.no_tb,Raise “Workplace Safety” to “By the law”: People → Workplace Safety — the briefing log will be kept for you.
 insp.fix.dirty_room,Dirt and swarf on the floor. Hire a cleaner (People → Hiring) or add cleaning to the schedule (People → Shift Schedule). Put up a swarf container.
-insp.fix.no_sout,Order the measurements: People → Workplace Safety → “Working conditions assessment”.
-insp.fix.no_milk,People → Workplace Safety → turn on “Issue milk”.
-insp.fix.ppe_worn,Buy PPE kits and put up a PPE cabinet: People → Workplace Safety → “PPE”.
+insp.fix.no_sout,Raise “Workplace Safety” to “By the law”: People → Workplace Safety — the SOUT measurements will be done for you.
+insp.fix.no_milk,Raise “Workplace Safety” to “By the law”: People → Workplace Safety — milk will be issued.
+insp.fix.ppe_worn,Raise “Workplace Safety” to “By the law”: People → Workplace Safety — everyone gets PPE.
 insp.fix.no_vent,"There's welding, painting or a furnace here — it needs extraction: Objects → Engineering → Exhaust fan or Extraction hood, with a duct in Utilities."
 insp.fix.no_lunch,Add a lunch break of at least 30 minutes: People → Shift Schedule.
 insp.fix.n1_unfiled,File an N-1 report: People → Workplace Safety → “N-1 reports”.

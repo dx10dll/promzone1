@@ -1,5 +1,5 @@
 extends Node
-## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152 --out=/файл.png [--lang=ru]
+## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161 --out=/файл.png [--lang=ru]
 
 var out := "/tmp/p147.png"
 var mode := "full"
@@ -160,6 +160,17 @@ func _ready() -> void:
 				cam_arg = "35,16,2.2"
 	elif mode == "plan":
 		gm.hud.toggle_plan()
+	elif mode == "safety161":
+		# 1.61: карточка «Охрана труда» (три уровня) — завод с людьми, выбран «По закону»
+		var S6 := preload("res://tests/setups.gd")
+		var sm6 := gm.sim
+		sm6.story.enabled = false
+		S6.big_shop(sm6)
+		for pr6 in [["turner", "turning"], ["laborer", "haul"], ["miller", "milling"], ["welder", "welding"]]:
+			S6.hire(sm6, str(pr6[0]), str(pr6[1]), 5)
+		sm6.safety.set_level(1)
+		sm6.progress.all_open = true
+		gm.hud.open_window("people:safety")
 	elif mode == "layers159":
 		gm.hud.on_layer_button("logistics")   # 1.59: «Логистика» включена, видны подвкладки
 		gm.hud.pick_sublayer("traffic")

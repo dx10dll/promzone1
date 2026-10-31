@@ -324,7 +324,7 @@ func show_worker(s: Sim, w: Worker) -> void:
 		actions.add_child(_act("+10%", on_upw, L.t("Поднять ставку: настроение вверх")))
 		actions.add_child(_act(L.t("Премия %s") % Defs.money_str(Defs.b("bonus_amount")), on_bonus, L.t("Разовая премия: хорошее настроение на три дня"), "money"))
 	if not w.is_itr():
-		actions.add_child(_act(L.t("Учить…"), _open_training, L.t("Курсы, наставник, инструктаж (Люди → Обучение)"), "research"))
+		actions.add_child(_act(L.t("Учить…"), _open_training, L.t("Курсы, наставник, практиканты (Люди → Карьера)"), "research"))
 	actions.add_child(UITheme.spacer())
 	if not w.order.is_empty():
 		actions.add_child(_act(L.t("Отменить приказ"), func() -> void:
@@ -593,7 +593,7 @@ func _wt_skills(w: Worker) -> void:
 	for l in lines:
 		box.add_child(_wrap(l, 12, UITheme.TEXT))
 	if not w.is_itr():
-		var b := _act(L.t("Курсы и наставник…"), _open_training, L.t("Люди → Обучение"), "research")
+		var b := _act(L.t("Курсы и наставник…"), _open_training, L.t("Люди → Карьера"), "research")
 		b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		box.add_child(b)
 

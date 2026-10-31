@@ -53,6 +53,7 @@ var plan: Plan             ## 1.17: план-калька будущего за�
 var faults: Faults         ## 1.18: аварии на сетях (обрыв провода, прорыв водопровода)
 var upkeep: Upkeep
 var eng: Eng
+var safety: Safety   ## 1.61: уровень «Охрана труда»
 var crew: Crew
 var market: Market
 var town: Town
@@ -127,6 +128,7 @@ func _init() -> void:
 	faults = Faults.new(self)
 	upkeep = Upkeep.new(self)
 	eng = Eng.new(self)
+	safety = Safety.new(self)
 	crew = Crew.new(self)
 	market = Market.new(self)
 	town = Town.new(self)
@@ -2194,6 +2196,7 @@ func _timed(prev: float, now: float) -> void:
 		progress.morning()
 		training.morning()
 		town.morning()
+		safety.morning()
 		eng.morning()
 		crew.morning()
 		crisis.morning()
@@ -2295,7 +2298,7 @@ func to_dict() -> Dictionary:
 		"office": office.to_dict(),
 		"season": season.to_dict(), "story": story.to_dict(), "inspect": inspect.to_dict(), "calls": calls.to_dict(), "paper": paper.to_dict(),
 		"progress": progress.to_dict(), "logi": logi.to_dict(), "grants": grants.to_dict(), "statlog": statlog.to_dict(),
-		"sales": sales.to_dict(), "training": training.to_dict(), "career": career.to_dict(), "upkeep": upkeep.to_dict(), "eng": eng.to_dict(), "crew": crew.to_dict(), "market": market.to_dict(), "town": town.to_dict(), "crisis": crisis.to_dict(), "fauna": fauna.to_dict(), "dev": dev.to_dict(), "bmats": bmats.to_dict(), "legacy": {"zone": rooms.legacy.keys(), "water": water.bonus},
+		"sales": sales.to_dict(), "training": training.to_dict(), "career": career.to_dict(), "upkeep": upkeep.to_dict(), "eng": eng.to_dict(), "safety": safety.to_dict(), "crew": crew.to_dict(), "market": market.to_dict(), "town": town.to_dict(), "crisis": crisis.to_dict(), "fauna": fauna.to_dict(), "dev": dev.to_dict(), "bmats": bmats.to_dict(), "legacy": {"zone": rooms.legacy.keys(), "water": water.bonus},
 		"company": company, "plan": plan.to_dict(), "faults": faults.to_dict(),
 		"areas": areas.to_dict(),
 	}
@@ -2339,6 +2342,7 @@ static func from_dict(d: Dictionary) -> Sim:
 	s.company = cdata if cdata is Dictionary and not (cdata as Dictionary).is_empty() else Company.default_data()
 	s.upkeep.from_dict(d.get("upkeep", {}))
 	s.eng.from_dict(d.get("eng", {}))
+	s.safety.from_dict(d.get("safety", {}))   # нет ключа (старый сейв) — уровень выведется из старых флагов
 	s.crew.from_dict(d.get("crew", {}))
 	s.market.from_dict(d.get("market", {}))
 	s.town.from_dict(d.get("town", {}))

@@ -598,6 +598,20 @@ func start_sout(all: bool) -> String:
 	return ""
 
 
+## 1.61: замеры по уровню «Охрана труда» — за счёт месячной ставки, без отдельной оплаты.
+func auto_sout(all: bool) -> void:
+	if sout_busy():
+		return
+	var ids: Array = []
+	for m in workplaces():
+		if all or not assessed(m):
+			ids.append(m.id)
+	if ids.is_empty():
+		return
+	sout_ids = ids
+	sout_until = sim.orders.deadline_after(SOUT_DAYS)
+
+
 func _finish_sout() -> void:
 	var n := [0, 0, 0, 0]
 	for mid in sout_ids:
@@ -619,7 +633,7 @@ func _finish_sout() -> void:
 	var harm := int(n[1]) + int(n[2]) + int(n[3])
 	var txt := L.t("СОУТ завершена: допустимых мест %d, вредных %d.") % [n[0], harm]
 	if harm > 0:
-		txt += L.t(" На вредных местах положены доплата (4–12%% к ставке) и молоко — включите выдачу молока в «Люди → Охрана труда».")
+		txt += L.t(" На вредных местах положены доплата (4–12%% к ставке) и молоко — поднимите «Охрану труда» до «По закону» (Люди → Охрана труда).")
 	sim.notify(txt, Sim.LVL_GOOD if harm == 0 else Sim.LVL_INFO)
 	sim.paper.add(L.t("Охрана труда"), L.t("Спецоценка: %d %s проверено") % [n[0] + harm, Defs.plural(n[0] + harm, "место", "места", "мест")],
 		L.t("Лаборатория замерила шум, свет, микроклимат и воздух. Вредных мест — %d. %s") % [harm, L.t("Профком доволен.") if harm == 0 else L.t("Будет молоко и доплата.")])
@@ -688,7 +702,7 @@ func without_ppe() -> Array[Worker]:
 func injury_k(w: Worker) -> float:
 	if w.is_itr():
 		return 1.0
-	return 1.5 if w.ppe <= 0.0 else 1.0
+	return (1.5 if w.ppe <= 0.0 else 1.0) * float(Safety.INJURY_K[clampi(sim.safety.level, 0, 2)])
 
 
 ## Человек пришёл на смену: износ СИЗ, молоко, доплата за вредность (в ставке).
@@ -696,11 +710,16 @@ func on_spawn(w: Worker) -> void:
 	if w.is_itr() or w.visitor:
 		return
 	w.ppe = maxf(0.0, w.ppe - PPE_WEAR)
+	var lv := sim.safety.level
+	if lv >= Safety.LAW and w.ppe < (50.0 if lv >= Safety.MODEL else 1.0):
+		w.ppe = 100.0   # 1.61: комплект выдан по уровню «Охрана труда», шкаф и склад не нужны
+		if lv >= Safety.MODEL:
+			Mood.add(sim, w, "safe_model")
 	if w.ppe <= 0.0:
 		if cabinets().is_empty():
 			sim.notify_once("ppe_cab", L.t("%s без СИЗ (каска, очки, наушники): %s. Поставьте шкаф СИЗ (Объекты → Безопасность) и закупите комплекты — без них травм в полтора раза больше.") % [w.full_name(), L.t("новичкам их выдают на заводе") if w.days_worked <= 1 else L.t("старый комплект износился")], Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
 		elif ppe_stock() < 1:
-			sim.notify_once("ppe_stock", L.t("Закончились комплекты СИЗ в шкафу. Закажите в «Люди → Охрана труда» (или включите автозакупку)."), Sim.LVL_WARN, Vector2i(-1, -1), 720.0)
+			sim.notify_once("ppe_stock", L.t("Закончились комплекты СИЗ в шкафу. Поднимите «Охрану труда» до «По закону» (Люди → Охрана труда) — комплекты будут выдавать сами."), Sim.LVL_WARN, Vector2i(-1, -1), 720.0)
 	if entitled_milk(w):
 		if milk_on:
 			milk_due += 1
@@ -737,7 +756,9 @@ func morning() -> void:
 		if not w.is_itr():
 			rab += 1
 	if rab >= 4 and unassessed() > 0 and not sout_busy():
-		sim.notify_once("sout_hint", L.t("Рабочих уже %d, а СОУТ не проведена на %d %s. Трудовая инспекция за это штрафует — закажите замеры в «Люди → Охрана труда».") % [rab, unassessed(), Defs.plural(unassessed(), "месте", "местах", "местах")], Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
+		sim.notify_once("sout_hint", L.t("Рабочих уже %d, а СОУТ не проведена на %d %s. Трудовая инспекция за это штрафует — поднимите «Охрану труда» до «По закону» (Люди → Охрана труда), и замеры проведут сами.") % [rab, unassessed(), Defs.plural(unassessed(), "месте", "местах", "местах")], Sim.LVL_INFO, Vector2i(-1, -1), 7.0 * 1440.0)
+	if milk_due > 0 and sim.safety.level >= Safety.LAW:
+		milk_due = 0   # молоко уже в месячной ставке «Охраны труда»
 	if milk_due > 0:
 		sim.spend(milk_due * MILK_COST, "Молоко за вредность: %d %s" % [milk_due, Defs.plural(milk_due, "бутылка", "бутылки", "бутылок")])
 		milk_due = 0

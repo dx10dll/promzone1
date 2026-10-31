@@ -576,9 +576,9 @@ func forecast(t: String, repeat: Array = []) -> Dictionary:
 	for k2: String in rules.keys():
 		if by_key.has(k2):
 			for vi2: Dictionary in by_key[k2]:
-				items.append({"key": k2, "ok": false, "text": str(vi2["text"]), "fix": str(vi2.get("fix", "")), "cell": vi2.get("cell", [-1, -1]), "fine": float(vi2["fine"]) * fine_k()})
+				items.append({"key": k2, "ok": false, "text": str(vi2["text"]), "fix": str(vi2.get("fix", "")), "cell": vi2.get("cell", [-1, -1]), "fine": float(vi2["fine"]) * fine_k(), "card": Safety.KEYS.has(k2)})
 		else:
-			items.append({"key": k2, "ok": true, "text": req_text(k2), "fix": "", "cell": [-1, -1], "fine": 0.0})
+			items.append({"key": k2, "ok": true, "text": req_text(k2), "fix": "", "cell": [-1, -1], "fine": 0.0, "card": Safety.KEYS.has(k2)})
 	var asm := assess(t, found, rep)
 	fine = float(asm["fine"])
 	warns = int(asm["warns"])
