@@ -1,5 +1,5 @@
 extends Node
-## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161|market162|grant162 --out=/файл.png [--lang=ru]
+## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161|market162|grant162|assort163|iso163 --out=/файл.png [--lang=ru]
 
 var out := "/tmp/p147.png"
 var mode := "full"
@@ -193,6 +193,27 @@ func _ready() -> void:
 			sm2.sales.market_prev[pid] = 1.0 if gid2 != "asm" else 1.0
 		GameWindow.mk_open["mill"] = true
 		gm.hud.open_window("orders:market")
+	elif mode == "assort163":
+		# 1.63: «Рынок» с закрытыми изделиями: условия «откроется: станок / репутация / этап»
+		var sm4 := gm.sim
+		sm4.story.enabled = false
+		sm4.office.all_depts = true
+		sm4.progress.stage = 2
+		sm4.reputation = 53.0
+		sm4.progress.refresh_products()
+		sm4.place_thing("drill", Vector2i(18, 8), true, false)
+		GameWindow.mk_open["turn"] = true
+		GameWindow.mk_open["mill"] = true
+		gm.hud.open_window("orders:market")
+	elif mode == "iso163":
+		# 1.63: ISO 9001 — одна карточка-чек-лист из 6 условий
+		var sm5 := gm.sim
+		sm5.story.enabled = false
+		sm5.office.all_depts = true
+		sm5.progress.rating["quality"] = 0.58
+		sm5.training.tb_day = -999
+		sm5.market.last_reclam = sm5.day() - 5
+		gm.hud.open_window("office:iso")
 	elif mode == "grant162":
 		# 1.62: памятка фонда — подать заявку или пропустить
 		var sm3 := gm.sim

@@ -92,6 +92,119 @@ func products() -> Array:
 	return arr
 
 
+# ================================================================ 1.63: изделия открываются по этапам
+
+## Ворота изделий: [этап роста, репутация]. Нет в таблице — открыто с начала. Станок — отдельное условие (Production.can_make).
+const PRODUCT_GATES := {
+	"pin": [1, 0], "stud": [1, 0], "bolt": [1, 0], "bushing": [1, 0], "fitting": [1, 0],
+	"nut": [2, 50], "shaft": [2, 50], "bracket": [2, 50], "washer": [2, 50], "flange": [2, 52], "clamp": [2, 52], "bracket_st": [2, 52], "disc": [2, 52],
+	"frame": [3, 55], "housing": [3, 55], "cast_cover": [3, 55], "harrow": [3, 56],
+	"spline_shaft": [4, 58], "gear": [4, 58], "beam": [4, 58], "cast_body": [4, 60], "drive_unit": [4, 60],
+	"gearbox": [5, 62], "truss": [5, 62], "valve": [5, 64], "axle": [5, 64], "brake_cyl": [5, 65], "pump": [5, 66],
+	"bench_lathe": [6, 68], "node12k": [6, 68], "item7t": [6, 70],
+}
+const START_MIN := 5       ## сколько изделий открыто в начале (если профиль даёт больше)
+
+var pset: Dictionary = {}        ## изделие -> true: уже открыто (раз открывшись, не закрывается)
+var pset_init := false
+
+
+func product_gate(p: String) -> Array:
+	return PRODUCT_GATES.get(p, [1, 0])
+
+
+## Изделия, которые открыты с начала для этого профиля: без ворот, а если их мало — самые дешёвые из списка профиля.
+func start_products() -> Array:
+	var all: Array = products()
+	var base: Array = all.filter(func(p: Variant) -> bool: return int(product_gate(str(p))[0]) <= 1 and Defs.products.has(str(p)))
+	var want := mini(START_MIN, maxi(1, all.size() - 1))
+	if base.size() < want:
+		var rest: Array = all.filter(func(p: Variant) -> bool: return not base.has(p) and Defs.products.has(str(p)) and not Defs.is_assembly(str(p)))
+		rest.sort_custom(func(a: Variant, b: Variant) -> bool: return float(Defs.products[str(a)].get("price", [0, 0])[0]) < float(Defs.products[str(b)].get("price", [0, 0])[0]))
+		for p: Variant in rest:
+			if base.size() >= want:
+				break
+			base.append(p)
+	return base
+
+
+func _gate_met(p: String) -> bool:
+	var g := product_gate(p)
+	return stage >= int(g[0]) and sim.reputation >= float(g[1])
+
+
+## Пустая запись или старое сохранение: открыто то, что уже делали или заказывали, плюс начальный набор и всё, что ворота уже пропускают.
+func _init_products() -> void:
+	pset_init = true
+	if all_open:
+		for k in Defs.products.keys():
+			pset[str(k)] = true
+		return
+	for k in start_products():
+		pset[str(k)] = true
+	for k in products():
+		if _gate_met(str(k)):
+			pset[str(k)] = true
+	for o: Dictionary in sim.orders.list:
+		pset[str(o.get("product", ""))] = true
+	for it in sim.items.values():
+		if (it.kind == "part" or it.kind == "product") and Defs.products.has(str(it.def_id)):
+			pset[str(it.def_id)] = true
+
+
+func product_open(p: String) -> bool:
+	if not pset_init:
+		_init_products()
+	if all_open or pset.has(p):
+		return true
+	return false
+
+
+## Открытые изделия профиля (то, что может прийти заказом).
+func open_products() -> Array:
+	return products().filter(func(p: Variant) -> bool: return product_open(str(p)))
+
+
+## Утро: что открылось по этапу и репутации. Одно уведомление на все новинки.
+func refresh_products() -> Array:
+	if not pset_init:
+		_init_products()
+		return []
+	var fresh: Array = []
+	for k in products():
+		var ks := str(k)
+		if Defs.products.has(ks) and not pset.has(ks) and _gate_met(ks):
+			pset[ks] = true
+			fresh.append(ks)
+	if not fresh.is_empty():
+		var names: Array[String] = []
+		for p: Variant in fresh:
+			names.append(Defs.product_name(str(p)))
+		sim.notify(L.t("Новое изделие в ассортименте: %s") % ", ".join(names), Sim.LVL_GOOD)
+	return fresh
+
+
+## Чего не хватает до изделия: «откроется: нужен токарный станок · репутация 55 · этап «Мастерская»». "" — открыто.
+func lock_text(p: String) -> String:
+	if product_open(p):
+		return ""
+	var parts: Array[String] = []
+	var g := product_gate(p)
+	var av := sim.prod.processes_available()
+	var ms: Array[String] = []
+	for pr in sim.sales.missing(p):
+		ms.append(sim.prod.missing_name(p, pr, av))
+	if not ms.is_empty():
+		parts.append((L.t("нужен станок: %s") if ms.size() == 1 else L.t("нужны станки: %s")) % ", ".join(ms))
+	if sim.reputation < float(g[1]):
+		parts.append(L.t("репутация %d") % int(g[1]))
+	if stage < int(g[0]):
+		parts.append(L.t("этап «%s»") % stage_title(int(g[0])))
+	if parts.is_empty():
+		return L.t("откроется завтра утром")
+	return L.t("откроется: ") + " · ".join(parts)
+
+
 ## Множитель числа заказов: профиль и сезон (сельхозмаш весной).
 func offers_k() -> float:
 	var k := float(pdef().get("offers_k", 1.0))
@@ -308,6 +421,7 @@ func morning() -> void:
 				Mood.add(sim, w2, "arrears")
 	_check_keep()
 	_check_goals()
+	refresh_products()
 
 
 func _check_goals() -> void:
@@ -543,7 +657,7 @@ func spawn_dogs(n: int) -> void:
 func to_dict() -> Dictionary:
 	return {"profile": profile, "stage": stage, "ooo": ooo, "all_open": all_open, "flags": flags, "rating": rating, "stars": stars,
 		"hist": history, "scn_done": scn_done, "tut": tutorial, "start_staff": start_staff, "start_day": start_day,
-		"roof": roof_leak, "roof_at": roof_fix_at, "dogs": dogs, "tame": dogs_tame, "arr_until": arrears_until, "keep_fail": keep_fail, "quiet": quiet_until}
+		"roof": roof_leak, "roof_at": roof_fix_at, "dogs": dogs, "tame": dogs_tame, "arr_until": arrears_until, "keep_fail": keep_fail, "quiet": quiet_until, "pset": pset.keys() if pset_init else null}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -566,6 +680,12 @@ func from_dict(d: Dictionary) -> void:
 	dogs_tame = bool(d.get("tame", false))
 	arrears_until = float(d.get("arr_until", -1.0))
 	keep_fail = bool(d.get("keep_fail", false))
+	pset = {}
+	pset_init = false
+	if d.get("pset") is Array:
+		for k in d["pset"]:
+			pset[str(k)] = true
+		pset_init = true
 
 
 ## Сохранение старой версии (до этапа 6): этап по тому, что уже построено и сделано.

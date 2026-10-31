@@ -628,8 +628,8 @@ func _signature() -> String:
 		"market":
 			var mk := sim.market
 			var ms: Array[String] = [tab, str(mk.iso), str(mk.memo_on), str(sim.day()), str(int(sim.minute / 240.0)), str(sim.money > 120000.0)]
-			for r: Array in mk.iso_reqs():
-				ms.append(str(r[1]))
+			for r: Dictionary in mk.iso_checklist():
+				ms.append(str(r["ok"]) + str(r["cur"]))
 			return ",".join(ms)
 		"honor":
 			var hs: Array[String] = [str(sim.honor_log.size()), str(sim.day())]
@@ -971,13 +971,16 @@ func _market() -> void:
 			var pw := tr("война цен") if bool(cd["war"]) else (tr("ниже рынка") if float(cd["price"]) < 0.97 else (tr("выше рынка") if float(cd["price"]) > 1.03 else tr("по рынку")))
 			comp_cell = _cl2(tr("%s · %d%%") % [L.name(str(cd["name"])), int(roundf(float(cd["share"]) * 100.0))], tr("%s · цены %s") % [str(cd["director"]), pw], UITheme.TEXT, UITheme.BAD if bool(cd["war"]) else UITheme.MUTED, 13)
 		var n_pr := (g["products"] as Array).size()
+		var n_lk := (g["locked"] as Array).size()
 		var gk := gid
-		_trow([[arrow, 30], [_cl2(tr(str(g["name"])), tr("изделий: %d") % n_pr, UITheme.TEXT, UITheme.MUTED, 14), 230], [_cl(verdict, 14, col, UITheme.f_semi), 140],
+		_trow([[arrow, 30], [_cl2(tr(str(g["name"])), (tr("изделий: %d") % n_pr) + ((tr(" · закрыто: %d") % n_lk) if n_lk > 0 else ""), UITheme.TEXT, UITheme.MUTED, 14), 230], [_cl(verdict, 14, col, UITheme.f_semi), 140],
 			[comp_cell, -1], [_cl("▴" if opened else "▾", 14, UITheme.MUTED, null, HORIZONTAL_ALIGNMENT_RIGHT), 24]],
 			func() -> void: _mk_toggle(gk), 50.0, tr("Щёлкните, чтобы раскрыть изделия группы"), card)
 		if opened:
-			if (g["products"] as Array).is_empty():
+			if (g["products"] as Array).is_empty() and n_lk == 0:
 				card.add_child(UITheme.para(tr("В вашем ассортименте изделий этой группы пока нет."), 12, UITheme.MUTED))
+			elif (g["products"] as Array).is_empty():
+				card.add_child(UITheme.para(tr("Открытых изделий в этой группе пока нет."), 12, UITheme.MUTED))
 			else:
 				_thead([["", 36], [tr("Изделие и маршрут"), -1], [tr("Цена за шт."), 170], [tr("Спрос за неделю"), 170], [tr("Мощность"), 120], ["", 120]], card)
 				var prods: Array = (g["products"] as Array).duplicate()
@@ -989,6 +992,10 @@ func _market() -> void:
 					return float(sl.demand(a)[1]) > float(sl.demand(b)[1]))
 				for p in prods:
 					_market_row(str(p), avail, card)
+			if n_lk > 0:
+				card.add_child(UITheme.caption(tr("Откроются позже")))
+				for lp in g["locked"]:
+					_locked_row(str(lp), card)
 			if not cd.is_empty():
 				card.add_child(UITheme.para(tr("Главный конкурент: %s — %s. Специализация: %s.") % [L.name(str(cd["name"])), str(cd["director"]), L.t(str(cd["spec"]))], 12, UITheme.INFO))
 	var more := bool(mk_open.get("all", false))
@@ -1015,6 +1022,16 @@ func _market_more() -> void:
 	_rival_cards(rows)
 	var cc := _card_in(content, tr("Доля рынка по дням"))
 	cc.add_child(_share_chart(150.0))
+
+
+## 1.63: закрытое изделие: что нужно, чтобы оно открылось (станок, репутация, этап). Заявок на него нет.
+func _locked_row(p: String, parent: Control) -> void:
+	var ic := _icon(Tex.item(p), 30)
+	ic.modulate = Color(1, 1, 1, 0.45)
+	var pr: Array = Defs.products[p].get("price", [0, 0])
+	var lt := sim.progress.lock_text(p)
+	_trow([[ic, 36], [_cl2(Defs.product_name(p), lt, UITheme.MUTED, UITheme.WARN), -1],
+		[_cl(tr("от %s за шт.") % Defs.money_str(float(pr[0])), 13, UITheme.MUTED), 130], [UITheme.chip(tr("закрыто"), UITheme.MUTED), 90]], Callable(), 46.0, tr("Пока не откроется, заявок на это изделие нет"), parent)
 
 
 ## Строка изделия в раскрытой группе: цена, тренд, спрос, мощность, ассортимент.
@@ -2186,7 +2203,7 @@ func _routes() -> void:
 	_intro(tr("Маршрут — последовательность операций по переделам. В скобках — сколько деталей ждут следующей операции (незавершённое производство)."))
 	_thead([["", 36], [tr("Изделие"), 200], [tr("Маршрут"), -1], [tr("Спрос"), 170]])
 	var prods: Array = Defs.products.keys()
-	prods = prods.filter(func(p: String) -> bool: return sim.progress.products().has(p) or sim.planner.demand(p) > 0)
+	prods = prods.filter(func(p: String) -> bool: return sim.progress.open_products().has(p) or sim.planner.demand(p) > 0)
 	for p in prods:
 		var ps := str(p)
 		var rt2 := Defs.route(ps)
@@ -3669,8 +3686,7 @@ func _iso() -> void:
 	var st := str(mk.iso.get("status", "none"))
 	_info(tr("сертификат: %s") % L.t(mk.iso_text()))
 	_intro(tr("ISO 9001 — международный стандарт системы менеджмента качества. Сертификат даёт +12% к заявкам, премиальные цены без потери заказчиков, контракты чаще, экспорт — уже с этапа «Малое предприятие». Две рекламации за срок действия — сертификат приостановят."))
-	var g := _cards(2)
-	var a := _card_in(g)
+	var a := _card_in(content)
 	var top := UITheme.hbox(14)
 	var sc := Control.new()
 	sc.custom_minimum_size = Vector2(110, 110)
@@ -3696,13 +3712,60 @@ func _iso() -> void:
 	tv.add_child(bt)
 	top.add_child(tv)
 	a.add_child(top)
-	var b := _card_in(g, tr("Требования (%d из 6)") % mk.iso_ready(), tr("Аудитор проверяет их в день аудита. Выполните всё заранее."))
-	for r: Array in mk.iso_reqs():
-		var rh := UITheme.hbox(8)
-		var okr := bool(r[1])
-		rh.add_child(UITheme.label("✓" if okr else "×", 15, UITheme.GOOD if okr else UITheme.BAD, UITheme.f_semi))
-		rh.add_child(UITheme.label(L.t(str(r[0])), 13, UITheme.TEXT if okr else UITheme.MUTED))
-		b.add_child(rh)
+	_iso_card(content)
+
+
+## 1.63: чек-лист ISO 9001 одной карточкой (как у инспектора): ✓/✗, «сейчас» против «нужно», «Показать» ведёт к месту.
+## Тот же вид — в «Что делать», когда до сертификата рукой подать.
+func _iso_card(parent: Control) -> void:
+	var mk := sim.market
+	var list := mk.iso_checklist()
+	var n_ok := mk.iso_ready()
+	var c := UITheme.card(12, Color("#1f2530") if n_ok < list.size() else Color("#23301f"), UITheme.INFO if n_ok < list.size() else UITheme.GOOD)
+	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	c.name = "IsoChecklist"
+	parent.add_child(c)
+	var v := UITheme.vbox(6)
+	c.add_child(v)
+	var head := UITheme.hbox(10)
+	head.add_child(_icon(Tex.ui("iso"), 24))
+	head.add_child(_cl2(tr("Чек-лист ISO 9001: выполнено %d из %d") % [n_ok, list.size()], tr("Аудитор проверяет эти условия в день аудита. Выполните всё заранее."), UITheme.TEXT, UITheme.MUTED, 15))
+	v.add_child(head)
+	v.add_child(UITheme.meter(100.0 * n_ok / maxf(1.0, float(list.size())), UITheme.GOOD if n_ok == list.size() else UITheme.INFO, 320, "%d/%d" % [n_ok, list.size()]))
+	for r: Dictionary in list:
+		var row := UITheme.hbox(8)
+		var okr := bool(r["ok"])
+		var mark := UITheme.label("✓" if okr else "✗", 15, UITheme.GOOD if okr else UITheme.BAD, UITheme.f_semi)
+		mark.custom_minimum_size.x = 18
+		row.add_child(mark)
+		var sub := tr("сейчас: %s") % str(r["cur"]) + ("" if okr else tr(" · нужно: %s") % str(r["need"]))
+		var cell := _cl2(str(r["text"]), sub, UITheme.TEXT if okr else UITheme.BAD, UITheme.GOOD if okr else UITheme.MUTED, 13)
+		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(cell)
+		if not okr:
+			var go: Dictionary = r["go"]
+			var what := str(r["text"])
+			var fixs := str(r["fix"])
+			var bt := UITheme.small(tr("Показать"), func() -> void:
+				_iso_go(go, what, fixs), fixs)
+			bt.name = "Show_" + str(r["key"])
+			row.add_child(bt)
+		v.add_child(row)
+		if not okr:
+			var hint := UITheme.para(tr("Что сделать: %s") % str(r["fix"]), 11, UITheme.MUTED)
+			hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			v.add_child(hint)
+
+
+func _iso_go(go: Dictionary, what: String, fixs: String) -> void:
+	if go.has("cell"):
+		var cc: Array = go["cell"]
+		hud.close_window()
+		hud.g.cam.focus_cell(Vector2i(int(cc[0]), int(cc[1])))
+	elif go.has("win"):
+		hud.open_window(str(go["win"]))
+	else:
+		hud.show_fix(what, fixs, Vector2i(-1, -1))
 
 
 ## Управление → Главный инженер: советы по заводу, самые важные — первыми.

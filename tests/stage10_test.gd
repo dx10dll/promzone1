@@ -63,6 +63,7 @@ func _init() -> void:
 	print("— сбыт: ассортимент, портфель заявок, товарный кредит")
 	var a := Scenario.new_game("garage", "mech", "calm", 8)
 	a.story.enabled = false
+	a.progress.all_open = true   # 1.63: изделия открываются по этапам; здесь нужен вал
 	a.sales.mode = "auto"
 	a.sales.off["pin"] = true
 	var o1 := a.orders.make_offer("pin")

@@ -95,6 +95,8 @@ func verdict(o: Dictionary) -> Array:
 		return ["завод в долгах — новых заказов не берём", []]
 	if not in_assortment(p):
 		return ["снято с ассортимента", []]
+	if not sim.progress.product_open(p):
+		return ["снято с ассортимента", []]   # 1.63: изделие ещё не открыто
 	var miss := missing(p)
 	if not miss.is_empty():
 		var names: Array[String] = []
@@ -586,7 +588,7 @@ func _day_str(d: int) -> String:
 func _new_contract() -> Dictionary:
 	var rng := sim.rng
 	var pool: Array = []
-	for k in sim.progress.products():
+	for k in sim.progress.open_products():
 		var p := str(k)
 		if not Defs.products.has(p) or not sim.office.unlocked(Defs.products[p]):
 			continue

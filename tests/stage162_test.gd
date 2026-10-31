@@ -214,6 +214,7 @@ func _initialize() -> void:
 
 	print("— рынок: карточка, 3–4 группы")
 	var m := _game(1629)
+	m.progress.all_open = true   # 1.63: группы считаются по открытым изделиям — открываем все
 	S.big_shop(m)
 	var mkt := m.market
 	var groups := mkt.card_groups()

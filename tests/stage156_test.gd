@@ -111,6 +111,7 @@ func _initialize() -> void:
 	print("— погрузка: грузчики машины, минуты, без наших")
 	var h := _game("garage", 1562)
 	h.workers.clear()
+	h.orders.list.clear()   # 1.63: стартовые заказы зависят от набора изделий — убираем, чтобы они не забирали детали
 	var ho := h.orders.make_offer("pin")
 	ho["qty"] = 40
 	ho["status"] = "offer"

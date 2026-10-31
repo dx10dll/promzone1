@@ -262,7 +262,7 @@ static func _deal(mk: Market, c: Dictionary, rng: RandomNumberGenerator) -> bool
 	if sub == "order":
 		var avail := sim.prod.processes_available()
 		var pool: Array = []
-		for k in sim.progress.products():
+		for k in sim.progress.open_products():
 			var ks := str(k)
 			if Defs.products.has(ks) and sim.office.unlocked(Defs.products[ks]) and sim.prod.can_make(ks, avail):
 				pool.append(ks)
@@ -322,7 +322,7 @@ static func _help(mk: Market, c: Dictionary, rng: RandomNumberGenerator) -> bool
 	# 1.58: сосед не успевает с заказом и просит сделать его за нас: субподряд с ценой, сроком и количеством
 	var avail := sim.prod.processes_available()
 	var pool: Array = []
-	for k in sim.progress.products():
+	for k in sim.progress.open_products():
 		var ks := str(k)
 		if Defs.products.has(ks) and sim.office.unlocked(Defs.products[ks]) and sim.prod.can_make(ks, avail):
 			pool.append(ks)

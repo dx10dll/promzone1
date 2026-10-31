@@ -24,6 +24,7 @@ func _game(seed_v: int) -> Sim:
 	g.progress.tutorial = -1
 	g.bmats.enabled = false
 	g.workers.clear()
+	g.orders.list.clear()   # 1.63: стартовые заказы зависят от набора изделий — убираем, чтобы они не забирали детали
 	return g
 
 

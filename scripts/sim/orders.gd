@@ -247,7 +247,7 @@ func make_offer(product: String = "") -> Dictionary:
 		# чаще предлагают то, что завод умеет делать; изредка — «на вырост»
 		var avail := sim.prod.processes_available()
 		var pool: Array = []
-		for k in sim.progress.products():
+		for k in sim.progress.open_products():
 			var ks := str(k)
 			if not Defs.products.has(ks) or not sim.office.unlocked(Defs.products[ks]):
 				continue
@@ -257,7 +257,7 @@ func make_offer(product: String = "") -> Dictionary:
 			for j in 6:
 				pool.append(ks)
 		if pool.is_empty():
-			for k2 in sim.progress.products():
+			for k2 in sim.progress.open_products():
 				if Defs.products.has(str(k2)) and sim.office.unlocked(Defs.products[str(k2)]):
 					pool.append(str(k2))
 		if pool.is_empty():

@@ -136,12 +136,16 @@ func main_competitor(procs: Array) -> Dictionary:
 func card_groups() -> Array:
 	var mine: Array = sim.progress.products()
 	var by: Dictionary = {}
+	var lk: Dictionary = {}   # 1.63: ещё не открытые изделия по группам
 	for p in mine:
 		if Defs.products.has(str(p)):
 			var gid := group_of(str(p))
+			var dst: Dictionary = by if sim.progress.product_open(str(p)) else lk
+			if not dst.has(gid):
+				dst[gid] = []
+			(dst[gid] as Array).append(str(p))
 			if not by.has(gid):
 				by[gid] = []
-			(by[gid] as Array).append(str(p))
 	var order: Array = GROUPS.filter(func(g: Dictionary) -> bool: return by.has(str(g["id"])))
 	order.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return (by[str(a["id"])] as Array).size() > (by[str(b["id"])] as Array).size())
 	for g0: Dictionary in GROUPS:
@@ -164,7 +168,7 @@ func card_groups() -> Array:
 			cd = {"id": str(c["id"]), "name": str(c["name"]), "director": Rivals.dname(c), "share": float(c["share"]),
 				"price": float(c["price"]), "war": int(c["war_until"]) >= sim.day(), "spec": _spec_text(c)}
 		out.append({"id": str(g["id"]), "name": str(g["name"]), "trend": tr_id, "arrow": {"up": "▲", "down": "▼", "flat": "►"}[tr_id],
-			"signal": sig, "products": prods, "procs": g["procs"], "comp": cd})
+			"signal": sig, "products": prods, "locked": lk.get(str(g["id"]), []), "procs": g["procs"], "comp": cd})
 	return out
 
 
@@ -538,19 +542,47 @@ func on_reclamation() -> void:
 
 ## Требования стандарта: [текст, выполнено].
 func iso_reqs() -> Array:
-	var qc_staff := false
+	var out: Array = []
+	for r: Dictionary in iso_checklist():
+		out.append([r["text"], r["ok"]])
+	return out
+
+
+## 1.63: чек-лист ISO 9001 одной карточкой: по каждому из 6 условий — текст, выполнено, что есть сейчас и что нужно,
+## что сделать и куда вести кнопку «Показать»: go = {"win": "группа:раздел"} или {"cell": [x, y]}.
+func iso_checklist() -> Array:
+	var qc_staff := 0
 	for w in sim.workers:
 		if w.prof == "qc":
-			qc_staff = true
-			break
+			qc_staff += 1
+	var desks := sim.things_of("qc").size()
 	var places := sim.eng.workplaces()
+	var unas := sim.eng.unassessed()
+	var q := float(sim.progress.rating.get("quality", 0.5))
+	var tech := sim.office.active("tech")
+	var tb_left := Training.TB_DAYS - (sim.day() - sim.training.tb_day)
+	var clean_days := sim.day() - last_reclam
+	var qc_go := {"win": "people:hire"} if qc_staff == 0 else {}   # пустой go — подсказка «как исправить»
+	var sout_go := {"win": "people:safety"}
 	return [
-		[L.t("Контролёр ОТК и стол ОТК"), qc_staff and not sim.things_of("qc").is_empty()],
-		[L.t("Качество в рейтинге от 65%"), float(sim.progress.rating.get("quality", 0.5)) >= 0.65],
-		[L.t("Техотдел с технологом"), sim.office.active("tech")],
-		[L.t("СОУТ проведена на всех местах"), not places.is_empty() and sim.eng.unassessed() == 0],
-		[L.t("Инструктаж по охране труда действует"), sim.training.tb_valid()],
-		[L.t("Без рекламаций последние 14 дней"), sim.day() - last_reclam >= 14],
+		{"key": "qc", "text": L.t("Контролёр ОТК и стол ОТК"), "ok": qc_staff > 0 and desks > 0,
+			"cur": L.t("контролёров %d, столов %d") % [qc_staff, desks], "need": L.t("по одному"),
+			"fix": L.t("Наймите контролёра ОТК («Люди → Найм») и поставьте стол ОТК («Объекты → ОТК»)."), "go": qc_go},
+		{"key": "quality", "text": L.t("Качество в рейтинге от 65%"), "ok": q >= 0.65,
+			"cur": "%d%%" % int(roundf(q * 100.0)), "need": L.t("от 65%"),
+			"fix": L.t("Меньше брака: обученные станочники, исправные станки, контроль ОТК."), "go": {"win": "goals:rating"}},
+		{"key": "tech", "text": L.t("Техотдел с технологом"), "ok": tech,
+			"cur": L.t("в штате") if tech else L.t("нет"), "need": L.t("в штате"),
+			"fix": L.t("Откройте отдел «Техотдел»: кабинет и технолог («Управление → Развитие и отделы»)."), "go": {"win": "office:develop"}},
+		{"key": "sout", "text": L.t("СОУТ проведена на всех местах"), "ok": not places.is_empty() and unas == 0,
+			"cur": L.t("без оценки: %d из %d") % [unas, places.size()] if not places.is_empty() else L.t("рабочих мест нет"), "need": L.t("все оценены"),
+			"fix": L.t("Уровень «По закону» в «Люди → Охрана труда» проведёт спецоценку сам."), "go": sout_go},
+		{"key": "tb", "text": L.t("Инструктаж по охране труда действует"), "ok": sim.training.tb_valid(),
+			"cur": (L.t("ещё %d дн.") % tb_left) if sim.training.tb_valid() else L.t("не проведён"), "need": L.t("действует"),
+			"fix": L.t("Проведите инструктаж («Люди → Охрана труда»): все рабочие по очереди идут в учебный класс."), "go": {"win": "people:safety"}},
+		{"key": "reclam", "text": L.t("Без рекламаций последние 14 дней"), "ok": clean_days >= 14,
+			"cur": L.t("дней без рекламаций: %d") % mini(clean_days, 99), "need": L.t("14 дней"),
+			"fix": L.t("Сдавайте заказы в срок и без брака — счёт идёт с последней рекламации."), "go": {"win": "orders:done"}},
 	]
 
 

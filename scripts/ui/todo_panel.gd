@@ -219,6 +219,18 @@ func _items() -> Array:
 				hud.open_window("office")
 				if hud.win:
 					hud.win.select_tab("advisor")])
+	# 1.63: ISO 9001 близко — чек-лист в «Управление → ISO 9001»
+	if sim.dev.on("tech3") and not sim.market.iso_ok() and str(sim.market.iso.get("status", "none")) != "audit" and sim.market.iso_ready() >= 4:
+		var rdy := sim.market.iso_ready()
+		var first := ""
+		for r: Dictionary in sim.market.iso_checklist():
+			if not bool(r["ok"]):
+				first = str(r["text"])
+				break
+		out.append(["iso", tr("ISO 9001: выполнено %d из 6") % rdy, first if first != "" else tr("заказывайте аудит"), UITheme.INFO, func() -> void:
+			hud.open_window("office")
+			if hud.win:
+				hud.win.select_tab("iso")])
 	# цели этапа
 	var pg := sim.progress
 	if pg.stage < Progress.STAGE_COUNT:
