@@ -1,0 +1,9 @@
+keys,en
+"Грузчик водителя","Driver's loader"
+"Несёт груз","Carrying cargo"
+"Идёт за поддоном","Going for a pallet"
+"Грузчики водителя не могут дойти до зоны разгрузки: нет прохода от ворот. Разгружают наши.","The driver's loaders cannot reach the unloading zone: no path from the gate. Our workers unload instead."
+"Далеко от дороги: погрузка ×%s","Far from the road: loading ×%s"
+"Грузчики водителя идут пешком от ворот, около %d клеток в один конец. Зону лучше поставить ближе к дороге.","The driver's loaders walk from the gate, about %d tiles one way. Better move the zone closer to the road."
+"Грузчики водителя носят груз от машины пешком, поддоны везут на рохле — ничего не перелетает","The driver's loaders carry cargo from the truck on foot, pallets go on a pallet jack — nothing teleports"
+"Чем дальше зона от дороги, тем дольше погрузка; на далёкой зоне предупреждение «Далеко от дороги: погрузка ×N»","The farther a zone is from the road, the longer loading takes; a far zone shows «Far from the road: loading ×N»"

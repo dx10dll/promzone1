@@ -24,6 +24,7 @@ var lane := 0              ## 1.30: 0 — ближняя полоса (едет 
 var crew_t := 0.0          ## 1.56: грузчики машины: накопленное рабочее время
 var crew_idle := 0.0       ## сколько стоят без дела при разгрузке (не смогли положить)
 var crew_off := false      ## разгрузку берут наши (зона разгрузки заставлена)
+var crew_n := -1           ## 1.57: сколько грузчиков ещё при машине (-1 — ещё не выходили; в старых сейвах так)
 var hold := false          ## 1.30: стоит, пока её не отпустит своя служба (пожарные, ломовоз)
 
 
@@ -36,7 +37,7 @@ func to_dict() -> Dictionary:
 		"id": id, "kind": kind, "x": x, "state": state, "park_x": park_x,
 		"order": order_id, "supply": supply_id, "need": need, "loaded": loaded,
 		"color": color, "desc": cargo_desc, "parked": parked_time, "equip": equip,
-		"bmat": bmat_order, "body": body, "lane": lane, "hold": hold, "crew_t": crew_t, "crew_idle": crew_idle, "crew_off": crew_off,
+		"bmat": bmat_order, "body": body, "lane": lane, "hold": hold, "crew_t": crew_t, "crew_idle": crew_idle, "crew_off": crew_off, "crew_n": crew_n,
 	}
 
 
@@ -62,6 +63,7 @@ static func from_dict(d: Dictionary) -> Vehicle:
 	v.crew_t = float(d.get("crew_t", 0.0))
 	v.crew_idle = float(d.get("crew_idle", 0.0))
 	v.crew_off = bool(d.get("crew_off", false))
+	v.crew_n = int(d.get("crew_n", -1))
 	return v
 
 

@@ -199,9 +199,9 @@ func _on_release(c: Vector2i) -> void:
 			if nz < 0:
 				message.emit(sim.area_refusal, false)   # 1.29: последнюю клетку обязательной зоны не стереть
 			elif int(arg) == Logistics.A_UNLOAD:
-				message.emit(L.t("Зона разгрузки: %d кл. Сюда будут разгружать металл (на поддоны заготовок) и ящики с оборудованием.") % nz if nz > 0 else L.t("Здесь нельзя отметить зону."), nz > 0)
+				message.emit(L.t("Зона разгрузки: %d кл. Сюда будут разгружать металл (на поддоны заготовок) и ящики с оборудованием.") % nz + _far_note(Logistics.A_UNLOAD) if nz > 0 else L.t("Здесь нельзя отметить зону."), nz > 0)
 			elif int(arg) == Logistics.A_SHIP:
-				message.emit(L.t("Зона отгрузки: %d кл. Сюда понесут готовые заказы — машина клиента грузит только отсюда.") % nz if nz > 0 else L.t("Здесь нельзя отметить зону."), nz > 0)
+				message.emit(L.t("Зона отгрузки: %d кл. Сюда понесут готовые заказы — машина клиента грузит только отсюда.") % nz + _far_note(Logistics.A_SHIP) if nz > 0 else L.t("Здесь нельзя отметить зону."), nz > 0)
 			else:
 				message.emit(L.t("Зона убрана: %d кл.") % nz if nz > 0 else L.t("Здесь нет зоны."), nz > 0)
 		"pipe":
@@ -926,3 +926,9 @@ func _cross(r: Rect2, col: Color) -> void:
 	var a := r.grow(-6)
 	draw_line(a.position, a.end, col, 3.0)
 	draw_line(Vector2(a.end.x, a.position.y), Vector2(a.position.x, a.end.y), col, 3.0)
+
+
+## 1.57: к сообщению о новой зоне — предупреждение, если она далеко от дороги.
+func _far_note(area: int) -> String:
+	var t := sim.logi.far_text(area)
+	return "" if t == "" else " " + t + "."

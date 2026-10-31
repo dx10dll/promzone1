@@ -727,7 +727,7 @@ func _detach(it: Item) -> void:
 			if veh_items.has(it.holder):
 				(veh_items[it.holder] as Array).erase(it.id)
 		Item.Loc.WORKER:
-			var w := get_worker(it.holder)
+			var w := get_person(it.holder)   # 1.57: груз могут нести и грузчики машин (гости)
 			if w:
 				if w.carrying == it.id:
 					w.carrying = -1
@@ -875,7 +875,7 @@ func item_cell(it: Item) -> Vector2i:
 			var v := get_vehicle(it.holder)
 			return v.access_cell(world.sidewalk_row) if v else Vector2i.ZERO
 		Item.Loc.WORKER:
-			var w := get_worker(it.holder)
+			var w := get_person(it.holder)
 			return w.cell() if w else Vector2i.ZERO
 	return Vector2i.ZERO
 
@@ -2022,7 +2022,7 @@ func _tick_vehicles(dt: float) -> void:
 					var late := tod() >= Defs.b("shift_end") or not is_workday()
 					if (v.parked_time > 300.0 or (late and v.parked_time > 30.0)) and not cargo.is_empty():
 						_dump_cargo(v)
-					if cargo.is_empty():
+					if cargo.is_empty() and not logi.crew_busy(v):   # 1.57: грузчики ещё несут груз или идут обратно
 						v.state = "leaving"
 				elif v.kind != "pickup":
 					if v.parked_time > 30.0:
@@ -2270,7 +2270,7 @@ func to_dict() -> Dictionary:
 		th.append(t.to_dict())
 	var its: Array = []
 	for it: Item in items.values():
-		its.append(it.to_dict())
+		its.append(logi.item_dict(it))   # 1.57: груз в руках грузчиков машины сохраняется там, откуда его взяли
 	var ws: Array = []
 	for w in workers:
 		var d := w.to_dict()

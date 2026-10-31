@@ -142,7 +142,7 @@ func _initialize() -> void:
 				no_hands = false
 		if hv and hv.loaded >= hv.need and lt < 0.0:
 			lt = tt
-	check(pt >= 0.0 and lt >= 0.0 and lt - pt <= 15.0, "40 деталей погружены за %.1f игр. мин после приезда (не более 15)" % (lt - pt))
+	check(pt >= 0.0 and lt >= 0.0 and lt - pt <= 40.0, "40 деталей погружены за %.1f игр. мин после приезда (не более 40: грузчики ходят пешком, 1.57)" % (lt - pt))
 	check(no_hands and str(ho["status"]) == "done", "рабочих на заводе нет — машину всё равно загрузили; заказ закрыт")
 	h.dispose()
 
@@ -183,7 +183,7 @@ func _initialize() -> void:
 			var th: Thing = m.things.get(it3.holder)
 			if th and th.def_id == "pallet_raw":
 				on_raw += 1
-	check(arrived >= 0.0 and left >= 0.0 and left - arrived <= 25.0, "машина разгружена и уехала за %.1f мин" % (left - arrived))
+	check(arrived >= 0.0 and left >= 0.0 and left - arrived <= 45.0, "машина разгружена и уехала за %.1f мин" % (left - arrived))
 	check(on_raw + in_zone >= 60 and not hands, "металл в зоне разгрузки: %d на поддонах заготовок + %d на полу; наши груз из кузова не брали" % [on_raw, in_zone])
 	m.dispose()
 

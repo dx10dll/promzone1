@@ -45,6 +45,7 @@ func _draw() -> void:
 	_power_marks(z, f, mp)
 	_pile_badges(z, f)
 	_pallet_tags(z, f)
+	_far_marks(z, f, mp)
 	# объекты вне своей зоны (1.13): ими не пользуются
 	var bare := {}    # неразмеченная часть зала -> [объекты]
 	for t: Thing in sim.things.values():
@@ -172,6 +173,42 @@ func _pallet_tags(z: float, f: Font) -> void:
 		draw_string(f, Vector2(4.0, 10.5), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.2, 0.13, 0.04))
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		row += 1
+
+
+## 1.57: зона далеко от дороги — грузчики ходят пешком, погрузка и разгрузка идут дольше. Маленькая подпись под зоной
+## «Далеко от дороги: погрузка ×N» (только от ×1.5); при наведении на зону — пояснение, сколько идти.
+func _far_marks(z: float, f: Font, mp: Vector2) -> void:
+	var mc := Vector2i(floori(mp.x / T), floori(mp.y / T))
+	for area: int in [Logistics.A_UNLOAD, Logistics.A_SHIP]:
+		var txt := sim.logi.far_text(area)
+		if txt == "":
+			continue
+		var cells: Array[Vector2i] = sim.logi.zone_cells() if area == Logistics.A_UNLOAD else sim.logi.ship_cells()
+		var lo := Vector2i(9999, 9999)
+		var hi := Vector2i(-9999, -9999)
+		var hovered := false
+		for c in cells:
+			lo = Vector2i(mini(lo.x, c.x), mini(lo.y, c.y))
+			hi = Vector2i(maxi(hi.x, c.x), maxi(hi.y, c.y))
+			if c == mc:
+				hovered = true
+		if z < 0.45 and not hovered:
+			continue
+		var lines: Array[String] = [txt]
+		if hovered:
+			lines.append(sim.logi.far_hint(area))
+		var fs := 10
+		var tw := 0.0
+		for ln in lines:
+			tw = maxf(tw, f.get_string_size(ln, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
+		var sz := Vector2(tw + 22.0, 4.0 + 13.0 * float(lines.size()))
+		var pos := Vector2(lo.x, hi.y + 1) * T + Vector2(0.0, 2.0) / z
+		draw_set_transform(pos, 0.0, Vector2.ONE / z)
+		draw_style_box(_badge_box(), Rect2(Vector2.ZERO, sz))
+		draw_colored_polygon(PackedVector2Array([Vector2(8, 3), Vector2(14, 12), Vector2(2, 12)]), UITheme.WARN)
+		for k in lines.size():
+			draw_string(f, Vector2(18.0, 11.0 + 13.0 * float(k)), lines[k], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(UITheme.WARN, 0.95) if k == 0 else Color(0.93, 0.9, 0.82, 0.95))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 var _bbox: StyleBoxFlat = null

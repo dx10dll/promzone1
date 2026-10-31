@@ -472,6 +472,44 @@ func _ready() -> void:
 			gm.hud.open_window("orders")
 			await get_tree().create_timer(0.4).timeout
 			gm.hud.win.select_tab("active")
+	elif mode == "crew157":
+		# 1.57: зона разгрузки далеко от дороги — грузчики машины идут пешком с поддоном; подпись «Далеко от дороги»
+		var sm6 := gm.sim
+		sm6.story.enabled = false
+		sm6.workers.clear()
+		for t6: Thing in sm6.things.values().duplicate():
+			if t6.def_id == Logistics.RAW_PALLET:
+				sm6.remove_thing(t6, 0.0)
+		var old6: Array[Vector2i] = sm6.logi.zone_cells().duplicate()
+		sm6.set_area(Rect2i(4, 22, 4, 3), Logistics.A_UNLOAD)
+		for c6: Vector2i in old6:
+			if not Rect2i(4, 22, 4, 3).has_point(c6):
+				sm6.set_area(Rect2i(c6, Vector2i(1, 1)), 0)
+		sm6.money = 900000.0
+		sm6.order_material("bar45", 90)
+		for sp6: Dictionary in sm6.supply:
+			sp6["eta"] = sm6.minute
+		var go6 := true
+		var guard6 := 0
+		while go6 and guard6 < 800:
+			sm6.tick(0.5)
+			guard6 += 1
+			for v6: Vehicle in sm6.vehicles:
+				var busy := 0
+				for c7: Dictionary in sm6.logi.crew_of(v6):
+					var w7: Worker = c7["w"]
+					if str(c7["st"]) == "to_b" and (c7["ids"] as Array).size() > 6 and w7.pos.x < 17.0 and w7.pos.y < 27.0:
+						busy += 1
+				if busy >= 1:
+					go6 = false
+		gm.menu_paused = true
+		for v8: Vehicle in sm6.vehicles:
+			for c8: Dictionary in sm6.logi.crew_of(v8):
+				var w8: Worker = c8["w"]
+				print("crew ", w8.id, " st=", c8["st"], " ids=", (c8["ids"] as Array).size(), " task=", w8.task, " carrying=", w8.carrying, " extra=", w8.carry_extra.size(), " pos=", w8.pos)
+		print("far text: ", sm6.logi.far_text(Logistics.A_UNLOAD), " steps ", sm6.logi.road_steps(Logistics.A_UNLOAD))
+		if cam_arg == "":
+			cam_arg = "14,24.5,1.0"
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":
