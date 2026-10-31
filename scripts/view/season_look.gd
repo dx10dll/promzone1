@@ -57,8 +57,8 @@ static func leaf_count(lk: String, hv: int) -> int:
 
 
 ## Лужа на этой клетке (осенью, на грунте и асфальте).
-static func puddle(lk: String, hv: int) -> bool:
-	return lk == "autumn" and hv % 9 == 0
+static func puddle(_lk: String, _hv: int) -> bool:
+	return false   # 1.56: владелец — синие лужи не нужны вообще
 
 
 ## Снежное пятно на этой клетке травы или грунта (зимой).

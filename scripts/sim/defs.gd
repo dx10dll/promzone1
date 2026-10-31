@@ -29,6 +29,7 @@ static var grants: Array = []
 static var stages: Dictionary = {}
 static var develop: Dictionary = {}
 static var build_mats: Dictionary = {}   ## 1.13: стройматериалы
+static var tare: Dictionary = {}         ## 1.56: тара (поддон/ящик), бригады машин
 static var templates: Dictionary = {}    ## 1.17: готовые помещения
 static var floor_by_id: Dictionary = {}
 static var wall_by_id: Dictionary = {}
@@ -71,6 +72,7 @@ static func load_all() -> void:
 	stages = _load_dict("res://data/stages.json")
 	develop = _load_dict("res://data/develop.json")
 	build_mats = _load_dict("res://data/build_mats.json").get("list", {})
+	tare = _load_dict("res://data/tare.json")
 	if not CHIEF_ENGINEER:
 		_strip_chief_engineer()
 	for k in floors.keys():

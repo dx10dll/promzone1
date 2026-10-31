@@ -2143,6 +2143,7 @@ func tick(dt: float) -> void:
 	_timed(prev_tod, now_tod)
 	_tick_supply()
 	logi.tick()
+	logi.tick_crews(dt)   # 1.56: грузчики машин
 	bmats.tick_trucks()
 	grants.tick(dt)
 	_tick_vehicles(dt)

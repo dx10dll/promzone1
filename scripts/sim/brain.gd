@@ -1263,19 +1263,23 @@ func _has_prof_free(prof: String) -> bool:
 	return false
 
 
-## 1.47: рабочий — станочник (профиль процесса) и у его станков есть задание от заказов.
-func _machinist_has_work(w: Worker) -> bool:
+## 1.56: рабочий — станочник (профиль процесса или оператор ЧПУ), не ИТР.
+func _is_machinist(w: Worker) -> bool:
 	if w.is_itr():
 		return false
-	var cnc := w.prof == "cnc_operator"
-	var is_m := cnc
-	if not is_m:
-		for pr in Defs.processes.values():
-			if str((pr as Dictionary).get("prof", "")) == w.prof:
-				is_m = true
-				break
-	if not is_m:
+	if w.prof == "cnc_operator":
+		return true
+	for pr in Defs.processes.values():
+		if str((pr as Dictionary).get("prof", "")) == w.prof:
+			return true
+	return false
+
+
+## 1.47: рабочий — станочник (профиль процесса) и у его станков есть задание от заказов.
+func _machinist_has_work(w: Worker) -> bool:
+	if not _is_machinist(w):
 		return false
+	var cnc := w.prof == "cnc_operator"
 	for m in sim.things_of("machine"):
 		if m.demolish or not m.built or m.product == "" or m.broken or not m.enabled:
 			continue
@@ -1384,24 +1388,7 @@ func _find_work(w: Worker) -> Task:
 	# 5а. готовые заказы — в зону отгрузки
 	sim.logi.add_ship_jobs(self, w, cands, haul_bonus)
 
-	# 6. погрузка заказа в машину клиента
-	for v in sim.vehicles:
-		if v.state != "parked" or v.kind != "pickup":
-			continue
-		if v.loaded + v.reserved_load >= v.need:
-			continue
-		var o := sim.orders.get_order(v.order_id)
-		if o.is_empty():
-			continue
-		var p := str(o["product"])
-		# 1.29: грузят только из зоны отгрузки (запасной путь — со склада, см. Logistics.ship_only)
-		var only_ship := sim.logi.ship_only(v, p)
-		var pred_ok := func(i: Item) -> bool: return i.kind == "part" and i.def_id == p and i.q == "ok" and (i.loc == Item.Loc.GROUND and sim.logi.in_ship(i.cell) if only_ship else _in_general_storage(i))
-		var it4 := _nearest_item(pred_ok, v.access_cell(sim.world.sidewalk_row), w)
-		if it4 == null:
-			continue
-		var sc6 := 82.0 + haul_bonus - _dist(wc, sim.item_cell(it4)) * 0.2
-		cands.append({"s": sc6, "k": "load", "item": it4, "veh": v})
+	# 6. 1.56: погрузка заказа в машину клиента — дело грузчиков машины (Logistics.tick_crews), наши в кузов не лезут
 
 	# 7. грузы, брошенные на полу
 	# 1.47: «захламлено» в замечаниях — убирают в первую очередь: уборщица и грузчик (+ полный бонус), прочие — меньше, станочники — только если некому
@@ -1562,6 +1549,17 @@ func _find_work(w: Worker) -> Task:
 			if sp3.is_empty():
 				continue
 			cands.append({"s": 240.0 + PROF_FIRST * 0.5 - _dist(wc, sp3["cell"]) * 0.3, "k": "presetup", "t": m3, "spot": sp3, "key": key3})
+
+	# 1.56: станочник груз не носит, если на смене есть разнорабочий (исключение — подать заготовку к станку, где пусто)
+	if not (w.has_meta("order_only") or w.has_meta("order_bp")) and not w.controlled and _is_machinist(w) and _has_prof_free("laborer"):
+		cands = cands.filter(func(cd: Dictionary) -> bool:
+			var k := str(cd["k"])
+			if k != "haul" and k != "haul_cell" and k != "deliver" and k != "load":
+				return true
+			if k == "haul" and cd.get("dest") is Thing:
+				var dm: Thing = cd["dest"]
+				return dm.kind() == "machine" and int(cd["slot"]) == 0 and sim.count_slot(dm, 0) == 0 and sim.prod.can_operate(w, dm)
+			return false)
 
 	if w.has_meta("order_only") or w.has_meta("order_bp"):
 		# 1.15: по приказу — только работа на указанном месте
@@ -2225,16 +2223,21 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				return null
 			if dest.kind() == "machine" and slot == 0 and dest.job_step == 0 and Defs.is_assembly(dest.product):
 				room = mini(room, maxi(1, int(Defs.components(dest.product).get(it.def_id, 1))))
-			var cap := carry_cap(it)
-			var avail_n := 1 + _stack_mates(it, 30).size()
+			var base_cap := carry_cap(it)
+			var cap := Logistics.cap_for(it, "", base_cap)   # 1.56: без тележки — ящиком, медленнее
+			var avail_n := 1 + _stack_mates(it, 100).size()
 			if avail_n >= 7 and room >= 7:
 				var veh := _haul_vehicle(w)
 				if veh:
 					veh.user = w.id
 					t.res_users.append(veh.id)
 					t.data["veh"] = veh.def_id
-					cap = int(Defs.b("forklift_cap")) if veh.def_id == "forklift" else int(Defs.b("cart_cap"))
+					cap = Logistics.cap_for(it, veh.def_id, base_cap)   # 1.56: целый поддон (погрузчик — два)
+					if cap == base_cap:
+						cap = int(Defs.b("forklift_cap")) if veh.def_id == "forklift" else int(Defs.b("cart_cap"))
 			var extra := _stack_mates(it, mini(cap - 1, room - 1))
+			if not t.data.has("veh") and extra.size() + 1 > base_cap:
+				t.data["crate"] = true
 			for iid in [it.id] + extra:
 				var ri: Item = sim.items[iid]
 				ri.reserved_by = w.id
@@ -2242,7 +2245,7 @@ func _make_task(w: Worker, cd: Dictionary) -> Task:
 				sim.reserve_incoming(dest, slot, it.stack_key())
 				t.res_incoming.append([dest.id, slot])
 			var n := 1 + extra.size()
-			var verb := L.t("Везёт на погрузчике") if t.data.get("veh", "") == "forklift" else (L.t("Везёт на тележке") if t.data.has("veh") else L.t("Несёт"))
+			var verb := L.t("Везёт на погрузчике") if t.data.get("veh", "") == "forklift" else (L.t("Везёт поддон на тележке") if t.data.has("veh") else (L.t("Несёт ящик") if t.data.has("crate") else L.t("Несёт")))
 			if Production.is_heavy(it) and not t.data.has("veh"):
 				# 1.14: тяжёлую деталь в зале с кран-балкой несёт кран, человек ведёт пультом
 				var cr := sim.prod.crane_at(src)
@@ -3564,6 +3567,8 @@ func _move(w: Worker, target: Vector2i, dt: float) -> int:
 			spd *= 0.72 if ci.q == "crate" else 0.92   # тяжёлый ящик — медленнее
 		elif Production.is_heavy(ci) and w.prop != "pendant":
 			spd *= Defs.b("heavy_drag_k") if Defs.b("heavy_drag_k") > 0.0 else 0.6   # без крана — волоком
+	if w.task and bool(w.task.data.get("crate", false)):
+		spd *= float(Defs.tare.get("crate_speed", 0.78))   # 1.56: ящик вместо поддона на рохле — медленнее
 	if w.task and str(w.task.data.get("veh", "")) == "forklift":
 		spd = Defs.b("walk_speed") * Defs.b("forklift_speed")
 	if not sim.world.climb.is_empty() and sim.world.climb.has(sim.world.idx(w.cell())):

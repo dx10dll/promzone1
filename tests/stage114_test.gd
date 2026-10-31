@@ -77,7 +77,7 @@ func _init() -> void:
 	var o := v.orders.make_offer("bushing")
 	o["kind"] = "export"
 	o["status"] = "ready"
-	o["pickup_eta"] = v.minute
+	o["pickup_eta"] = v.minute - 300.0   # 1.56: машина приезжает к собранному поддону; здесь поддона нет — срок комплектации вышел
 	o["pickup_spawned"] = false
 	v.orders.list.append(o)
 	v.orders.tick(1.0)

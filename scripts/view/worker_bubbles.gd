@@ -129,9 +129,11 @@ func _process(d: float) -> void:
 		_hov = hov
 		_hov_bubble = hb
 		busy = true
-	_busy = busy
-	if busy:
+	# 1.56: когда последнее облачко догасло, перерисовываем ещё раз — иначе на экране оставался
+	# прошлый кадр и облачко «висело в воздухе», пока человек уходил
+	if busy or _busy:
 		queue_redraw()
+	_busy = busy
 
 
 func _sel_id() -> int:

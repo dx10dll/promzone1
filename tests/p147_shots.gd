@@ -429,6 +429,49 @@ func _ready() -> void:
 			sm4.paper.unread = false
 			gm.hud.open_window("paper")
 			await get_tree().create_timer(0.4).timeout
+	elif mode == "logi156" or mode == "status156":
+		# 1.56: поддоны с бирками в зоне отгрузки и машина клиента (logi156); окно заказов со статусами (status156)
+		var sm5 := gm.sim
+		sm5.story.enabled = false
+		sm5.progress.stage = maxi(sm5.progress.stage, 2)
+		gm.menu_paused = true
+		var ship: Array[Vector2i] = sm5.logi.ship_cells()
+		var specs5 := [["pin", 36, 0, "shipping"], ["bushing", 18, 1, "ready"], ["stud", 40, 2, "ready"], ["bolt", 24, 3, "ready"], ["nut", 30, -1, "active"]]
+		for sp5: Array in specs5:
+			var o5 := sm5.orders.make_offer(str(sp5[0]))
+			o5["qty"] = int(sp5[1])
+			o5["status"] = "offer"
+			sm5.orders.list.append(o5)
+			sm5.orders.accept(int(o5["id"]), false)
+			var home := int(sp5[2])
+			if home >= 0:
+				var n5 := int(sp5[1]) if home < 3 else int(sp5[1]) / 2   # у «bolt» собрана половина — «комплектуется»
+				for k in n5:
+					var it5 := sm5.new_item("part", str(sp5[0]), "ok")
+					it5.ord_id = int(o5["id"])
+					sm5.put_on_ground(it5, ship[home * 2 % ship.size()] if str(sp5[0]) != "stud" else ship[(home * 2 + k / 20) % ship.size()])
+				o5["status"] = "ready"
+				o5["allocated"] = int(sp5[1])
+				o5["ready_at"] = sm5.minute
+			if str(sp5[3]) == "shipping":
+				var vp := sm5.spawn_vehicle("pickup")
+				vp.order_id = int(o5["id"])
+				vp.need = int(o5["qty"])
+				vp.body = "flatbed"
+				vp.cargo_desc = sm5.orders.short(o5)
+				vp.state = "parked"
+				vp.x = vp.park_x
+				vp.loaded = 0
+				o5["pickup_spawned"] = true
+				o5["status"] = "shipping"
+		if mode == "logi156":
+			if cam_arg == "":
+				var c0 := ship[ship.size() / 2]
+				cam_arg = "%s,%s,1.9" % [c0.x + 0.5, c0.y + 1.8]
+		else:
+			gm.hud.open_window("orders")
+			await get_tree().create_timer(0.4).timeout
+			gm.hud.win.select_tab("active")
 	elif mode == "settings":
 		gm.hud.show_settings()
 	elif mode == "finance":

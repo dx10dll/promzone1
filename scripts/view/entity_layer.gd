@@ -300,6 +300,22 @@ func _sync_ground() -> void:
 	ground.clear()
 	var per_cell := {}
 	var piles := {}     # стройматериалы: клетка -> [def, сколько]
+	# 1.56: в зоне отгрузки детали стоят на поддонах — сначала рисуем поддон (он под деталями)
+	var pal_seen := {}
+	for gid0 in sim.ground_items:
+		var it0: Item = sim.items.get(gid0)
+		if it0 == null or it0.kind != "part" or pal_seen.has(it0.cell) or not sim.logi.in_ship(it0.cell):
+			continue
+		pal_seen[it0.cell] = true
+		var pm: Dictionary = Defs.sprites.get("pallet", {})
+		var ps0 := Sprite2D.new()
+		ps0.texture = Tex.obj("pallet")
+		ps0.centered = false
+		ps0.scale = Vector2(0.5, 0.5)
+		ps0.position = Vector2(it0.cell.x * T, it0.cell.y * T + 3.0)
+		ps0.offset = Vector2(-float(pm.get("ox", 0)), -float(pm.get("oy", 74)) + (T - 3.0) * 2.0)
+		add_child(ps0)
+		ground[-1000000 - it0.cell.y * 4096 - it0.cell.x] = ps0
 	for gid in sim.ground_items:
 		var it: Item = sim.items.get(gid)
 		if it == null:

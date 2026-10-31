@@ -1,0 +1,23 @@
+keys,en
+"Везёт поддон на тележке","Pushing a pallet on the jack"
+"Несёт ящик","Carrying a crate"
+"Заказ №%d, %s, %d шт.","Order #%d, %s, %d pcs"
+"В производстве","In production"
+"Комплектуется","Being picked"
+"Готов к отгрузке","Ready to ship"
+"Грузится","Loading"
+"Уехал","Gone"
+"Грузчики водителя не могут разгрузиться: зона разгрузки заставлена. Освободите её или расширьте (Стройка → Зоны).","The driver's loaders cannot unload: the unloading zone is full. Clear it or extend it (Build → Zones)."
+"на поддоне %d из %d","on the pallet %d of %d"
+"ждём машину","waiting for the truck"
+"Цепочка заказа: ","Order chain: "
+"Тележка-рохля","Pallet jack"
+"Рохля для поддонов: разнорабочий берёт её, если везти много, и перевозит поддон целиком (20–50 штук за ходку). Без неё носят ящиками, втрое меньше и медленнее.","A pallet jack: a laborer takes it for big loads and moves a whole pallet (20-50 pieces a trip). Without it they carry crates, a third as much and slower."
+"Отгрузка на поддонах: заказ собирается на поддон с биркой «Заказ №, заказчик, штук» в зоне отгрузки","Shipping on pallets: an order is kitted on a pallet tagged «Order #, customer, qty» in the shipping zone"
+Статус заказа: в производстве → комплектуется → готов к отгрузке → грузится → уехал,Order status: in production → kitting → ready to ship → loading → shipped
+"Машины грузят и разгружают грузчики водителя; ваши люди только носят между зонами, складом и станками","Trucks are loaded and unloaded by the driver's own crew; your people only carry between zones, storage and machines"
+"Тележка-рохля: поддон целиком за ходку, без неё — ящиками","Pallet jack: a whole pallet per trip, crates without it"
+"Станочники не таскают грузы, если на смене есть разнорабочий",Machinists don't haul cargo if a general labourer is on shift
+"Электричество как раньше: без автомата, ночного тарифа и вкладки «Электричество»","Electricity as before: no main breaker, night tariff or «Electricity» tab"
+"Убраны синие лужи; плашка кВт не обрезается; облачко над рабочим пропадает, когда уводишь мышь",Blue puddles removed; the kW chip is no longer clipped; a worker's bubble disappears when the mouse leaves
+"Текст чётче: буквы без мути, серые подписи светлее","Sharper text: no blur on letters, grey captions are lighter"

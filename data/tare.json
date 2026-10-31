@@ -1,0 +1,10 @@
+{
+ "parts": {"s": 50, "m": 30, "l": 20},
+ "mat": 30,
+ "mats": {"strip2": 50, "charge": 20, "forging": 20},
+ "crate_div": 3,
+ "crate_speed": 0.78,
+ "crew": {"van": 2, "flatbed": 2, "truck": 3, "semi": 4},
+ "cycle": 2.0,
+ "pick_grace": 240.0
+}

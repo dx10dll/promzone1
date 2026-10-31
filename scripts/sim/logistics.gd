@@ -16,6 +16,7 @@ const A_UNLOAD := 1
 const A_SHIP := 2                ## зона отгрузки (1.12): готовые заказы ждут машину клиента
 const MAT_PER_CELL := 24
 const RAW_PALLET := "pallet_raw"   ## 1.29: поддон заготовок в зоне разгрузки
+const NO_ORD := -9                 ## 1.56: «взять заказ из самой детали» (аргумент _cell_room / free_cell)
 
 var sim: Sim
 var equip: Array = []            ## заказанное оборудование в пути: [{id, thing, def, eta, spawned}]
@@ -48,6 +49,30 @@ static func crates_for(def_id: String) -> int:
 	if str(d.get("kind", "")) == "machine" or str(d.get("kind", "")) == "power":
 		return clampi(area, 1, 4)
 	return clampi(int(ceil(area / 2.0)), 1, 3)
+
+
+## 1.56: сколько штук в одной таре (поддон): деталь — по размеру, металл — по сорту. Данные в data/tare.json.
+static func tare_of(it: Item) -> int:
+	var t: Dictionary = Defs.tare
+	if it.kind == "part":
+		var sz := str(Defs.products.get(it.def_id, {}).get("size", "s"))
+		return int((t.get("parts", {}) as Dictionary).get(sz, 30))
+	if it.kind == "mat":
+		return int((t.get("mats", {}) as Dictionary).get(it.def_id, t.get("mat", 30)))
+	return 1
+
+
+## Сколько штук за ходку: на тележке-рохле — целый поддон, на погрузчике — два, в руках — ящик (треть поддона,
+## но не меньше обычной пачки). veh — def_id тележки/погрузчика или "". Тяжёлое и прочее — как было (base).
+static func cap_for(it: Item, veh: String, base: int) -> int:
+	if (it.kind != "part" and it.kind != "mat") or Production.is_heavy(it):
+		return base
+	var tare := tare_of(it)
+	if veh == "forklift":
+		return tare * 2
+	if veh == "cart":
+		return tare
+	return maxi(base, int(ceil(float(tare) / maxf(1.0, float(Defs.tare.get("crate_div", 3))))))
 
 
 static func crate_name(it: Item) -> String:
@@ -106,6 +131,37 @@ func staged(p: String) -> int:
 	return n
 
 
+## 1.56: сколько деталей заказа уже на его поддоне в зоне отгрузки (или несут туда). Детали без бирки
+## (старые сохранения, ручная выкладка) считаются любому заказу этого изделия.
+func staged_for(o: Dictionary) -> int:
+	var p := str(o["product"])
+	var oid := int(o["id"])
+	var n := 0
+	for it: Item in sim.items.values():
+		if it.kind != "part" or it.def_id != p or it.q != "ok":
+			continue
+		if it.loc == Item.Loc.GROUND and in_ship(it.cell):
+			if it.ord_id == oid or it.ord_id < 0:
+				n += 1
+		elif it.reserved_by >= 0 and it.ord_id == oid and bool(it.get_meta("to_ship", false)):
+			n += 1
+	return n
+
+
+## 1.56: на скольких поддонах (клетках) лежит заказ в зоне отгрузки: [поддонов, деталей на них].
+func pallets_of(o: Dictionary) -> Array:
+	var cells := {}
+	var n := 0
+	var p := str(o["product"])
+	var oid := int(o["id"])
+	for gid in sim.ground_items:
+		var it: Item = sim.items.get(gid)
+		if it and it.kind == "part" and it.def_id == p and in_ship(it.cell) and (it.ord_id == oid or it.ord_id < 0):
+			cells[it.cell] = true
+			n += 1
+	return [cells.size(), n]
+
+
 ## Детали этого изделия нужны машине клиента (заказ готов или уже грузят).
 func ship_wanted(p: String) -> bool:
 	for o: Dictionary in sim.orders.by_status(["active", "ready", "shipping"]):
@@ -119,13 +175,14 @@ func ship_wanted(p: String) -> bool:
 func ship_only(v: Vehicle, p: String) -> bool:
 	if not has_ship():
 		return false
-	if staged(p) > 0:
+	var ord_o := sim.orders.get_order(v.order_id)
+	if (staged_for(ord_o) if not ord_o.is_empty() else staged(p)) > 0:
 		return true
 	var probe := Item.new()
 	probe.kind = "part"
 	probe.def_id = p
 	probe.q = "ok"
-	if free_cell(ship_cells(), probe, ship_cells()[0]).x < 0 or v.parked_time > 90.0:
+	if free_cell(ship_cells(), probe, ship_cells()[0], int(ord_o.get("id", -1))).x < 0 or v.parked_time > 90.0:
 		sim.notify_once("ship_fallback", L.t("Готовый заказ не донесли до зоны отгрузки — грузим в машину прямо со склада. Проверьте, свободна ли зона отгрузки и есть ли к ней проход."), Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
 		return false
 	return true
@@ -165,6 +222,24 @@ func raw_pallet(it: Item, near: Vector2i) -> Array:
 	return best
 
 
+## 1.56: грузы на полу вне зон разгрузки и отгрузки — «захламлённость» для проверок (в зонах им и место).
+func clutter_count() -> int:
+	var n := 0
+	for gid in sim.ground_items:
+		var it: Item = sim.items.get(gid)
+		if it and not in_zone(it.cell) and not in_ship(it.cell):
+			n += 1
+	return n
+
+
+func first_clutter() -> int:
+	for gid in sim.ground_items:
+		var it: Item = sim.items.get(gid)
+		if it and not in_zone(it.cell) and not in_ship(it.cell):
+			return int(gid)
+	return -1
+
+
 ## Клетки склада оборудования: свободный пол в помещениях «Склад».
 func stash_cells() -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
@@ -200,7 +275,7 @@ func _ground_on(c: Vector2i) -> Array[Item]:
 
 
 ## Сколько ещё таких грузов поместится в клетку: ящик — один на клетку, металл — пачкой.
-func _cell_room(c: Vector2i, it: Item) -> int:
+func _cell_room(c: Vector2i, it: Item, ordv: int = NO_ORD) -> int:
 	if cell_res.has(sim.world.idx(c)):
 		return 0
 	if not sim.world.passable(c) or sim.world.occ[sim.world.idx(c)] >= 0:
@@ -213,6 +288,13 @@ func _cell_room(c: Vector2i, it: Item) -> int:
 			return 0
 	if it.kind == "bmat":
 		return BuildMats.pallet(it.def_id) - here.size()
+	if it.kind == "part" and in_ship(c):
+		# 1.56: клетка зоны отгрузки — поддон одного заказа: вмещает целую тару, чужие детали не кладут
+		var ov := it.ord_id if ordv == NO_ORD else ordv
+		for o2 in here:
+			if o2.ord_id != ov:
+				return 0
+		return tare_of(it) - here.size()
 	return MAT_PER_CELL - here.size()
 
 
@@ -220,14 +302,17 @@ func cell_space(c: Vector2i, it: Item) -> int:
 	return _cell_room(c, it)
 
 
-## Ближайшая к near клетка из списка, куда поместится груз.
-func free_cell(cells: Array[Vector2i], it: Item, near: Vector2i) -> Vector2i:
+## Ближайшая к near клетка из списка, куда поместится груз. ordv >= 0 — в зоне отгрузки сначала достраивают
+## поддон этого заказа, и только потом ставят новый.
+func free_cell(cells: Array[Vector2i], it: Item, near: Vector2i, ordv: int = NO_ORD) -> Vector2i:
 	var best := Vector2i(-1, -1)
 	var bd := INF
 	for c in cells:
-		if _cell_room(c, it) <= 0:
+		if _cell_room(c, it, ordv) <= 0:
 			continue
 		var d := Vector2(c - near).length_squared()
+		if ordv >= 0 and it.kind == "part" and in_ship(c) and not _ground_on(c).is_empty():
+			d -= 100000.0
 		if d < bd:
 			bd = d
 			best = c
@@ -402,6 +487,8 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 	for v in sim.vehicles:
 		if v.state != "parked" or v.kind != "delivery":
 			continue
+		if crew_unloads(v):
+			continue   # 1.56: машину разгружают грузчики водителя — наши носят уже из зоны разгрузки
 		var acc := v.access_cell(sim.world.sidewalk_row)
 		for iid in (sim.veh_items.get(v.id, []) as Array):
 			var it: Item = sim.items.get(iid)
@@ -483,7 +570,7 @@ func add_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 			break
 
 
-## Готовые заказы — в зону отгрузки, пока едет машина клиента (1.12).
+## Готовые заказы — на поддон в зоне отгрузки (1.12). 1.56: у каждого заказа свой поддон с биркой, тару несут целиком.
 func add_ship_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void:
 	if not has_ship():
 		return
@@ -491,19 +578,143 @@ func add_ship_jobs(b: Brain, w: Worker, cands: Array, haul_bonus: float) -> void
 	# 1.20: готовые детали несут в зону отгрузки сразу, не дожидаясь всей партии
 	for o: Dictionary in sim.orders.by_status(["ready", "shipping", "active"]):
 		var p := str(o["product"])
-		if staged(p) >= sim.orders.remaining(o):
+		var oid := int(o["id"])
+		if staged_for(o) >= sim.orders.remaining(o):
 			continue
 		var early := str(o["status"]) == "active"
 		var pred := func(i: Item) -> bool: return i.kind == "part" and i.def_id == p and i.q == "ok" and b._in_general_storage(i) and not (i.loc == Item.Loc.GROUND and in_ship(i.cell))
 		var it := b._nearest_item(pred, wc, w)
 		if it == null:
 			continue
-		var c := free_cell(ship_cells(), it, sim.item_cell(it))
+		var c := free_cell(ship_cells(), it, sim.item_cell(it), oid)
 		if c.x < 0:
 			sim.notify_once("ship_full", L.t("Зона отгрузки заполнена: расширьте её (Стройка → Зоны), чтобы готовые заказы ждали машину у ворот."), Sim.LVL_INFO, Vector2i(-1, -1), 1440.0)
 			return
-		cands.append({"s": (50.0 if early else 66.0) + haul_bonus - b._dist(wc, sim.item_cell(it)) * 0.25, "k": "haul_cell", "item": it, "cell": c})
+		cands.append({"s": (50.0 if early else 66.0) + haul_bonus - b._dist(wc, sim.item_cell(it)) * 0.25, "k": "haul_cell", "item": it, "cell": c, "ord": oid, "need": sim.orders.remaining(o) - staged_for(o)})
 		return
+
+
+# ================================================================ 1.56: грузчики машин
+
+## Машину грузят и разгружают грузчики, приехавшие с водителем: наши в кузов не лезут.
+## Кладут привезённое в зону разгрузки и берут готовое из зоны отгрузки — тарой, по несколько минут на ходку.
+func crew_size(v: Vehicle) -> int:
+	return int((Defs.tare.get("crew", {}) as Dictionary).get(v.body, 2))
+
+
+## Разгружают ли эту машину грузчики (иначе — наши, как раньше: зоны нет или она не принимает).
+func crew_unloads(v: Vehicle) -> bool:
+	return v.kind == "delivery" and v.bmat_order < 0 and not v.crew_off and has_zone()
+
+
+func tick_crews(dt: float) -> void:
+	for v in sim.vehicles:
+		if v.state != "parked" or v.hold:
+			continue
+		if v.kind == "pickup":
+			var n := _batches(v, dt)
+			if n > 0:
+				_crew_load(v, n)
+		elif crew_unloads(v):
+			var n2 := _batches(v, dt)
+			if n2 > 0:
+				_crew_unload(v, n2, dt)
+
+
+## Сколько ходок грузчики успели сделать за этот шаг (по ходке на человека за цикл).
+func _batches(v: Vehicle, dt: float) -> int:
+	v.crew_t += dt * float(crew_size(v))
+	var cyc := maxf(0.5, float(Defs.tare.get("cycle", 2.0)))
+	var n := int(v.crew_t / cyc)
+	v.crew_t -= float(n) * cyc
+	return n
+
+
+func _crew_load(v: Vehicle, batches: int) -> void:
+	var o := sim.orders.get_order(v.order_id)
+	if o.is_empty():
+		return
+	var p := str(o["product"])
+	var oid := int(o["id"])
+	var only_ship := ship_only(v, p)
+	var probe := Item.new()
+	probe.kind = "part"
+	probe.def_id = p
+	for k in batches:
+		var left := v.need - v.loaded
+		if left <= 0:
+			return
+		var cap := mini(left, tare_of(probe))
+		var onship: Array[Item] = []
+		var store: Array[Item] = []
+		for it: Item in sim.items.values():
+			if it.kind != "part" or it.def_id != p or it.q != "ok" or it.reserved_by >= 0:
+				continue
+			if it.loc == Item.Loc.GROUND and in_ship(it.cell):
+				if it.ord_id == oid or it.ord_id < 0:
+					onship.append(it)
+			elif not only_ship and sim.brain._in_general_storage(it):
+				store.append(it)
+		# поддон заказа — раньше чужих деталей без бирки; по клеткам, чтобы брали поддон целиком
+		onship.sort_custom(func(a: Item, b: Item) -> bool:
+			if (a.ord_id == oid) != (b.ord_id == oid):
+				return a.ord_id == oid
+			return a.cell.y * 4096 + a.cell.x < b.cell.y * 4096 + b.cell.x)
+		var take: Array[Item] = []
+		for it2: Item in onship + store:
+			if take.size() >= cap:
+				break
+			take.append(it2)
+		if take.is_empty():
+			return
+		for it3: Item in take:
+			sim.put_in_vehicle(it3, v)
+			it3.reserved_by = -1
+			v.loaded += 1
+			sim.orders.on_loaded(v, it3)
+
+
+func _crew_unload(v: Vehicle, batches: int, dt: float) -> void:
+	var acc := v.access_cell(sim.world.sidewalk_row)
+	var did := 0
+	for k in batches:
+		var cargo: Array = (sim.veh_items.get(v.id, []) as Array).duplicate()
+		var first: Item = null
+		for iid in cargo:
+			var c0: Item = sim.items.get(iid)
+			if c0 and (c0.kind == "mat" or c0.kind == "crate") and c0.reserved_by < 0:
+				first = c0
+				break
+		if first == null:
+			return
+		var cap := 2 if first.kind == "crate" else tare_of(first)
+		var key := first.stack_key()
+		var n := 0
+		for iid2 in cargo:
+			if n >= cap:
+				break
+			var it: Item = sim.items.get(iid2)
+			if it == null or it.reserved_by >= 0 or it.kind != first.kind or it.stack_key() != key:
+				continue
+			if it.kind == "mat":
+				var rp := raw_pallet(it, acc)
+				if not rp.is_empty():
+					sim.put_in_thing(it, rp[0], int(rp[1]))
+					n += 1
+					continue
+			var zc := free_cell(zone_cells(), it, acc)
+			if zc.x < 0:
+				break
+			sim.put_on_ground(it, zc)
+			n += 1
+		did += n
+	if did > 0:
+		v.crew_idle = 0.0
+	else:
+		v.crew_idle += dt
+		if v.crew_idle > 45.0:
+			v.crew_off = true   # зона разгрузки заставлена — пусть носят наши, как раньше
+			sim.notify_once("unload_full", L.t("Грузчики водителя не могут разгрузиться: зона разгрузки заставлена. Освободите её или расширьте (Стройка → Зоны)."), Sim.LVL_WARN, acc, 720.0)
 
 
 ## Сколько ящиков к объекту уже несут.
@@ -531,20 +742,31 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 				b._set_cool(w, "item%d" % it.id)
 				return null
 			var extra: Array[int] = []
+			var ordv := int(cd.get("ord", -1))
+			if in_ship(c) and it.kind == "part" and ordv >= 0:
+				it.ord_id = ordv   # 1.56: деталь едет на поддон этого заказа
 			if it.kind != "crate":
-				var cap := b.carry_cap(it)
-				# 1.29: большую партию в зону отгрузки везут на погрузчике или тележке
-				if in_ship(c) and it.kind == "part" and not Production.is_heavy(it) and b._stack_mates(it, 30).size() >= 6:
+				var base := b.carry_cap(it)
+				var cap := cap_for(it, "", base)
+				# 1.56: партию (поддон) везут на тележке-рохле или погрузчике, иначе — ящиками, медленнее
+				if (it.kind == "part" or it.kind == "mat") and not Production.is_heavy(it) and b._stack_mates(it, 100).size() >= 6:
 					var veh := b._haul_vehicle(w)
 					if veh:
 						veh.user = w.id
 						t.res_users.append(veh.id)
 						t.data["veh"] = veh.def_id
-						cap = int(Defs.b("forklift_cap")) if veh.def_id == "forklift" else int(Defs.b("cart_cap"))
-				extra = b._stack_mates(it, mini(cap - 1, maxi(0, _cell_room(c, it) - 1)))
+						cap = cap_for(it, veh.def_id, base)
+				var lim := mini(cap - 1, maxi(0, _cell_room(c, it, ordv) - 1))
+				if cd.has("need"):
+					lim = mini(lim, maxi(0, int(cd["need"]) - 1))   # лишнего на поддон заказа не несут
+				extra = b._stack_mates(it, lim)
+				if not t.data.has("veh") and extra.size() + 1 > base:
+					t.data["crate"] = true
 			for iid in [it.id] + extra:
 				var ri: Item = sim.items[iid]
 				ri.reserved_by = w.id
+				if in_ship(c) and ri.kind == "part" and ordv >= 0:
+					ri.ord_id = ordv
 				t.res_items.append(iid)
 			cell_res[sim.world.idx(c)] = w.id
 			t.data["zres"] = sim.world.idx(c)
@@ -554,7 +776,7 @@ func make_task(b: Brain, w: Worker, cd: Dictionary) -> Task:
 			if in_ship(c):
 				for iid2 in t.res_items:
 					(sim.items[iid2] as Item).set_meta("to_ship", true)
-			var verb := L.t("Везёт на погрузчике") if t.data.get("veh", "") == "forklift" else (L.t("Везёт на тележке") if t.data.has("veh") else L.t("Несёт"))
+			var verb := L.t("Везёт на погрузчике") if t.data.get("veh", "") == "forklift" else (L.t("Везёт поддон на тележке") if t.data.has("veh") else (L.t("Несёт ящик") if t.data.has("crate") else L.t("Несёт")))
 			t.label = ("%s %s: " % [verb, to]) + what + (" ×%d" % n if n > 1 else "")
 			t.data["cool"] = "item%d" % it.id
 			t.add({"t": "goto", "cell": src})

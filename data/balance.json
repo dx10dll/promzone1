@@ -75,7 +75,7 @@
   4,
   6
  ],
- "tariff_night_k": 0.5,
+ "tariff_night_k": 1.0,
  "tariff_night_from": 23,
  "tariff_night_to": 7,
  "light_kw_per_cell": 0.015,

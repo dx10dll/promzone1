@@ -16,6 +16,7 @@ var holder := -1       ## id объекта / рабочего / машины
 var slot := 0
 var reserved_by := -1
 var rw := false        ## 1.15: брак уже пробовали доработать у слесарного верстака
+var ord_id := -1          ## 1.56: деталь лежит на поддоне этого заказа в зоне отгрузки (-1 — не привязана)
 var dest := -1         ## ящик с оборудованием: для какого объекта (-1 — запасной, на склад)
 
 
@@ -50,7 +51,7 @@ func display_name() -> String:
 func to_dict() -> Dictionary:
 	return {
 		"id": id, "kind": kind, "def": def_id, "q": q, "defect": defect, "step": step,
-		"loc": loc, "cx": cell.x, "cy": cell.y, "holder": holder, "slot": slot, "dest": dest, "rw": rw,
+		"loc": loc, "cx": cell.x, "cy": cell.y, "holder": holder, "slot": slot, "dest": dest, "rw": rw, "ord": ord_id,
 	}
 
 
@@ -68,4 +69,5 @@ static func from_dict(d: Dictionary) -> Item:
 	it.slot = int(d["slot"])
 	it.dest = int(d.get("dest", -1))
 	it.rw = bool(d.get("rw", false))
+	it.ord_id = int(d.get("ord", -1))
 	return it

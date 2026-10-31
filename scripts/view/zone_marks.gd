@@ -44,6 +44,7 @@ func _draw() -> void:
 		_q.append([Vector2(rr.position) * T + Vector2(6, 6) / z, ["стены и дверь — зона только в помещении"], "Нужно:"])
 	_power_marks(z, f, mp)
 	_pile_badges(z, f)
+	_pallet_tags(z, f)
 	# объекты вне своей зоны (1.13): ими не пользуются
 	var bare := {}    # неразмеченная часть зала -> [объекты]
 	for t: Thing in sim.things.values():
@@ -111,6 +112,66 @@ func _pile_badges(z: float, f: Font) -> void:
 		draw_style_box(_badge_box(), Rect2(Vector2.ZERO, sz))
 		draw_string(f, Vector2(4.0, 10.5), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, 0.95))
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+var _tag_rev := -1
+var _tags: Array = []     ## [id заказа, клетки его поддонов]
+var _tbox: StyleBoxFlat = null
+
+
+## 1.56: бирка заказа на поддоне в зоне отгрузки: «Заказ №N, заказчик, K шт.». Бирки стоят рядком над зоной,
+## от каждой — тонкая линия к своему поддону (иначе длинные подписи на соседних клетках налезают друг на друга).
+func _pallet_tags(z: float, f: Font) -> void:
+	if z < 0.45:
+		return
+	if sim.item_rev != _tag_rev:
+		_tag_rev = sim.item_rev
+		_tags.clear()
+		var by_order := {}
+		for gid in sim.ground_items:
+			var it: Item = sim.items.get(gid)
+			if it and it.kind == "part" and it.ord_id >= 0 and sim.logi.in_ship(it.cell):
+				if not by_order.has(it.ord_id):
+					by_order[it.ord_id] = {}
+				(by_order[it.ord_id] as Dictionary)[it.cell] = true
+		var ids: Array = by_order.keys()
+		ids.sort()
+		for oid in ids:
+			_tags.append([int(oid), (by_order[oid] as Dictionary).keys()])
+	if _tags.is_empty():
+		return
+	if _tbox == null:
+		_tbox = StyleBoxFlat.new()
+		_tbox.bg_color = Color(0.96, 0.9, 0.62, 0.96)
+		_tbox.border_color = Color(0.45, 0.33, 0.12, 0.95)
+		_tbox.set_border_width_all(1)
+		_tbox.set_corner_radius_all(3)
+		_tbox.anti_aliasing = true
+	var top := 9999
+	var left := 9999
+	for sc in sim.logi.ship_cells():
+		top = mini(top, sc.y)
+		left = mini(left, sc.x)
+	var fs := 10
+	var row := 0
+	for tg in _tags:
+		var o := sim.orders.get_order(int(tg[0]))
+		if o.is_empty():
+			continue
+		var txt := sim.orders.tag(o)
+		var tw := f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var sz := Vector2(tw + 8.0, 14.0)
+		var pos := Vector2(left, top) * T + Vector2(0.0, -(float(row) + 1.0) * 17.0 - 4.0) / z
+		var line_col := Color(0.45, 0.33, 0.12, 0.8)
+		for c: Vector2i in tg[1]:
+			var tgt := Vector2(c.x + 0.5, c.y + 0.15) * T
+			draw_line(pos + Vector2(10.0, 14.0) / z, tgt, line_col, 1.0 / z)
+			draw_circle(tgt, 2.0 / z, line_col)
+		draw_set_transform(pos, 0.0, Vector2.ONE / z)
+		draw_style_box(_tbox, Rect2(Vector2.ZERO, sz))
+		draw_string(f, Vector2(4.0, 10.5), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.2, 0.13, 0.04))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		row += 1
 
 
 var _bbox: StyleBoxFlat = null

@@ -266,13 +266,9 @@ func _build_top() -> void:
 	weather_i = (_chips["weather"] as Control).get_meta("icon")
 	weather_l.set_meta("box", _chips["weather"])
 	h.add_child(_chips["weather"])
-	var ec := _chip("energy", "power", func() -> void:
-		if sim != null and sim.power.any_tripped():
-			sim.power.reset_all()   # 1.53: по клику на плашку «АВТОМАТ ВЫБИТ» — включить
-		else:
-			toggle_sub("power"))
+	var ec := _chip("energy", "power", func() -> void: toggle_sub("power"))
 	power_l = UITheme.label("", 13, UITheme.TEXT, UITheme.f_semi)
-	power_bar = UITheme.bar(0, UITheme.GOOD, 86, 5)
+	power_bar = UITheme.bar(0, UITheme.GOOD, 64, 5)
 	ec.add_child(power_l)
 	ec.add_child(power_bar)
 	h.add_child(_chips["power"])
@@ -651,21 +647,22 @@ func _refresh_top() -> void:
 		fast_l.add_theme_color_override("font_color", UITheme.INFO)
 	else:
 		fast_l.text = ""
+	fast_l.visible = fast_l.text != ""   # 1.56: пустая надпись не отнимает место у плашек слева (электричество обрезалось)
 	var pw := sim.power
 	var cap := pw.capacity_total()
 	if pw.any_tripped():
-		power_l.text = tr("АВТОМАТ ВЫБИТ · включить")
+		power_l.text = tr("АВТОМАТ ВЫБИТ")
 		power_l.add_theme_color_override("font_color", UITheme.BAD)
 		power_bar.value = 100
 		power_bar.add_theme_stylebox_override("fill", UITheme.sb(UITheme.BAD, UITheme.BAD, 0, 3, 0, 0))
 	else:
-		power_l.text = tr("%.0f/%.0f/%d кВт") % [pw.total_load, maxf(pw.peak_day, pw.total_load), int(cap)]
+		power_l.text = tr("%d/%d кВт") % [int(round(pw.total_load)), int(cap)]   # 1.56: короче — плашка не обрезается
 		var frac := pw.total_load / maxf(1.0, cap)
 		power_bar.value = frac * 100.0
 		var pc := UITheme.BAD if frac > 0.95 else (UITheme.WARN if frac > 0.8 else UITheme.GOOD)
 		power_bar.add_theme_stylebox_override("fill", UITheme.sb(pc, pc, 0, 3, 0, 0))
 		power_l.add_theme_color_override("font_color", UITheme.TEXT)
-	(_chips["power"] as Control).tooltip_text = tr("Электросеть (сейчас / пик за сутки / лимит): сейчас %.1f кВт, пик за сутки %.1f кВт (вчера %.1f), лимит подстанции %d кВт.\nТариф сейчас: %s (%.1f ₽/кВт·ч); ночью с 23:00 до 7:00 вдвое дешевле — ночная смена экономит на энергии.\nНажмите — меню «Сети» (E); если автомат выбит — включить.") % [pw.total_load, maxf(pw.peak_day, pw.total_load), pw.peak_prev, int(cap), tr("ночной") if pw.night_now() else tr("дневной"), pw.price_now()]
+	(_chips["power"] as Control).tooltip_text = tr("Электросеть: нагрузка %.1f из %d кВт.\nНажмите — меню «Сети» (E).") % [pw.total_load, int(cap)]
 	var offers := sim.orders.by_status(["offer"]).size() + sim.sales.by_state(["offer"]).size() + sim.sales.board.size()   # 1.48: заявки на доске
 	order_badge.text = str(offers)
 	order_badge.visible = offers > 0

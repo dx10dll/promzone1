@@ -222,7 +222,7 @@ func prune_marks() -> void:
 		if key == "" and str(m.get("text", "")) == clutter_txt:
 			key = "clutter"
 			m["key"] = key
-		if key == "clutter" and sim.ground_items.size() < 12:
+		if key == "clutter" and sim.logi.clutter_count() < 12:
 			marks.erase(m)
 
 
@@ -852,8 +852,8 @@ func violations(t: String) -> Array:
 					out.append(_v(t, "one_exit", _cell_of_room(r), r.id, [r.title()]))
 			if sim.power.any_tripped():
 				out.append(_v(t, "wiring", none, -1, [], true))
-			if sim.ground_items.size() >= 12:
-				var it: Item = sim.items.get(sim.ground_items[0])
+			if sim.logi.clutter_count() >= 12:
+				var it: Item = sim.items.get(sim.logi.first_clutter())
 				var c := it.cell if it else none
 				var rr := sim.rooms.room_at(c)
 				out.append(_v(t, "clutter", c, rr.id if rr else -1))

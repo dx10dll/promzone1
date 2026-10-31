@@ -46,118 +46,21 @@ func _init() -> void:
 	Defs.load_all()
 	L.apply("ru")
 
-	print("— лимит мощности: выбивает вводной автомат, завод стоит до включения")
-	var g := _new_shop(1531)
-	var src: Thing = g.things[g.power.grid_input_id()]
-	var caps: Array = []
-	for ck in Defs.objects.keys():
-		if str(Defs.objects[ck].get("power_source", "")) != "":
-			caps.append([ck, float(Defs.objects[ck].get("capacity_kw", 15.0))])
-			Defs.objects[ck]["capacity_kw"] = 3.0
-	var batt_ids: Array = []
-	for bk in Defs.objects.keys():
-		if str(Defs.objects[bk].get("kind", "")) == "battery":
-			batt_ids.append([bk, float(Defs.objects[bk].get("boost_kw", 20.0))])
-			Defs.objects[bk]["boost_kw"] = 0.0
-	g.tick(2.0)
-	g.minute = 5.0 * 1440.0 + 3.0 * 60.0   # ночь: никого нет, никто не сбросит автомат
-	for w in g.workers:
-		w.present = false
-	var tripped := false
-	for i in 40:
-		_force_work(g)
-		g.tick(1.0)
-		if g.power.any_tripped():
-			tripped = true
-			break
-	check(tripped, "нагрузка выше лимита подстанции — автомат выбило")
-	check(g.power.trips_today == 1, "выбивание сосчитано: %d" % g.power.trips_today)
-	check(not _letter(g, "breaker").is_empty(), "пришла тревога с кнопкой «Включить»")
-	var m0: Thing = g.things_of("machine")[0]
-	check(not g.power.powered(m0) and not m0.working, "станки обесточены и стоят")
-	var peak := g.power.peak_day
-	check(peak > 6.0, "пик нагрузки записан: %.1f кВт при лимите 3" % peak)
-	for i in 120:
-		g.tick(1.0)
-	check(g.power.any_tripped() and not g.power.powered(m0), "через два часа завод всё ещё стоит: автомат сам не включается")
-	for cc: Array in caps:
-		Defs.objects[cc[0]]["capacity_kw"] = cc[1]
-	for bb: Array in batt_ids:
-		Defs.objects[bb[0]]["boost_kw"] = bb[1]
-	g.story.resolve(int(_letter(g, "breaker")["id"]), 0)
-	g.tick(1.0)
-	check(not g.power.any_tripped() and g.power.powered(m0), "«Включить» — автомат включён, ток есть")
-	check(g.power.hist.size() == 0 and g.power.peak_day >= peak, "пик за сутки держится до конца суток")
-	g.minute = 6.0 * 1440.0 + 1.0
-	g._on_new_day()
-	check(absf(g.power.peak_prev - peak) < 0.01 and g.power.hist.size() == 1, "утром пик ушёл во «вчера» (%.1f)" % g.power.peak_prev)
-
-	print("— увеличение мощности приходит через N дней")
-	var g2 := _new_shop(1532)
-	var kw0 := g2.power.total_kw()
-	var nu := g2.power.next_upgrade()
-	check(not nu.is_empty() and int(nu["days"]) >= 1, "в данных есть шаг: +%d кВт за %s, %d дн." % [int(nu["kw"]), Defs.money_str(float(nu["cost"])), int(nu["days"])])
-	var m_before := g2.money
-	g2.money = 100.0
-	check(g2.power.order_upgrade() != "" and g2.power.upgrade.is_empty(), "без денег заказать нельзя")
-	g2.money = m_before
-	check(g2.power.order_upgrade() == "", "заявка принята")
-	check(absf(m_before - g2.money - float(nu["cost"])) < 0.5, "деньги списаны: %d" % int(m_before - g2.money))
-	check(g2.power.upgrade_block() != "", "вторую заявку подать нельзя, пока первая идёт")
-	var due := int(g2.power.upgrade["due"])
-	g2.minute = float(due - 2) * 1440.0 + 8.0 * 60.0
-	g2._on_new_day()
-	check(absf(g2.power.total_kw() - kw0) < 0.01 and not g2.power.upgrade.is_empty(), "за день до срока мощности ещё нет")
-	g2.minute = float(due - 1) * 1440.0 + 8.0 * 60.0
-	g2._on_new_day()
-	g2.tick(1.0)
-	check(absf(g2.power.total_kw() - kw0 - float(nu["kw"])) < 0.01 and g2.power.upgrade.is_empty(), "в срок мощность +%d кВт: %d → %d" % [int(nu["kw"]), int(kw0), int(g2.power.total_kw())])
-	var g2b := Sim.from_dict(_roundtrip(g2.to_dict()))
-	check(g2b.power.contract_steps == 1 and absf(g2b.power.total_kw() - g2.power.total_kw()) < 0.01 or g2b.power.contract_steps == 1, "договор переживает сохранение")
-
-	print("— ночной тариф дешевле и виден в финансах")
+	print("— 1.56: энергетика как до 1.53 (без тревоги, тарифа и договора)")
 	var g3 := _new_shop(1533)
 	var pw := g3.power
-	g3.minute = 3.0 * 1440.0 + 12.0 * 60.0
-	var p_day := pw.price_now()
-	g3.minute = 3.0 * 1440.0 + 2.0 * 60.0
-	var p_night := pw.price_now()
-	check(p_night < p_day and absf(p_night * 2.0 - p_day) < 0.01, "ночью дешевле вдвое: %.2f против %.2f ₽/кВт·ч" % [p_night, p_day])
-	g3.minute = 3.0 * 1440.0 + 23.0 * 60.0
-	check(pw.night_now(), "с 23:00 уже ночной")
-	g3.minute = 3.0 * 1440.0 + 7.0 * 60.0
-	check(not pw.night_now(), "с 7:00 уже дневной")
-	pw.kwh_day = 0.0
-	pw.kwh_night = 0.0
-	var tl := 0.0
-	for hh in [3.0, 13.0]:
-		g3.minute = 3.0 * 1440.0 + hh * 60.0
-		var before := pw.kwh_day + pw.kwh_night
-		for i in 30:
-			_force_work(g3)
-			g3.tick(1.0)
-		tl = maxf(tl, pw.kwh_day + pw.kwh_night - before)
-	check(pw.kwh_night > 0.0 and pw.kwh_day > 0.0, "энергия считается отдельно: ночь %.2f, день %.2f кВт·ч" % [pw.kwh_night, pw.kwh_day])
+	check(absf(Defs.b("tariff_night_k") - 1.0) < 0.001, "ночного тарифа нет: цена одна")
 	pw.kwh_day = 100.0
-	pw.kwh_night = 100.0
-	var ct := pw.cost_today()
-	check(absf(float(ct[1]) * 2.0 - float(ct[0])) < 0.01, "100 кВт·ч ночью вдвое дешевле: %d ₽ против %d ₽" % [int(ct[1]), int(ct[0])])
-	var n0 := g3.ledger.size()
-	g3.minute = 4.0 * 1440.0 + 60.0
+	pw.kwh_night = 50.0
+	g3.minute = 3.0 * 1440.0 + 1.0
 	g3._on_new_day()
-	var got_day := false
-	var got_night := false
-	for e: Dictionary in g3.ledger.slice(0, 6):
-		if str(e["text"]).begins_with("Электроэнергия, день"):
-			got_day = true
-		if str(e["text"]).begins_with("Электроэнергия, ночь"):
-			got_night = true
-	check(got_day and got_night, "в журнале денег две строки: день и ночь")
-	check(g3.ledger.size() >= n0 + 2, "расход списан")
-	var cats: Dictionary = g3.office.weeks[0]["cats"]
-	check(float(cats.get("energy", 0.0)) < 0.0, "в отчёте по неделям статья «Электроэнергия» растёт: %d" % int(cats.get("energy", 0.0)))
-	var ws := pw.week_sum(7)
-	check(float(ws[3]) > 0.0 and float(ws[2]) > float(ws[3]), "за неделю: день %d ₽, ночь %d ₽" % [int(ws[2]), int(ws[3])])
+	var lines := 0
+	for e: Dictionary in g3.ledger:
+		if str(e["text"]).begins_with("Электроэнергия"):
+			lines += 1
+			check(str(e["text"]).begins_with("Электроэнергия: 150"), "одна строка за сутки: %s" % str(e["text"]))
+	check(lines == 1, "в журнале денег одна строка за электричество")
+	check(not g3.story.letters.any(func(l: Dictionary) -> bool: return str(l["ev"]) == "breaker"), "тревожных писем про автомат нет")
 
 	print("— сжатый воздух: значок «нет воздуха»")
 	var booth: Thing = null

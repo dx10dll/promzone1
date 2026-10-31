@@ -39,8 +39,7 @@ const GROUPS := {
 		["summary", "Сводка", "finance", "finance", "summary"], ["charts", "Графики", "chart_up", "finance", "charts"],
 		["stats", "Статистика", "statistics", "finance", "stats"],
 		["weeks", "По неделям", "log", "finance", "weeks"], ["loans", "Кредиты и лизинг", "money", "finance", "loans"],
-		["insurance", "Страхование", "shield", "finance", "insurance"], ["grants", "Гранты", "medal", "finance", "grants"],
-		["energy", "Электричество", "energy", "finance", "energy"]]},
+		["insurance", "Страхование", "shield", "finance", "insurance"], ["grants", "Гранты", "medal", "finance", "grants"]]},   # 1.56: вкладку «Электричество» владелец убрал
 	"office": {"title": "Управление", "icon": "management", "secs": [
 		["develop", "Развитие и отделы", "develop", "develop", ""], ["research", "Разработки", "research", "research", ""],
 		["iso", "ISO 9001", "iso", "market", "iso"], ["advisor", "Главный инженер", "engineer", "market", "advisor"]]},
@@ -1144,14 +1143,26 @@ func _active_row(o: Dictionary) -> void:
 	var p := str(o["product"])
 	var st := str(o["status"])
 	var prog: Control
+	var stg := sim.orders.stage(o)   # 1.56: цепочка статусов: в производстве → комплектуется → готов к отгрузке → грузится → уехал
 	match st:
 		"active":
 			var ok := mini(sim.ok_in_storage(p), sim.orders.remaining(o))
 			prog = UITheme.meter(100.0 * ok / maxf(1.0, float(int(o["qty"]))), UITheme.INFO, 56, tr("%d из %d") % [ok, int(o["qty"])])
 		"ready":
-			prog = _cl(tr("готов, ждём машину"), 13, UITheme.GOOD)
+			if stg == 1:
+				var pl: Array = sim.logi.pallets_of(o)
+				prog = _cl(tr("на поддоне %d из %d") % [mini(int(pl[1]), sim.orders.remaining(o)), sim.orders.remaining(o)], 13, UITheme.WARN)
+			else:
+				prog = _cl(tr("ждём машину"), 13, UITheme.GOOD)
 		_:
 			prog = _cl(tr("отгрузка %d/%d") % [int(o["shipped"]), int(o["qty"])], 13, UITheme.GOOD)
+	var chip := _cl("%d/5 · %s" % [stg + 1, sim.orders.stage_name(stg)], 12, UITheme.ACCENT if stg < 2 else UITheme.GOOD)
+	var pbox := VBoxContainer.new()
+	pbox.add_theme_constant_override("separation", 0)
+	pbox.add_child(chip)
+	pbox.add_child(prog)
+	pbox.tooltip_text = tr("Цепочка заказа: ") + sim.orders.chain_text(o)
+	prog = pbox
 	var late := sim.minute > float(o["deadline"])
 	var left := (float(o["deadline"]) - sim.minute) / 1440.0
 	var when := tr("просрочен") if late else (tr("через %d дн.") % int(ceil(left)) if left >= 1.0 else tr("сегодня"))
@@ -1187,7 +1198,7 @@ func _active_row(o: Dictionary) -> void:
 		hb.add_child(mv)
 		dl_cell = hb
 	var who := L.name(str(o["client"]))
-	_trow([[_icon(Tex.item(p), 30), 36], [_cl2("%s × %d" % [Defs.product_name(p), int(o["qty"])], who), -1], [prog, 140], [dl_cell, 190], [pr_ctl, 150],
+	_trow([[_icon(Tex.item(p), 30), 36], [_cl2("%s × %d" % [Defs.product_name(p), int(o["qty"])], who), -1], [prog, 170], [dl_cell, 170], [pr_ctl, 150],
 		[_cl(Defs.money_str(float(o["price"]) * int(o["qty"])), 14, UITheme.GOOD, UITheme.f_semi, HORIZONTAL_ALIGNMENT_RIGHT), 100]], Callable(), 46.0)   # 1.51: кнопку «Чертёж» владелец убрал
 
 

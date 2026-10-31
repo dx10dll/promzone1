@@ -135,10 +135,9 @@ func cost_today() -> Array:
 ## Закрыть сутки: списать за электричество (две строки — день и ночь) и записать в историю.
 func close_day() -> void:
 	var c := cost_today()
-	if kwh_day > 0.0:
-		sim.spend(float(c[0]), "Электроэнергия, день: %d кВт·ч" % int(kwh_day))
-	if kwh_night > 0.0:
-		sim.spend(float(c[1]), "Электроэнергия, ночь: %d кВт·ч" % int(kwh_night))
+	var kwh := kwh_day + kwh_night
+	if kwh > 0.0:
+		sim.spend(float(c[0]) + float(c[1]), "Электроэнергия: %d кВт·ч" % int(kwh))   # 1.56: одной строкой, как до 1.53
 	hist.push_front({"d": sim.day(), "kd": kwh_day, "kn": kwh_night, "cd": float(c[0]), "cn": float(c[1]), "peak": peak_day})
 	if hist.size() > 14:
 		hist.resize(14)
@@ -554,12 +553,6 @@ func _trip(net: Net) -> void:
 	sim.notify(L.t("Выбило автомат: перегрузка сети (%.1f из %d кВт). Его сбросят на подстанции, но перегруз повторится — выключите лишний станок в его карточке или прижмите к подстанции аккумуляторные шкафы (+20 кВт каждый).") % [net.load, int(net.capacity)], Sim.LVL_BAD, cell)
 	sim.sfx.emit("breaker", cell)
 	trips_today += 1
-	# 1.53: тревога — окно с кнопкой «Включить» (игра встаёт на паузу), завод стоит, пока автомат не включат
-	sim.story.letter("breaker", L.t("ТРЕВОГА: выбило вводной автомат"),
-		L.t("Нагрузка %.1f кВт превысила лимит подстанции %d кВт — завод обесточен, станки стоят. Включить автомат можно сразу, но если не убрать лишнюю нагрузку или не заказать больше мощности у сетевой компании, он выбьет снова.") % [net.load, int(net.capacity)],
-		"bolt_off", Sim.LVL_BAD,
-		[{"text": L.t("Включить"), "hint": L.t("Автомат включён, станки продолжают работу")}, {"text": L.t("Позже"), "hint": L.t("Завод стоит, пока рабочие не сбросят автомат на подстанции")}],
-		1, {"cx": cell.x, "cy": cell.y})
 	sim.story.on_trip(cell)
 	for w in sim.workers:
 		if w.present:

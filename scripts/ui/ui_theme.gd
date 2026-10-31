@@ -11,8 +11,8 @@ const BG4 := Color("#3a3b3e")         ## наведение
 const LINE := Color("#3a3b3d")
 const LINE2 := Color("#4a4b4e")
 const TEXT := Color("#ece4d0")
-const MUTED := Color("#a39e93")
-const DIM := Color("#77746d")
+const MUTED := Color("#c2bcaf")   ## 1.56: светлее, мелкий серый текст мазался
+const DIM := Color("#9d998f")
 ## 1.30: цвета значков меню — кремовый, кирпичный, оливковый; панели HUD — тёмный графит.
 const CREAM := Color("#e6dcc5")
 const BRICK := Color("#c8492f")       ## «включено» на панелях HUD (вместо янтаря)

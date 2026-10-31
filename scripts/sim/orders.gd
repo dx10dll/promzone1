@@ -41,6 +41,68 @@ func is_overdue(o: Dictionary) -> bool:
 	return sim.minute > float(o["deadline"])
 
 
+## 1.56: цепочка статусов заказа: в производстве → комплектуется → готов к отгрузке → грузится → уехал.
+const STAGES := ["prod", "pick", "ready", "load", "gone"]
+
+
+## Номер заказа для бирки (сквозной по порядку принятия; у старых заказов присваивается при первом обращении).
+func num(o: Dictionary) -> int:
+	if not o.has("num"):
+		var m := 0
+		for x: Dictionary in list:
+			m = maxi(m, int(x.get("num", 0)))
+		o["num"] = m + 1
+	return int(o["num"])
+
+
+## Бирка на поддоне: «Заказ №N, заказчик, K шт.»
+func tag(o: Dictionary) -> String:
+	return L.t("Заказ №%d, %s, %d шт.") % [num(o), Company.firm(str(o["client"])), int(o["qty"])]
+
+
+## Текущее звено цепочки (индекс в STAGES) или -1, если заказ не в этой цепочке (предложение, сорван).
+func stage(o: Dictionary) -> int:
+	match str(o["status"]):
+		"active":
+			return 0
+		"ready":
+			if sim.logi.has_ship() and sim.logi.staged_for(o) < remaining(o):
+				return 1
+			return 2
+		"shipping":
+			for v: Vehicle in sim.vehicles:
+				if v.kind == "pickup" and v.order_id == int(o["id"]) and v.state == "parked":
+					return 3
+			return 2
+		"done":
+			return 4
+	return -1
+
+
+func stage_name(st: int) -> String:
+	match st:
+		0:
+			return L.t("В производстве")
+		1:
+			return L.t("Комплектуется")
+		2:
+			return L.t("Готов к отгрузке")
+		3:
+			return L.t("Грузится")
+		4:
+			return L.t("Уехал")
+	return ""
+
+
+## Вся цепочка одной строкой, текущее звено в скобках.
+func chain_text(o: Dictionary) -> String:
+	var cur := stage(o)
+	var parts: Array[String] = []
+	for i in STAGES.size():
+		parts.append(("[%s]" if i == cur else "%s") % stage_name(i))
+	return " → ".join(parts)
+
+
 func remaining(o: Dictionary) -> int:
 	return int(o["qty"]) - int(o["shipped"])
 
@@ -287,6 +349,7 @@ func accept(id: int, auto_buy: bool, by_sales: bool = false) -> String:
 		return L.t("Слишком много заказов в работе (максимум %d — растёт со штатом)") % max_active()
 	o["status"] = "active"
 	o["accepted"] = sim.minute
+	num(o)   # 1.56: номер заказа для бирки
 	o["deadline"] = deadline_after(int(o.get("lead", 3)))
 	var p := str(o["product"])
 	var msg := (L.t("Сбыт взял заказ: %s, %s. Срок — %s.") % [short(o), Defs.money_str(float(o["price"]) * int(o["qty"])), deadline_str(o)]) if by_sales else (L.t("Заказ принят: %s. Срок — %s.") % [short(o), deadline_str(o)])
@@ -374,6 +437,9 @@ func tick(dt: float) -> void:
 			sim.notify_once("late_%d" % int(o["id"]), L.t("Просрочка по заказу: %s. Каждый день — штраф %d%%.%s") % [short(o), int(float(o["penalty"]) * 100), hint], Sim.LVL_BAD, Vector2i(-1, -1), 1440.0)
 	for o: Dictionary in by_status(["ready"]):
 		if not bool(o["pickup_spawned"]) and sim.minute >= float(o["pickup_eta"]):
+			# 1.56: машина едет к собранному поддону; не собрали за отведённое время — приедет всё равно (заказ не застрянет)
+			if sim.logi.has_ship() and sim.logi.staged_for(o) < remaining(o) and sim.ok_in_storage(str(o["product"])) > sim.logi.staged_for(o) and sim.minute < float(o["pickup_eta"]) + float(Defs.tare.get("pick_grace", 240.0)):
+				continue
 			var v := sim.spawn_vehicle("pickup")
 			v.order_id = int(o["id"])
 			v.need = remaining(o)

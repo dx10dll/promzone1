@@ -21,6 +21,9 @@ var equip: Array = []      ## заказы оборудования в кузо�
 var bmat_order := -1       ## 1.13: заказ стройматериалов в кузове
 var body := "van"          ## van — фургон, flatbed — бортовой грузовик, truck, semi, fire — пожарная машина
 var lane := 0              ## 1.30: 0 — ближняя полоса (едет вправо), 1 — дальняя (встречная, едет влево)
+var crew_t := 0.0          ## 1.56: грузчики машины: накопленное рабочее время
+var crew_idle := 0.0       ## сколько стоят без дела при разгрузке (не смогли положить)
+var crew_off := false      ## разгрузку берут наши (зона разгрузки заставлена)
 var hold := false          ## 1.30: стоит, пока её не отпустит своя служба (пожарные, ломовоз)
 
 
@@ -33,7 +36,7 @@ func to_dict() -> Dictionary:
 		"id": id, "kind": kind, "x": x, "state": state, "park_x": park_x,
 		"order": order_id, "supply": supply_id, "need": need, "loaded": loaded,
 		"color": color, "desc": cargo_desc, "parked": parked_time, "equip": equip,
-		"bmat": bmat_order, "body": body, "lane": lane, "hold": hold,
+		"bmat": bmat_order, "body": body, "lane": lane, "hold": hold, "crew_t": crew_t, "crew_idle": crew_idle, "crew_off": crew_off,
 	}
 
 
@@ -56,6 +59,9 @@ static func from_dict(d: Dictionary) -> Vehicle:
 	v.body = str(d.get("body", "van"))
 	v.lane = int(d.get("lane", 0))
 	v.hold = bool(d.get("hold", false))
+	v.crew_t = float(d.get("crew_t", 0.0))
+	v.crew_idle = float(d.get("crew_idle", 0.0))
+	v.crew_off = bool(d.get("crew_off", false))
 	return v
 
 

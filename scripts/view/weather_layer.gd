@@ -60,8 +60,8 @@ func _draw() -> void:
 				draw_texture_rect(chips[hsh % 3], rr, false, Color(1, 1, 1, clampf(float(v) / 110.0, 0.15, 1.0)))
 				if v >= 140:
 					draw_texture_rect(chips[(hsh + 1) % 3], rr.grow(-3.0), false, Color(1, 1, 1, clampf(float(v - 120) / 100.0, 0.0, 1.0)))
-	# лужи под дырявой крышей в дождь
-	if _rain:
+	# лужи под дырявой крышей в дождь — 1.56: владелец просил убрать лужи совсем
+	if false and _rain:
 		var puddle := Tex.fx("puddle")
 		for r in sim.rooms.list:
 			if r.type != "workshop" and r.area() < 60:

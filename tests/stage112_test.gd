@@ -138,7 +138,7 @@ func _init() -> void:
 	while str(o["status"]) != "done" and guard < 6000:
 		g.tick(1.0)
 		guard += 1
-	check(str(o["status"]) == "done" and g.logi.staged("pin") == 0, "машина забрала заказ из зоны отгрузки")
+	check(str(o["status"]) == "done" and g.logi.staged_for(o) == 0, "машина забрала заказ из зоны отгрузки")   # 1.56: у другого заказа на штифты свой поддон
 
 	print("— новые стены, двери, полы")
 	for k in ["concrete_wall", "sandwich", "partition", "metal_door"]:

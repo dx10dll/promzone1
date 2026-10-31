@@ -59,7 +59,7 @@ func _ready() -> void:
 	for h in 40:
 		any_p = any_p or SeasonLook.puddle("autumn", h)
 		any_s = any_s or SeasonLook.snow_patch("winter", h)
-	check(any_p and not SeasonLook.puddle("winter", 9) and any_s and not SeasonLook.snow_patch("autumn", 9), "лужи осенью, снежные пятна зимой")
+	check(not any_p and any_s and not SeasonLook.snow_patch("autumn", 9), "1.56: луж нет (владелец просил убрать), снежные пятна зимой")
 
 	var gb := Tex.tile("grass_0")
 	var gw := SeasonLook.baked("grass_0", "winter", true)
