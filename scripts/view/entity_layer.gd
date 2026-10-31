@@ -237,7 +237,7 @@ func _sync_vans() -> void:
 			vans[v.id] = n
 		var vx := v.x if v.px < -1e8 or absf(v.px - v.x) > 6.0 else lerpf(v.px, v.x, Worker.view_alpha)   # 1.29: плавно между шагами
 		# 1.40: в очереди машина ещё в пути (не стоит на дороге); подъезжает издалека, а не появляется у края карты
-		n.visible = v.state != "queued"
+		n.visible = v.state != "queued" and CityMode.vehicle_shown(v.kind)   # 1.60
 		var lead := float(n.get_meta("lead", 40.0 if v.state in ["queued", "arriving"] else 0.0))
 		if v.state != "queued":
 			lead = maxf(0.0, lead - maxf(0.4, lead * 0.04))
@@ -429,7 +429,7 @@ func _sync_dogs(delta: float) -> void:
 
 func _sync_cat() -> void:
 	var c: Cat = sim.town.cat if sim.town else null
-	if c == null:
+	if c == null or not CityMode.cat_shown():   # 1.60: «Живость города: выкл.» — кота на карте нет
 		if cat_node:
 			cat_node.queue_free()
 			cat_node = null

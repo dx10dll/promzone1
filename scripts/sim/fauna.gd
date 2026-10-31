@@ -98,7 +98,12 @@ func _spawn() -> void:
 			if str(p["st"]) != "fly" or not bool(p.get("leave", false)):
 				_fly(p, _edge_point(), true)
 		return
-	var want := mini(MAX_PIGEONS, 2 + int(sim.workers.size() / 6))
+	var want := CityMode.count(mini(MAX_PIGEONS, 2 + int(sim.workers.size() / 6)))
+	if want == 0:   # 1.60: «Живость города: выкл.» — голуби улетают и не возвращаются
+		for p0: Dictionary in pigeons:
+			if str(p0["st"]) != "fly" or not bool(p0.get("leave", false)):
+				_fly(p0, _edge_point(), true)
+		return
 	if pigeons.size() < want and rng.randf() < 0.25:
 		var c := _yard_cell()
 		if c.x >= 0:

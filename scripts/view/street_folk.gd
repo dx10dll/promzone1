@@ -621,12 +621,17 @@ func _folk_tick(np: Dictionary) -> void:
 	for i in ds.size():
 		if _front_door(i):
 			fr.append(i)
+	var want := CityMode.count(FOLK_N)   # 1.60: «Живость города»
+	if _folk.size() != want:
+		for f0: Dictionary in _folk:
+			(f0["view"] as Node).queue_free()
+		_folk.clear()
 	if fr.size() < 2:
 		return
-	if _folk.is_empty():
+	if _folk.is_empty() and want > 0:
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 13030
-		for k in FOLK_N:
+		for k in want:
 			var w := People.make(rng, "laborer", 0.5)
 			w.id = -9000 - k
 			w.present = false
@@ -750,8 +755,16 @@ func _draw() -> void:
 		draw_rect(Rect2(p.x - 4, p.y - 6, 8, 2), Color(0.95, 0.85, 0.55, 0.35))
 	for sd: int in [-1, 1]:
 		_shelter(sd)
-	if not is_nan(_bus_x):
+	if not is_nan(_bus_x) and (CityMode.level() > CityMode.OFF or _bus_has_riders()):
 		_bus(Vector2(_bus_x, _yb()))
+
+
+## 1.60: при «Живость города: выкл.» автобус виден, только пока на нём едут наши люди или посетители.
+func _bus_has_riders() -> bool:
+	for tr: Dictionary in _trips.values():
+		if str(tr.get("post", "")) == "bus" or str(tr.get("pre", "")) == "bus":
+			return true
+	return false
 
 
 ## Павильон остановки: навес, задняя стенка из стекла, скамейка, табличка «А».

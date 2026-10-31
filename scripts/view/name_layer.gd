@@ -52,8 +52,27 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 
+## 1.60: режим ников (Game.settings["nick_mode"]): 0 — все, 1 — важные (по умолчанию), 2 — нет.
+const NICK_ALL := 0
+const NICK_IMPORTANT := 1
+const NICK_NONE := 2
+var mouse_override := Vector2(INF, INF)   ## для снимков и тестов: «мышь» стоит здесь
+
+
+static func nick_mode() -> int:
+	return clampi(CityMode.setting("nick_mode", NICK_IMPORTANT), 0, 2)
+
+
+## Нужен ли ник человеку: выбранный, бригадир, под мышью, с тяжёлой проблемой (настроение < 25).
+static func shows_nick(mode: int, selected: bool, leader: bool, hovered: bool, problem: bool) -> bool:
+	if mode == NICK_NONE:
+		return false
+	return mode == NICK_ALL or selected or leader or hovered or problem
+
+
 func _draw() -> void:
-	if sim == null or game == null or not bool(Game.settings.get("names_on_map", true)):
+	var mode := nick_mode()
+	if sim == null or game == null or mode == NICK_NONE:
 		return
 	var cam: Camera2D = game.get("cam")
 	if cam == null or cam.zoom.x < MIN_ZOOM:
@@ -63,6 +82,7 @@ func _draw() -> void:
 	var view := Rect2(cam.get_screen_center_position() - get_viewport_rect().size * 0.5 * k, get_viewport_rect().size * k).grow(40.0)
 	var tool: Node = game.get("tool")
 	var sel_id := int(tool.get("sel_id")) if tool and str(tool.get("sel_kind")) == "worker" else -999999
+	var mp := get_global_mouse_position() if mouse_override.x == INF else mouse_override
 	for w: Worker in sim.workers + sim.visitors:
 		if not w.present or w.hidden:
 			continue
@@ -70,6 +90,11 @@ func _draw() -> void:
 		var p := Vector2(wp.x * T, wp.y * T + 6.0 + 9.0)
 		if not view.has_point(p):
 			continue
+		if mode != NICK_ALL:
+			var body := Rect2(Vector2(wp.x * T - 9.0, wp.y * T + 6.0 - 34.0), Vector2(18.0, 40.0)).grow(3.0 * k)
+			var ld := (not w.visitor) and w.brigade >= 0 and sim.crew.lead_of(w.brigade) == w
+			if not shows_nick(mode, w.id == sel_id, ld, body.has_point(mp), (not w.visitor) and w.mood < 25.0):
+				continue
 		var nm := L.name(w.last if w.last != "" else w.first)
 		var sel := w.id == sel_id
 		var tl: TextLine = _tw.get(nm)
@@ -91,7 +116,7 @@ func _draw() -> void:
 		tl.draw(get_canvas_item(), Vector2(x, FONT_PX + 0.5 - tl.get_line_ascent()), col)
 	# кот — тоже с именем, тёплым цветом
 	var ct: Cat = sim.town.cat if sim.town else null
-	if ct:
+	if ct and mode == NICK_ALL and CityMode.cat_shown():
 		var cv := ct.vpos()   # 1.48: по сглаженной позиции (как у людей), а не по шагу клетки — ник не дёргается
 		var cp := Vector2(cv.x * T, cv.y * T + 10.5)
 		if view.has_point(cp):

@@ -814,11 +814,11 @@ static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> voi
 	# 1.40: разделы, где есть нужное помещению в центре экрана, — с бирюзовой рамкой
 	var need_cats := {}
 	for nk: String in _need.keys():
-		need_cats[str(Defs.objects[nk].get("cat", ""))] = true
+		need_cats[Hud.obj_group(str(Defs.objects[nk].get("cat", "")))] = true
 	for c in Hud.OBJ_CATS:
 		var first := ""
 		for k in Defs.objects.keys():
-			if str(Defs.objects[k].get("cat", "")) == c and not bool(Defs.objects[k].get("legacy", false)):
+			if Hud.obj_group(str(Defs.objects[k].get("cat", ""))) == c and not bool(Defs.objects[k].get("legacy", false)):
 				first = str(k)
 				break
 		var cc: String = c
@@ -854,9 +854,9 @@ static func _objects(h: Hud, cats: Control, head: Control, grid: Control) -> voi
 		var od: Dictionary = Defs.objects[k3]
 		if bool(od.get("legacy", false)):
 			continue
-		if _q == "" and str(od.get("cat", "")) != h.obj_cat:
+		if _q == "" and Hud.obj_group(str(od.get("cat", ""))) != h.obj_cat:
 			continue
-		if _q != "" and not Hud.OBJ_CATS.has(str(od.get("cat", ""))):
+		if _q != "" and not Hud.OBJ_CATS.has(Hud.obj_group(str(od.get("cat", "")))):
 			continue
 		var sz: Array = od.get("size", [1, 1])
 		var desc := L.t("%s Размер %d×%d.") % [L.t(str(od.get("desc", ""))), int(sz[0]), int(sz[1])]

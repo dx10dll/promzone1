@@ -165,6 +165,39 @@ func _ready() -> void:
 		gm.hud.pick_sublayer("traffic")
 	elif mode == "build159":
 		gm.hud.toggle_sub("build")            # 1.59: в «Стройке» кнопка «Калька (план)»
+	elif mode == "build160":
+		gm.sim.progress.all_open = true
+		gm.hud.toggle_sub("objects")          # 1.60: меню «Объекты» — 8 вкладок
+	elif mode == "nicks160":
+		# 1.60: цех с десятком людей; ники («важные») только у выбранного, бригадира и того, на кого наведена мышь
+		var S5 := preload("res://tests/setups.gd")
+		var sm5 := gm.sim
+		sm5.story.enabled = false
+		S5.big_shop(sm5)
+		for pr in [["turner", "turning"], ["turner", "turning"], ["laborer", "haul"], ["miller", "milling"], ["fitter", "fitting"], ["welder", "welding"], ["laborer", "haul"], ["fitter", "fitting"]]:
+			S5.hire(sm5, str(pr[0]), str(pr[1]), 5)
+		gm.menu_paused = true
+		var ws5: Array = sm5.workers.filter(func(x: Worker) -> bool: return not x.visitor)
+		var br5 := sm5.crew.add_brigade()
+		var i5 := 0
+		for wk5: Worker in ws5:
+			wk5.present = true
+			wk5.hidden = false
+			wk5.mood = 70.0
+			wk5.bubble = ""
+			wk5.task = null
+			wk5.path.clear()
+			wk5.pos = Vector2(33.0 + (i5 % 5) * 2.2, 11.0 + (i5 / 5) * 2.6)
+			wk5.vprev = wk5.pos
+			i5 += 1
+		(ws5[2] as Worker).brigade = int(br5["id"])
+		br5["lead"] = (ws5[2] as Worker).id
+		(ws5[5] as Worker).mood = 12.0
+		gm.tool.select_worker((ws5[0] as Worker).id)
+		cam_arg = "37,13,1.6"
+		await get_tree().create_timer(0.5).timeout
+		for nl in gm.find_children("*", "NameLayer", true, false):
+			(nl as NameLayer).mouse_override = (ws5[7] as Worker).vpos() * World.T + Vector2(0, -10)
 	elif mode.begins_with("win:"):
 		gm.hud.open_window(mode.substr(4))
 	elif mode.begins_with("sub:"):

@@ -57,7 +57,11 @@ func _process(delta: float) -> void:
 	_t += d
 	var w := backdrop.sim.world
 	# поезд
-	if _train_x < -99000.0:
+	var lvl := CityMode.level()
+	if lvl == CityMode.OFF:   # 1.60: поезда нет
+		_train_x = -99999.0
+		_train_wait = maxf(_train_wait, 2.0)
+	elif _train_x < -99000.0:
 		_train_wait -= d
 		if _train_wait <= 0.0:
 			_train_dir = 1.0 if _rng.randf() < 0.5 else -1.0
@@ -119,11 +123,22 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
+## 1.60: какие из фоновых машин рисуются (индексы): все / каждая вторая / ни одной.
+func visible_cars() -> Array[int]:
+	var out: Array[int] = []
+	var lvl := CityMode.level()
+	for i in _cars.size():
+		if lvl >= CityMode.FULL or (lvl == CityMode.MODERATE and i % 2 == 0):
+			out.append(i)
+	return out
+
+
 func _draw() -> void:
 	if backdrop == null:
 		return
 	# машины
-	for c: Dictionary in _cars:
+	for ci in visible_cars():
+		var c: Dictionary = _cars[ci]
 		var ln: Array = backdrop.lanes[int(c["lane"])]
 		var seg := _lane_seg(ln, float(c["k"]))
 		var a: Vector2 = seg[0]

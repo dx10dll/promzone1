@@ -7,7 +7,6 @@ const TOGGLES := [
 	["fast_night", "Ускорять ночь и выходные, когда на заводе пусто"],
 	["pause_on_event", "Ставить паузу, когда приходит событие с выбором"],
 	["edge_scroll", "Двигать камеру, когда курсор у края экрана"],
-	["names_on_map", "Фамилии под людьми на карте"],
 	["fullscreen", "Полноэкранный режим"],
 	["intro", "Показывать интро"],   # 1.39
 	["calls_on", "Звонки советника"],   # 1.41
@@ -90,6 +89,10 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 	v.add_child(_choice("Подбор музыки", [[0.0, "по времени суток"], [1.0, "всё подряд"], [2.0, "только вальсы"]], "music_mode",
 		"По времени суток: утром — бодрее, днём — рабочий ритм, в аврал — марш, ночью — тихо"))
 	v.add_child(UITheme.section("layers", "Экран"))
+	v.add_child(_choice("Живость города", [[2.0, "полная"], [1.0, "умеренная"], [0.0, "выкл."]], "city_life",
+		"Пешеходы, автобус, машины, голуби, поезд и кот на фоне. Умеренная — вдвое меньше; выкл. — город пустой. Поставки и наши люди остаются"))
+	v.add_child(_choice("Ники", [[0.0, "все"], [1.0, "важные"], [2.0, "нет"]], "nick_mode",
+		"Фамилии над людьми. Важные: выбранный, бригадиры, тот, на кого навели мышь, и кому совсем плохо"))
 	v.add_child(_choice("Качество эффектов", [[0.0, "низкое — без искр и дыма"], [1.0, "среднее"], [2.0, "высокое"]], "quality",
 		"Искры, стружка, пар, дым, листья и облака. На слабых компьютерах поставьте пониже"))
 	v.add_child(_choice("Предел кадров", [[0.0, "без предела"], [30.0, "30"], [60.0, "60"], [120.0, "120"], [144.0, "144"], [240.0, "240"]], "fps_cap",
@@ -99,7 +102,7 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 	v.add_child(_choice("Масштаб интерфейса", [[0.85, "85%"], [1.0, "100%"], [1.15, "115%"], [1.3, "130%"]], "ui_scale", "Размер кнопок и текста", func() -> void: Game.apply_ui_scale()))
 
 
-const ROW_ICONS := {"hour_len": "clock", "music_mode": "music", "quality": "star", "fps_cap": "speed_3", "vsync": "statistics", "ui_scale": "layers", "notify_mode": "letter"}
+const ROW_ICONS := {"hour_len": "clock", "music_mode": "music", "quality": "star", "fps_cap": "speed_3", "vsync": "statistics", "ui_scale": "layers", "notify_mode": "letter", "city_life": "star", "nick_mode": "letter"}
 
 
 static func _choice(title: String, items: Array, key: String, tip: String, after: Callable = Callable()) -> HBoxContainer:
