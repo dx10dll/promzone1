@@ -2408,19 +2408,26 @@ func _build_with_mat(w: Worker, t: Task, i0: int, mat: String, stand0: Vector2i)
 	var cap := BuildMats.carry(mat)
 	var cells: Array[int] = [i0]
 	if cap > 1:
-		var near: Array = []
+		var near: Array[int] = []
 		for k in sim.bp_cells.keys():
 			var ki := int(k)
 			if ki == i0 or sim.bp_res.has(ki) or sim.bmats.mat_for(ki) != mat or not sim.bp_ready(ki):
 				continue
-			var dk := _dist(sim.world.cell_of(ki), c0)
-			if dk <= 6.0:
-				near.append([dk, ki])
-		near.sort_custom(func(a: Array, b: Array) -> bool: return float(a[0]) < float(b[0]))
-		for pr: Array in near:
-			if cells.size() >= cap:
-				break
-			cells.append(int(pr[1]))
+			if _dist(sim.world.cell_of(ki), c0) <= 10.0:
+				near.append(ki)
+		# 1.64: цепочка «ближайшая к только что построенной» — несколько клеток подряд без беготни
+		var last := c0
+		while cells.size() < cap and not near.is_empty():
+			var bi := 0
+			var bdist := INF
+			for n in near.size():
+				var dn := _dist(sim.world.cell_of(near[n]), last)
+				if dn < bdist:
+					bdist = dn
+					bi = n
+			last = sim.world.cell_of(near[bi])
+			cells.append(near[bi])
+			near.remove_at(bi)
 	var extra := _stack_mates(pile, cells.size() - 1)
 	while cells.size() > 1 + extra.size():
 		cells.pop_back()

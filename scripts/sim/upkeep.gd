@@ -18,6 +18,7 @@ const LEVEL_MOOD := [-3, 0, 2, 4, 6]
 var sim: Sim
 var dirt := PackedByteArray()   ## грязь на клетке 0–255
 var dirt_rev := 0
+const SOOT_DIRT := 120   ## 1.64: сколько «весит» след пожара в очереди уборки
 var bin_kg: Dictionary = {}     ## id контейнера -> кг стружки
 var blanks: Dictionary = {}     ## материал -> нарезанных заготовок
 var pickups := 0                ## сколько раз приезжал ломовоз
@@ -117,6 +118,10 @@ func _dirty_cells(min_v: int, limit: int) -> Array[Vector2i]:
 			var v := int(dirt[sim.world.idx(c)])
 			if v >= min_v and sim.world.passable(c):
 				cells.append([v, c])
+	for si: int in sim.story.soot.keys():
+		var sc := sim.world.cell_of(si)
+		if sim.world.passable(sc) and SOOT_DIRT >= min_v:
+			cells.append([SOOT_DIRT, sc])   # 1.64: гарь после пожара убирают как грязь
 	cells.sort_custom(func(a: Array, b: Array) -> bool: return int(a[0]) > int(b[0]))
 	var out: Array[Vector2i] = []
 	for e: Array in cells.slice(0, limit):
@@ -133,7 +138,9 @@ func has_hotspot() -> bool:
 	if _hot_rev == dirt_rev / 16:
 		return _hot
 	_hot_rev = dirt_rev / 16
-	_hot = false
+	_hot = not sim.story.soot.is_empty()
+	if _hot:
+		return true
 	_ensure()
 	for r in sim.rooms.list:
 		for c in r.cells:
@@ -167,6 +174,8 @@ func clean_cell(c: Vector2i, power: float = 1.0) -> void:
 	if not sim.world.inb(c):
 		return
 	var got := 0
+	if sim.story.soot.erase(sim.world.idx(c)):
+		got += 20   # гарь смыли
 	for cc in [c, c + Vector2i(1, 0), c + Vector2i(-1, 0), c + Vector2i(0, 1), c + Vector2i(0, -1)]:
 		if not sim.world.inb(cc):
 			continue

@@ -528,7 +528,7 @@ func _update_carry() -> void:
 			ic.position = Vector2(-5.0 + float(k2 % 2) * 7.0 + float(k2 / 2) * 2.0, -1.0 - float(k2 / 2) * 2.0)
 			held.add_child(ic)
 	else:
-		for k in mini(n, 3):
+		for k in mini(n, 6 if it.kind == "bmat" else 3):   # 1.64: стопка стройматериала — до шести слоёв
 			var sp := Sprite2D.new()
 			sp.texture = tex
 			sp.scale = Vector2(0.5, 0.5)

@@ -293,6 +293,20 @@ func notify(text: String, level: int = LVL_INFO, cell: Vector2i = Vector2i(-1, -
 	notified.emit(text, level, cell)
 
 
+## 1.64: рутина (заказ материала, «привезли», «грузим») — только в журнал, без всплывающего уведомления.
+func note(text: String, level: int = LVL_INFO) -> void:
+	events.push_front({"day": day(), "time": time_str(), "text": text, "level": level})
+	if events.size() > 120:
+		events.resize(120)
+
+
+func note_once(key: String, text: String, level: int = LVL_INFO, cooldown: float = 360.0) -> void:
+	if once.has(key) and minute - float(once[key]) < cooldown:
+		return
+	once[key] = minute
+	note(text, level)
+
+
 func notify_once(key: String, text: String, level: int = LVL_WARN, cell: Vector2i = Vector2i(-1, -1), cooldown: float = 360.0) -> void:
 	if once.has(key) and minute - float(once[key]) < cooldown:
 		return
@@ -919,7 +933,7 @@ func order_cons(c: String, packs: int) -> String:
 	spend(cost, "Расходники: %s × %d" % [str(cd["name"]), packs])
 	var eta := to_work_time(minute + rng.randf_range(60.0, 150.0))
 	cons_supply.append({"cons": c, "packs": packs, "eta": eta})
-	notify(L.t("Заказано: %s × %d. Курьер привезёт %s.") % [L.dt("consumable.%s.pack" % c, str(cd["pack"])), packs, _eta_str(eta)], LVL_INFO)
+	note(L.t("Заказано: %s × %d. Курьер привезёт %s.") % [L.dt("consumable.%s.pack" % c, str(cd["pack"])), packs, _eta_str(eta)], LVL_INFO)
 	return ""
 
 
@@ -943,7 +957,7 @@ func _tick_cons_supply() -> void:
 			var c := str(s["cons"])
 			var cd: Dictionary = Defs.consumables.get(c, {})
 			cons[c] = float(cons.get(c, 0.0)) + float(cd.get("units", 0)) * int(s["packs"])
-			notify(L.t("Привезли расходники: %s.") % L.dt("consumable.%s.name" % c, str(cd.get("name", c))), LVL_INFO)
+			note(L.t("Привезли расходники: %s.") % L.dt("consumable.%s.name" % c, str(cd.get("name", c))), LVL_INFO)
 			cons_supply.remove_at(i)
 
 
@@ -1938,7 +1952,7 @@ func order_material(mat: String, qty: int, auto: bool = false) -> String:
 	var eta := to_work_time(minute + delay)
 	supply.append({"id": new_id(), "mat": mat, "qty": qty, "eta": eta, "spawned": false, "done": false})
 	var when := _eta_str(eta)
-	notify(L.t("Заказан металл: %s × %d. Привезут %s.") % [Defs.material_name(mat), qty, when], LVL_INFO)
+	note(L.t("Заказан металл: %s × %d. Привезут %s.") % [Defs.material_name(mat), qty, when], LVL_INFO)
 	return ""
 
 
@@ -2052,7 +2066,7 @@ func _dump_cargo(v: Vehicle) -> void:
 		put_on_ground(it, c)
 		dumped += 1
 	if dumped > 0:
-		notify(L.t("Водитель не дождался разгрузки и оставил груз у ворот — занесут, когда освободятся руки."), LVL_INFO, Vector2i(gate_x, world.plot.end.y - 1))
+		note(L.t("Водитель не дождался разгрузки и оставил груз у ворот — занесут, когда освободятся руки."), LVL_INFO)
 
 
 func dispose() -> void:
@@ -2107,12 +2121,12 @@ func _on_park(v: Vehicle) -> void:
 					var it := new_item("mat", str(s["mat"]), "raw")
 					put_in_vehicle(it, v)
 				s["done"] = true
-				notify(L.t("Привезли металл: %s. Разгружаем.") % v.cargo_desc, LVL_INFO, cell)
+				note(L.t("Привезли металл: %s. Разгружаем.") % v.cargo_desc, LVL_INFO)
 		supply = supply.filter(func(x: Dictionary) -> bool: return not bool(x["done"]))
 	else:
 		var o := orders.get_order(v.order_id)
 		if not o.is_empty():
-			notify(L.t("Приехали за заказом: %s. Грузим.") % orders.short(o), LVL_INFO, cell)
+			note(L.t("Приехали за заказом: %s. Грузим.") % orders.short(o), LVL_INFO)
 
 
 # ---------------------------------------------------------------- тик

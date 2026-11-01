@@ -45,7 +45,7 @@ func event(id: String, args: Array = []) -> void:
 		var i := (start + k) % tpls.size()
 		var f: Array = tpls[i]
 		var need := str(f[3]) if f.size() > 3 else ""
-		if need != "" and not has_prof(need):
+		if not cond_ok(need):
 			continue
 		var base := "paper.ev.%s.%d." % [id, i]
 		var title := L.dt(base + "title", str(f[1]))
@@ -171,7 +171,7 @@ func publish(force: bool = false) -> void:
 		# 1.44: заметка про должность выходит, только если такой человек есть; иначе — следующая подходящая
 		for _k in fillers.size():
 			var need := str((fillers[fi] as Array)[2]) if (fillers[fi] as Array).size() > 2 else ""
-			if need == "" or has_prof(need):
+			if cond_ok(need):
 				break
 			fi = (fi + 1) % fillers.size()
 		var f: Array = fillers[fi]
@@ -316,6 +316,43 @@ func has_prof(p: String) -> bool:
 	return false
 
 
+## 1.64: условия заметки (шаблон data/paper.json): через запятую, все должны выполняться.
+## «профессия» — такой работник есть; «room:тип» — готовое помещение; «obj:id» — построенный объект;
+## «union» — профком; «shift2» — есть вторая смена; «off» — заметка отключена (проверить нечем).
+func cond_ok(spec: String) -> bool:
+	for part in spec.split(",", false):
+		var p := part.strip_edges()
+		if p == "off":
+			return false
+		elif p == "union":
+			if not sim.crew.union_on():
+				return false
+		elif p == "shift2":
+			var ok := false
+			for w in sim.workers:
+				if w.shift == 1:
+					ok = true
+					break
+			if not ok:
+				return false
+		elif p.begins_with("room:"):
+			if sim.rooms.of_type(p.substr(5)).is_empty():
+				return false
+		elif p.begins_with("obj:"):
+			if not has_obj(p.substr(4)):
+				return false
+		elif not has_prof(p):
+			return false
+	return true
+
+
+func has_obj(def_id: String) -> bool:
+	for t: Thing in sim.things.values():
+		if t.built and t.def_id == def_id:
+			return true
+	return false
+
+
 func _life_item() -> Dictionary:
 	if sim.rooms.of_type("canteen").is_empty():
 		return {"rubric": L.t("Письма читателей"), "title": L.t("Когда будет столовая?"), "text": L.t("«Обедаем на скамейке, бутерброды в промасленной газете. Нельзя ли по-человечески?» — пишет группа рабочих.")}
@@ -336,7 +373,8 @@ func _weather_item() -> Dictionary:
 		if not cold.is_empty():
 			txt += L.t(" В помещении «%s» холодно — администрация, где батареи?") % (cold[0] as Rooms.Room).title()
 		else:
-			txt += L.t(" В цехах тепло — спасибо отоплению.")
+			if sim.season.radiators > 0:
+				txt += L.t(" В цехах тепло — спасибо отоплению.")
 	elif s.season_id() == "summer":
 		txt += L.t(" Пейте воду и не стойте на солнцепёке.")
 	return {"rubric": L.t("Погода"), "title": "", "text": txt}

@@ -476,7 +476,7 @@ func on_park(v: Vehicle) -> void:
 			equip.remove_at(i)
 	v.equip.clear()
 	var where := L.t("в зону разгрузки") if has_zone() else L.t("сразу к местам установки (зоны разгрузки нет)")
-	sim.notify(L.t("Привезли %s. Разгружаем %s.") % [v.cargo_desc, where], Sim.LVL_INFO, v.access_cell(sim.world.sidewalk_row))
+	sim.note(L.t("Привезли %s. Разгружаем %s.") % [v.cargo_desc, where], Sim.LVL_INFO)
 
 
 # ================================================================ работа для людей

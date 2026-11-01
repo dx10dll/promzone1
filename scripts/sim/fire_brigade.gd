@@ -86,7 +86,7 @@ func tick(dt: float) -> void:
 	if not st.fires.is_empty() and on_site > MAX_ON_SITE:
 		# запасной выход: к огню не подобраться — заливают из лафетного ствола с дороги
 		for i: int in st.fires.keys():
-			st.soot[i] = true
+			st.burn_mark(i)
 		st.fires.clear()
 		st._fire_out(true)
 	var all_in := true

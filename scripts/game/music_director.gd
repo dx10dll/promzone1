@@ -18,7 +18,7 @@ const TITLES := {
 const ALL := ["music_morning", "music_shop", "music_march", "music_evening", "music_night", "music_calm", "music_waltz",
 	"music_accwaltz", "music_folk", "music_march2", "music_rain", "music_winter", "music_dawn"]
 const NEW_131 := ["music_accwaltz", "music_folk", "music_march2", "music_rain", "music_winter", "music_dawn"]
-## «Только вальсы»: венский, лирический и «снежный» вальсы.
+## Вальсы (режима «только вальсы» больше нет): венский, лирический и «снежный» вальсы.
 const CLASSIC := ["music_waltz", "music_accwaltz", "music_winter"]
 const MENU := ["music_menu", "music_accwaltz", "music_rain", "music_waltz"]
 const MOODS := {
@@ -72,13 +72,19 @@ static func is_rain(sim: Sim) -> bool:
 	return sim.season != null and sim.season.is_raining()
 
 
-## Список треков по режиму из настроек: 0 — по обстановке, 1 — всё подряд, 2 — только вальсы.
+## 1.64: режимы подбора — 0 по обстановке, 1 всё подряд (вальсы играют и там). Старое «только вальсы» (2) читается как «всё подряд».
+const MODES := [[0.0, "по времени суток"], [1.0, "всё подряд"]]
+
+
+static func norm_mode(mode: int) -> int:
+	return 0 if mode <= 0 else 1
+
+
+## Список треков по режиму из настроек: 0 — по обстановке, 1 — всё подряд.
 ## Первый в списке — «лицо» настроения: он вступает первым, когда настроение сменилось.
 static func playlist(sim: Sim, mode: int) -> Array:
-	if mode == 1:
+	if norm_mode(mode) == 1:
 		return ALL
-	if mode == 2:
-		return CLASSIC
 	return for_mood(mood(sim), is_winter(sim), is_rain(sim))
 
 

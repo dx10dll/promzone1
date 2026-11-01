@@ -1355,9 +1355,9 @@ help.overlays.text,"The column of icons on the right edge:
 • Zones: what's where and what's missing.
 • Utilities: cable, plumbing, air, ventilation.
 • Lighting, Temperature, Cleanliness.
-• Foot traffic: where people walk most; put storage and lockers closer there.
+• Logistics: Distribution (draw a line from a workshop to a locker room, toilet or canteen), Foot traffic (where people walk most; put storage and lockers closer there).
 • Machine load: working, idle, rejects (needs a planning office).
-• Crews and security: crew areas, cameras and posts.
+• Crews: crew areas, cameras and posts.
 Click to turn on, again to turn off; the legend is a card at the bottom left."
 help.sec.prod,Machines and production
 help.machines.title,Processes and specialists
@@ -1831,7 +1831,7 @@ help.save.text,"• F5: quick save, F9: quick load.
 help.settings.title,Settings
 help.settings.text,"Menu (Esc) → Settings:
 • Volume by category: master, music, machines and tools, ambient sounds, interface.
-• [b]Music selection[/b]: by time of day / everything / waltzes only.
+• [b]Music selection[/b]: by time of day / everything (waltzes play there too).
 • Effects quality (sparks, steam, leaves), frame limit and V-Sync.
 • Edge scrolling, pause on an event letter.
 • Language: Russian / English."

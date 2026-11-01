@@ -107,6 +107,31 @@ func _inner(c: Vector2i) -> bool:
 	return w.inb(c) and w.flr[w.idx(c)] > 0 and w.wall[w.idx(c)] == World.W_NONE
 
 
+## 1.64: клетка без пола внутри замкнутого помещения тоже можно размечать (помещение без пола — помещение).
+func _zonable(c: Vector2i) -> bool:
+	if _inner(c):
+		return true
+	var w := sim.world
+	return w.inb(c) and w.wall[w.idx(c)] == World.W_NONE and space_id_at(c) >= 0
+
+
+## 1.64: затравка для помещения вовсе без пола: голая клетка у стены, рядом нет полов.
+func _bare_seed(c: Vector2i) -> bool:
+	var w := sim.world
+	if not w.in_plot(c) or w.flr[w.idx(c)] > 0 or w.wall[w.idx(c)] != World.W_NONE:
+		return false
+	var by_wall := false
+	for d: Vector2i in DIRS:
+		var nb := c + d
+		if not w.inb(nb):
+			return false
+		if w.wall[w.idx(nb)] != World.W_NONE:
+			by_wall = true
+		elif w.flr[w.idx(nb)] > 0:
+			return false
+	return by_wall
+
+
 func rebuild() -> void:
 	var w := sim.world
 	var n := w.w * w.h
@@ -125,12 +150,17 @@ func rebuild() -> void:
 		if seen[i] != 0:
 			continue
 		var c0 := w.cell_of(i)
+		var bare_seed := false
 		if not _inner(c0):
-			continue
+			if not _bare_seed(c0):
+				continue
+			bare_seed = true
 		var cells: Array[Vector2i] = []
 		var openings := {}
 		var enclosed := true
 		var bare := {}   ## 1.47: клетки без пола внутри контура — замкнутость от пола не зависит
+		if bare_seed:
+			bare[i] = true
 		var queue: Array[Vector2i] = [c0]
 		seen[i] = 1
 		while not queue.is_empty():
@@ -146,6 +176,8 @@ func rebuild() -> void:
 					if seen[ni] == 0:
 						seen[ni] = 1
 						queue.append(nb)
+					elif bare_seed and not cells.has(nb):
+						enclosed = false   # упёрлись в чужое помещение с полом — не наше дело
 				elif w.wall[ni] == World.W_NONE:
 					# земля без пола: если её немного и она ограничена стенами — это часть помещения, иначе улица
 					if w.flr[ni] <= 0 and not bare.has(ni) and bare.size() < BARE_MAX:
@@ -156,6 +188,9 @@ func rebuild() -> void:
 				else:
 					openings[ni] = w.wall[ni]
 		if not enclosed:
+			if bare_seed:
+				for bi2 in bare.keys():
+					seen[int(bi2)] = 1   # улица: заново не обходим
 			_open_zones(cells)
 			continue
 		for bi in bare.keys():
@@ -516,10 +551,11 @@ func paint(rect: Rect2i, type: String) -> int:
 	var w := sim.world
 	var z := 0 if type == "" else TYPES.find(type) + 1
 	var n := 0
+	update()
 	for y in range(rect.position.y, rect.end.y):
 		for x in range(rect.position.x, rect.end.x):
 			var c := Vector2i(x, y)
-			if not _inner(c):
+			if not _zonable(c):
 				continue
 			var i := w.idx(c)
 			if int(w.zone[i]) != z:
@@ -537,7 +573,7 @@ func paint_cells(cells: Array, type: String) -> int:
 	var z := 0 if type == "" else TYPES.find(type) + 1
 	var n := 0
 	for c: Vector2i in cells:
-		if not _inner(c):
+		if not _zonable(c):
 			continue
 		var i := w.idx(c)
 		if int(w.zone[i]) != z:
@@ -552,7 +588,8 @@ func paint_cells(cells: Array, type: String) -> int:
 ## Залить зону, как ведром: связные клетки помещения с той же разметкой, что под курсором.
 func fill(c: Vector2i, type: String) -> int:
 	var w := sim.world
-	if not _inner(c):
+	update()
+	if not _zonable(c):
 		return 0
 	var z := 0 if type == "" else TYPES.find(type) + 1
 	var from := int(w.zone[w.idx(c)])
@@ -567,7 +604,7 @@ func fill(c: Vector2i, type: String) -> int:
 		n += 1
 		for d: Vector2i in DIRS:
 			var nb: Vector2i = cc + d
-			if not _inner(nb):
+			if not _zonable(nb):
 				continue
 			var ni := w.idx(nb)
 			if seen.has(ni) or int(w.zone[ni]) != from:

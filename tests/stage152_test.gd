@@ -238,7 +238,7 @@ func _init() -> void:
 				continue
 			var got := str(p.pending[0]["title"])
 			for tp: Array in tpls:
-				if tp.size() > 3 and not p.has_prof(str(tp[3])) and got == str(tp[1]).replace("{0}", "А").replace("{1}", "Б"):
+				if tp.size() > 3 and not p.cond_ok(str(tp[3])) and got == str(tp[1]).replace("{0}", "А").replace("{1}", "Б"):
 					bad_tpl += 1
 	check(bad_tpl == 0, "газета не пишет про должности, которых нет на заводе (нарушений правила: %d)" % bad_tpl)
 	check(events.size() >= 9, "шаблонов событий: %d видов" % events.size())

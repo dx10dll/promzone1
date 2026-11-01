@@ -130,7 +130,7 @@ func tick(dt: float) -> void:
 			return
 	var eta := sim.to_work_time(sim.minute + sim.rng.randf_range(35.0, 80.0))
 	orders.append({"id": sim.new_id(), "mats": add, "eta": eta, "spawned": false})
-	sim.notify_once("bmat_order", L.t("Заказаны стройматериалы: %s. Привезут %s.") % [desc(add), sim._eta_str(eta)], Sim.LVL_INFO, Vector2i(-1, -1), 240.0)
+	sim.note_once("bmat_order", L.t("Заказаны стройматериалы: %s. Привезут %s.") % [desc(add), sim._eta_str(eta)], Sim.LVL_INFO, 240.0)
 
 
 ## «кирпич ×8, плитка ×16»
@@ -166,7 +166,7 @@ func on_park(v: Vehicle) -> void:
 		orders.remove_at(i)
 	v.bmat_order = -1
 	var where := L.t("в зону разгрузки") if sim.logi.has_zone() else L.t("у ворот (зоны разгрузки нет)")
-	sim.notify(L.t("Привезли %s. Разгружают %s.") % [v.cargo_desc, where], Sim.LVL_INFO, v.access_cell(sim.world.sidewalk_row))
+	sim.note(L.t("Привезли %s. Разгружают %s.") % [v.cargo_desc, where], Sim.LVL_INFO)
 
 
 ## Куда сгрузить поддон без зоны разгрузки: свободная земля у ворот, не в помещении.

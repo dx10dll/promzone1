@@ -1,5 +1,5 @@
 extends Node
-## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161|market162|grant162|assort163|iso163 --out=/файл.png [--lang=ru]
+## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161|market162|grant162|assort163|iso163|build164 --out=/файл.png [--lang=ru]
 
 var out := "/tmp/p147.png"
 var mode := "full"
@@ -25,7 +25,7 @@ func _ready() -> void:
 			lang = a.get_slice("=", 1)
 	L.apply(lang)
 	Game.pending = "new"
-	Game.pending_scn = "garage"
+	Game.pending_scn = "sandbox" if mode == "build164" else "garage"
 	Game.pending_profile = "mech"
 	Game.pending_opts = {"tutorial": false}
 	Game.pending_seed = 147
@@ -193,6 +193,37 @@ func _ready() -> void:
 			sm2.sales.market_prev[pid] = 1.0 if gid2 != "asm" else 1.0
 		GameWindow.mk_open["mill"] = true
 		gm.hud.open_window("orders:market")
+	elif mode == "build164":
+		# 1.64: строитель несёт стопку материала к ряду стен и строит их подряд
+		var sm6 := gm.sim
+		sm6.story.enabled = false
+		sm6.money = 5000000.0
+		var pl := sm6.world.plot
+		var by := pl.position.y + 10
+		var bx := pl.position.x + 14
+		for k6 in 10:
+			sm6.place_wall_bp(Vector2i(bx + k6, by), World.W_BRICK)
+		for k8 in 10:
+			sm6.put_on_ground(sm6.new_item("bmat", "bm_brick", "bmat"), Vector2i(bx + 4, by + 4))
+		var seen6 := false
+		var last6 := {}
+		for tm6 in 900:
+			sm6.tick(0.25)
+			for w6 in sm6.workers:
+				var lp: Vector2 = last6.get(w6.id, w6.pos)
+				var side6 := absf(w6.pos.x - lp.x) > absf(w6.pos.y - lp.y) * 2.0 and absf(w6.pos.x - lp.x) > 0.01
+				last6[w6.id] = w6.pos
+				if w6.carrying >= 0 and w6.carry_count() >= 6 and side6 and not seen6:
+					seen6 = true
+					print("builder ", w6.id, " carries ", w6.carry_count(), " at ", w6.cell(), " wall y ", by, " x ", bx)
+					cam_arg = "%s,%s,3.0" % [str(w6.pos.x), str(w6.pos.y - 1.0)]
+			if seen6:
+				break
+		print("builder carries: ", seen6)
+		if cam_arg == "":
+			cam_arg = "%s,%s,2.4" % [str(bx + 5.0), str(by + 2.0)]
+		for w9 in sm6.workers:
+			print("  worker ", w9.id, " ", w9.cell(), " pos ", w9.pos, " n=", w9.carry_count(), " task ", w9.task.label if w9.task else "-")
 	elif mode == "assort163":
 		# 1.63: «Рынок» с закрытыми изделиями: условия «откроется: станок / репутация / этап»
 		var sm4 := gm.sim

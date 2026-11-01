@@ -101,13 +101,13 @@ paper.ev.order_failed.2.title,A failed order is our common trouble
 paper.ev.order_failed.2.text,"""{0} — not shipped on time. Let's find out where we lose hours,"" writes a reader."
 paper.ev.mass_hire.0.rubric,People
 paper.ev.mass_hire.0.title,New faces on the team
-paper.ev.mass_hire.0.text,{0} new workers joined the plant this week. Get to know them and don't hesitate to ask where the canteen is.
+paper.ev.mass_hire.0.text,{0} new workers joined the plant this week. Get to know them and don't hesitate to ask where things are.
 paper.ev.mass_hire.1.rubric,Staff
 paper.ev.mass_hire.1.title,Hiring continues
-paper.ev.mass_hire.1.text,{0} people were hired. HR asks the old-timers to show newcomers where things are.
+paper.ev.mass_hire.1.text,{0} people were hired. The old-timers are asked to show newcomers where things are.
 paper.ev.mass_hire.2.rubric,News
 paper.ev.mass_hire.2.title,The plant is growing
-paper.ev.mass_hire.2.text,"{0} new employees. The locker room got tighter, the shops got livelier."
+paper.ev.mass_hire.2.text,"{0} new employees. The shops got livelier."
 paper.ev.mass_fire.0.rubric,Staff
 paper.ev.mass_fire.0.title,Parting with colleagues
 paper.ev.mass_fire.0.text,{0} people left the plant this week. The administration thanks them for their work and wishes them luck.
@@ -119,7 +119,7 @@ paper.ev.mass_fire.2.title,The union watches the staff
 paper.ev.mass_fire.2.text,{0} people were let go. The union reminds: layoffs follow the law and are done with respect.
 paper.ev.crew_overplan.0.rubric,Competition
 paper.ev.crew_overplan.0.title,"Crew ""{0}"" beat its plan!"
-paper.ev.crew_overplan.0.text,Yesterday the crew delivered {1}% of the plan. The pies in the break room are on the winners.
+paper.ev.crew_overplan.0.text,Yesterday the crew delivered {1}% of the plan. The pies are on the winners.
 paper.ev.crew_overplan.1.rubric,Heroes
 paper.ev.crew_overplan.1.title,"""{0}"" works like clockwork"
 paper.ev.crew_overplan.1.text,The shift plan was met at {1}%. Neighbouring sections look on with respect and slight envy.

@@ -1044,6 +1044,7 @@ static func _new_sandbox(seed_value: int, story_mode: String, profile: String, o
 	if trm:
 		sim.rooms.assign(trm, "tech_room")
 	autowire(sim)
+	autopipe(sim)   # 1.64: насос сразу подключён — труба начинается в его клетке
 	add_yard_zones(sim)   # 1.29: обязательные зоны у ворот
 	hire_builders(sim, 3)
 	sim.refresh_candidates()
@@ -1091,7 +1092,7 @@ static func add_yard_zones(sim: Sim, with_pallets: bool = true) -> Array[String]
 	if sim.logi.has_ship():
 		sr = _cells_rect(sim.logi.ship_cells())
 	else:
-		sr = _yard_rect(sim, Vector2i(3, 3), Vector2(sim.gate_x + 12, gy), avoid)
+		sr = _yard_rect(sim, Vector2i(3, 4), Vector2(sim.gate_x + 12, gy), avoid)   # 1.64: 3×4 — верхний ряд под поддоны готовой продукции, внутри зоны
 		if sr.size.x > 0 and sim.set_area(sr, Logistics.A_SHIP) > 0:
 			out.append("ship")
 		else:
@@ -1103,10 +1104,10 @@ static func add_yard_zones(sim: Sim, with_pallets: bool = true) -> Array[String]
 				have = true
 				break
 		if not have:
-			# склад готовой продукции — у зоны отгрузки, чтобы носить недалеко
+			# склад готовой продукции — в верхнем ряду зоны отгрузки (1.64: раньше стоял над зоной, вне её)
 			for k2 in 2:
-				var c := Vector2i(sr.position.x + k2, sr.position.y - 1)
-				if sim.world.area[sim.world.idx(c)] == 0 and put(sim, "pallet", c):
+				var c := Vector2i(sr.position.x + k2, sr.position.y)
+				if sim.world.area[sim.world.idx(c)] == Logistics.A_SHIP and put(sim, "pallet", c):
 					out.append("pallet")
 	return out
 

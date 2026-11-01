@@ -533,7 +533,7 @@ func _start(ev: String, delayed: bool) -> void:
 			var k := sim.rng.randf_range(1.2, 1.35) if mode != "wild" else sim.rng.randf_range(1.3, 1.6)
 			add_mod("metal_price", k, sim.rng.randf_range(9.0, 14.0) * 1440.0, L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)))
 			info(L.t("Металл подорожал"), L.t("Металлобазы подняли цены на %d%%: виноваты курс и «сложная ситуация на рынке». Дорого продержится недели две. Покупайте только под заказы.") % int(round((k - 1.0) * 100.0)), "chart_up", Sim.LVL_WARN)
-			sim.paper.add(L.t("Экономика"), L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)), (L.t("Снабженцы хватаются за голову: прутки дорожают. Бухгалтерия просит не точить лишнего.") if sim.paper.has_prof("accountant") else L.t("Снабженцы хватаются за голову: прутки дорожают. Просим не точить лишнего.")))
+			sim.paper.add(L.t("Экономика"), L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)), (L.t("Прутки дорожают. Бухгалтерия просит не точить лишнего.") if sim.paper.has_prof("accountant") else L.t("Прутки дорожают. Просим не точить лишнего.")))
 		"metal_down":
 			add_mod("metal_price", 0.85, 10.0 * 1440.0, L.t("Металл подешевел на 15%"))
 			info(L.t("Металл подешевел"), L.t("На рынке избыток проката: металлобазы снизили цены на 15% на ближайшие полторы недели. Хорошее время запастись."), "chart_down", Sim.LVL_GOOD)
@@ -541,7 +541,7 @@ func _start(ev: String, delayed: bool) -> void:
 			var mins := sim.rng.randf_range(90.0, 240.0)
 			add_mod("outage", 1.0, mins, L.t("Авария в городской сети"))
 			info(L.t("Авария в горсетях"), L.t("Электричество пропало по всему району. Обещают дать через %d ч. Станки стоят, свет только из окон.") % int(ceil(mins / 60.0)), "bolt_off", Sim.LVL_BAD)
-			sim.paper.add(L.t("Происшествия"), L.t("Свет отключили всему району"), L.t("Станки стоят, чайник холодный. Энергетики горсетей ищут виноватого экскаваторщика."))
+			sim.paper.add(L.t("Происшествия"), L.t("Свет отключили всему району"), L.t("Станки стоят. Энергетики горсетей ищут виноватого экскаваторщика."))
 		"pipe_burst":
 			_ev_pipe()
 		"wire_break":
@@ -565,7 +565,7 @@ func _start(ev: String, delayed: bool) -> void:
 			sim.season.snap = sim.rng.randf_range(7.0, 10.0)
 			sim.season.snap_until = sim.minute + sim.rng.randf_range(2.0, 4.0) * 1440.0
 			info(L.t("Жара"), L.t("На улице за +30. В горячих цехах тяжело: помогут окна и кулер с водой."), "thermo", Sim.LVL_WARN)
-			sim.paper.add(L.t("Погода"), L.t("Жара!"), L.t("Термисты просят выдать им мороженое за вредность. Профсоюз изучает вопрос."))
+			sim.paper.add(L.t("Погода"), L.t("Жара!"), (L.t("Термисты просят выдать им мороженое за вредность. Профсоюз изучает вопрос.") if sim.paper.has_prof("heat_treater") and sim.crew.union_on() else L.t("Пейте воду и не стойте на солнцепёке: в цехах жарко.")))
 		"flood":
 			for s: Dictionary in sim.supply:
 				s["eta"] = float(s["eta"]) + 1440.0
@@ -677,13 +677,19 @@ func ignite(c: Vector2i, why: String) -> void:
 		sim.paper.add(L.t("Происшествия"), L.t("Пожар на заводе"), L.t("%s. Коллектив бросился тушить, кто с огнетушителем, кто с ведром.") % why)
 
 
+## 1.64: след пожара — это грязь: уборщица (или разнорабочий) смывает его, как стружку.
+func burn_mark(i: int) -> void:
+	soot[i] = true
+	sim.upkeep.dirt_rev += 1
+
+
 func extinguish(i: int, amount: float) -> void:
 	if not fires.has(i):
 		return
 	var v := float(fires[i]) - amount
 	if v <= 0.0:
 		fires.erase(i)
-		soot[i] = true
+		burn_mark(i)
 		if fires.is_empty():
 			_fire_out(brigade.deployed())   # 1.30: расчёт уже на месте — тушили пожарные
 	else:
@@ -1073,7 +1079,7 @@ func _ev_theft() -> void:
 		return
 	if sim.progress.dogs_tame and not sim.progress.dogs.is_empty() and sim.rng.randf() < 0.7:
 		info(L.t("Собаки подняли лай"), L.t("Ночью кто-то лез через забор к складу, но заводские собаки подняли такой лай, что вор сбежал без металла."), "thief", Sim.LVL_GOOD)
-		sim.paper.add(L.t("Бдительность"), L.t("Жучка на страже"), L.t("Заводские собаки отогнали несуна от склада. Профком выделил им по косточке."))
+		sim.paper.add(L.t("Бдительность"), L.t("Жучка на страже"), (L.t("Заводские собаки отогнали несуна от склада. Профком выделил им по косточке.") if sim.crew.union_on() else L.t("Заводские собаки отогнали несуна от склада. Им положена косточка.")))
 		return
 	if sim.crew.search_on() and sim.rng.randf() < 0.85:
 		info(L.t("Вахта задержала несуна"), L.t("Охранник на проходной нашёл в сумке у рабочего три прутка. Металл вернули на склад."), "thief", Sim.LVL_GOOD)
@@ -1661,7 +1667,7 @@ func _holidays() -> void:
 			for w in sim.workers:
 				Mood.add(sim, w, "nye_off")
 			info(L.t("Новогодние каникулы"), L.t("Три дня отдыха: завод стоит, люди с семьями. С Новым годом!"), "party", Sim.LVL_GOOD)
-			sim.paper.add(L.t("С Новым годом!"), L.t("С Новым годом, товарищи!"), L.t("Пусть станки не ломаются, заказы не горят, а компот в столовой не кончается!"))
+			sim.paper.add(L.t("С Новым годом!"), L.t("С Новым годом, товарищи!"), (L.t("Пусть станки не ломаются, заказы не горят, а компот в столовой не кончается!") if not sim.rooms.of_type("canteen").is_empty() else L.t("Пусть станки не ломаются, а заказы не горят!")))
 		"feb23":
 			letter("holiday", L.t("23 февраля"), L.t("Женская часть коллектива спрашивает, будет ли завод поздравлять мужчин."), "party", Sim.LVL_INFO,
 				[{"text": L.t("Подарки мужчинам (%s)") % Defs.money_str(_count_sex(false) * 1500.0), "hint": ""}, {"text": L.t("Только открытка"), "hint": ""}], 1, {"h": "feb23"})

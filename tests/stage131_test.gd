@@ -102,7 +102,7 @@ func _moods() -> void:
 	g.orders.list.append({"status": "active", "deadline": g.minute + 600.0, "product": "x"})
 	check(MusicDirector.playlist(g, 0)[0] == "music_march", "игра: аврал — «Встречный план»")
 	check(MusicDirector.playlist(g, 1) == MusicDirector.ALL, "«всё подряд»")
-	check(MusicDirector.playlist(g, 2) == MusicDirector.CLASSIC and MusicDirector.CLASSIC.has("music_accwaltz"), "«только вальсы» — с новым вальсом")
+	check(MusicDirector.playlist(g, 2) == MusicDirector.ALL and MusicDirector.ALL.has("music_accwaltz") and MusicDirector.CLASSIC.has("music_accwaltz"), "вальсы (в т. ч. новый) играют в «всё подряд»")
 
 
 func _no_repeats() -> void:

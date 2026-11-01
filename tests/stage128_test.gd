@@ -44,7 +44,7 @@ func _init() -> void:
 
 	print("— режимы")
 	check(MusicDirector.playlist(g, 1).size() == MusicDirector.ALL.size(), "«всё подряд» — все треки")
-	check(MusicDirector.playlist(g, 2) == MusicDirector.CLASSIC, "«только вальсы» — старые два")
+	check(MusicDirector.playlist(g, 2) == MusicDirector.ALL, "1.64: старый режим «только вальсы» читается как «всё подряд»")
 
 	print("")
 	if fails.is_empty():

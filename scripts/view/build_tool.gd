@@ -191,7 +191,7 @@ func _on_release(c: Vector2i) -> void:
 				if sim.place_cable(cc):
 					n += 1
 			if n > 0:
-				message.emit(L.t("Чертёж кабеля: %d кл. (%s). Проложит электрик или строитель.") % [n, Defs.money_str(n * Defs.b("cable_cost"))], true)
+				sim.note(L.t("Чертёж кабеля: %d кл. (%s). Проложит электрик или строитель.") % [n, Defs.money_str(n * Defs.b("cable_cost"))])
 			elif broke:
 				message.emit(L.t("Не хватает денег на кабель."), false)
 		"zone":
@@ -214,7 +214,7 @@ func _on_release(c: Vector2i) -> void:
 				if sim.place_pipe(cc):
 					np += 1
 			if np > 0:
-				message.emit(L.t("Чертёж трубы: %d кл. (%s). Проложат строители.") % [np, Defs.money_str(np * Defs.b("pipe_cost"))], true)
+				sim.note(L.t("Чертёж трубы: %d кл. (%s). Проложат строители.") % [np, Defs.money_str(np * Defs.b("pipe_cost"))])
 			elif brokep:
 				message.emit(L.t("Не хватает денег на трубы."), false)
 		"duct", "air":
@@ -229,7 +229,7 @@ func _on_release(c: Vector2i) -> void:
 					nl += 1
 			var lname := L.t("воздуховода") if lay == "duct" else L.t("пневмомагистрали")
 			if nl > 0:
-				message.emit(L.t("Чертёж %s: %d кл. (%s). Проложат строители.") % [lname, nl, Defs.money_str(nl * Defs.b(lay + "_cost"))], true)
+				sim.note(L.t("Чертёж %s: %d кл. (%s). Проложат строители.") % [lname, nl, Defs.money_str(nl * Defs.b(lay + "_cost"))])
 			elif brokel:
 				message.emit(L.t("Не хватает денег."), false)
 		"unduct", "unair":
@@ -400,7 +400,7 @@ func _apply_room(r: Rect2i) -> void:
 	if err != "":
 		message.emit(err, false)
 		return
-	message.emit(L.t("Чертёж помещения %d×%d: пол, стены и дверь. Назначение выберите после постройки (Помещения).") % [r.size.x, r.size.y], true)
+	sim.note(L.t("Чертёж помещения %d×%d: пол, стены и дверь. Назначение выберите после постройки (Помещения).") % [r.size.x, r.size.y])
 
 
 func _apply_wall(r: Rect2i) -> void:
@@ -452,7 +452,7 @@ func _apply_demolish(r: Rect2i) -> void:
 
 func _report(n: int, broke: bool, what: String) -> void:
 	if n > 0:
-		message.emit(L.t("Чертёж %s: %d кл. Рабочие построят, когда освободятся.") % [what, n], true)
+		sim.note(L.t("Чертёж %s: %d кл. Рабочие построят, когда освободятся.") % [what, n])
 	if broke:
 		message.emit(L.t("Не хватает денег на весь чертёж."), false)
 	elif n == 0:
@@ -487,7 +487,7 @@ func _place_object(c: Vector2i) -> void:
 		return
 	sim.place_thing(def_id, c, false, true, place_rot)
 	Snd.play("place", -6.0)
-	message.emit(L.t("Заказано: %s. Рабочие смонтируют.") % L.t(str(Defs.objects[def_id]["name"])), true)
+	sim.note(L.t("Заказано: %s. Рабочие смонтируют.") % L.t(str(Defs.objects[def_id]["name"])))
 
 
 ## 1.17: готовое помещение — центр под курсором.
@@ -507,7 +507,7 @@ func _place_template(c: Vector2i) -> void:
 	if plan_mode:
 		message.emit(L.t("«%s» — на плане.") % nm, true)
 	else:
-		message.emit(L.t("Заказано помещение «%s»: строители начнут с пола и стен, мебель и зону поставят, когда достроят.") % nm, true)
+		sim.note(L.t("Заказано помещение «%s»: строители начнут с пола и стен, мебель и зону поставят, когда достроят.") % nm)
 
 
 func _draw_template_ghost() -> void:
