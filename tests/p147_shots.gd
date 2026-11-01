@@ -1,5 +1,5 @@
 extends Node
-## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161|market162|grant162|assort163|iso163|build164 --out=/файл.png [--lang=ru]
+## 1.47: снимки интерфейса. xvfb-run -a -s "-screen 0 1920x1080x24" godot --path . --resolution 1920x1080 res://tests/p147_shots.tscn -- --mode=full|crop|hud|card|card150|orders|checklist152|paper152|safety161|market162|grant162|assort163|iso163|build164|dyn165 --out=/файл.png [--lang=ru]
 
 var out := "/tmp/p147.png"
 var mode := "full"
@@ -77,22 +77,25 @@ func _ready() -> void:
 		await get_tree().create_timer(0.8).timeout
 		gm.hud.info.refresh()
 		print("card size ", gm.hud.info.size)
-	elif mode == "power153":
-		# 1.53: «Финансы → Электричество»: пик, лимит, расход день/ночь, заявка на мощность; плашка кВт вверху
-		var pwr := gm.sim.power
-		gm.sim.minute = 12.0 * 1440.0 + 10.0 * 60.0
-		gm.sim.money = 400000.0
-		for i in 7:
-			pwr.hist.append({"d": 11 - i, "kd": 120.0 + i * 9.0, "kn": 38.0 + i * 5.0, "cd": (120.0 + i * 9.0) * 7.5, "cn": (38.0 + i * 5.0) * 3.75, "peak": 21.0 + (i % 3) * 3.5})
-		pwr.kwh_day = 64.0
-		pwr.kwh_night = 21.0
-		pwr.peak_day = 23.4
-		pwr.peak_prev = 26.1
-		pwr.trips_today = 1
-		pwr.upgrade = {"step": 1, "due": gm.sim.day() + 2, "cost": 60000.0}
+	elif mode == "dyn165":
+		# 1.65: «Финансы → Динамика» (слитые «Графики», «Статистика», «По неделям»): режим «Сутки» с историей за 30 суток
+		var slg165 := gm.sim.statlog
+		var rng165 := RandomNumberGenerator.new()
+		rng165.seed = 165
+		var m165 := 90000.0
+		for i in 40:
+			var prof165 := rng165.randf_range(-3000.0, 9000.0)
+			m165 += prof165
+			var made165 := rng165.randi_range(20, 60)
+			var scr165 := rng165.randi_range(0, 7)
+			slg165.days.append({"d": 3 + i, "money": m165, "profit": prof165, "made": made165, "scrap": scr165, "defect": float(scr165) / float(made165 + scr165),
+				"mood": 55.0 + 12.0 * sin(float(i) / 4.0) + rng165.randf_range(-3, 3), "staff": 6 + i / 8, "kwh": rng165.randf_range(60.0, 110.0)})
 		gm.hud.open_window("finance")
 		await get_tree().create_timer(0.4).timeout
-		gm.hud.win.select_tab("energy")
+		gm.hud.win.select_tab("dyn")
+		gm.hud.win.sub = "day"
+		gm.hud.win.rebuild(true)
+		await get_tree().create_timer(0.6).timeout
 	elif mode == "stats154":
 		# 1.54: «Финансы → Статистика»: 30 суток синтетической истории (--range=7 — неделя)
 		var slg := gm.sim.statlog

@@ -139,10 +139,6 @@ func passable(c: Vector2i) -> bool:
 	return not Defs.wall_solid(wall[i]) and block[i] < 0 and flora[i] == 0
 
 
-## Дерево или куст в клетке (1.13).
-func flora_at(c: Vector2i) -> int:
-	return flora[idx(c)] if inb(c) else 0
-
 
 static func flora_name(v: int) -> String:
 	return ["", L.t("тополь"), L.t("берёза"), L.t("клён"), L.t("куст сирени"), L.t("куст шиповника")][clampi(v, 0, 5)]

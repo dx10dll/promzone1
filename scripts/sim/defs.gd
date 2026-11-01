@@ -4,6 +4,13 @@ extends RefCounted
 ## Загружаются из JSON-файлов в папке data/, чтобы баланс можно было править без кода.
 
 static var objects: Dictionary = {}
+
+## 1.65: убранные объекты. Значение — на что заменить в старом сохранении; пустая строка — предмета больше нет
+## (поставленный экземпляр снимается с возвратом оплаченного).
+const OBJ_REMAP := {
+	"cooler": "water_cooler", "locker2": "locker", "cactus": "plant", "monstera": "plant", "palm": "plant",
+	"globe": "", "bookcase": "", "coat_rack": "", "samovar": "", "statue_worker": "", "notice_board": "", "loudspeaker": "", "lamp_street": "",
+}
 static var floors: Dictionary = {}
 static var walls: Dictionary = {}
 static var products: Dictionary = {}
@@ -224,6 +231,14 @@ static func ev(key: String) -> float:
 
 
 ## 1.39: название объекта на языке игры.
+## Цена убранного предмета (его уже нет в objects.json): для возврата денег по старому сохранению.
+const REMOVED_COST := {"globe": 3500, "bookcase": 9000, "coat_rack": 1500, "samovar": 7000, "statue_worker": 26000, "notice_board": 3000, "loudspeaker": 6000, "lamp_street": 12000}
+
+
+static func objects_cost_of(def_id: String) -> float:
+	return float(REMOVED_COST.get(def_id, 0))
+
+
 static func obj_name(id: String) -> String:
 	return L.dt("object.%s.name" % id, str(objects.get(id, {}).get("name", id)))
 

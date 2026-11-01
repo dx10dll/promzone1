@@ -21,10 +21,6 @@ static func build(win: GameWindow) -> void:
 			_canteen(win)
 		"kg":
 			_kg(win)
-		"radio":
-			_radio(win)
-		"cat":
-			_cat(win)
 		_:
 			_overview(win)
 
@@ -58,7 +54,6 @@ static func _overview(win: GameWindow) -> void:
 		["med", "Медпункт", not t.medbays().is_empty() and not t.nurses().is_empty(), "Больничные короче на 40%, гриппа меньше.", "Кушетка, шкаф с лекарствами, раковина и фельдшер", "canteen"],
 		["kid", "Детсад «Шестерёнка»", t.kg_level > 0, "Родителям спокойнее, прогулов меньше.", "С этапа «Малое предприятие»", "kg"],
 		["culture", "ДК «Машиностроитель»", t.dk, "Кружки и концерты к праздникам.", "С этапа «Среднее предприятие»", "kg"],
-		["radio", "Заводское радио", t.radio_station() != null, "Новости, гимнастика и музыка в обед.", "Радиоузел и громкоговорители (Объекты → Офис)", "radio"],
 	]
 	for it: Array in items:
 		var v := win._card_in(cards)
@@ -76,15 +71,8 @@ static func _overview(win: GameWindow) -> void:
 		var ob := UITheme.small("Подробнее →", func() -> void: win.select_tab(sec))
 		ob.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		v.add_child(ob)
-	if t.cat:
-		var cc := win._card_in(win.content)
-		var ch := UITheme.hbox(10)
-		cc.add_child(ch)
-		ch.add_child(_cat_pic(t.cat, 1.4))
-		var cv := UITheme.vbox(2)
-		cv.add_child(UITheme.label(L.name(t.cat.title()), 15, UITheme.TEXT, UITheme.f_semi))
-		cv.add_child(UITheme.label(L.t(t.cat.activity), 12, UITheme.INFO))
-		ch.add_child(cv)
+	_radio(win, true)   # 1.65: «Заводское радио» и «Кот» слиты с обзором
+	_cat(win, true)
 
 
 # ---------------------------------------------------------------- общежитие
@@ -243,20 +231,21 @@ static func _kg(win: GameWindow) -> void:
 
 # ---------------------------------------------------------------- радио
 
-static func _radio(win: GameWindow) -> void:
+static func _radio(win: GameWindow, embedded: bool = false) -> void:
 	var sim := win.sim
 	var t := sim.town
 	var st := t.radio_station()
 	var rooms := t.radio_rooms()
-	win._info(L.t("радио «Заводская волна» · %s") % L.t("в эфире" if st else "молчит"))
-	win._intro(L.t("Радиоузел (Объекты → Офис) под током и громкоговорители под потолком: радио слышно в помещениях, где висит рупор. Программы — по рабочим дням."))
+	if embedded:
+		win.content.add_child(UITheme.caption(L.t("радио «Заводская волна» · %s") % L.t("в эфире" if st else "молчит")))
+	else:
+		win._info(L.t("радио «Заводская волна» · %s") % L.t("в эфире" if st else "молчит"))
+		win._intro(L.t("Радиоузел (Объекты → Офис) под током со своим динамиком: радио слышно в помещении, где он стоит. Программы — по рабочим дням."))
 	var g := win._cards(2)
 	var a := win._card_in(g, L.t("Эфир"))
 	var have := not sim.things_of("radio").is_empty()
 	_status_row(a, "Радиоузел", have, "Объекты → Офис → Радиоузел (этап «Малое предприятие»)")
 	_status_row(a, "Радиоузел под током", st != null)
-	var sp := sim.things_of("speaker").size()
-	_status_row(a, L.t("Громкоговорители: %d") % sp, sp > 0, "Объекты → Офис → Громкоговоритель, кабель не дальше 3 клеток")
 	var names: Array[String] = []
 	for r in rooms:
 		names.append(L.t((r as Rooms.Room).title()))
@@ -297,17 +286,22 @@ static func _cat_pic(c: Cat, z: float) -> Control:
 	return host
 
 
-static func _cat(win: GameWindow) -> void:
+static func _cat(win: GameWindow, embedded: bool = false) -> void:
 	var sim := win.sim
 	var t := sim.town
 	var c := t.cat
 	if c == null:
+		if embedded:
+			return   # кота нет — карточки в обзоре тоже нет
 		win._info(L.t("кота нет"))
 		var msg := L.t("Кот ушёл: без миски на заводе голодно. Может, прибьётся другой…" if t.cat_gone else ("Кот отказался от предложения — ну и ладно." if t.cat_offered else "Кот ещё не прибился. Обычно это случается, когда на заводе есть столовая: запах котлет слышно издалека."))
 		win.content.add_child(UITheme.empty(msg))
 		return
-	win._info(L.t(c.activity).to_lower())
-	win._intro(L.t("Заводской кот гуляет по цехам, спит у тёплого, ест из миски дважды в день (корм — 40 ₽ в день) и ловит крыс: с ним крысы не портят расходники на складе. Кто проходит мимо в перерыв, гладит его: +3 к настроению."))
+	if embedded:
+		win.content.add_child(UITheme.caption(L.t("Заводской кот")))
+	else:
+		win._info(L.t(c.activity).to_lower())
+		win._intro(L.t("Заводской кот гуляет по цехам, спит у тёплого, ест из миски дважды в день (корм — 40 ₽ в день) и ловит крыс: с ним крысы не портят расходники на складе. Кто проходит мимо в перерыв, гладит его: +3 к настроению."))
 	var cols := win._cards(2)
 	var a := win._card_in(cols)
 	var h := UITheme.hbox(14)

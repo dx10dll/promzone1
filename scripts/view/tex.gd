@@ -6,7 +6,7 @@ extends RefCounted
 ## картинка чёткая при любом приближении и на больших мониторах.
 
 const K := 3.0
-const HI_DIRS := ["/objects/", "/people/", "/items/", "/tiles/", "/vehicles/", "/ui/", "/fx/", "/portrait/"]
+const HI_DIRS := ["/objects/", "/people/", "/items/", "/tiles/", "/vehicles/", "/ui/", "/fx/"]
 const KEEP := ["glow.svg"]
 
 static var _cache: Dictionary = {}
@@ -151,9 +151,6 @@ static func people_lod() -> bool:
 	return people_e < 1.3
 
 
-static func portrait(name: String) -> Texture2D:
-	return get_tex("res://assets/portrait/%s.svg" % name)
-
 
 ## 1.19: значки интерфейса — из вектора точно под размер на экране (VecIcon), без мыла.
 static var ui_scale := 1.0
@@ -184,17 +181,6 @@ static func _vec_icon(name: String, world: bool) -> Texture2D:
 	_ui_vec[ck] = t
 	return t
 
-
-## Значок над человеком (эмоции, нужды) — из вектора под зум камеры.
-static func emo(name: String) -> Texture2D:
-	var ck := "e:" + name
-	if _ui_vec.has(ck):
-		return _ui_vec[ck]
-	var t: Texture2D = png("emo_" + name, 32)
-	if t == null:
-		t = VecIcon.make("emo", name, true)
-	_ui_vec[ck] = t
-	return t
 
 
 ## 1.38: цветные значки владельца из assets/ui/icons (PNG 128×128 с прозрачными полями ~12%).

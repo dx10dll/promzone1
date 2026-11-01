@@ -642,15 +642,6 @@ func _tick_dogs(dt: float) -> void:
 				break
 
 
-func spawn_dogs(n: int) -> void:
-	var w := sim.world
-	for i in n:
-		for k in 40:
-			var c := Vector2i(sim.rng.randi_range(w.plot.position.x + 1, w.plot.end.x - 2), sim.rng.randi_range(w.plot.position.y + 1, w.plot.end.y - 2))
-			if w.passable(c) and sim.rooms.room_at(c) == null:
-				dogs.append({"x": c.x + 0.5, "y": c.y + 0.5, "tx": c.x + 0.5, "ty": c.y + 0.5, "wait": sim.rng.randf_range(0.0, 20.0), "f": sim.rng.randi_range(0, 3)})
-				break
-
 
 # ================================================================ сохранение
 

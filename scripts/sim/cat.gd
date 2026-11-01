@@ -100,7 +100,7 @@ func hunt(c: Vector2i, kind: String) -> bool:
 	var dst := c
 	if not sim.world.passable(dst):
 		return false
-	if _go(dst, "hunt", L.t("Охотится на мышь") if kind == "mouse" else L.t("Подкрадывается к голубю")):
+	if _go(dst, "hunt", L.t("Подкрадывается к голубю")):
 		return true
 	return false
 

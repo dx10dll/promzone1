@@ -246,13 +246,6 @@
   "ox": 0,
   "oy": 96
  },
- "cooler": {
-  "file": "res://assets/objects/cooler.svg",
-  "w": 80,
-  "h": 130,
-  "ox": 0,
-  "oy": 114
- },
  "sofa": {
   "file": "res://assets/objects/sofa.svg",
   "w": 144,
@@ -943,13 +936,6 @@
   "ox": 0,
   "oy": 98
  },
- "lamp_street": {
-  "file": "res://assets/objects/lamp_street.svg",
-  "w": 80,
-  "h": 176,
-  "ox": 0,
-  "oy": 160
- },
  "water_inlet": {
   "file": "res://assets/objects/water_inlet.svg",
   "w": 80,
@@ -1026,20 +1012,6 @@
   "h": 112,
   "ox": 0,
   "oy": 96
- },
- "cooler_v": {
-  "file": "res://assets/objects/cooler_v.svg",
-  "w": 80,
-  "h": 130,
-  "ox": 0,
-  "oy": 114
- },
- "cooler_b": {
-  "file": "res://assets/objects/cooler_b.svg",
-  "w": 80,
-  "h": 130,
-  "ox": 0,
-  "oy": 114
  },
  "toilet_v": {
   "file": "res://assets/objects/toilet_v.svg",
@@ -1666,13 +1638,6 @@
   "ox": 0,
   "oy": 134
  },
- "palm": {
-  "file": "res://assets/objects/palm.svg",
-  "w": 80,
-  "h": 136,
-  "ox": 0,
-  "oy": 120
- },
  "aquarium": {
   "file": "res://assets/objects/aquarium.svg",
   "w": 144,
@@ -1699,13 +1664,6 @@
   "h": 128,
   "ox": 0,
   "oy": 128
- },
- "bookcase": {
-  "file": "res://assets/objects/bookcase.svg",
-  "w": 80,
-  "h": 146,
-  "ox": 0,
-  "oy": 130
  },
  "tv": {
   "file": "res://assets/objects/tv.svg",
@@ -1888,13 +1846,6 @@
   "ox": 0,
   "oy": 100
  },
- "loudspeaker": {
-  "file": "res://assets/objects/loudspeaker.svg",
-  "w": 64,
-  "h": 94,
-  "ox": 0,
-  "oy": 94
- },
  "cat_bowl": {
   "file": "res://assets/objects/cat_bowl.svg",
   "w": 64,
@@ -1962,27 +1913,6 @@
   "h": 128,
   "ox": 0,
   "oy": 112
- },
- "locker2": {
-  "file": "res://assets/objects/locker2.svg",
-  "w": 80,
-  "h": 136,
-  "ox": 0,
-  "oy": 120
- },
- "locker2_v": {
-  "file": "res://assets/objects/locker2_v.svg",
-  "w": 80,
-  "h": 136,
-  "ox": 0,
-  "oy": 120
- },
- "locker2_b": {
-  "file": "res://assets/objects/locker2_b.svg",
-  "w": 80,
-  "h": 136,
-  "ox": 0,
-  "oy": 120
  },
  "company_board": {
   "file": "res://assets/objects/company_board.svg",
@@ -4910,13 +4840,6 @@
    ]
   }
  },
- "coat_rack": {
-  "file": "res://assets/objects/coat_rack.svg",
-  "w": 80,
-  "h": 144,
-  "ox": 0,
-  "oy": 128
- },
  "radio": {
   "file": "res://assets/objects/radio.svg",
   "w": 80,
@@ -4930,32 +4853,12 @@
    ]
   }
  },
- "samovar": {
-  "file": "res://assets/objects/samovar.svg",
-  "w": 80,
-  "h": 130,
-  "ox": 0,
-  "oy": 114,
-  "anchors": {
-   "steam": [
-    32,
-    4
-   ]
-  }
- },
  "trophy_case": {
   "file": "res://assets/objects/trophy_case.svg",
   "w": 80,
   "h": 146,
   "ox": 0,
   "oy": 130
- },
- "globe": {
-  "file": "res://assets/objects/globe.svg",
-  "w": 80,
-  "h": 120,
-  "ox": 0,
-  "oy": 104
  },
  "ny_tree": {
   "file": "res://assets/objects/ny_tree.svg",
@@ -5032,20 +4935,6 @@
     8
    ]
   }
- },
- "statue_worker": {
-  "file": "res://assets/objects/statue_worker.svg",
-  "w": 80,
-  "h": 172,
-  "ox": 0,
-  "oy": 156
- },
- "notice_board": {
-  "file": "res://assets/objects/notice_board.svg",
-  "w": 144,
-  "h": 128,
-  "ox": 0,
-  "oy": 112
  },
  "cast_ist": {
   "file": "res://assets/objects/cast_ist.svg",

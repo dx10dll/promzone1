@@ -51,6 +51,9 @@ func _refresh_texture(force: bool = false) -> void:
 		var r := _chair_key()
 		key = r[0]
 		fl = r[1]
+	var vars: Array = thing.def().get("variants", [])   # 1.65: «Растение» — три картинки (фикус, кактус, монстера)
+	if not vars.is_empty():
+		key = str(vars[absi(thing.id) % vars.size()])
 	if key == tex_key and fl == flip and not force:
 		return
 	tex_key = key
@@ -362,14 +365,6 @@ func _draw_decor_anim() -> void:
 				over.draw_circle(tp(lp[0], lp[1]), 1.4, col if on else col.darkened(0.6))
 				if on:
 					over.draw_circle(tp(lp[0], lp[1]), 3.0, Color(col.r, col.g, col.b, 0.25))
-		"samovar":
-			var st := _anchor("steam")
-			if st.is_empty():
-				return
-			for k in 4:
-				var ph := fmod(_t * 0.35 + k * 0.25, 1.0)
-				var p := tp(st[0], st[1]) + Vector2(sin(_t * 1.5 + k) * 2.0 + ph * 3.0, -ph * 14.0)
-				over.draw_circle(p, 1.5 + ph * 2.5, Color(1, 1, 1, 0.35 * (1.0 - ph)))
 		"water_cooler":
 			var bo := _anchor("bottle")
 			if bo.is_empty():

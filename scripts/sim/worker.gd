@@ -427,7 +427,7 @@ static func from_dict(d: Dictionary) -> Worker:
 	w.parts_made = int(d.get("made", 0))
 	w.exit_cell = Vector2i(int(d.get("exit_x", 0)), int(d.get("exit_y", 30)))
 	w.traits = d.get("traits", [])
-	w.thoughts = d.get("thoughts", [])
+	w.thoughts = (d.get("thoughts", []) as Array).filter(func(th: Variant) -> bool: return th is Dictionary and Defs.thoughts.has(str((th as Dictionary).get("id", ""))))   # 1.65: убранные мысли («mice», «ate_menu») из старых сохранений отбрасываем
 	w.mood = float(d.get("mood", 50.0))
 	w.shift = int(d.get("shift", 0))
 	w.pending_shift = int(d.get("pshift", -1))

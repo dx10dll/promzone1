@@ -1807,7 +1807,7 @@ func cancel_thing(t: Thing) -> void:
 	if t.cost_paid > 0.0 and not_sent:
 		earn(t.cost_paid, "Отмена покупки: " + t.title_ru())
 	elif t.cost_paid > 0.0:
-		notify(L.t("%s уже везут — ящики сложат на склад оборудования, их можно поставить позже или продать (Производство → Склад оборудования).") % t.title(), LVL_INFO, t.cell)
+		notify(L.t("%s уже везут — ящики сложат на склад оборудования, их можно поставить позже или продать (Производство → Склад и логистика).") % t.title(), LVL_INFO, t.cell)
 	t.cost_paid = 0.0
 	remove_thing(t, 0.0)
 
@@ -2303,7 +2303,66 @@ func to_dict() -> Dictionary:
 	}
 
 
+## 1.65: старое сохранение с убранными предметами: заменяем на оставшиеся, лишние снимаем.
+## Возвращает, сколько денег вернуть за снятые (оплаченное целиком).
+static func migrate_removed_objects(d: Dictionary) -> float:
+	var refund := 0.0
+	var gone: Dictionary = {}
+	var things_out: Array = []
+	for td: Dictionary in d.get("things", []):
+		var dn := str(td.get("def", ""))
+		if not Defs.OBJ_REMAP.has(dn):
+			things_out.append(td)
+			continue
+		var to := str(Defs.OBJ_REMAP[dn])
+		if to == "":
+			gone[int(td["id"])] = true
+			refund += float(td.get("paid", 0.0)) if not bool(td.get("built", false)) else float(Defs.objects_cost_of(dn))
+			continue
+		td["def"] = to
+		things_out.append(td)
+	if d.has("things"):
+		d["things"] = things_out
+	var items_out: Array = []
+	for idd: Dictionary in d.get("items", []):
+		var dn2 := str(idd.get("def", ""))
+		if str(idd.get("kind", "")) == "crate" and Defs.OBJ_REMAP.has(dn2):
+			var to2 := str(Defs.OBJ_REMAP[dn2])
+			if to2 == "":
+				continue
+			idd["def"] = to2
+		items_out.append(idd)
+	if d.has("items"):
+		d["items"] = items_out
+	var lg: Dictionary = d.get("logi", {})
+	if lg.has("equip"):
+		var eq_out: Array = []
+		for e: Dictionary in lg["equip"]:
+			var de := str(e.get("def", ""))
+			if Defs.OBJ_REMAP.has(de):
+				var to3 := str(Defs.OBJ_REMAP[de])
+				if to3 == "" or gone.has(int(e.get("thing", -1))):
+					continue
+				e["def"] = to3
+			eq_out.append(e)
+		lg["equip"] = eq_out
+	var pl: Dictionary = d.get("plan", {})
+	if pl.has("objs"):
+		var po_out: Array = []
+		for o: Dictionary in pl["objs"]:
+			var dp := str(o.get("def", ""))
+			if Defs.OBJ_REMAP.has(dp):
+				var to4 := str(Defs.OBJ_REMAP[dp])
+				if to4 == "":
+					continue
+				o["def"] = to4
+			po_out.append(o)
+		pl["objs"] = po_out
+	return refund
+
+
 static func from_dict(d: Dictionary) -> Sim:
+	var refund_removed := migrate_removed_objects(d)
 	var s := Sim.new()
 	s.scenario = str(d.get("scenario", "garage"))
 	s.minute = float(d["minute"])
@@ -2448,6 +2507,8 @@ static func from_dict(d: Dictionary) -> Sim:
 	if int(d.get("version", 1)) < 13:
 		Scenario.migrate_v13(s)   # 1.29: обязательные зоны разгрузки и отгрузки
 	s.faults.from_dict(d.get("faults", {}))
+	if refund_removed > 0.0:
+		s.earn(refund_removed, "Возврат: убранные предметы обстановки")
 	if not d.has("areas"):
 		Director.ensure(s)   # 1.40: в сохранениях до 1.40 директора не было — он появляется
 	# 1.18: сразу после загрузки — сеть, вода и помещения посчитаны (насосная качает до первого тика)

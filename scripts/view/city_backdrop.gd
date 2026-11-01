@@ -1472,16 +1472,6 @@ func _panel_house(r: Rect2) -> void:
 		_rec.draw_rect(Rect2(dx - 5, face.end.y - 7, 10, 7), Color("#5a4636"))
 
 
-func _school(r: Rect2) -> void:
-	_rec.draw_rect(r, Color("#6a6f58"))
-	var body := Rect2(r.position, Vector2(r.size.x, r.size.y * 0.45))
-	_building(body, Color("#c9b98f"), Color("#d8c9a2"), 0, L.t("Школа №%d") % _rng.randi_range(3, 27))
-	var field := Rect2(r.position + Vector2(r.size.x * 0.1, r.size.y * 0.55), Vector2(r.size.x * 0.8, r.size.y * 0.4))
-	_rec.draw_rect(field, Color("#5f8a4a"))
-	_rec.draw_rect(field.grow(-4), Color(1, 1, 1, 0.5), false, 1.5)
-	_rec.draw_line(Vector2(field.get_center().x, field.position.y + 4), Vector2(field.get_center().x, field.end.y - 4), Color(1, 1, 1, 0.5), 1.5)
-	_rec.draw_arc(field.get_center(), minf(field.size.y * 0.2, 20.0), 0, TAU, 24, Color(1, 1, 1, 0.5), 1.5)
-
 
 ## Здание «три четверти»: кровля сверху, снизу — лицевая стена (окна, ворота).
 ## gates: сколько ворот в лицевой стене. Возвращает прямоугольник кровли (для узора крыши).

@@ -133,13 +133,6 @@ func start(a: Worker, b: Worker, kind: String) -> void:
 		_gather(e, a)
 
 
-## Болтают, не бросая еду или сигарету: только значки над головой.
-func chat_in_place(a: Worker, b: Worker) -> void:
-	var e := {"kind": "chat", "a": a.id, "b": b.id, "end": sim.minute + rng.randf_range(3.0, 6.0), "watchers": [], "breaker": -1, "inplace": true}
-	events.append(e)
-	for p: Worker in [a, b]:
-		p.bubble = "laugh" if Mood.has_trait(p, "cheerful") or rng.randf() < 0.3 else "chat"
-
 
 func _task(w: Worker, o: Worker, kind: String, cell: Vector2i, dur: float) -> Task:
 	var t := Task.new()

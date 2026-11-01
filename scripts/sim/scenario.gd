@@ -376,9 +376,9 @@ static func _furnish_annex(sim: Sim) -> void:
 	# туалет: кабинка входом вниз и раковина
 	sim.place_thing("toilet", Vector2i(8, 16), true, false)
 	sim.place_thing("sink", Vector2i(9, 16), true, false)
-	# бытовка: два шкафчика на двоих, скамейка, огнетушитель
-	sim.place_thing("locker2", Vector2i(11, 16), true, false)
-	sim.place_thing("locker2", Vector2i(12, 16), true, false)
+	# бытовка: два шкафчика, скамейка, огнетушитель
+	sim.place_thing("locker", Vector2i(11, 16), true, false)
+	sim.place_thing("locker", Vector2i(12, 16), true, false)
 	sim.place_thing("extinguisher", Vector2i(13, 16), true, false)
 	sim.place_thing("bench", Vector2i(11, 18), true, false)
 
@@ -987,9 +987,9 @@ static func _new_field(seed_value: int, story_mode: String, profile: String) -> 
 	# 1.18: подстанция и насосная; 1.40 — отдельным домиком, через проход от бытовок (раньше стена к стене)
 	_build_tech(sim, Rect2i(19, 27, 7, 5), Vector2i(22, 31))
 	w.refresh_all()
-	# раздевалка: шкафчики на двоих, скамейки
+	# раздевалка: шкафчики, скамейки
 	for c in [Vector2i(5, 27), Vector2i(6, 27), Vector2i(7, 27)]:
-		put(sim, "locker2", c)
+		put(sim, "locker", c)
 	put(sim, "bench", Vector2i(5, 30))
 	put(sim, "extinguisher", Vector2i(8, 27))
 	put(sim, "lamp_bulb", Vector2i(7, 29))

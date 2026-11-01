@@ -463,6 +463,10 @@ func _present_staff() -> Array[Worker]:
 	return out
 
 
+func _can_heat_pipe() -> bool:
+	return sim.season.heating_season() and sim.season.radiators > 0
+
+
 func _can(ev: String) -> bool:
 	match ev:
 		"fire":
@@ -473,14 +477,11 @@ func _can(ev: String) -> bool:
 			return _materials().size() >= 6
 		"outage":
 			return not sim.things_of("power").is_empty()
-		"pipe_burst":
-			return sim.season.heating_season() and sim.season.radiators > 0
 		"wire_break":
 			return sim.faults.count("cable") == 0 and not sim.faults.candidates("cable").is_empty()
 		"leak":
-			return sim.faults.count("pipe") == 0 and not sim.faults.candidates("pipe").is_empty()
-		"heat_off":
-			return sim.season.heating_season() and sim.season.radiators > sim.eng.boiler_rads.size()
+			# 1.65: «Прорвало трубу» — и водопровод, и труба отопления (бывшая «Прорванная труба отопления»)
+			return _can_heat_pipe() or (sim.faults.count("pipe") == 0 and not sim.faults.candidates("pipe").is_empty())
 		"supply_delay":
 			return not sim.supply.is_empty()
 		"theft":
@@ -529,43 +530,43 @@ func _start(ev: String, delayed: bool) -> void:
 				injure(ps[sim.rng.randi_range(0, ps.size() - 1)], "event")
 		"bad_metal":
 			_ev_bad_metal()
-		"metal_up":
-			var k := sim.rng.randf_range(1.2, 1.35) if mode != "wild" else sim.rng.randf_range(1.3, 1.6)
-			add_mod("metal_price", k, sim.rng.randf_range(9.0, 14.0) * 1440.0, L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)))
-			info(L.t("Металл подорожал"), L.t("Металлобазы подняли цены на %d%%: виноваты курс и «сложная ситуация на рынке». Дорого продержится недели две. Покупайте только под заказы.") % int(round((k - 1.0) * 100.0)), "chart_up", Sim.LVL_WARN)
-			sim.paper.add(L.t("Экономика"), L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)), (L.t("Прутки дорожают. Бухгалтерия просит не точить лишнего.") if sim.paper.has_prof("accountant") else L.t("Прутки дорожают. Просим не точить лишнего.")))
-		"metal_down":
-			add_mod("metal_price", 0.85, 10.0 * 1440.0, L.t("Металл подешевел на 15%"))
-			info(L.t("Металл подешевел"), L.t("На рынке избыток проката: металлобазы снизили цены на 15% на ближайшие полторы недели. Хорошее время запастись."), "chart_down", Sim.LVL_GOOD)
+		"metal_jump", "metal_up", "metal_down":
+			# 1.65: «Скачок цен на металл»: вверх или вниз (прежние metal_up/metal_down из старых отложенных событий — по имени)
+			var up := ev == "metal_up" or (ev == "metal_jump" and sim.rng.randf() < (0.7 if mode == "wild" else (0.5 if mode == "calm" else 0.57)))
+			if up:
+				var k := sim.rng.randf_range(1.2, 1.35) if mode != "wild" else sim.rng.randf_range(1.3, 1.6)
+				add_mod("metal_price", k, sim.rng.randf_range(9.0, 14.0) * 1440.0, L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)))
+				info(L.t("Металл подорожал"), L.t("Металлобазы подняли цены на %d%%: виноваты курс и «сложная ситуация на рынке». Дорого продержится недели две. Покупайте только под заказы.") % int(round((k - 1.0) * 100.0)), "chart_up", Sim.LVL_WARN)
+				sim.paper.add(L.t("Экономика"), L.t("Металл подорожал на %d%%") % int(round((k - 1.0) * 100.0)), (L.t("Прутки дорожают. Бухгалтерия просит не точить лишнего.") if sim.paper.has_prof("accountant") else L.t("Прутки дорожают. Просим не точить лишнего.")))
+			else:
+				add_mod("metal_price", 0.85, 10.0 * 1440.0, L.t("Металл подешевел на 15%"))
+				info(L.t("Металл подешевел"), L.t("На рынке избыток проката: металлобазы снизили цены на 15% на ближайшие полторы недели. Хорошее время запастись."), "chart_down", Sim.LVL_GOOD)
 		"outage":
 			var mins := sim.rng.randf_range(90.0, 240.0)
 			add_mod("outage", 1.0, mins, L.t("Авария в городской сети"))
 			info(L.t("Авария в горсетях"), L.t("Электричество пропало по всему району. Обещают дать через %d ч. Станки стоят, свет только из окон.") % int(ceil(mins / 60.0)), "bolt_off", Sim.LVL_BAD)
 			sim.paper.add(L.t("Происшествия"), L.t("Свет отключили всему району"), L.t("Станки стоят. Энергетики горсетей ищут виноватого экскаваторщика."))
-		"pipe_burst":
-			_ev_pipe()
 		"wire_break":
 			_ev_fault("cable")
-		"leak":
-			_ev_fault("pipe")
-		"heat_off":
-			var hm := sim.rng.randf_range(1.0, 2.0) * 1440.0
-			add_mod("heat_off", 1.0, hm, L.t("Авария на теплотрассе: батареи от теплосети холодные"))
-			var own := sim.eng.boiler_rads.size()
-			info(L.t("Авария на теплотрассе"), L.t("Городская теплосеть отключила район на %d %s: батареи от неё холодные. %s") % [int(ceil(hm / 1440.0)), Defs.plural(int(ceil(hm / 1440.0)), "день", "дня", "дней"),
-				(L.t("Своя котельная греет %d %s как ни в чём не бывало.") % [own, Defs.plural(own, "батарею", "батареи", "батарей")]) if own > 0 else L.t("Своя котельная (газовый котёл) от таких аварий не зависит.")], "heat", Sim.LVL_BAD)
-			sim.paper.add(L.t("Происшествия"), L.t("Район без тепла"), (L.t("Теплосеть меняет трубу на перекрёстке. Мастера советуют поддеть тёплое под спецовку.") if sim.paper.has_prof("foreman") else L.t("Теплосеть меняет трубу на перекрёстке. Советуем поддеть тёплое под спецовку.")))
+		"leak", "pipe_burst":
+			# 1.65: одно событие «Прорвало трубу»: зимой с батареями — труба отопления, иначе водопровод
+			if ev == "pipe_burst" or (_can_heat_pipe() and (sim.faults.count("pipe") > 0 or sim.faults.candidates("pipe").is_empty() or sim.rng.randf() < 0.5)):
+				_ev_pipe()
+			else:
+				_ev_fault("pipe")
 		"cold_snap":
+			# 1.65: морозы вместе с аварией на теплотрассе (бывшее отдельное «Авария на теплотрассе»); «Жара» убрана
 			sim.season.snap = -sim.rng.randf_range(12.0, 18.0)
 			sim.season.snap_until = sim.minute + sim.rng.randf_range(2.0, 4.0) * 1440.0
 			var t := int(round(sim.season.outside_temp()))
 			info(L.t("Ударили морозы"), L.t("Синоптики обещают до %d °C на несколько дней. Счёт за отопление вырастет, в неотапливаемых помещениях работать невозможно.") % mini(t, -25), "snow", Sim.LVL_WARN)
 			sim.paper.add(L.t("Погода"), L.t("Мороз и солнце"), L.t("До %d °C! Не забудьте шапку-ушанку и тёплые портянки.") % mini(t, -25))
-		"heatwave":
-			sim.season.snap = sim.rng.randf_range(7.0, 10.0)
-			sim.season.snap_until = sim.minute + sim.rng.randf_range(2.0, 4.0) * 1440.0
-			info(L.t("Жара"), L.t("На улице за +30. В горячих цехах тяжело: помогут окна и кулер с водой."), "thermo", Sim.LVL_WARN)
-			sim.paper.add(L.t("Погода"), L.t("Жара!"), (L.t("Термисты просят выдать им мороженое за вредность. Профсоюз изучает вопрос.") if sim.paper.has_prof("heat_treater") and sim.crew.union_on() else L.t("Пейте воду и не стойте на солнцепёке: в цехах жарко.")))
+			if sim.season.heating_season() and sim.season.radiators > sim.eng.boiler_rads.size():
+				var hm := sim.rng.randf_range(1.0, 2.0) * 1440.0
+				add_mod("heat_off", 1.0, hm, L.t("Авария на теплотрассе: батареи от теплосети холодные"))
+				var own := sim.eng.boiler_rads.size()
+				info(L.t("Авария на теплотрассе"), L.t("Городская теплосеть отключила район на %d %s: батареи от неё холодные. %s") % [int(ceil(hm / 1440.0)), Defs.plural(int(ceil(hm / 1440.0)), "день", "дня", "дней"),
+					(L.t("Своя котельная греет %d %s как ни в чём не бывало.") % [own, Defs.plural(own, "батарею", "батареи", "батарей")]) if own > 0 else L.t("Своя котельная (газовый котёл) от таких аварий не зависит.")], "heat", Sim.LVL_BAD)
 		"flood":
 			for s: Dictionary in sim.supply:
 				s["eta"] = float(s["eta"]) + 1440.0
@@ -1425,12 +1426,6 @@ func _collect(r: Dictionary) -> void:
 	sim.earn(a, "Оплата (долг): " + who)
 	sim.notify(L.t("%s наконец заплатил: %s.") % [who, Defs.money_str(a)], Sim.LVL_GOOD)
 
-
-func receivable_total() -> float:
-	var t := 0.0
-	for r: Dictionary in receivables:
-		t += float(r["amount"])
-	return t
 
 
 # ================================================================ забастовка

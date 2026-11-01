@@ -27,54 +27,52 @@ const GROUPS := {
 		["contracts", "Контракты", "handshake", "orders", "contracts"],
 		["plan", "План ПДО", "calendar", "orders", "plan"], ["done", "Архив", "log", "orders", "done"]]},
 	"prod": {"title": "Производство", "icon": "production", "secs": [
-		["machines", "Станки", "shop", "shop", ""], ["stall", "Простой", "warn", "shop", "stall"], ["supply", "Металл и расходники", "supply", "supply", "main"],
-		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["logi", "Склад и логистика", "supply", "supply", "logi"], ["stash", "Склад оборудования", "objects", "supply", "stash"]]},
+		["machines", "Станки", "shop", "shop", ""], ["supply", "Металл и расходники", "supply", "supply", "main"],
+		["routes", "Маршруты изделий", "orders", "shop", "routes"], ["logi", "Склад и логистика", "supply", "supply", "logi"]]},
 	"people": {"title": "Люди", "icon": "people", "secs": [
 		["staff", "Сотрудники", "staff", "staff", "staff"], ["hire", "Найм", "hire", "staff", "hire"],
 		["train", "Карьера", "idea", "staff", "train"], ["safety", "Охрана труда", "injury", "staff", "safety"],
-		["brig", "Бригады", "crew", "crew", "brig"], ["sched", "График смены", "clock", "crew", "sched"],
+		["brig", "Бригады и график смены", "crew", "crew", "brig"],
 		["sec", "Охрана", "thief", "crew", "sec"], ["union", "Профсоюз", "handshake", "crew", "union"],
 		["honor", "Доска почёта", "medal", "honor", ""]]},
 	"finance": {"title": "Финансы", "icon": "finances", "secs": [
-		["summary", "Сводка", "finance", "finance", "summary"], ["charts", "Графики", "chart_up", "finance", "charts"],
-		["stats", "Статистика", "statistics", "finance", "stats"],
-		["weeks", "По неделям", "log", "finance", "weeks"], ["loans", "Кредиты и лизинг", "money", "finance", "loans"],
+		["summary", "Сводка", "finance", "finance", "summary"], ["dyn", "Динамика", "chart_up", "finance", "dyn"],
+		["loans", "Кредиты и лизинг", "money", "finance", "loans"],
 		["insurance", "Страхование", "shield", "finance", "insurance"], ["grants", "Гранты", "medal", "finance", "grants"]]},   # 1.56: вкладку «Электричество» владелец убрал
 	"office": {"title": "Управление", "icon": "management", "secs": [
 		["develop", "Развитие и отделы", "develop", "develop", ""], ["research", "Разработки", "research", "research", ""],
 		["iso", "ISO 9001", "iso", "market", "iso"], ["advisor", "Главный инженер", "engineer", "market", "advisor"]]},
 	"goals": {"title": "Цели", "icon": "goals", "secs": [
-		["stage", "Этап роста", "stage_up", "goals", "stage"], ["rating", "Рейтинг", "star", "goals", "rating"],
-		["scn", "Сценарий", "scn_garage", "goals", "scn"], ["ach", "Достижения", "medal", "goals", "ach"]]},
+		["stage", "Этап роста и рейтинг", "stage_up", "goals", "stage"], ["scn", "Сценарий", "scn_garage", "goals", "scn"], ["ach", "Достижения", "medal", "goals", "ach"]]},
 	"events": {"title": "События", "icon": "events", "secs": [
 		["now", "Сейчас", "calendar", "events", "now"], ["insp", "Проверки", "inspect", "events", "insp"],
-		["cal", "Календарь", "clock", "events", "cal"], ["hist", "Хроника", "log", "events", "hist"],
 		["paper", "Многотиражка", "paper", "paper", ""], ["log", "Журнал", "letter", "log", ""]]},
 	"town": {"title": "Город", "icon": "city", "secs": [
 		["overview", "Обзор", "town", "town", "overview"], ["dorm", "Общежитие", "bed", "town", "dorm"],
-		["canteen", "Столовая и медпункт", "med", "town", "canteen"], ["kg", "Детсад и ДК", "kid", "town", "kg"],
-		["radio", "Заводское радио", "radio", "town", "radio"], ["cat", "Кот", "cat", "town", "cat"]]},
+		["canteen", "Столовая и медпункт", "med", "town", "canteen"], ["kg", "Детсад и ДК", "kid", "town", "kg"]]},
 }
 ## Старые названия окон -> [группа, раздел].
 const ALIASES := {"develop": ["office", "develop"], "staff": ["people", "staff"], "crew": ["people", "brig"], "shop": ["prod", "machines"], "supply": ["prod", "supply"],
 	"research": ["office", "research"], "paper": ["events", "paper"], "log": ["events", "log"]}
 ## Старые ключи вкладок -> разделы.
-const SEC_ALIASES := {"main": "supply", "stage": "stage", "compet": "market"}
+const SEC_ALIASES := {"main": "supply", "stage": "stage", "compet": "market", "stall": "machines", "stash": "logi", "rating": "stage", "sched": "brig", "radio": "overview", "cat": "overview"}
+## 1.65: слитые разделы: старый ключ -> [новый раздел, режим внутри него].
+const SUB_ALIASES := {"charts": ["dyn", "chart"], "stats": ["dyn", "day"], "weeks": ["dyn", "week"],
+	"hist": ["log", "events"], "cal": ["insp", ""]}
 ## Разделы, которые открывает специалист (1.10) или ступень развития (1.11, «dev:…»): раздел -> [отдел, что появится].
 const SEC_GATES := {
-	"weeks": ["accounting", "Движение денег по неделям и статьям, себестоимость и маржа заказов, прогноз кассы."],
 	"insurance": ["dev:fin3", "Страховые полисы оформляет и ведёт бухгалтерия."],
 	"contracts": ["dev:mkt3", "Долгие контракты с крупными заказчиками: поставки партиями по графику, цена выше рыночной. И экспортные заказы при репутации от 60."],
 	"iso": ["dev:tech3", "Сертификация ISO 9001: аудитор проверяет ОТК, качество, техотдел, СОУТ и инструктажи. Сертификат даёт больше заявок и премиальные цены."],
 	"plan": ["pdo", "План производства с прогнозом сроков, приоритеты заказов, вдвое меньше переналадок, оценка «успеваем?» на рынке."],
-	"brig": ["foreman", "Бригады и бригадиры, участки, соцсоревнование между бригадами."],
-	"sched": ["foreman", "Свой график смены по 15 минут: планёрка, обед, перерывы, уборка."],
+	"brig": ["foreman", "Бригады и бригадиры, участки, соцсоревнование между бригадами; свой график смены по 15 минут: планёрка, обед, перерывы, уборка."],
 	"honor": ["dev:prod3", "Доска почёта: лучшие рабочие месяца и соцсоревнование."],
 	"advisor": ["engineer", "Советы главного инженера, ППР без вашего участия, сводка сетей: мощность, воздух, вода."],
 }
 
 var group := ""
 var sec := ""
+var sub := ""   ## 1.65: режим внутри слитого раздела (Динамика: week/chart/day, Журнал: all/events/money и т. п.)
 var _secs: Array = []
 var sec_title: Label
 var sec_info: Label
@@ -207,6 +205,9 @@ func setup(s: Sim, h: Node, k: String, first_sec: String = "", w: float = 1180.0
 	var want := first_sec
 	if SEC_ALIASES.has(want):
 		want = str(SEC_ALIASES[want])
+	if SUB_ALIASES.has(want) and _has_sec(str(SUB_ALIASES[want][0])):
+		sub = str(SUB_ALIASES[want][1])
+		want = str(SUB_ALIASES[want][0])
 	if want == "" or not _has_sec(want):
 		want = str(_secs[0][0])
 	_open_sec(want)
@@ -318,6 +319,9 @@ var _tab_btns: Dictionary = {}
 ## Переключить раздел снаружи (по старому ключу вкладки или ключу раздела).
 func select_tab(key: String) -> void:
 	var k := str(SEC_ALIASES.get(key, key))
+	if SUB_ALIASES.has(k) and _has_sec(str(SUB_ALIASES[k][0])):
+		sub = str(SUB_ALIASES[k][1])
+		k = str(SUB_ALIASES[k][0])
 	if _has_sec(k):
 		_open_sec(k)
 		return
@@ -368,7 +372,7 @@ func _popup_open() -> bool:
 
 func rebuild(force: bool) -> void:
 	set_badge("board", sim.sales.board.size())   # 1.48b: счётчик новых заявок у пункта меню
-	var sig := _signature() + _gate_sig()
+	var sig := sub + "~" + _signature() + _gate_sig()
 	if not force and sig == _sig:
 		return
 	_sig = sig
@@ -567,7 +571,7 @@ func _signature() -> String:
 			s2.append(str(sim.logi.equip.size()))
 			s2.append(str(sim.item_rev))
 			if tab == "logi":
-				s2.append("logi%d|%d|%d" % [int(sim.minute / 5.0), sim.thing_rev, sim.orders.list.size()])
+				s2.append("logi%d|%d|%d|%d" % [int(sim.minute / 5.0), sim.thing_rev, sim.orders.list.size(), sim.logi.spare_sets().size()])
 			return ",".join(s2)
 		"shop":
 			var s5: Array[String] = [tab, str(sim.thing_rev)]
@@ -597,8 +601,6 @@ func _signature() -> String:
 					for goal: Dictionary in Grants.def(str(a["id"])).get("goals", []):
 						gs += "1" if sim.grants.goal_ok(goal, a) else "0"
 				gs += "|%d|%d|%d|%d" % [sim.grants.active.size(), sim.grants.done.size(), sim.grants.pending.size(), sim.day()]
-			if tab == "energy":
-				gs = "%d|%d|%s|%d|%d" % [int(sim.power.kwh_day + sim.power.kwh_night), int(sim.power.peak_day), str(sim.power.upgrade), sim.power.contract_steps, int(sim.power.night_now())]
 			return "%s|%d|%d|%d|%s|%s|%d|%s|%d" % [tab, sim.ledger.size(), int(sim.money), sim.office.loans.size(), gs, str(sim.market.insurance), sim.market.leases.size(), str(sim.market.leasing_on), sim.market.hist.size()]
 		"office":
 			var s6: Array[String] = [str(sim.office.policies), sim.office.supplier, str(sim.rooms.list.size()), str(sim.thing_rev)]
@@ -614,7 +616,7 @@ func _signature() -> String:
 				dsig.append("1" if sim.office.active(str(dk)) else "0")
 			return ",".join(dsig)
 		"log":
-			return str(sim.events.size()) + (str(sim.events[0]) if not sim.events.is_empty() else "")
+			return str(sim.events.size()) + (str(sim.events[0]) if not sim.events.is_empty() else "") + "|%d|%d" % [sim.ledger.size(), sim.story.archive.size()]
 		"events":
 			var st := sim.story
 			return "%s|%d|%s|%d|%d|%d|%d|%d|%d|%d|%s" % [tab, st.letters.size(), str(st.strike.get("active", false)), st.fires.size(), sim.inspect.queue.size(),
@@ -1314,9 +1316,6 @@ func _schedule_card(parent: Control) -> void:
 
 
 func _supply() -> void:
-	if tab == "stash":
-		_stash()
-		return
 	if tab == "logi":
 		_logi()
 		return
@@ -1419,14 +1418,6 @@ func _supply() -> void:
 		cg.add_child(t)
 
 
-## Расходники: сколько на складе (снабжение докупает само).
-func _cons_rows() -> void:
-	for c in Defs.consumables.keys():
-		var cd: Dictionary = Defs.consumables[c]
-		var stock := float(sim.cons.get(c, 0.0))
-		var line := tr("%s: на складе %.0f ед.%s — докупается автоматически") % [cons_text(str(c)), stock, tr(" · едет") if sim.cons_on_way(str(c)) else ""]
-		content.add_child(UITheme.label(line, 14, UITheme.TEXT if stock > float(cd["units"]) * 0.25 else UITheme.WARN))
-
 
 ## 1.58: «Склад и логистика» — один экран: склады по типам, заказы по этапам, машины, носильщики, проблемы.
 func _logi() -> void:
@@ -1487,10 +1478,13 @@ func _logi() -> void:
 		var pl := UITheme.label(str(p["text"]), 13, UITheme.BAD if str(p["k"]) in ["noway", "full"] else UITheme.WARN)
 		pl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		d.add_child(pl)
+	_stash()
 
 
+## 1.65: бывшая вкладка «Склад оборудования» — карточка внизу «Склада и логистики».
 func _stash() -> void:
-	_intro(tr("Демонтированное и неустановленное оборудование лежит в ящиках в помещении «Склад» (или в зоне разгрузки). Поставите такой же объект — возьмут отсюда бесплатно. Ненужное можно продать за полцены."))
+	content.add_child(UITheme.caption(tr("Склад оборудования")))
+	content.add_child(UITheme.para(tr("Демонтированное и неустановленное оборудование лежит в ящиках в помещении «Склад» (или в зоне разгрузки). Поставите такой же объект — возьмут отсюда бесплатно. Ненужное можно продать за полцены."), 12, UITheme.MUTED))
 	var sets := sim.logi.spare_sets()
 	var g := _cards(2)
 	var any := false
@@ -1521,17 +1515,6 @@ func _stash() -> void:
 
 
 # ---------------------------------------------------------------- персонал
-
-func _traits_line(w: Worker) -> HFlowContainer:
-	var trn := HFlowContainer.new()
-	trn.add_theme_constant_override("h_separation", 6)
-	for t in w.traits:
-		var chip := UITheme.label(trait_name(str(t)), 12, UITheme.TEXT)
-		chip.add_theme_stylebox_override("normal", UITheme.sb(UITheme.BG3, UITheme.LINE, 1, 9, 7, 1))
-		chip.mouse_filter = Control.MOUSE_FILTER_STOP
-		chip.tooltip_text = trait_desc(str(t))
-		trn.add_child(chip)
-	return trn
 
 
 func _staff() -> void:
@@ -2105,10 +2088,10 @@ func _shop() -> void:
 	if tab == "routes":
 		_routes()
 		return
-	if tab == "stall":
-		_stall()
-		return
 	var ms := sim.things_of("machine")
+	var stalled: Dictionary = {}   # 1.65: бывшая вкладка «Простой» — колонка в таблице станков
+	for sr: Dictionary in Stall.list(sim):
+		stalled[(sr["m"] as Thing).id] = sr
 	var work := 0
 	var broken := 0
 	for m0 in ms:
@@ -2124,7 +2107,7 @@ func _shop() -> void:
 	if ms.is_empty():
 		content.add_child(UITheme.empty(tr("Станков пока нет. Поставьте их через «Объекты» (O).")))
 		return
-	_thead([["", 44], [tr("Станок"), 230], [tr("Задание"), -1], [tr("Работает"), 150], [tr("Состояние"), 130], [tr("Операций"), 70], ["", 92]])
+	_thead([["", 44], [tr("Станок"), 230], [tr("Задание"), -1], [tr("Работает"), 110], [tr("Состояние"), 110], [tr("Простой"), 190], ["", 92]])
 	for m in ms:
 		var st := _machine_state(m)
 		var job := tr("нет задания")
@@ -2140,54 +2123,22 @@ func _shop() -> void:
 				who = w.call_name()
 		var ccol := UITheme.GOOD if m.condition >= 60.0 else (UITheme.WARN if m.condition >= Defs.b("breakdown_below") else UITheme.BAD)
 		var mid := m.id
+		var sc: Control = _cl("—", 13, UITheme.MUTED)
+		if stalled.has(m.id):
+			var sr2: Dictionary = stalled[m.id]
+			var scol: Color = [UITheme.BAD, UITheme.WARN, UITheme.MUTED][clampi(int(sr2["lvl"]), 0, 2)]
+			sc = _chip_box(UITheme.chip(L.t(str(sr2["why"])), scol, L.t(str(sr2["hint"]))))
 		var tb := UITheme.small(tr("Выключить") if m.enabled else tr("Включить"), func() -> void:
 			var t: Thing = sim.things.get(mid)
 			if t:
 				t.enabled = not t.enabled
 			rebuild(true))
 		_trow([[_icon(Tex.obj(m.def_id), 40), 44], [_cl2(m.title(), str(st[0]), UITheme.TEXT, st[1]), 230], [_cl(job, 13, UITheme.INFO if m.product != "" else UITheme.MUTED), -1],
-			[_cl(who, 13), 150], [UITheme.meter(m.condition, ccol, 70, "%d%%" % int(m.condition)), 130], [_cl(str(m.parts_made), 13, UITheme.MUTED), 70], [tb, 92]],
+			[_cl(who, 13), 110], [UITheme.meter(m.condition, ccol, 70, "%d%%" % int(m.condition)), 110], [sc, 190], [tb, 92]],
 			func() -> void:
 				hud.select_thing(mid)
 				closed.emit(), 48.0, tr("Показать станок на заводе"))
 
-
-## 1.24: «Простой» — все простаивающие станки с причиной; щелчок — показать станок.
-func _stall() -> void:
-	var ms := sim.things_of("machine")
-	var lst := Stall.list(sim)
-	var bad := 0
-	for r0: Dictionary in lst:
-		if int(r0["lvl"]) <= Stall.WARN:
-			bad += 1
-	_info(tr("станков %d · работают %d · стоят %d%s") % [ms.size(), ms.size() - lst.size(), lst.size(), (tr(" · требуют внимания %d") % bad) if bad > 0 else ""])
-	_intro(tr("Все станки, которые сейчас не работают, и почему. Сверху — то, что само не пройдёт (поломка, нет тока, нет металла). Щёлкните по строке — камера покажет станок."))
-	if ms.is_empty():
-		content.add_child(UITheme.empty(tr("Станков пока нет. Поставьте их через «Объекты» (O).")))
-		return
-	if lst.is_empty():
-		content.add_child(UITheme.empty(tr("Все станки работают. Так держать!")))
-		return
-	var groups := [[Stall.BAD, tr("Нужно вмешаться"), UITheme.BAD], [Stall.WARN, tr("Скоро встанет совсем"), UITheme.WARN], [Stall.INFO, tr("Обычное ожидание"), UITheme.MUTED]]
-	for g: Array in groups:
-		var part := lst.filter(func(r: Dictionary) -> bool: return int(r["lvl"]) == int(g[0]))
-		if part.is_empty():
-			continue
-		var hh := UITheme.hbox(8)
-		var ic := _icon(Tex.ui("warn" if int(g[0]) < Stall.INFO else "clock"), 18.0)
-		UITheme.tint_icon(ic, ic.texture, g[2])
-		hh.add_child(ic)
-		hh.add_child(_cl("%s · %d" % [str(g[1]), part.size()], 13, g[2], UITheme.f_semi))
-		content.add_child(hh)
-		for r: Dictionary in part:
-			var m: Thing = r["m"]
-			var mid := m.id
-			var rm := sim.rooms.room_of_thing(m)
-			_trow([[_icon(Tex.obj(m.def_id), 40), 44], [_cl2(m.title(), rm.title() if rm else tr("без помещения"), UITheme.TEXT, UITheme.MUTED), 230],
-				[_chip_box(UITheme.chip(L.t(str(r["why"])), g[2])), 190], [_cl(L.t(str(r["hint"])), 13, UITheme.TEXT), -1]],
-				func() -> void:
-					hud.select_thing(mid)
-					closed.emit(), 52.0, tr("Показать станок на заводе"))
 
 
 func _chip_box(c: Control) -> Control:
@@ -2225,14 +2176,8 @@ func _routes() -> void:
 
 func _finance() -> void:
 	match tab:
-		"weeks":
-			_finance_weeks()
-			return
-		"charts":
-			_finance_charts()
-			return
-		"stats":
-			_finance_stats()
+		"dyn":
+			_finance_dyn()
 			return
 		"insurance":
 			_finance_insurance()
@@ -2242,9 +2187,6 @@ func _finance() -> void:
 			return
 		"grants":
 			_finance_grants()
-			return
-		"energy":
-			_finance_energy()
 			return
 	var st := sim.stats
 	_info(tr("налог с выручки %d%% · долг по кредитам %s") % [int(round(sim.office.tax_rate() * 100.0)), Defs.money_str(sim.office.debt())])
@@ -2321,6 +2263,17 @@ func _crisis_card() -> void:
 
 
 func _log() -> void:
+	if not ["all", "events", "money"].has(sub):
+		sub = "all"
+	content.add_child(UITheme.segmented([["all", tr("Все")], ["events", tr("События")], ["money", tr("Деньги")]], sub, func(k: String) -> void:
+		sub = k
+		rebuild(true)))
+	if sub == "events":
+		_log_chronicle()
+		return
+	if sub == "money":
+		_log_money()
+		return
 	_info(tr("последние %d событий") % sim.events.size())
 	for e: Dictionary in sim.events:
 		var lvl := int(e["level"])
@@ -2337,61 +2290,46 @@ func _log() -> void:
 		_trow([[dot, 6], [_cl(tr("день %d, %s") % [int(e["day"]), str(e["time"])], 12, UITheme.MUTED), 110], [t, -1]], cb, 28.0, str(e["text"]) + (tr("\nНажмите — открыть, где с этим разбираться") if tg != "" else ""))
 
 
-## 1.53: «Финансы → Электричество»: расход днём и ночью, пик нагрузки, увеличение мощности у сетевой компании.
-func _finance_energy() -> void:
-	var pw := sim.power
-	var price := Defs.b("power_price_kwh")
-	var nk := Defs.b("tariff_night_k")
-	_info(tr("сейчас %s тариф · %.1f ₽/кВт·ч · лимит подстанции %d кВт") % [tr("ночной") if pw.night_now() else tr("дневной"), pw.price_now(), int(pw.total_kw())])
-	var ct := pw.cost_today()
-	var wk := pw.week_sum(7)
-	var g := _cards(4)
-	for t in [UITheme.stat(tr("Сейчас"), tr("%.1f кВт") % pw.total_load, UITheme.TEXT, tr("из %d кВт лимита") % int(pw.total_kw())),
-			UITheme.stat(tr("Пик за сутки"), tr("%.1f кВт") % maxf(pw.peak_day, pw.total_load), UITheme.BAD if pw.peak_day > pw.total_kw() * 0.9 else UITheme.TEXT, tr("вчера %.1f кВт") % pw.peak_prev),
-			UITheme.stat(tr("Сегодня"), Defs.money_str(float(ct[0]) + float(ct[1])), UITheme.WARN, tr("%d кВт·ч") % int(pw.kwh_day + pw.kwh_night)),
-			UITheme.stat(tr("Выбивало сегодня"), str(pw.trips_today), UITheme.BAD if pw.trips_today > 0 else UITheme.MUTED, tr("раз вводной автомат"))]:
-		t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		g.add_child(t)
-	var c := _card_in(content, tr("Расход на электричество"), tr("Днём кВт·ч стоит %.1f ₽, ночью (с 23:00 до 7:00) — %.1f ₽.") % [price, price * nk])
-	for row: Array in [[tr("Сегодня, день"), "%d %s" % [int(pw.kwh_day), tr("кВт·ч")], Defs.money_str(float(ct[0]))], [tr("Сегодня, ночь"), "%d %s" % [int(pw.kwh_night), tr("кВт·ч")], Defs.money_str(float(ct[1]))],
-			[tr("7 дней, день"), "%d %s" % [int(wk[0]), tr("кВт·ч")], Defs.money_str(float(wk[2]))], [tr("7 дней, ночь"), "%d %s" % [int(wk[1]), tr("кВт·ч")], Defs.money_str(float(wk[3]))]]:
-		var rh := UITheme.hbox(8)
-		var rl := UITheme.label(str(row[0]), 13, UITheme.MUTED)
-		rl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		rh.add_child(rl)
-		rh.add_child(UITheme.label(str(row[1]), 13, UITheme.TEXT))
-		var rv := UITheme.label(str(row[2]), 13, UITheme.BAD, UITheme.f_semi)
-		rv.custom_minimum_size = Vector2(110, 0)
-		rv.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		rh.add_child(rv)
-		c.add_child(rh)
-	c.add_child(UITheme.para(tr("Совет: ночная смена дешевле по энергии — ночью электричество вдвое дешевле. Печи и прессы выгодно ставить на ночь."), 12, UITheme.INFO))
-	var u := _card_in(content, tr("Мощность по договору"), tr("Лимит подстанции — 15–40 кВт плюс аккумуляторы. Если нагрузка выше лимита, вводной автомат выбивает, и завод стоит, пока его не включат. Сетевая компания за деньги подключит дополнительные кВт — не сразу."))
-	var nu := pw.next_upgrade()
-	u.add_child(UITheme.para(tr("Сейчас по договору: +%d кВт к подстанции (шаг %d из %d).") % [int(pw.contract_kw()), pw.contract_steps, pw.max_contract()], 13, UITheme.TEXT))
-	if not pw.upgrade.is_empty():
-		u.add_child(UITheme.chip(tr("заявка в работе: ещё %d дн.") % maxi(0, int(pw.upgrade["due"]) - sim.day()), UITheme.WARN, ""))
-	elif nu.is_empty():
-		u.add_child(UITheme.para(tr("Больше мощности по договору не выдают."), 12, UITheme.MUTED))
-	else:
-		var b := UITheme.primary(tr("Заказать +%d кВт · %s · %d дн.") % [int(nu["kw"]), Defs.money_str(float(nu["cost"])), int(nu["days"])], func() -> void:
-			var err := pw.order_upgrade()
-			if err != "":
-				hud.toast(err, Sim.LVL_WARN)
-			rebuild(true))
-		var why := pw.upgrade_block()
-		b.disabled = why != ""
-		if why != "":
-			b.tooltip_text = why
-		u.add_child(b)
-	if pw.any_tripped():
-		u.add_child(UITheme.primary(tr("Включить автомат"), func() -> void:
-			pw.reset_all()
-			rebuild(true)))
-	_thead([[tr("День"), 90], [tr("Пик, кВт"), 100], [tr("День, кВт·ч"), 120], [tr("Ночь, кВт·ч"), 120], [tr("Расход"), -1]])
-	for h: Dictionary in pw.hist.slice(0, 7):
-		_trow([[_cl(str(int(h["d"])), 13, UITheme.MUTED), 90], [_cl("%.1f" % float(h["peak"]), 13), 100], [_cl("%d" % int(h["kd"]), 13), 120], [_cl("%d" % int(h["kn"]), 13), 120],
-			[_cl(Defs.money_str(float(h["cd"]) + float(h["cn"])), 13, UITheme.BAD, UITheme.f_semi), -1]], Callable(), 28.0)
+
+## 1.65: «Динамика» = бывшие «Графики», «Статистика» и «По неделям»: один раздел, переключатель режима.
+func _finance_dyn() -> void:
+	if not ["week", "chart", "day"].has(sub):
+		sub = "chart"
+	content.add_child(UITheme.segmented([["week", tr("Неделя")], ["chart", tr("График")], ["day", tr("Сутки")]], sub, func(k: String) -> void:
+		sub = k
+		rebuild(true)))
+	match sub:
+		"week":
+			_finance_weeks()
+		"day":
+			_finance_stats()
+		_:
+			_finance_charts()
+
+
+## Журнал → «События»: прошедшие события завода с полным текстом (бывшая «Хроника»).
+func _log_chronicle() -> void:
+	var ar: Array = sim.story.archive
+	_info("%d %s" % [ar.size(), Defs.plural(ar.size(), "запись", "записи", "записей")])
+	if ar.is_empty():
+		content.add_child(UITheme.empty(tr("Пока ничего не случилось. Это ненадолго.")))
+	for e: Dictionary in ar:
+		var ic := _icon(Tex.ui(str(e.get("icon", "letter"))), 22)
+		UITheme.tint_icon(ic, ic.texture, [UITheme.INFO, UITheme.GOOD, UITheme.WARN, UITheme.BAD][clampi(int(e.get("level", 0)), 0, 3)])
+		var txt := _cl(str(e["text"]).replace("\n", " "), 12, UITheme.MUTED)
+		txt.tooltip_text = str(e["text"])
+		_trow([[ic, 26], [_cl(str(e.get("date", "")), 12, UITheme.MUTED), 150], [_cl(L.t(str(e["title"])), 13, UITheme.TEXT, UITheme.f_semi), 300], [txt, -1]], Callable(), 32.0, str(e["text"]))
+
+
+## Журнал → «Деньги»: последние операции по счёту.
+func _log_money() -> void:
+	_info(tr("последние %d операций") % mini(sim.ledger.size(), 80))
+	if sim.ledger.is_empty():
+		content.add_child(UITheme.empty(tr("Денежных операций пока не было.")))
+	for e: Dictionary in sim.ledger.slice(0, 80):
+		var v := float(e["v"])
+		_trow([[_cl(tr("день %d, %s") % [int(e["day"]), str(e["time"])], 12, UITheme.MUTED), 110], [_cl(str(e["text"]), 13), -1],
+			[_cl(("+" if v > 0 else "") + Defs.money_str(v), 13, UITheme.GOOD if v > 0 else UITheme.BAD, UITheme.f_semi, HORIZONTAL_ALIGNMENT_RIGHT), 130]], Callable(), 28.0)
 
 
 func _finance_weeks() -> void:
@@ -2750,10 +2688,6 @@ func _events() -> void:
 			_events_now()
 		"insp":
 			_events_insp()
-		"cal":
-			_events_cal()
-		"hist":
-			_events_hist()
 
 
 func _events_now() -> void:
@@ -3002,55 +2936,6 @@ func fix_line(text: String, what: String, fix: String, cell: Vector2i = Vector2i
 	return l
 
 
-func _events_cal() -> void:
-	var se := sim.season
-	_info(tr("сейчас: %s") % se.long_date())
-	_intro(tr("Игровой месяц — две недели, год — 168 дней. В конце каждого месяца подводится план: выполнили — репутация и настроение растут. Если план горит, можно объявить аврал (штурмовщина)."))
-	var grid := _cards(4)
-	var temps: Array = Defs.seasons.get("month_temp", [])
-	for m in 12:
-		var cur := m == se.month()
-		var p := UITheme.card(10, UITheme.BG3 if cur else UITheme.BG2, UITheme.ACCENT if cur else UITheme.LINE)
-		p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var v := UITheme.vbox(1)
-		p.add_child(v)
-		var hh := UITheme.hbox(6)
-		hh.add_child(UITheme.label(month_name(m), 14, UITheme.ACCENT if cur else UITheme.TEXT, UITheme.f_semi))
-		hh.add_child(UITheme.label("~%+d °C" % (int(temps[m]) if temps.size() == 12 else 0), 12, UITheme.MUTED))
-		v.add_child(hh)
-		for h: Dictionary in Defs.seasons.get("holidays", []):
-			if int(h["month"]) == m:
-				v.add_child(_cl("★ %s" % L.t(str(h["name"])), 12, UITheme.GOOD if bool(h.get("off", false)) else UITheme.INFO))
-		var extra := ""
-		match m:
-			11, 0, 1:
-				extra = tr("морозы, снег, отопление")
-			2:
-				extra = tr("таяние, гололёд")
-			3:
-				extra = tr("паводок, субботник")
-			6:
-				extra = tr("сезон отпусков")
-			5, 7:
-				extra = tr("жара в горячих цехах")
-			10:
-				extra = tr("заказчики закрывают год")
-		if extra != "":
-			v.add_child(_cl(extra, 11, UITheme.MUTED))
-		grid.add_child(p)
-
-
-func _events_hist() -> void:
-	var ar: Array = sim.story.archive
-	_info("%d %s" % [ar.size(), Defs.plural(ar.size(), "запись", "записи", "записей")])
-	if ar.is_empty():
-		content.add_child(UITheme.empty(tr("Пока ничего не случилось. Это ненадолго.")))
-	for e: Dictionary in ar:
-		var ic := _icon(Tex.ui(str(e.get("icon", "letter"))), 22)
-		UITheme.tint_icon(ic, ic.texture, [UITheme.INFO, UITheme.GOOD, UITheme.WARN, UITheme.BAD][clampi(int(e.get("level", 0)), 0, 3)])
-		var txt := _cl(str(e["text"]).replace("\n", " "), 12, UITheme.MUTED)
-		txt.tooltip_text = str(e["text"])
-		_trow([[ic, 26], [_cl(str(e.get("date", "")), 12, UITheme.MUTED), 150], [_cl(L.t(str(e["title"])), 13, UITheme.TEXT, UITheme.f_semi), 300], [txt, -1]], Callable(), 32.0, str(e["text"]))
 
 
 # ---------------------------------------------------------------- многотиражка
@@ -3229,6 +3114,27 @@ func _goal_rows(goals: Array, parent: Control = null, routes: bool = false, keyp
 		host.add_child(h)
 
 
+## 1.65: бывший раздел «Рейтинг» — блок внизу «Этапа роста»: пять показателей и звёзды.
+func _goal_rating(pg: Progress) -> void:
+	_intro(tr("Звёзды складываются из пяти показателей и пересчитываются каждое утро. Сценарии и этапы требуют определённого числа звёзд."))
+	var tips := {"output": tr("Сдавайте заказы в срок и выполняйте месячный план."), "quality": tr("Меньше брака: опытные люди, исправные станки, мастер, ОТК."),
+		"safety": tr("Без травм и пожаров, без нарушений после проверок. Аптечки, огнетушители, отдых."), "people": tr("Настроение: столовая, бытовка, зарплата, отопление."),
+		"finance": tr("Деньги на счёте растут, долги под контролем.")}
+	content.add_child(UITheme.caption(tr("Рейтинг завода")))
+	content.add_child(UITheme.label(pg.stars_text(), 34, UITheme.ACCENT, UITheme.f_semi))
+	var g := _cards(5)
+	for k in Progress.RATING_NAMES.keys():
+		var val := float(pg.rating.get(k, 0.5))
+		var col2 := UITheme.ramp(val)
+		var v := _card_in(g)
+		v.add_child(UITheme.caption(tr(str(Progress.RATING_NAMES[k]))))
+		v.add_child(UITheme.label("%d%%" % int(round(val * 100.0)), 22, col2, UITheme.f_semi))
+		var pb := UITheme.bar(val * 100.0, col2, 100, 6)
+		pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		v.add_child(pb)
+		v.add_child(UITheme.para(str(tips[k]), 11))
+
+
 func _goals() -> void:
 	var pg := sim.progress
 	if tab == "ach":
@@ -3271,25 +3177,7 @@ func _goals() -> void:
 				vv.add_child(UITheme.para(_stage_text(i, "opens"), 11, UITheme.MUTED))
 				h.add_child(vv)
 				b.add_child(h)
-		"rating":
-			_info(tr("рейтинг завода %s") % pg.stars_text())
-			_intro(tr("Звёзды складываются из пяти показателей и пересчитываются каждое утро. Сценарии и этапы требуют определённого числа звёзд."))
-			var tips := {"output": tr("Сдавайте заказы в срок и выполняйте месячный план."), "quality": tr("Меньше брака: опытные люди, исправные станки, мастер, ОТК."),
-				"safety": tr("Без травм и пожаров, без нарушений после проверок. Аптечки, огнетушители, отдых."), "people": tr("Настроение: столовая, бытовка, зарплата, отопление."),
-				"finance": tr("Деньги на счёте растут, долги под контролем.")}
-			var big := UITheme.label(pg.stars_text(), 34, UITheme.ACCENT, UITheme.f_semi)
-			content.add_child(big)
-			var g := _cards(5)
-			for k in Progress.RATING_NAMES.keys():
-				var val := float(pg.rating.get(k, 0.5))
-				var col2 := UITheme.ramp(val)
-				var v := _card_in(g)
-				v.add_child(UITheme.caption(tr(str(Progress.RATING_NAMES[k]))))
-				v.add_child(UITheme.label("%d%%" % int(round(val * 100.0)), 22, col2, UITheme.f_semi))
-				var pb := UITheme.bar(val * 100.0, col2, 100, 6)
-				pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				v.add_child(pb)
-				v.add_child(UITheme.para(str(tips[k]), 11))
+			_goal_rating(pg)
 		"scn":
 			var sd2 := pg.sdef()
 			var scn_name := L.dt("scn.%s.name" % sim.scenario, str(sd2.get("name", "")))
@@ -3520,12 +3408,6 @@ func _legend(ser: Array) -> HFlowContainer:
 		f.add_child(h)
 	return f
 
-
-func _our_procs() -> Array[String]:
-	var out: Array[String] = []
-	for pr in sim.prod.processes_available():
-		out.append(Defs.process_name(str(pr)).to_lower())
-	return out
 
 
 ## Последние N дней статистики (N = chart_range; 0 — всё).

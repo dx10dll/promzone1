@@ -66,7 +66,7 @@ func _process(delta: float) -> void:
 		_flies.clear()
 		if want:
 			for t: Thing in sim.things.values():
-				if t.built and (t.def_id == "flower_bed" or t.def_id == "plant" or t.def_id == "palm") and _flies.size() < 12:
+				if t.built and (t.def_id == "flower_bed" or t.def_id == "plant") and _flies.size() < 12:
 					_flies.append(_fly((Vector2(t.cell) + Vector2(t.size()) * 0.5) * T))
 			for k2 in 6:
 				var c2 := Vector2i(_rng.randi_range(0, w.w - 1), _rng.randi_range(0, w.h - 1))

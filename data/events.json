@@ -57,9 +57,9 @@
       "cd": 10,
       "min_day": 5
     },
-    "metal_up": {
+    "metal_jump": {
       "kind": "bad",
-      "w": 4,
+      "w": 7,
       "sev": 10,
       "cd": 12,
       "min_day": 6,
@@ -68,13 +68,6 @@
         "wild": 2.0
       }
     },
-    "metal_down": {
-      "kind": "good",
-      "w": 3,
-      "sev": 0,
-      "cd": 14,
-      "min_day": 6
-    },
     "outage": {
       "kind": "bad",
       "w": 5,
@@ -82,29 +75,13 @@
       "cd": 8,
       "min_day": 4
     },
-    "pipe_burst": {
-      "kind": "bad",
-      "w": 6,
-      "sev": 15,
-      "cd": 10,
-      "min_day": 8,
-      "season": "winter"
-    },
     "cold_snap": {
       "kind": "bad",
-      "w": 6,
+      "w": 8,
       "sev": 15,
       "cd": 14,
       "min_day": 8,
       "season": "winter"
-    },
-    "heatwave": {
-      "kind": "bad",
-      "w": 5,
-      "sev": 10,
-      "cd": 14,
-      "min_day": 8,
-      "season": "summer"
     },
     "flood": {
       "kind": "bad",
@@ -257,14 +234,6 @@
       "cd": 20,
       "min_day": 8
     },
-    "heat_off": {
-      "kind": "bad",
-      "w": 5,
-      "sev": 12,
-      "cd": 16,
-      "min_day": 10,
-      "season": "winter"
-    },
     "wire_break": {
       "kind": "bad",
       "w": 4,
@@ -274,9 +243,9 @@
     },
     "leak": {
       "kind": "bad",
-      "w": 4,
+      "w": 7,
       "sev": 10,
-      "cd": 12,
+      "cd": 10,
       "min_day": 7
     }
   },

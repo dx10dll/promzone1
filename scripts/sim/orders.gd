@@ -382,16 +382,6 @@ func accept(id: int, auto_buy: bool, by_sales: bool = false) -> String:
 	return ""
 
 
-## Сколько металла уже «обещано» другим принятым заказам.
-func _committed_material(mat: String, except_id: int) -> int:
-	var n := 0
-	for o: Dictionary in list:
-		if int(o["id"]) == except_id:
-			continue
-		if ["active", "ready", "shipping"].has(str(o["status"])) and sim.planner.material_of(str(o["product"])) == mat:
-			n += maxi(0, remaining(o) - sim.ok_in_storage(str(o["product"])))
-	return n
-
 
 func decline(id: int) -> void:
 	var o := get_order(id)

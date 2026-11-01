@@ -766,12 +766,6 @@ func cohesion(bid: int) -> float:
 	return clampf(float(b.get("coh", COH_START)) - float(b.get("coh_pen", 0.0)), 0.0, 100.0)
 
 
-## Сколько сплочённости потеряет бригада, если убрать из неё человека (для подтверждения).
-func move_cost(w: Worker) -> float:
-	if w.brigade < 0:
-		return 0.0
-	return minf(COH_SHAKE, cohesion(w.brigade))
-
 
 ## Предупреждение при переводе человека: "" — спокойно, иначе текст для подтверждения.
 func move_warning(w: Worker, to_bid: int) -> String:
@@ -1742,13 +1736,6 @@ func on_hidden_found() -> void:
 	sim.reputation = maxf(0.0, sim.reputation - 5.0)
 
 
-func open_cases() -> int:
-	var n := 0
-	for c: Dictionary in cases:
-		if str(c["status"]) in ["open", "act"]:
-			n += 1
-	return n
-
 
 func safe_days() -> int:
 	return sim.day() - maxi(last_injury_day, 0) if last_injury_day > 0 else sim.day() - 1
@@ -1804,7 +1791,7 @@ func morning() -> void:
 	if sim.is_workday():
 		_brigade_daily()
 		if lunch_violation():
-			sim.notify_once("no_lunch_sched", L.t("В графике смены обед меньше 30 минут (или больше двух часов): это нарушение трудового кодекса. Поправьте во вкладке «Бригады → График смены»."), Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
+			sim.notify_once("no_lunch_sched", L.t("В графике смены обед меньше 30 минут (или больше двух часов): это нарушение трудового кодекса. Поправьте во вкладке «Бригады и график смены»."), Sim.LVL_WARN, Vector2i(-1, -1), 2880.0)
 		if pennant >= 0 and sim.day() - pennant_day > 7:
 			pennant = -1
 

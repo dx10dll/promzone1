@@ -469,6 +469,3 @@ func _sync_cat() -> void:
 func worker_view(id: int) -> WorkerView:
 	return workers.get(id)
 
-
-func thing_view(id: int) -> ThingView:
-	return things.get(id)

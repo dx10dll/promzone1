@@ -56,7 +56,6 @@ func _init() -> void:
 	sim.place_thing("med_cabinet", Vector2i(16, 21), true, false)
 	sim.place_thing("sink", Vector2i(17, 21), true, false)
 	sim.place_thing("radio_station", Vector2i(2, 21), true, false)
-	sim.place_thing("loudspeaker", Vector2i(3, 22), true, false)
 	Scenario.autowire(sim)
 	Scenario.autolight(sim, false)
 	Scenario.autopipe(sim)

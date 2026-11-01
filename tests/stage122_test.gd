@@ -78,7 +78,7 @@ func _init() -> void:
 		f.fauna.tick(0.5)
 		f.minute += 0.5
 	check(f.fauna.pigeons.is_empty(), "ночью голуби улетают")
-	# грязь — мыши
+	# 1.65: мыши убраны — в грязном помещении они больше не заводятся, а кот охотится только на голубей
 	f.rooms.update()
 	var r: Rooms.Room = null
 	for rr in f.rooms.list:
@@ -87,43 +87,13 @@ func _init() -> void:
 	f.upkeep._ensure()
 	for c in r.cells:
 		f.upkeep.dirt[f.world.idx(c)] = 220
-	for i4 in 400:
+	for i4 in 200:
 		f.fauna.tick(0.5)
 		f.minute += 0.5
-		if not f.fauna.mice.is_empty():
-			break
-	check(not f.fauna.mice.is_empty(), "в грязном помещении завелись мыши")
-	# кот ловит
-	if f.town.cat == null:
-		f.town.cat = Cat.new(f)
-	var cat := f.town.cat
-	cat.pos = Vector2(r.cells[0]) + Vector2(0.5, 0.5)
-	cat.state = "sit"
-	cat.until = f.minute
-	var m0 := cat.mice
-	var hunted := false
-	for i5 in 6000:
-		f.minute += 0.5
-		f.fauna.tick(0.5)
-		cat.tick(0.5)
-		if cat.state == "pounce" or str(cat.next_state) == "hunt":
-			hunted = true
-		if cat.mice > m0:
-			break
-		# мыши не должны пропасть из-за уборки в тесте
-		for c2 in r.cells:
-			f.upkeep.dirt[f.world.idx(c2)] = 220
-	check(hunted, "кот охотится")
-	check(cat.mice > m0, "кот поймал мышь (всего %d)" % cat.mice)
-	# чисто — мыши уходят
-	for c3 in r.cells:
-		f.upkeep.dirt[f.world.idx(c3)] = 0
-	for i6 in 10:
-		f.fauna.tick(2.0)
-		f.minute += 2.0
-	check(f.fauna.mice.is_empty(), "убрали — мыши ушли")
+	check(not ("mice" in f.fauna), "поля mice в живности больше нет")
+	check(not f.inspect.violations("sanitary").any(func(v: Dictionary) -> bool: return str(v["key"]) == "mice"), "санинспекция грызунов не ищет")
 	var fd := Sim.from_dict(f.to_dict())
-	check(fd.fauna.caught_mice == f.fauna.caught_mice, "живность сохраняется (поймано мышей: %d)" % fd.fauna.caught_mice)
+	check(fd.fauna.caught_pigeons == f.fauna.caught_pigeons, "живность сохраняется (поймано голубей: %d)" % fd.fauna.caught_pigeons)
 
 	print("")
 	if fails.is_empty():

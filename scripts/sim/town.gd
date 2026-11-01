@@ -260,9 +260,6 @@ func _flu_morning() -> void:
 
 # ================================================================ детсад
 
-func kids_of(w: Worker) -> int:
-	return w.kids
-
 
 func parents() -> Array[Worker]:
 	var out: Array[Worker] = []
@@ -381,17 +378,15 @@ func radio_station() -> Thing:
 	return null
 
 
-## Помещения, где слышно радио: есть громкоговоритель под током.
+## Помещения, где слышно радио (1.65: громкоговорители убраны — у радиоузла свой динамик, слышно там, где он стоит).
 func radio_rooms() -> Array:
 	var out: Array = []
-	if radio_station() == null:
+	var st := radio_station()
+	if st == null:
 		return out
-	for t in sim.things_of("speaker"):
-		if not t.built or not sim.power.powered(t):
-			continue
-		var r := sim.rooms.room_at(t.cell)
-		if r and not out.has(r):
-			out.append(r)
+	var r := sim.rooms.room_at(st.cell)
+	if r:
+		out.append(r)
 	return out
 
 

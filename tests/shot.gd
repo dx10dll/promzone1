@@ -178,15 +178,13 @@ func _ready() -> void:
 		for k3 in spots.size():
 			fs.fauna.pigeons.append({"pos": spots[k3], "to": spots[k3], "st": "peck" if k3 % 2 == 0 else "walk", "until": fs.minute + 999.0, "dir": 1 if k3 % 2 == 0 else -1, "fly_t": 0.0, "inside": false})
 		fs.fauna.pigeons.append({"pos": Vector2(19.5, 22.4), "to": Vector2(24.0, 20.0), "from": Vector2(16.0, 25.0), "st": "fly", "until": 0.0, "dir": 1, "fly_t": 0.0, "inside": false})
-		fs.fauna.mice.append({"pos": Vector2(13.4, 22.7), "to": Vector2(13.4, 22.7), "room": 0, "st": "sit", "until": fs.minute + 999.0, "dir": -1})
-		fs.fauna.mice.append({"pos": Vector2(10.6, 21.4), "to": Vector2(10.6, 21.4), "room": 0, "st": "sit", "until": fs.minute + 999.0, "dir": 1})
 		fs.fauna.rng.seed = 1
 		fs.fauna._t = 9999.0
 	if setup == "decor123":
 		# 1.23: новый декор в ряд перед гаражом
 		var ds := gm.sim
-		var ids := ["cactus", "monstera", "flower_bed", "bust", "floor_clock", "water_cooler", "coat_rack", "radio",
-			"samovar", "trophy_case", "globe", "ny_tree", "flagpole", "statue_worker", "notice_board"]
+		var ids := ["plant", "flower_bed", "bust", "floor_clock", "water_cooler", "radio",
+			"trophy_case", "ny_tree", "flagpole"]
 		var x0 := 8
 		var y0 := 22
 		for id: String in ids:
@@ -275,11 +273,11 @@ func _ready() -> void:
 		su.place_thing("sofa", Vector2i(3, 4), true, false)
 		su.place_thing("aquarium", Vector2i(7, 4), true, false)
 		su.place_thing("rug", Vector2i(4, 6), true, false)
-		su.place_thing("palm", Vector2i(3, 8), true, false)
+		su.place_thing("plant", Vector2i(3, 8), true, false)
 		su.place_thing("tv", Vector2i(9, 4), true, false)
-		su.place_thing("bookcase", Vector2i(9, 8), true, false)
+		su.place_thing("trophy_case", Vector2i(9, 8), true, false)
 		su.place_thing("pennant", Vector2i(6, 8), true, false)
-		su.place_thing("cooler", Vector2i(3, 6), true, false)
+		su.place_thing("water_cooler", Vector2i(3, 6), true, false)
 		su.place_thing("lamp_tube", Vector2i(6, 6), true, false)
 		su.rooms.update()
 		su.rooms.assign(su.rooms.room_at(Vector2i(5, 6)), "restroom")
@@ -360,7 +358,6 @@ func _ready() -> void:
 		st.place_thing("med_cabinet", Vector2i(6, 21), true, false)
 		st.place_thing("sink", Vector2i(7, 21), true, false)
 		st.place_thing("radio_station", Vector2i(3, 15), true, false)
-		st.place_thing("loudspeaker", Vector2i(6, 16), true, false)
 		st.place_thing("cat_bowl", Vector2i(7, 18), true, false)
 		Scenario.autowire(st)
 		Scenario.autolight(st, false)
@@ -871,7 +868,7 @@ func _ready() -> void:
 					ms0[0].broken = true
 					ms0[1].enabled = false
 					gm.sim.cons["tools"] = 0.0
-				gm.hud.open_window("prod:stall")
+				gm.hud.open_window("prod:machines")
 			"year126":
 				var sm := gm.sim
 				var S6 := preload("res://tests/setups.gd")
@@ -1822,7 +1819,7 @@ func _p138(gm: GameMain, what: String) -> void:
 				["Падение заказов", "chart_down", 3], ["Свет отключили", "bolt_off", 3], ["Культпоход", "culture", 1], ["Идея рационализатора", "idea", 1]]
 			for e: Array in evs:
 				sm.story._archive(str(e[0]), "Пример записи для снимка значков 1.38.", str(e[1]), int(e[2]))
-			gm.hud.open_window("events:hist")
+			gm.hud.open_window("events:log")
 			gm.hud.toast("Станок без электричества: проверьте кабель", Sim.LVL_WARN)
 		"p138letter":
 			sm.story._ev_rational()

@@ -9,7 +9,7 @@ static var kd_pick: Dictionary = {}
 
 
 static func tabs() -> Array:
-	return [["brig", "Бригады"], ["sched", "График смены"], ["sec", "Охрана"], ["union", "Профсоюз"]]
+	return [["brig", "Бригады и график"], ["sec", "Охрана"], ["union", "Профсоюз"]]
 
 
 static func sig(win: GameWindow) -> String:
@@ -27,8 +27,8 @@ static func build(win: GameWindow) -> void:
 	match win.tab:
 		"brig":
 			_brigades(win)
-		"sched":
-			_schedule(win)
+			win.content.add_child(UITheme.caption(L.t("График смены")))   # 1.65: «График смены» слит с «Бригадами»
+			_schedule(win, true)
 		"sec":
 			_security(win)
 		"union":
@@ -361,7 +361,7 @@ static func _mini_strip(s: String, cw: float, ch: float) -> HBoxContainer:
 
 # ---------------------------------------------------------------- график смены
 
-static func _schedule(win: GameWindow) -> void:
+static func _schedule(win: GameWindow, embedded: bool = false) -> void:
 	var sim := win.sim
 	var cr := sim.crew
 	if sched_key.begins_with("b") and cr.brigade(int(sched_key.substr(1))).is_empty():
@@ -372,8 +372,12 @@ static func _schedule(win: GameWindow) -> void:
 	elif sched_key.begins_with("b"):
 		shift = cr._brig_shift(int(sched_key.substr(1)))
 	var s := cr.get_sched(sched_key)
-	win._info(cr.sched_text(s, shift))
-	win._intro("Выберите, что рисовать, и щёлкайте по клеткам (по 15 минут). Планёрка в начале смены — +3% к скорости на всю смену (если есть бригадир или мастер). Перерыв — чай и отдых, курильщики курят по графику. Уборка в конце — участок чистый к сдаче смены. Обед — не меньше 30 минут, иначе трудовая инспекция оштрафует. Разные графики бригадам — меньше очередей в столовой.")
+	if not embedded:
+		win._info(cr.sched_text(s, shift))
+	else:
+		win.content.add_child(UITheme.para(cr.sched_text(s, shift) + " · " + L.t("Выберите, что рисовать, и щёлкайте по клеткам (по 15 минут)."), 12, UITheme.MUTED))
+	if not embedded:
+		win._intro("Выберите, что рисовать, и щёлкайте по клеткам (по 15 минут). Планёрка в начале смены — +3% к скорости на всю смену (если есть бригадир или мастер). Перерыв — чай и отдых, курильщики курят по графику. Уборка в конце — участок чистый к сдаче смены. Обед — не меньше 30 минут, иначе трудовая инспекция оштрафует. Разные графики бригадам — меньше очередей в столовой.")
 	# кому график
 	var keys: Array = [["0", "1-я смена · 8:00"], ["1", "2-я смена · 17:00"]]
 	for b: Dictionary in cr.brigades:

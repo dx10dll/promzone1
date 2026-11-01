@@ -255,7 +255,7 @@ func _build_top() -> void:
 	var rc := _chip("reputation", "rep", func() -> void:
 		open_window("goals")
 		if win:
-			win.select_tab("rating"))
+			win.select_tab("stage"))
 	rep_l = UITheme.label("", 14, UITheme.TEXT, UITheme.f_semi)
 	rc.add_child(UITheme.label("репутация", 11, UITheme.MUTED))
 	rc.add_child(rep_l)
@@ -606,11 +606,6 @@ func _chip(icon: String, key: String, cb: Callable) -> VBoxContainer:
 	return v
 
 
-func _short_money(v: float) -> String:
-	if v >= 1000000.0:
-		return tr("%.2f млн") % (v / 1000000.0)
-	return tr("%d тыс.") % int(v / 1000.0)
-
 
 ## 1.30: значок верхней панели — цветной из набора владельца, если он есть, иначе прежний векторный.
 func _top_tex(n: String, sz: int = 28) -> Texture2D:
@@ -796,7 +791,7 @@ func _refresh_top() -> void:
 	if win and win.group == "orders":
 		win.set_badge("contracts", sim.sales.by_state(["offer"]).size())
 	if win and win.group == "prod":
-		win.set_badge("stall", Stall.bad_count(sim))
+		win.set_badge("machines", Stall.bad_count(sim))
 
 
 ## 1.20: самая серьёзная беда — красной плашкой сверху. Нажатие открывает, где её решать.
@@ -1977,9 +1972,6 @@ func show_help(first_time: bool, article: String = "", from_menu: bool = false) 
 	add_child(hb)
 	modal = hb
 
-
-func help_open() -> bool:
-	return modal is HelpBook
 
 
 ## Плашка «Достижение получено» сверху по центру, сама исчезает.

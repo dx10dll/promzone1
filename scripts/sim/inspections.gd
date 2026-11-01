@@ -531,7 +531,6 @@ const REQ := {
 	"ppe_worn": "У всех рабочих целые СИЗ", "no_lunch": "Обед в положенное время", "n1_unfiled": "Все несчастные случаи оформлены (акт Н-1)",
 	"no_sink": "Раковина в туалете", "no_canteen": "Столовая (если людей 8 и больше)", "few_wc": "Один туалет на 12 человек",
 	"garbage": "Территория без мусора и брака", "dirty_room": "В помещениях убрана стружка", "no_vent": "Вентиляция там, где сварка, покраска или печь",
-	"mice": "Нет грызунов",
 	"worn": "Нет станков в работе с износом ниже 25%", "crane": "Для кран-балки — стропальщик", "forklift": "Для погрузчика — водитель",
 	"no_electrician": "Электрик в штате", "broken_long": "Нет сломанных станков",
 	"scrap_heap": "Брак не копится: тара не переполнена", "paint_room": "Покрасочная камера — в отдельном помещении", "furnace_smoke": "У печи есть окна или вентиляция",
@@ -802,14 +801,6 @@ func _things(def_id: String) -> Array[Thing]:
 	return out
 
 
-func _room_count(r: Rooms.Room, def_id: String) -> int:
-	var n := 0
-	for tid in r.things:
-		var t: Thing = sim.things.get(tid)
-		if t and t.built and t.def_id == def_id:
-			n += 1
-	return n
-
 
 func _cell_of_room(r: Rooms.Room) -> Vector2i:
 	var c := _stand_cell(r)
@@ -871,7 +862,7 @@ func violations(t: String) -> Array:
 			for w2 in sim.workers:
 				if not w2.is_itr():
 					rab += 1
-			if rab >= 2 and (_things("locker").size() + 2 * _things("locker2").size()) * 2 < rab:
+			if rab >= 2 and _things("locker").size() * 2 < rab:
 				out.append(_v(t, "no_ppe", none, -1, [], true))
 			if sim.workers.size() >= 3 and _things("first_aid").is_empty():
 				out.append(_v(t, "no_aid", none, -1, [], true))
@@ -929,12 +920,6 @@ func violations(t: String) -> Array:
 					worst = r
 			if worst:
 				out.append(_v(t, "dirty_room", _cell_of_room(worst), worst.id, [worst.title()]))
-			# 1.22: грызуны
-			if sim.fauna and not sim.fauna.mice.is_empty():
-				var mr := int((sim.fauna.mice[0] as Dictionary)["room"])
-				if mr >= 0 and mr < sim.rooms.list.size():
-					var mroom: Rooms.Room = sim.rooms.list[mr]
-					out.append(_v(t, "mice", _cell_of_room(mroom), mroom.id, [mroom.title()]))
 			var smoky: Rooms.Room = null
 			var sf := 40.0
 			for r2 in sim.rooms.list:

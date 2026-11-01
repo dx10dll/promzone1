@@ -1241,13 +1241,13 @@ help.first_steps.text,"What to do in the first days:
 4. Hire the missing people (People → Hiring): a turner, an inspector, a laborer.
 5. After that, orders will come by themselves: watch the deadlines in the Orders window and people's mood.
 
-Tip: spend your first money on whatever holds back output the most. The Market shows missed profit, and Production → Downtime shows why machines stand idle."
+Tip: spend your first money on whatever holds back output the most. The Market shows missed profit, and Production → Machines shows why machines stand idle."
 help.todo.title,"Task list, banners and notifications"
 help.todo.text,"• [b]“What to do”[/b] (left): task cards. A [color=#e0675a]red[/color] stripe means urgent, [color=#e0aa48]amber[/color] means decide, [color=#7fb6d8]blue[/color] is advice. A click takes you where to deal with it.
 • The [b]red banner[/b] under the top bar is the main trouble (wage arrears, negative cash, no tools). Clicking it opens the right window.
 • [b]Notifications[/b] at the bottom are clickable: the camera flies to the spot, or a window opens (Finance, Supply, Orders…). Everything is kept in the log (Events → Log).
 • Red banners over objects (“No power”, “Broken”, “Not heating”) tell you what to do.
-• The production bottleneck is shown in the “Downtime” tab."
+• The production bottleneck is shown in the “Downtime” column of Production → Machines."
 help.tutorial.title,Tutorial
 help.tutorial.text,"In the Garage, the 14-step tutorial walks you through the basics: the screen dims, exactly what to press lights up, and a pulsing frame leads to the target. The camera moves to whatever is being discussed.
 • The yellow panel says why and what to do; explanations close with “Got it”.
@@ -1425,10 +1425,10 @@ help.consumables.text,"Supply restocks consumables by itself:
 • PPE: 7,500 ₽ for 5 kits.
 In a [b]tool crib[/b] (a zone with a tool cabinet) cutters wear a quarter slower. No tools and no money: machines stop, people get angry."
 help.stall.title,Machine downtime
-help.stall.text,"Production → [b]Downtime[/b]: every machine that isn't working right now and the reason in plain words: broken, no power or cable, sealed, worn, outside a workshop, no water, no task, no consumable, no one to run it, machinist off shift, output full, no metal, waiting for blanks.
+help.stall.text,"Production → [b]Machines[/b], “Downtime” column: every machine that isn't working right now and the reason in plain words: broken, no power or cable, sealed, worn, outside a workshop, no water, no task, no consumable, no one to run it, machinist off shift, output full, no metal, waiting for blanks.
 • Three groups: “Needs your attention”, “Will stop soon”, “Normal waiting”.
 • Clicking a line shows the machine and opens its card.
-• The [b]bottleneck[/b] is the process holding back output the most; it shows in the “Downtime” tab."
+• The [b]bottleneck[/b] is the process holding back output the most; it shows in the “Downtime” column."
 help.sec.qc,QC and rejects
 help.qc_table.title,QC inspection
 help.qc_table.text,"A [b]QC table[/b] (26,000 ₽): the inspector checks every part. Good ones go on the pallet, rejects into the reject bin.
@@ -1602,7 +1602,7 @@ help.chief_shop.text,"A shop manager: +5% speed for all workers and the director
 • [b]Overtime[/b]: the shift is 2 hours longer at time and a half.
 The orders are a line above the Development tree."
 help.schedule.title,Shift schedule
-help.schedule.text,"People → Shift schedule, in 15-minute slots: a planning meeting (+3% speed for the shift), lunch (at least 30 minutes, otherwise a fine), a tea break, cleanup at the end of the shift.
+help.schedule.text,"People → Crews & shift schedule, in 15-minute slots: a planning meeting (+3% speed for the shift), lunch (at least 30 minutes, otherwise a fine), a tea break, cleanup at the end of the shift.
 Crews can get their own schedule, meaning shorter canteen queues."
 help.competition.title,Socialist competition and the Board of Honor
 help.competition.text,"The “Socialist competition” step: on Fridays the best crew (operations per person) gets a pennant, +mood and +3% speed for a week. The Board of Honor shows the leading workers of the month."
@@ -1761,7 +1761,7 @@ help.injuries.text,"Injuries come from fatigue, rush jobs, worn machines, darkne
 • The injured person goes on sick leave; a first aid kit nearby shortens it.
 • Fewer injuries: “Workplace Safety” (PPE, briefings −30%), a safety engineer (−15%), the “Days without injury” board, light and order."
 help.breakdowns.title,Machine breakdowns
-help.breakdowns.text,"A completely worn machine breaks down, and the repair is expensive and long. Turn on preventive maintenance, keep a fitter and a setter. A broken machine is listed in Production → Downtime with the reason."
+help.breakdowns.text,"A completely worn machine breaks down, and the repair is expensive and long. Turn on preventive maintenance, keep a fitter and a setter. A broken machine is listed in Production → Machines with the reason."
 help.medbay.title,First aid post and flu
 help.medbay.text,"A first aid post: a couch, a medicine cabinet and a sink + a paramedic (the “Social services” step).
 • Sick leave after injuries 40% shorter, flu (November to February) rarer.
@@ -1787,17 +1787,17 @@ help.kg_dk.title,Kindergarten and House of Culture
 help.kg_dk.text,"• [b]Kindergarten “Little Gear”[/b] (the “Patronage” step): places for workers' children, 6, 12 or 24. Parents are pleased and don't stay home with the child.
 • [b]House of Culture “Machine Builder”[/b]: 600,000 ₽ and 15,000 ₽ a week: clubs and holiday concerts."
 help.radio.title,Plant radio
-help.radio.text,"A radio room and loudspeakers under the ceiling:
+help.radio.text,"A powered radio room with its own speaker (heard in the room where it stands):
 • 8:15, morning plant news;
 • 10:00, workplace exercises, people tire less;
 • music at lunch, lunch is more fun."
 help.cat.title,The cat
-help.cat.text,"A cat turns up by itself (sooner if you have a canteen). Put out a [b]bowl[/b] and it stays: petting it is pleasant, and rats stop spoiling consumables. Town → Cat."
+help.cat.text,"A cat turns up by itself (sooner if you have a canteen). Put out a [b]bowl[/b] and it stays: petting it is pleasant, and rats stop spoiling consumables. Town → Overview."
 help.paper.title,Plant newspaper
 help.paper.text,"On Mondays the plant newspaper comes out (N): plant news, leading workers, veterans, fights and inspections, weather. The “Newspaper” button stays highlighted until the issue is read."
 help.sec.seasons,Seasons
 help.calendar.title,Calendar
-help.calendar.text,"The calendar is compressed: [b]a month is two weeks[/b] (14 days). The game starts in September. There are holidays, summer vacations and a monthly plan. Events → Calendar shows what's ahead."
+help.calendar.text,"The calendar is compressed: [b]a month is two weeks[/b] (14 days). The game starts in September. There are holidays, summer vacations and a monthly plan. Upcoming inspections are in Events → Inspections."
 help.winter.title,"Winter, snow and cold"
 help.winter.text,"In winter, frosts down to −15 °C and snow.
 • Put up [b]radiators[/b] and a boiler, or the shops get cold: below +15 °C people are chilly, below +6 very cold, work is slower and injuries more common.

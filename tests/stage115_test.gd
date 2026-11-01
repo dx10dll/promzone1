@@ -79,13 +79,10 @@ func _init() -> void:
 	var viol: Array = f.inspect.violations("fire")
 	check(not viol.any(func(v: Dictionary) -> bool: return str(v["key"]) == "no_ext"), "пожарный надзор: огнетушители есть, туалету не нужен")
 
-	print("— шкафчик на двоих")
-	var lk2: Thing = null
-	for t: Thing in g.things.values():
-		if t.def_id == "locker2":
-			lk2 = t
-			break
-	check(lk2 != null and int(lk2.def().get("seats", 1)) == 2, "в бытовке гаража шкафчики на двоих")
+	print("— шкафчики (1.65: «на двоих» слит с обычным)")
+	check(not Defs.objects.has("locker2"), "шкафчика на двоих в каталоге больше нет")
+	var lks := g.things_of("locker")
+	check(lks.size() >= 2, "в бытовке гаража стоят шкафчики (%d)" % lks.size())
 	var seen := {}
 	for w in g.workers:
 		var l: Thing = g.brain._locker_for(w)
@@ -93,9 +90,9 @@ func _init() -> void:
 			seen[l.id] = int(seen.get(l.id, 0)) + 1
 	var shared := false
 	for k in seen.keys():
-		if int(seen[k]) == 2:
+		if int(seen[k]) > 1:
 			shared = true
-	check(shared, "двое закреплены за одним шкафчиком на двоих: %s" % str(seen))
+	check(not shared, "у каждого свой шкафчик: %s" % str(seen))
 
 	print("— стройматериалы: вместительные поддоны")
 	check(BuildMats.pallet("bm_brick") >= 16 and BuildMats.pallet("bm_cement") >= 24, "кирпича на поддоне %d, цемента %d" % [BuildMats.pallet("bm_brick"), BuildMats.pallet("bm_cement")])

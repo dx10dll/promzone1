@@ -150,7 +150,7 @@ func _init() -> void:
 		check(it.loc != Item.Loc.GROUND, "груз унесён по команде (лежит: %d)" % it.loc)
 		# идти
 		g.brain.give_order(w, cells[0], "go")
-		run(g, 60.0, func() -> bool: return w.cell() == cells[0])
+		run(g, 200.0, func() -> bool: return w.cell() == cells[0])
 		check(w.cell().distance_to(cells[0]) <= 1.5, "пошёл, куда велели")
 		# сохранение
 		var d: Dictionary = JSON.parse_string(JSON.stringify(g.to_dict()))

@@ -12,6 +12,7 @@ const TOGGLES := [
 	["calls_on", "Звонки советника"],   # 1.41
 	["reduce_motion", "Меньше анимации (без тряски, искр, пара и дыма)"],   # 1.41
 ]
+const HIDDEN_VOLUMES := ["vol_env", "vol_ui"]
 const VOLUMES := [["vol_master", "Общая громкость"], ["vol_music", "Музыка"], ["vol_sfx", "Станки и инструмент"],
 	["vol_env", "Звуки окружения"], ["vol_ui", "Интерфейс"]]   # 1.29: цех, быт, голоса и город — одним ползунком
 
@@ -61,6 +62,19 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 	v.add_child(_choice("Уведомления", [[0.0, "все"], [1.0, "важные"], [2.0, "только тревоги"]], "notify_mode",
 		"Всплывашки справа. Остальное — только в журнале («События»), счётчик на кнопке"))
 	v.add_child(UITheme.section("music", "Звук"))
+	# 1.65: ползунки «Окружение» и «Интерфейс» редко трогают — спрятаны под кнопку
+	var more := UITheme.vbox(6)
+	more.name = "MoreVolumes"
+	more.visible = false
+	var more_btn := Button.new()
+	more_btn.name = "MoreVolumesBtn"
+	more_btn.text = "Звук: окружение и интерфейс ▸"
+	more_btn.flat = true
+	more_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	more_btn.focus_mode = Control.FOCUS_NONE
+	more_btn.pressed.connect(func() -> void:
+		more.visible = not more.visible
+		more_btn.text = "Звук: окружение и интерфейс ▾" if more.visible else "Звук: окружение и интерфейс ▸")
 	for vo in VOLUMES:
 		var key2 := str(vo[0])
 		var h := UITheme.hbox(10)
@@ -85,7 +99,12 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 			Snd.play("n_info", -4.0))
 		h.add_child(sl)
 		h.add_child(pct)
-		v.add_child(h)
+		if key2 in HIDDEN_VOLUMES:
+			more.add_child(h)
+		else:
+			v.add_child(h)
+	v.add_child(more_btn)
+	v.add_child(more)
 	v.add_child(_choice("Подбор музыки", MusicDirector.MODES, "music_mode",
 		"По времени суток: утром — бодрее, днём — рабочий ритм, в аврал — марш, ночью — тихо"))
 	v.add_child(UITheme.section("layers", "Экран"))

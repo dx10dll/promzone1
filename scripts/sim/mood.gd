@@ -286,7 +286,7 @@ static func advice_for(sim: Sim, w: Worker, scale: String, cid: String) -> Strin
 	if cid == "tired" or tid in ["overtime_drink", "overtime"]:
 		if not _has_restroom(sim):
 			return L.t("Построить комнату отдыха: диван и кулер")
-		if not _rest_has(sim, ["cooler", "water_cooler"]):
+		if not _rest_has(sim, ["water_cooler"]):
 			return L.t("Поставить кулер в комнату отдыха")
 		if not _rest_has(sim, ["sofa"]):
 			return L.t("Поставить диван в комнату отдыха")
@@ -329,7 +329,7 @@ static func advice_for(sim: Sim, w: Worker, scale: String, cid: String) -> Strin
 		"stuffy": "Поставить вентиляцию", "fumes": "Поставить вытяжной зонт у станка",
 		"noisy": "Выдать наушники (СИЗ)",
 		"dirty": "Навести чистоту: нанять уборщика", "very_dirty": "Навести чистоту: нанять уборщика",
-		"mice": "Навести чистоту и убрать мусор", "rats": "Навести чистоту на складе",
+		"rats": "Навести чистоту на складе",
 		"ate_bench": "Поставить столовую с обедом", "ate_standing": "Поставить столовую с обедом", "ate_table": "Поставить столовую с обедом",
 		"toilet_open": "Построить туалет со стенами", "toilet_nosink": "Поставить раковину у туалета", "held_it": "Построить ещё один туалет",
 		"changed_corner": "Поставить шкафчики в бытовке", "changed_shop": "Поставить шкафчики в бытовке",

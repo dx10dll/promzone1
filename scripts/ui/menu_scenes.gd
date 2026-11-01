@@ -152,7 +152,7 @@ static func _shop(sim: Sim) -> void:
 	for e in [["mill", 31, 5], ["drill", 35, 5], ["lathe", 38, 5], ["weld_post", 31, 9], ["assembly_table", 35, 9], ["furnace", 31, 13],
 			["paint_booth", 35, 13], ["wip_rack", 42, 5], ["wip_rack", 42, 7], ["rack", 42, 9], ["rack", 42, 11], ["pallet", 42, 13],
 			["pallet", 43, 13], ["pallet", 44, 13], ["qc_table", 39, 9], ["crane", 44, 4], ["cart", 40, 17], ["tool_cabinet", 39, 13], ["toilet", 44, 17],
-			["extinguisher", 30, 11], ["notice_board", 33, 18]]:
+			["extinguisher", 30, 11]]:
 		_put(sim, str(e[0]), Vector2i(int(e[1]), int(e[2])))
 	var ktp := sim.place_thing("ktp", Vector2i(40, 21), true, false)
 	sim.rooms.update()
@@ -175,7 +175,7 @@ static func _offices(sim: Sim) -> void:
 	sim.world.refresh_all()
 	for c in [Vector2i(2, 2), Vector2i(5, 2), Vector2i(2, 4), Vector2i(5, 4), Vector2i(2, 7), Vector2i(8, 7)]:
 		_put(sim, "office_desk", c)
-	for e in [["drawing_board", 4, 7], ["plant", 9, 5], ["floor_clock", 9, 2], ["water_cooler", 8, 2], ["trophy_case", 9, 3], ["coat_rack", 8, 5]]:
+	for e in [["drawing_board", 4, 7], ["plant", 9, 5], ["floor_clock", 9, 2], ["water_cooler", 8, 2], ["trophy_case", 9, 3]]:
 		_put(sim, str(e[0]), Vector2i(int(e[1]), int(e[2])))
 	sim.rooms.update()
 	sim.rooms.assign(sim.rooms.room_at(Vector2i(5, 3)), "office")
@@ -193,7 +193,7 @@ static func _canteen(sim: Sim) -> void:
 			_put(sim, "chair", Vector2i(x + dx, 22))
 			_put(sim, "chair", Vector2i(x + dx, 24))
 			_put(sim, "chair", Vector2i(x + dx, 25))
-	for e in [["stove", 11, 22], ["serving_line", 11, 24], ["fridge", 12, 26], ["samovar", 11, 26], ["radio", 4, 22], ["plant", 12, 23]]:
+	for e in [["stove", 11, 22], ["serving_line", 11, 24], ["fridge", 12, 26], ["radio", 4, 22], ["plant", 12, 23]]:
 		_put(sim, str(e[0]), Vector2i(int(e[1]), int(e[2])))
 	sim.rooms.update()
 	var cr := sim.rooms.room_at(Vector2i(6, 24))
@@ -203,8 +203,8 @@ static func _canteen(sim: Sim) -> void:
 
 ## Двор: клумбы, флагшток, скульптуры, скамейки у проходной.
 static func _yard(sim: Sim) -> void:
-	for e in [["flower_bed", 15, 22], ["flower_bed", 15, 25], ["statue_worker", 17, 23], ["bench", 15, 27], ["flagpole", 28, 22],
-			["flower_bed", 30, 22], ["flower_bed", 33, 22], ["bench", 30, 24], ["statue_worker", 36, 23], ["flower_bed", 30, 26]]:
+	for e in [["flower_bed", 15, 22], ["flower_bed", 15, 25], ["bench", 15, 27], ["flagpole", 28, 22],
+			["flower_bed", 30, 22], ["flower_bed", 33, 22], ["bench", 30, 24], ["flower_bed", 30, 26]]:
 		_put(sim, str(e[0]), Vector2i(int(e[1]), int(e[2])))
 
 

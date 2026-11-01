@@ -1,6 +1,6 @@
 extends SceneTree
 ## Тест версии 1.38 «Новые иконки»: все 102 значка владельца из assets/ui/icons/icons.json на месте и находятся
-## через Tex.ui / UITheme.micon (emo_* — через Tex.emo), помечены как цветные (не перекрашиваются);
+## через Tex.ui / UITheme.micon (emo_* — тоже через Tex.ui; 1.65: мёртвую Tex.emo убрали), помечены как цветные (не перекрашиваются);
 ## у каждой зоны из Defs.rooms и у каждого сценария есть свой цветной значок.
 ## godot --headless --path . --audio-driver Dummy -s res://tests/stage138_test.gd
 
@@ -23,7 +23,7 @@ func _initialize() -> void:
 		for e: Dictionary in d:
 			var id := str(e["id"])
 			n += 1
-			var t: Texture2D = Tex.emo(id.substr(4)) if id.begins_with("emo_") else Tex.ui(id)
+			var t: Texture2D = Tex.ui(id)
 			if t == null or not Tex.is_color(t) or UITheme.micon(id) == null:
 				bad.append(id)
 	check(n == 102 and bad.is_empty(), "все значки находятся через Tex.ui/Tex.emo и micon, цветные%s" % ("" if bad.is_empty() else ": нет " + ", ".join(bad)))

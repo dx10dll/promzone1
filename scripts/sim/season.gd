@@ -380,12 +380,6 @@ func _snow_stats() -> void:
 	snow_avg = float(s) / sweep_cells.size()
 
 
-func snow_at(c: Vector2i) -> int:
-	var w := sim.world
-	if not w.inb(c) or snow.size() != w.w * w.h:
-		return 0
-	return snow[w.idx(c)]
-
 
 ## Шаг человека по клетке: протаптывает дорожку; на гололёде можно поскользнуться.
 func on_step(w: Worker, c: Vector2i) -> void:
@@ -515,7 +509,7 @@ func _cooler_near(c: Vector2i) -> bool:
 		return false
 	for tid in sim.rooms.spaces[si].things:
 		var th: Thing = sim.things.get(tid)
-		if th and th.built and th.def_id in ["cooler", "water_cooler"]:
+		if th and th.built and th.def_id == "water_cooler":
 			return true
 	return false
 

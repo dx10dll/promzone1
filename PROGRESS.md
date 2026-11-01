@@ -14,6 +14,9 @@
 Новая игра начинается с выбора профиля завода и сценария, завод растёт через шесть этапов,
 а рейтинг в звёздах показывает, насколько он хорош.
 
+### Версия 1.65: убрано лишнее (docs/lishnee_1.64.md, кроме 3.4)
+- Слиты разделы окон, убраны globe/bookcase/coat_rack/samovar/statue_worker/notice_board/cooler/loudspeaker/lamp_street, plant вместо cactus/monstera/palm, locker вместо locker2 (старые сейвы: замена или возврат денег). Слиты дубли событий, убраны heatwave, ate_menu, «Комплексные обеды», мыши, мёртвый код, assets/portrait. Отчёт docs/lishnee_1.65_sdelano.md. Тест stage165.
+
 ### Версия 1.64: правки владельца
 - Sim.note()/note_once() — только в журнал (заказы и доставки материалов, металла, расходников). rooms.gd: помещение и без пола. build_mats carry 8, строитель ставит стены цепочкой. «Распределение», MusicDirector.MODES без вальсов. Story.burn_mark → грязь, убирает уборщица. Paper.cond_ok (профессия, room:, obj:, union…). add_yard_zones 3×4, autopipe в песочнице. «Что нового» в меню не показывается. Тест stage164.
 

@@ -936,7 +936,7 @@ func show_thing(s: Sim, t: Thing) -> void:
 			t.demolish = true
 			sim.thing_rev += 1
 			show_thing(sim, t)
-		actions.add_child(_act(L.t("Демонтаж"), on_dem, L.t("Рабочие разберут объект и унесут в ящиках на склад оборудования (помещение «Склад» или зона разгрузки). Поставить снова — бесплатно, продать — за полцены (Производство → Склад оборудования)."), "demolish", UITheme.BAD))
+		actions.add_child(_act(L.t("Демонтаж"), on_dem, L.t("Рабочие разберут объект и унесут в ящиках на склад оборудования (помещение «Склад» или зона разгрузки). Поставить снова — бесплатно, продать — за полцены (Производство → Склад и логистика)."), "demolish", UITheme.BAD))
 	# тело
 	if t.kind() == "machine" and t.built:
 		_bar_row(L.t("Состояние"), UITheme.GOOD, "cond")
@@ -1551,41 +1551,6 @@ static func scale_tip(g: Array, parts: Array) -> String:
 			tip.append(("%+d  " % int(round(float(pp[1])))) + str(pp[0]))
 	return L.t(str(g[1])) + ": " + (("\n" + "\n".join(tip)) if not tip.is_empty() else L.t("ничего особенного")) + L.t("\n\nЧто помогает: ") + L.t(str(Mood.LIFE_HINT[str(g[0])]))
 
-
-func _people_line(w: Worker) -> String:
-	var tr := sim.training
-	var parts: Array[String] = []
-	if w.brigade >= 0:
-		var b := sim.crew.brigade(w.brigade)
-		if not b.is_empty():
-			var ld := sim.crew.lead_of(w.brigade)
-			parts.append("«%s»%s" % [str(b["name"]), (L.t(", бригадир (+10% к ставке)") if ld == w else (L.t(", бригадир — ") + ld.call_name()) if ld else "")])
-	if sim.crew.union_on() and int(sim.crew.union.get("lead", -1)) == w.id:
-		parts.append(L.t("председатель профкома"))
-	var c := tr.course_of(w)
-	if not c.is_empty():
-		parts.append(L.t("на курсах: %s, %d%%") % [L.t(str(Worker.SKILL_NAMES.get(str(c["skill"]), ""))).to_lower(), int(tr.progress(w) * 100.0)])
-	var m := tr.mentor_of(w)
-	if m:
-		parts.append(L.t("наставник: ") + m.full_name())
-	var ap: Array[String] = []
-	for a in tr.apprentices(w):
-		ap.append(a.call_name())
-	if not ap.is_empty():
-		parts.append(L.t("ученики: ") + ", ".join(ap))
-	if w.practice_until >= 0:
-		parts.append(L.t("практика до дня %d") % w.practice_until)
-	var fr: Array[String] = []
-	for f in tr.friends(w):
-		fr.append(f.call_name())
-	if not fr.is_empty():
-		parts.append(L.t("дружит: ") + ", ".join(fr.slice(0, 3)))
-	var fo: Array[String] = []
-	for f2 in tr.foes(w):
-		fo.append(f2.call_name())
-	if not fo.is_empty():
-		parts.append(L.t("не ладит: ") + ", ".join(fo.slice(0, 3)))
-	return "" if parts.is_empty() else "\n" + " · ".join(parts)
 
 
 func _thing_state(t: Thing) -> String:

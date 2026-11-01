@@ -785,6 +785,13 @@ func from_dict(d: Dictionary) -> void:
 	research_done = d.get("done", [])
 	research_cur = str(d.get("cur", ""))
 	research_pts = d.get("pts", {})
+	# 1.65: убранные разработки («Комплексные обеды») из старого сохранения выкидываем
+	research_done = research_done.filter(func(r: Variant) -> bool: return Defs.research.has(str(r)))
+	if research_cur != "" and not Defs.research.has(research_cur):
+		research_cur = ""
+	for rk in research_pts.keys():
+		if not Defs.research.has(str(rk)):
+			research_pts.erase(rk)
 	weeks = d.get("weeks", [])
 	loans = d.get("loans", [])
 	# 1.62: торгового кредита поставщика больше нет — старые «отсрочки» остаются обычным долгом без процентов, без места в лимите банка

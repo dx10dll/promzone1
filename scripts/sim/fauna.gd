@@ -3,21 +3,16 @@ extends RefCounted
 ## 1.22: живность вокруг завода.
 ## — Голуби: днём прилетают во двор, ходят и клюют, разлетаются от людей, машин и кота; иногда залетают
 ##   в цех через открытые ворота и через какое-то время улетают. На ночь улетают совсем.
-## — Мыши: заводятся в очень грязных помещениях, бегают вдоль стен; люди недовольны, проверка придерётся.
-## — Кот охотится: подкрадывается к голубю или мыши и прыгает. Голуби обычно успевают улететь, мышей кот ловит.
+## — Кот охотится: подкрадывается к голубю и прыгает. Голуби обычно успевают улететь. (1.65: мыши убраны.)
 ## Своя случайность (rng) — не сбивает остальную симуляцию.
 
 const MAX_PIGEONS := 7
-const MAX_MICE := 4
-const MOUSE_DIRT := 130.0       ## средняя грязь помещения (0–255), с которой заводятся мыши
 const PIGEON_SPEED := 1.1       ## клеток в минуту пешком
 const FLY_SPEED := 14.0         ## клеток в минуту в полёте
 
 var sim: Sim
 var rng := RandomNumberGenerator.new()
 var pigeons: Array = []         ## [{pos: Vector2, to: Vector2, st: walk|peck|fly|gone, until, dir, fly_t, inside}]
-var mice: Array = []            ## [{pos, to, room, st: run|hide, until, dir}]
-var caught_mice := 0
 var caught_pigeons := 0
 var _t := 0.0
 var _spawn_t := 0.0
@@ -84,7 +79,6 @@ func tick(dt: float) -> void:
 	_t = 2.0
 	_spawn()
 	_scare()
-	_mice_spawn()
 	_hunt()
 
 
@@ -214,77 +208,6 @@ func _move(dt: float) -> void:
 						p["st"] = "walk"
 					else:
 						p["until"] = sim.minute + 1.0
-	for m: Dictionary in mice:
-		if str(m["st"]) != "run":
-			if sim.minute >= float(m["until"]):
-				m["st"] = "run"
-				m["to"] = _mouse_target(int(m["room"]), m["pos"])
-			continue
-		var to3: Vector2 = m["to"]
-		var pos4: Vector2 = m["pos"]
-		var v3 := to3 - pos4
-		var ln3 := v3.length()
-		var st3 := 6.0 * dt
-		if ln3 <= st3:
-			m["pos"] = to3
-			m["st"] = "hide" if rng.randf() < 0.35 else "sit"
-			m["until"] = sim.minute + rng.randf_range(1.0, 6.0) * (3.0 if str(m["st"]) == "hide" else 1.0)
-		else:
-			m["pos"] = pos4 + v3 / ln3 * st3
-			if absf(v3.x) > 0.05:
-				m["dir"] = 1 if v3.x > 0.0 else -1
-
-
-# ================================================================ мыши
-
-func _mouse_target(room_id: int, from: Vector2) -> Vector2:
-	var r: Rooms.Room = sim.rooms.list[room_id] if room_id >= 0 and room_id < sim.rooms.list.size() else null
-	if r == null or r.cells.is_empty():
-		return from
-	# вдоль стен: клетки у края помещения
-	for k in 10:
-		var c: Vector2i = r.cells[rng.randi_range(0, r.cells.size() - 1)]
-		var edge := false
-		for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-			if WallKinds.is_room_wall(sim.world.get_wall(c + d)):
-				edge = true
-		if edge and sim.world.passable(c):
-			return Vector2(c) + Vector2(rng.randf_range(0.2, 0.8), rng.randf_range(0.3, 0.8))
-	return from
-
-
-func _mice_spawn() -> void:
-	# мыши уходят, когда убрали
-	mice = mice.filter(func(m: Dictionary) -> bool:
-		var rid := int(m["room"])
-		if rid < 0 or rid >= sim.rooms.list.size():
-			return false
-		return sim.upkeep.room_dirt(sim.rooms.list[rid]) >= MOUSE_DIRT * 0.7)
-	if mice.size() >= MAX_MICE or rng.randf() > 0.15:
-		return
-	for i in sim.rooms.list.size():
-		var r: Rooms.Room = sim.rooms.list[i]
-		if r.cells.size() < 6:
-			continue
-		if sim.upkeep.room_dirt(r) < MOUSE_DIRT:
-			continue
-		var n := mice.filter(func(m2: Dictionary) -> bool: return int(m2["room"]) == i).size()
-		if n >= 2:
-			continue
-		var start := _mouse_target(i, Vector2(r.cells[0]) + Vector2(0.5, 0.5))
-		mice.append({"pos": start, "to": start, "room": i, "st": "sit", "until": sim.minute + 1.0, "dir": 1})
-		sim.notify_once("mice", L.t("В помещении «%s» завелись мыши — там очень грязно. Нужна уборка: уборщица или разнорабочие (Люди → График смены → «Уборка»). Кот поможет.") % r.title(), Sim.LVL_WARN, r.cells[0], 2880.0)
-		for w in sim.workers:
-			if w.present and sim.rooms.room_at(w.cell()) == r:
-				Mood.add(sim, w, "mice")
-		return
-
-
-func mice_in(r: Rooms.Room) -> int:
-	if r == null:
-		return 0
-	var idx := sim.rooms.list.find(r)
-	return mice.filter(func(m: Dictionary) -> bool: return int(m["room"]) == idx).size()
 
 
 # ================================================================ кот охотится
@@ -295,18 +218,10 @@ func _hunt() -> void:
 		return
 	if cat.state == "walk" and str(cat.next_state) == "hunt":
 		return
-	# мышь — главная добыча
 	var best: Dictionary = {}
 	var bd := INF
-	for m: Dictionary in mice:
-		if str(m["st"]) == "hide":
-			continue
-		var d := cat.pos.distance_to(m["pos"])
-		if d < bd and d < 14.0:
-			bd = d
-			best = m
-	var kind := "mouse"
-	if best.is_empty() and rng.randf() < 0.25:
+	var kind := "pigeon"
+	if rng.randf() < 0.25:
 		for p: Dictionary in pigeons:
 			if str(p["st"]) == "fly":
 				continue
@@ -314,7 +229,6 @@ func _hunt() -> void:
 			if d2 < bd and d2 < 9.0:
 				bd = d2
 				best = p
-				kind = "pigeon"
 	if best.is_empty():
 		return
 	var tc := Vector2i(floori((best["pos"] as Vector2).x), floori((best["pos"] as Vector2).y))
@@ -329,19 +243,7 @@ func pounce(cat: Cat) -> void:
 	if prey.is_empty():
 		return
 	var close := cat.pos.distance_to(prey["pos"]) < 1.6
-	if mice.has(prey):
-		if close and rng.randf() < 0.6:
-			mice.erase(prey)
-			caught_mice += 1
-			cat.mice += 1
-			cat.activity = L.t("Поймал мышь!") if not cat.female else L.t("Поймала мышь!")
-			if cat.mice % 3 == 1:
-				sim.notify(Nicks.gendered(L.t("%s поймал{|а} мышь. Уже %d за всё время!"), cat.female) % [cat.shown_name(), cat.mice], Sim.LVL_GOOD, cat.cell())
-		else:
-			prey["st"] = "run"
-			prey["to"] = _mouse_target(int(prey["room"]), prey["pos"])
-			cat.activity = L.t("Мышь удрала")
-	elif pigeons.has(prey):
+	if pigeons.has(prey):
 		if close and rng.randf() < 0.08:
 			pigeons.erase(prey)
 			caught_pigeons += 1
@@ -354,11 +256,10 @@ func pounce(cat: Cat) -> void:
 
 
 func to_dict() -> Dictionary:
-	return {"rng": rng.state, "mice_c": caught_mice, "pig_c": caught_pigeons}
+	return {"rng": rng.state, "pig_c": caught_pigeons}
 
 
 func from_dict(d: Dictionary) -> void:
 	if d.has("rng"):
 		rng.state = int(d["rng"])
-	caught_mice = int(d.get("mice_c", 0))
 	caught_pigeons = int(d.get("pig_c", 0))

@@ -26,7 +26,6 @@ var zone_players: Dictionary = {}    ## петля -> AudioStreamPlayer2D
 var _fx := 2.0
 var _coo := 8.0
 var _meow := 25.0
-var _squeak := 6.0
 var _train: AudioStreamPlayer2D
 
 ## 1.29: голоса
@@ -349,14 +348,6 @@ func _spot_fx(center: Vector2, z: float, base_db: float) -> void:
 		_meow = randf_range(25.0, 60.0)
 		if cat and (cat.pos * T).distance_to(center) < view:
 			Snd.play_at("meow", cat.pos * T, base_db - 3.0, 5.0)
-	_squeak -= 0.25
-	if _squeak <= 0.0:
-		_squeak = randf_range(4.0, 10.0)
-		for ms: Dictionary in sim.fauna.mice:
-			var mp := (ms["pos"] as Vector2) * T
-			if mp.distance_to(center) < view:
-				Snd.play_at("squeak", mp, base_db - 6.0, 2.0)
-				break
 
 
 ## Какой звук издаёт место, где стоит человек.

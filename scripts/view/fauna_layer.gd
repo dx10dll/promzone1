@@ -21,8 +21,8 @@ const BEAK := Color("#5c5f66")
 
 func _process(delta: float) -> void:
 	_t += delta
-	if sim and sim.fauna and (not sim.fauna.pigeons.is_empty() or not sim.fauna.mice.is_empty() or _had):
-		_had = not sim.fauna.pigeons.is_empty() or not sim.fauna.mice.is_empty()
+	if sim and sim.fauna and (not sim.fauna.pigeons.is_empty() or _had):
+		_had = not sim.fauna.pigeons.is_empty()
 		queue_redraw()
 
 
@@ -33,9 +33,6 @@ func _draw() -> void:
 	for p: Dictionary in sim.fauna.pigeons:
 		i += 1
 		_pigeon(p, i)
-	for m: Dictionary in sim.fauna.mice:
-		if str(m["st"]) != "hide":
-			_mouse(m)
 
 
 func _pigeon(p: Dictionary, i: int) -> void:
@@ -148,23 +145,6 @@ func _poly(pts: PackedVector2Array, col: Color, line: Color, wdt: float) -> void
 		cl.append(pts[0])
 		draw_polyline(cl, line, wdt)
 
-
-func _mouse(m: Dictionary) -> void:
-	var pos: Vector2 = m["pos"]
-	var at := pos * T
-	var dir := float(m.get("dir", 1))
-	var run := str(m["st"]) == "run"
-	draw_set_transform(at, 0.0, Vector2(dir, 1))
-	_ellipse(Vector2(0, 0.6), 4.0, 1.4, Color(0, 0, 0, 0.2))
-	var wig := sin(_t * 30.0) * (1.2 if run else 0.3)
-	draw_polyline(PackedVector2Array([Vector2(-3.6, -1.0), Vector2(-6.0, -1.6 + wig), Vector2(-8.4, -0.6 - wig)]), Color("#c79a92"), 0.9)
-	_ellipse(Vector2(0, -1.8), 3.8, 2.2, Color("#8a8580"))
-	draw_circle(Vector2(3.2, -2.2), 1.7, Color("#8a8580"))
-	draw_circle(Vector2(2.4, -4.0), 1.1, Color("#d6a8a0"))
-	draw_circle(Vector2(4.4, -2.6), 0.4, Color("#1a1a1a"))
-	draw_circle(Vector2(4.9, -1.9), 0.4, Color("#e08a90"))
-	_ellipse_line(Vector2(0, -1.8), 3.8, 2.2, Color("#4a4642"), 0.7)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 func _ellipse(c: Vector2, rx: float, ry: float, col: Color) -> void:

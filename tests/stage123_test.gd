@@ -45,8 +45,8 @@ func _init() -> void:
 		check(ResourceLoader.exists("res://assets/sound/%s.ogg" % snd) or ResourceLoader.exists("res://assets/sound/%s.wav" % snd), "звук " + str(snd))
 
 	print("— новый декор")
-	var decor := ["cactus", "monstera", "flower_bed", "bust", "floor_clock", "water_cooler", "coat_rack", "radio", "samovar",
-		"trophy_case", "globe", "ny_tree", "flagpole", "statue_worker", "notice_board"]
+	var decor := ["plant", "flower_bed", "bust", "floor_clock", "water_cooler", "radio",
+		"trophy_case", "ny_tree", "flagpole"]   # 1.65: кактус, монстера, пальма слиты в «Растение»; глобус, вешалка, самовар и т. п. убраны
 	for id: String in decor:
 		var d: Dictionary = Defs.objects.get(id, {})
 		check(str(d.get("kind", "")) == "decor" and int(d.get("prestige", 0)) > 0, "декор «%s» в каталоге" % str(d.get("name", id)))
@@ -64,7 +64,7 @@ func _init() -> void:
 	g2.training._add_rel(a, b, -190.0)
 	check(not g2.training.friends(a).has(b) and g2.training.foes(a).has(b), "поссорились — список обновился")
 	var n0 := g2.things_of("decor").size()
-	var t := g2.place_thing("cactus", Vector2i(g2.world.plot.position.x + 2, g2.world.plot.position.y + 2), true, false)
+	var t := g2.place_thing("plant", Vector2i(g2.world.plot.position.x + 2, g2.world.plot.position.y + 2), true, false)
 	check(g2.things_of("decor").size() == n0 + 1 and g2.things_of("decor").has(t), "новый объект сразу в списке по виду")
 	g2.things_of("decor").clear()
 	check(g2.things_of("decor").size() == n0 + 1, "чужие правки списка не портят запомненное")

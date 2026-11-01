@@ -62,8 +62,7 @@
     "needs": [
       {
         "ids": [
-          "locker",
-          "locker2"
+          "locker"
         ],
         "n": 2,
         "text": "2 места в шкафчиках"
@@ -164,7 +163,6 @@
       },
       {
         "ids": [
-          "cooler",
           "water_cooler",
           "kettle"
         ],
@@ -562,8 +560,7 @@
       },
       {
         "ids": [
-          "locker",
-          "locker2"
+          "locker"
         ],
         "n": 1,
         "text": "шкафчик"
