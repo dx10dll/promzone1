@@ -726,7 +726,7 @@ static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 		build_cat = str(BUILD_CATS[0])
 	for k: String in BUILD_CATS:
 		var it: Array = names[k]
-		_cat(cats, Tex.tile(str(it[0])), str(it[1]), build_cat == k and _q == "", func() -> void:
+		_cat(cats, _wall_icon(str(it[0])), str(it[1]), build_cat == k and _q == "", func() -> void:
 			build_cat = k
 			query["build"] = ""
 			h._fill_sub())
@@ -761,6 +761,12 @@ static func _build(h: Hud, cats: Control, head: Control, grid: Control) -> void:
 		_build_tiles(h, head, grid, build_cat)
 
 
+## 1.67: значки стен — PNG из нынешней отрисовки мира (assets/ui/icons, запекаются чётко); нет файла — прежний векторный.
+static func _wall_icon(id: String) -> Texture2D:
+	var t: Texture2D = Tex.crisp(id, 48)
+	return t if t != null else Tex.tile(id)
+
+
 static func _build_tiles(h: Hud, head: Control, grid: Control, cat: String) -> void:
 	match cat:
 		"frame":
@@ -790,7 +796,7 @@ static func _build_tiles(h: Hud, head: Control, grid: Control, cat: String) -> v
 				if (cat == "wall") != (kind == "wall"):
 					continue
 				var mode := "wall" if kind == "wall" else kind
-				_tile(h, grid, Tex.tile(str(wd.get("icon", icons.get(k2, "icon_wall")))), str(wd["name"]), _per_cell(float(wd["cost"])), UITheme.ACCENT, str(wd.get("desc", "")), mode, int(wd["id"]))
+				_tile(h, grid, _wall_icon(str(wd.get("icon", icons.get(k2, "icon_wall")))), str(wd["name"]), _per_cell(float(wd["cost"])), UITheme.ACCENT, str(wd.get("desc", "")), mode, int(wd["id"]))
 		"yard":
 			_head_text(head, "Зоны на улице рисуют прямоугольником у ворот. Разгрузка и отгрузка обязательны — их можно расширить или перенести, но не убрать. Внутренние зоны — в меню «Зоны».")
 			_yard_tiles(h, grid)

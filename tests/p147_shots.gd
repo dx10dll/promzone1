@@ -24,6 +24,9 @@ func _ready() -> void:
 		elif a.begins_with("--lang="):
 			lang = a.get_slice("=", 1)
 	L.apply(lang)
+	if mode == "walls167":
+		await _walls167()
+		return
 	Game.pending = "new"
 	Game.pending_scn = "sandbox" if mode == "build164" else "garage"
 	Game.pending_profile = "mech"
@@ -295,6 +298,9 @@ func _ready() -> void:
 		gm.hud.pick_sublayer("traffic")
 	elif mode == "build159":
 		gm.hud.toggle_sub("build")            # 1.59: в «Стройке» кнопка «Калька (план)»
+	elif mode == "icons167":
+		BuildMenu.build_cat = "wall"
+		gm.hud.toggle_sub("build")            # 1.67: «Стройка → Стены» — значки из нынешней отрисовки мира
 	elif mode == "build160":
 		gm.sim.progress.all_open = true
 		gm.hud.toggle_sub("objects")          # 1.60: меню «Объекты» — 8 вкладок
@@ -908,3 +914,25 @@ func _setup158(gm: GameMain) -> void:
 	for k in 14:
 		lg.heat_add(Vector2i(37 - k, 18 - k / 7 * 2), 25.0 + float(k % 5) * 12.0, false)
 	lg.heat_add(Vector2i(30, 18), 80.0, true)
+
+
+## 1.67: стены крупно — все материалы, дверные проёмы, угол и Т-стык (без игры, тот же WallPiece.paint).
+func _walls167() -> void:
+	Defs.load_all()
+	var bg := ColorRect.new()
+	bg.color = Color("#2a2d2a")
+	bg.size = Vector2(1920, 1080)
+	add_child(bg)
+	var mats := [World.W_BRICK, World.W_CONCRETE, World.W_SANDWICH, World.W_PARTITION, World.W_SILICATE, World.W_GASBLOCK]
+	for i in mats.size():
+		var v := Walls167View.new()
+		v.mat = mats[i]
+		v.scale = Vector2(1.0, 1.0)
+		v.position = Vector2(12 + (i % 3) * 530, 12 + (i / 3) * 290)
+		add_child(v)
+	await get_tree().create_timer(0.5).timeout
+	await RenderingServer.frame_post_draw
+	var img := get_viewport().get_texture().get_image()
+	img.save_png(out)
+	print("saved ", out, " ", img.get_size())
+	get_tree().quit(0)
