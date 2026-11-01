@@ -816,6 +816,7 @@ var _see_cap: Label
 var _prev_b: Button
 var _next_b: Button
 var _count_l: Label
+var on_task: Callable = Callable()   ## 1.66: кнопка «Ваша задача» (три слайда о цели игры)
 
 
 ## article_id — какую статью открыть ("" — последнюю открытую или первую).
@@ -857,6 +858,14 @@ func _ready() -> void:
 	var pause_chip := UITheme.chip("игра на паузе", UITheme.ACCENT)
 	head.add_child(pause_chip)
 	head.add_child(UITheme.spacer())
+	if on_task.is_valid():
+		var tb := UITheme.button("Ваша задача", on_task, "Три коротких слайда: кто вы, что делаете, как выиграть и проиграть")
+		tb.name = "TaskBtn"
+		tb.icon = UITheme.micon("goals", 22)
+		tb.expand_icon = false
+		UITheme.micon_colors(tb)
+		tb.custom_minimum_size = Vector2(0, 34)
+		head.add_child(tb)
 	_search = LineEdit.new()
 	_search.placeholder_text = "Поиск: поддон, кредит, пожар…"
 	_search.custom_minimum_size = Vector2(320, 34)

@@ -486,6 +486,7 @@ func hire(index: int) -> String:
 	w.present = false
 	w.ppe = 0.0   # новичку СИЗ выдают со склада (шкаф СИЗ)
 	add_worker(w)
+	stats["hired"] = int(stats.get("hired", 0)) + 1   # 1.66: задание «Нанять человека»
 	candidates.remove_at(index)
 	w.add_history(day(), (L.t("Принята на работу: %s%s") if w.female else L.t("Принят на работу: %s%s")) % [w.prof_name(), (L.t(" (иногородняя, живёт в общежитии)") if w.female else L.t(" (иногородний, живёт в общежитии)")) if w.from_away else ""])
 	town.on_hired(w)

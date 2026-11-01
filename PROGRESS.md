@@ -14,6 +14,9 @@
 Новая игра начинается с выбора профиля завода и сценария, завод растёт через шесть этапов,
 а рейтинг в звёздах показывает, насколько он хорош.
 
+### Версия 1.66: цели для новичка
+- task_slides.gd («Ваша задача», 3 слайда, этапы из data/stages.json, настройка и «?»), «Этап N из 6» в hud с подсказкой недостающих целей, first_steps.gd (7 шагов с наградами, FirstSteps.STEPS, Calls.chain_comment) в «Что делать». Только из game_main. Тест stage166 (+stage166_ui.tscn).
+
 ### Версия 1.65: убрано лишнее (docs/lishnee_1.64.md, кроме 3.4)
 - Слиты разделы окон, убраны globe/bookcase/coat_rack/samovar/statue_worker/notice_board/cooler/loudspeaker/lamp_street, plant вместо cactus/monstera/palm, locker вместо locker2 (старые сейвы: замена или возврат денег). Слиты дубли событий, убраны heatwave, ate_menu, «Комплексные обеды», мыши, мёртвый код, assets/portrait. Отчёт docs/lishnee_1.65_sdelano.md. Тест stage165.
 

@@ -38,6 +38,7 @@ var weather_i: TextureRect
 var money_d: Label
 var stage_l: Label
 var stars_l: Label
+var stage_bar: ProgressBar   ## 1.66: полоска этапа в верхней панели
 var people_l: Label
 var people_s: Label
 var time_l: Label
@@ -246,9 +247,22 @@ func _build_top() -> void:
 	# этап и звёзды
 	var gc := _chip("level", "goals", func() -> void: open_window("goals"))
 	stage_l = UITheme.label("", 14, UITheme.TEXT, UITheme.f_semi)
+	stage_l.clip_text = true
+	stage_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	stage_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stars_l = UITheme.label("", 12, UITheme.ACCENT)
 	gc.add_child(stage_l)
-	gc.add_child(stars_l)
+	# 1.66: под названием этапа — полоска «сколько целей этапа выполнено» и звёзды
+	var srow := UITheme.hbox(6)
+	srow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_bar = UITheme.bar(0, UITheme.ACCENT, 56, 6)
+	stage_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	stage_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_bar.add_theme_stylebox_override("background", UITheme.sb(Color(1, 1, 1, 0.1), Color(0, 0, 0, 0), 0, 3, 0, 0))
+	srow.add_child(stage_bar)
+	stars_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	srow.add_child(stars_l)
+	gc.add_child(srow)
 	h.add_child(_chips["goals"])
 	goal_l = stage_l
 	# репутация
@@ -648,22 +662,11 @@ func _refresh_top() -> void:
 		company_s.text = tr("ООО" if sim.progress.ooo else "Мастерская")
 		(_chips["company"] as Control).tooltip_text = tr("%s — паспорт завода: название и эмблема (нажмите, чтобы изменить).") % Company.title(sim)
 	var pg := sim.progress
-	var stn := L.dt("stage.%s.name" % str(pg.stage_def().get("id", "")), pg.stage_name())
-	stage_l.text = stn
+	stage_l.text = pg.stage_label()
+	stage_l.custom_minimum_size.x = minf(150.0, stage_l.get_theme_font("font").get_string_size(stage_l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 2.0)
 	stars_l.text = pg.stars_text()
-	var gtip := tr("Этап %d из %d: «%s». Рейтинг завода: %d из 5 звёзд.") % [pg.stage, Progress.STAGE_COUNT, stn, pg.stars] + "\n"
-	if pg.stage < Progress.STAGE_COUNT:
-		gtip += tr("Чтобы перейти на следующий этап:") + "\n"
-		for g2: Dictionary in pg.stage_goals():
-			var gs: Array = pg.goal_state(g2)
-			gtip += "%s %s — %s\n" % ["✓" if bool(gs[0]) else "•", str(g2.get("text", "")), str(gs[1])]
-		if pg.choice_need() > 0:
-			gtip += tr("И любые %d на выбор (%d выполнено):") % [pg.choice_need(), pg.choice_done()] + "\n"
-			for g3: Dictionary in pg.stage_choice().get("list", []):
-				var gs3: Array = pg.goal_state(g3)
-				gtip += "%s %s: %s — %s\n" % ["✓" if bool(gs3[0]) else "◦", str(g3.get("route", "")), str(g3.get("text", "")), str(gs3[1])]
-	gtip += tr("Нажмите, чтобы открыть «Цели» (G).")
-	(_chips["goals"] as Control).tooltip_text = gtip
+	stage_bar.value = pg.stage_fraction() * 100.0
+	(_chips["goals"] as Control).tooltip_text = pg.stage_tip()
 	# люди
 	var tot := 0
 	var here := 0
@@ -1949,7 +1952,9 @@ func show_settings() -> void:
 	sc.add_child(sv)
 	SettingsUI.build(sv, func(key: String, val: bool) -> void:
 		if key == "edge_scroll":
-			g.cam.edge_scroll = val, show_settings)   # 1.39: сменили язык — пересобрать окно
+			g.cam.edge_scroll = val
+		elif key == "first_steps":
+			sim.progress.starter.enabled = val, show_settings)   # 1.39: сменили язык — пересобрать окно
 	_menu_button(v, "Назад", show_pause_menu)
 
 
@@ -1963,6 +1968,7 @@ func show_help(first_time: bool, article: String = "", from_menu: bool = false) 
 		Game.settings["tutorial_done"] = true
 		Game.save_settings()
 	var hb := HelpBook.new()
+	hb.on_task = func() -> void: show_task()
 	hb.setup(article if article != "" else ("welcome" if first_time else ""), first_time, func() -> void:
 		close_modal()
 		if letter_box != null and bool(Game.settings.get("pause_on_event", true)):
@@ -1972,6 +1978,32 @@ func show_help(first_time: bool, article: String = "", from_menu: bool = false) 
 	add_child(hb)
 	modal = hb
 
+
+
+## 1.66: экран «Ваша задача» (три слайда). Новая игра — сам; иначе из справочника. Игра на паузе; обучение прячется и возвращается.
+## after_help — после слайдов показать приветствие справочника (первый запуск).
+func show_task(after_help: bool = false) -> void:
+	close_modal()
+	close_window()
+	g.menu_paused = true
+	sim.progress.starter.slides_seen = true
+	var was_intro := sim.progress.tutorial == 0
+	if tutorial:
+		tutorial.visible = false
+	var ts := TaskSlides.new()
+	ts.setup(sim, func() -> void:
+		close_modal()
+		if tutorial:
+			if was_intro:
+				# карточка обучения «Что мы делаем» повторяла бы слайды: сразу к первому шагу
+				sim.progress.tutorial = 1
+				if g.speed == 0:
+					g.set_speed(1)
+			tutorial._show()
+		if after_help:
+			show_help(true))
+	add_child(ts)
+	modal = ts
 
 
 ## Плашка «Достижение получено» сверху по центру, сама исчезает.

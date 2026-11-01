@@ -139,6 +139,19 @@ func has_call() -> bool:
 	return not peek().is_empty()
 
 
+## 1.66: короткая реплика главного инженера за выполненное задание первого часа. Не тратит его суточный лимит советов.
+func chain_comment(tag: String, text: String) -> bool:
+	if queue.size() >= MAX_QUEUE:
+		return false
+	for q: Dictionary in queue:
+		if str(q["tag"]) == tag:
+			return false
+	seq += 1
+	total += 1
+	queue.append({"id": seq, "caller": "engineer", "emotion": "pleased", "key": text, "args": [], "action": "", "label": "", "born": sim.minute, "tag": tag})
+	return true
+
+
 # ---------------------------------------------------------------- проверки и визиты
 
 func on_inspection(t: String, n: int, fine: float, due_day: int) -> void:

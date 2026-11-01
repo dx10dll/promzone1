@@ -29,10 +29,12 @@ var dogs_tame := false
 var arrears_until := -1.0        ## до какой минуты погасить долги по зарплате (моногород)
 var keep_fail := false
 var _t := 0.0
+var starter: FirstSteps           ## 1.66: «Первые шаги» и экран «Ваша задача»
 
 
 func _init(s: Sim) -> void:
 	sim = s
+	starter = FirstSteps.new(s)
 
 
 func pdef() -> Dictionary:
@@ -364,6 +366,49 @@ func stage_progress() -> Array:
 	return [d + mini(choice_done(), choice_need()), stage_goals().size() + choice_need()]
 
 
+## 1.66: «Этап 2 из 6: Мастерская» — главная цель в верхней панели.
+func stage_label() -> String:
+	return L.t("Этап %d из %d: %s") % [stage, STAGE_COUNT, stage_name()]
+
+
+## Доля выполненного до следующего этапа (на последнем этапе — полная).
+func stage_fraction() -> float:
+	if stage >= STAGE_COUNT:
+		return 1.0
+	var sp := stage_progress()
+	return clampf(float(sp[0]) / maxf(1.0, float(sp[1])), 0.0, 1.0)
+
+
+## Чего не хватает до следующего этапа: невыполненные цели с текущим значением (деньги, люди, репутация, станки…).
+func missing_lines() -> Array[String]:
+	var out: Array[String] = []
+	if stage >= STAGE_COUNT:
+		return out
+	for g: Dictionary in stage_goals():
+		var gs := goal_state(g)
+		if not bool(gs[0]):
+			out.append("• %s — %s" % [L.t(str(g.get("text", ""))), str(gs[1])])
+	if choice_need() > 0 and choice_done() < choice_need():
+		out.append(L.t("Ещё %d из %d дорог на выбор:") % [choice_need() - choice_done(), (stage_choice().get("list", []) as Array).size()])
+		for g2: Dictionary in stage_choice().get("list", []):
+			var gs2 := goal_state(g2)
+			if not bool(gs2[0]):
+				out.append("◦ %s: %s — %s" % [L.t(str(g2.get("route", ""))), L.t(str(g2.get("text", ""))), str(gs2[1])])
+	return out
+
+
+## Подсказка к полоске этапа в верхней панели.
+func stage_tip() -> String:
+	var t := stage_label() + ". " + L.t("Рейтинг завода: %d из 5 звёзд.") % stars + "\n"
+	if stage >= STAGE_COUNT:
+		return t + L.t("Это высший этап: завод вырос до градообразующего. Дальше — только держать марку.") + "\n" + L.t("Нажмите, чтобы открыть «Цели» (G).")
+	var sp := stage_progress()
+	t += L.t("До следующего этапа («%s») выполнено %d из %d. Не хватает:") % [stage_name(stage + 1), int(sp[0]), int(sp[1])] + "\n"
+	for line: String in missing_lines():
+		t += line + "\n"
+	return t + L.t("Нажмите, чтобы открыть «Цели» (G).")
+
+
 func avg_mood() -> float:
 	if sim.workers.is_empty():
 		return 0.0
@@ -394,6 +439,7 @@ func scenario_goals() -> Array:
 
 func tick(dt: float) -> void:
 	_tick_dogs(dt)
+	starter.tick(dt)
 	if roof_fix_at > 0.0 and sim.minute >= roof_fix_at:
 		roof_fix_at = -1.0
 		roof_leak = false
@@ -422,6 +468,7 @@ func morning() -> void:
 	_check_keep()
 	_check_goals()
 	refresh_products()
+	starter.update()
 
 
 func _check_goals() -> void:
@@ -648,7 +695,7 @@ func _tick_dogs(dt: float) -> void:
 func to_dict() -> Dictionary:
 	return {"profile": profile, "stage": stage, "ooo": ooo, "all_open": all_open, "flags": flags, "rating": rating, "stars": stars,
 		"hist": history, "scn_done": scn_done, "tut": tutorial, "start_staff": start_staff, "start_day": start_day,
-		"roof": roof_leak, "roof_at": roof_fix_at, "dogs": dogs, "tame": dogs_tame, "arr_until": arrears_until, "keep_fail": keep_fail, "quiet": quiet_until, "pset": pset.keys() if pset_init else null}
+		"roof": roof_leak, "roof_at": roof_fix_at, "dogs": dogs, "tame": dogs_tame, "arr_until": arrears_until, "keep_fail": keep_fail, "quiet": quiet_until, "starter": starter.to_dict(), "pset": pset.keys() if pset_init else null}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -671,6 +718,9 @@ func from_dict(d: Dictionary) -> void:
 	dogs_tame = bool(d.get("tame", false))
 	arrears_until = float(d.get("arr_until", -1.0))
 	keep_fail = bool(d.get("keep_fail", false))
+	starter = FirstSteps.new(sim)
+	if d.get("starter") is Dictionary:
+		starter.from_dict(d["starter"])
 	pset = {}
 	pset_init = false
 	if d.get("pset") is Array:

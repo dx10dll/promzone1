@@ -192,7 +192,21 @@ void fragment() {
 	start_events.reverse()
 	for e: Dictionary in start_events:
 		hud.on_notified(str(e["text"]), int(e["level"]), Vector2i(-1, -1))
-	if Game.pending == "new" and not bool(Game.settings.get("tutorial_done", false)) and sim.progress.tutorial < 0:
+	# 1.66: «Ваша задача» и «Первые шаги»: только настоящая игра (в тестах и замерах — по явному opts.first_steps)
+	var real := bool(Game.pending_opts.get("first_steps", not Game.is_test_run()))
+	var st := sim.progress.starter
+	st.enabled = bool(Game.settings.get("first_steps", true))
+	if real and Game.pending == "new" and st.mode == FirstSteps.MODE_NONE:
+		if sim.scenario == "sandbox":
+			st.skip()
+		else:
+			st.begin()
+	elif real and st.mode == FirstSteps.MODE_NONE:
+		st.adopt_old()
+	var want_help := Game.pending == "new" and not bool(Game.settings.get("tutorial_done", false)) and sim.progress.tutorial < 0
+	if real and Game.pending == "new" and sim.scenario != "sandbox" and bool(Game.settings.get("task_intro", true)) and not st.slides_seen:
+		hud.show_task(want_help)
+	elif want_help:
 		hud.show_help(true)
 	# 1.30: камеру можно увести за край карты — к телебашне, Цне и центру Тамбова (юг дальше всего)
 	cam.bounds = Rect2(-12 * World.T, -10 * World.T, (sim.world.w + 24) * World.T, (sim.world.h + 34) * World.T)

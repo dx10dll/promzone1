@@ -274,7 +274,7 @@ func _refresh() -> void:
 	if hr != _hour:
 		_hour = hr
 		_sig = ""
-	var sig := str(collapsed) + str(items.map(func(a: Array) -> String: return str(a[1]) + str(a[2]) + (str(a[5]) if a.size() > 5 else "")))
+	var sig := str(collapsed) + _chain_sig() + str(items.map(func(a: Array) -> String: return str(a[1]) + str(a[2]) + (str(a[5]) if a.size() > 5 else "")))
 	if sig == _sig:
 		return
 	_sig = sig
@@ -289,6 +289,8 @@ func _refresh() -> void:
 	_hr.visible = not collapsed
 	if collapsed:
 		return
+	if _chain_shown():
+		_body.add_child(_chain_card())
 	for it2: Array in items:
 		_body.add_child(_line(it2))
 		if it2.size() > 5 and str(it2[5]) == "cta":
@@ -397,3 +399,96 @@ func _line(it: Array) -> Button:
 		cb.call())
 	b.tooltip_text = tr("%s\nЩёлкните — откроется, где это сделать") % tr(str(it[1]))
 	return b
+
+
+# ---------------------------------------------------------------- 1.66: «Первые шаги»
+
+## Карточка видна, пока цепочка идёт; пока играет обучение, она ждёт (шаги обучения те же, что и первые задания).
+func _chain_shown() -> bool:
+	var st := sim.progress.starter
+	return st.active() and sim.progress.tutorial < 0 and not st.current().is_empty()
+
+
+func _chain_sig() -> String:
+	return "|c%s%d" % [str(_chain_shown()), sim.progress.starter.count_done()]
+
+
+func _open_step(go: String) -> void:
+	if go == "build":
+		hud.toggle_sub("build")
+	else:
+		hud.open_window(go)
+
+
+## Карточка: заголовок со счётчиком и полоской, текущее задание с наградой и подсказкой, следующие мелко.
+func _chain_card() -> PanelContainer:
+	var st := sim.progress.starter
+	var total := FirstSteps.STEPS.size()
+	var card := PanelContainer.new()
+	card.set_meta("chain_card", true)   # имя не годится: пока старая карточка не удалена, Godot переименует новую
+	card.add_theme_stylebox_override("panel", UITheme.sb(Color(UITheme.ACCENT.r, UITheme.ACCENT.g, UITheme.ACCENT.b, 0.1), Color(UITheme.ACCENT.r, UITheme.ACCENT.g, UITheme.ACCENT.b, 0.55), 1, 8, 10, 8))
+	var v := UITheme.vbox(5)
+	card.add_child(v)
+	var h := UITheme.hbox(8)
+	h.add_child(UITheme.icon_plate("medal", 22, UITheme.ACCENT, false))
+	var tl := UITheme.label("ПЕРВЫЕ ШАГИ", 12, UITheme.ACCENT, UITheme.f_semi)
+	tl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(tl)
+	h.add_child(UITheme.spacer())
+	var cl := UITheme.label(tr("%d из %d") % [st.count_done(), total], 12, UITheme.MUTED, UITheme.f_semi)
+	cl.name = "ChainCount"
+	h.add_child(cl)
+	v.add_child(h)
+	var bar := UITheme.bar(100.0 * float(st.count_done()) / float(total), UITheme.ACCENT, 0, 5)
+	bar.add_theme_stylebox_override("background", UITheme.sb(Color(1, 1, 1, 0.1), Color(0, 0, 0, 0), 0, 3, 0, 0))
+	v.add_child(bar)
+	var cur := st.current()
+	var b := Button.new()
+	b.set_meta("chain_current", true)
+	b.flat = true
+	b.focus_mode = Control.FOCUS_NONE
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.custom_minimum_size = Vector2(0, 30)
+	var e := UITheme.sb(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 4, 2, 0)
+	var hv := UITheme.sb(Color(1, 1, 1, 0.07), Color(0, 0, 0, 0), 0, 4, 2, 0)
+	b.add_theme_stylebox_override("normal", e)
+	b.add_theme_stylebox_override("hover", hv)
+	b.add_theme_stylebox_override("pressed", hv)
+	var r := UITheme.hbox(8)
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	r.offset_left = 4
+	r.offset_right = -4
+	b.add_child(r)
+	var tx := UITheme.label("▶ " + tr(str(cur["text"])), 14, UITheme.TEXT, UITheme.f_semi)
+	tx.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tx.clip_text = true
+	tx.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	tx.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.add_child(tx)
+	var pill := UITheme.chip(st.reward_text(cur), UITheme.GOOD)
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.add_child(pill)
+	var go := str(cur["go"])
+	b.pressed.connect(func() -> void:
+		Snd.play("ui_click", -8.0)
+		_open_step(go))
+	b.tooltip_text = tr("%s\nЩёлкните — откроется, где это сделать") % tr(str(cur["tip"]))
+	v.add_child(b)
+	v.add_child(UITheme.para(tr(str(cur["tip"])), 12, UITheme.MUTED))
+	var shown := 0
+	var more := 0
+	for s2: Dictionary in FirstSteps.STEPS:
+		if st.done.has(str(s2["id"])) or str(s2["id"]) == str(cur["id"]):
+			continue
+		if shown >= 2:
+			more += 1
+			continue
+		shown += 1
+		var nl := UITheme.label("○  " + tr(str(s2["text"])), 12, UITheme.DIM)
+		nl.clip_text = true
+		nl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		v.add_child(nl)
+	if more > 0:
+		v.add_child(UITheme.label(tr("и ещё %d") % more, 11, UITheme.DIM))
+	return card

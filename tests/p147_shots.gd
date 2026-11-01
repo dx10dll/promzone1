@@ -29,6 +29,8 @@ func _ready() -> void:
 	Game.pending_profile = "mech"
 	Game.pending_opts = {"tutorial": false}
 	Game.pending_seed = 147
+	if mode.ends_with("166") or mode.begins_with("slides166"):
+		Game.pending_opts = {"tutorial": false, "first_steps": true}   # 1.66: слайды «Ваша задача» и цепочка «Первые шаги»
 	Game.settings["tutorial_done"] = true
 	var big155 := mode.ends_with("155")
 	if big155:
@@ -77,6 +79,39 @@ func _ready() -> void:
 		await get_tree().create_timer(0.8).timeout
 		gm.hud.info.refresh()
 		print("card size ", gm.hud.info.size)
+	elif mode.begins_with("slides166"):
+		# 1.66: экран «Ваша задача»: slides166 — третий слайд, slides166_1 / slides166_2 — первый и второй
+		var ts: TaskSlides = gm.hud.modal as TaskSlides
+		ts._go(2 if mode == "slides166" else int(mode.get_slice("_", 1)) - 1)
+		await get_tree().create_timer(0.4).timeout
+	elif mode == "topbar166":
+		# 1.66: этап с полоской в верхней панели и подсказка «чего не хватает»
+		(gm.hud.modal as TaskSlides).close()
+		gm.sim.stats["orders_done"] = 4
+		gm.sim.stats["earned"] = 380000.0
+		await get_tree().create_timer(0.8).timeout
+		gm.hud._refresh_top()
+		var chip: Control = gm.hud._chips["goals"]
+		var cp := chip.get_global_rect().get_center()
+		get_viewport().warp_mouse(cp)
+		var mm := InputEventMouseMotion.new()
+		mm.position = cp
+		mm.global_position = cp
+		Input.parse_input_event(mm)
+		await get_tree().create_timer(1.6).timeout
+	elif mode == "chain166":
+		# 1.66: карточка «Первые шаги» в списке «Что делать» после первого принятого заказа
+		(gm.hud.modal as TaskSlides).close()
+		var o166 := gm.sim.orders.make_offer()
+		gm.sim.orders.list.append(o166)
+		gm.sim.orders.accept(int(o166["id"]), false)
+		gm.sim.progress.starter.update()
+		await get_tree().create_timer(1.0).timeout
+		gm.hud.todo._sig = ""
+		gm.hud.todo._refresh()
+		if crop_arg == "":
+			crop_arg = "0,50,620,520"
+		await get_tree().create_timer(0.4).timeout
 	elif mode == "dyn165":
 		# 1.65: «Финансы → Динамика» (слитые «Графики», «Статистика», «По неделям»): режим «Сутки» с историей за 30 суток
 		var slg165 := gm.sim.statlog

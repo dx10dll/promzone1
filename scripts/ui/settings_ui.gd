@@ -11,6 +11,8 @@ const TOGGLES := [
 	["intro", "Показывать интро"],   # 1.39
 	["calls_on", "Звонки советника"],   # 1.41
 	["reduce_motion", "Меньше анимации (без тряски, искр, пара и дыма)"],   # 1.41
+	["task_intro", "Показывать экран «Ваша задача» в новой игре"],   # 1.66
+	["first_steps", "Показывать задания первого часа («Первые шаги»)"],   # 1.66
 ]
 const HIDDEN_VOLUMES := ["vol_env", "vol_ui"]
 const VOLUMES := [["vol_master", "Общая громкость"], ["vol_music", "Музыка"], ["vol_sfx", "Станки и инструмент"],
@@ -48,7 +50,7 @@ static func build(v: VBoxContainer, on_toggle: Callable = Callable(), on_lang: C
 		var cb := CheckBox.new()
 		cb.text = str(o[1])
 		cb.focus_mode = Control.FOCUS_NONE
-		cb.button_pressed = bool(Game.settings.get(key, key == "intro" or key == "calls_on"))
+		cb.button_pressed = bool(Game.settings.get(key, key == "intro" or key == "calls_on" or key == "task_intro" or key == "first_steps"))
 		cb.toggled.connect(func(val: bool) -> void:
 			Game.settings[key] = val
 			Game.save_settings()
